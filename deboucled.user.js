@@ -5,14 +5,18 @@
 // @include     http://www.jeuxvideo.com/forums/*
 // @include     https://www.jeuxvideo.com/forums/*
 // @include     http://m.jeuxvideo.com/forums/*
-// @version     1.0
+// @version     1.0.1
 // @author      Randomax
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
 // @todo        "Reversed/Highlight option" : highlight elements of interest
-// @todo        "Hiding mode option" : show blacklisted elements in red (not hidden)
+// @todo        "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
 // @todo        "Zap mode" : select author/word directly in the main page to blacklist
+// @todo        "Blacklist author button" : blacklist author directly from a topic with a button
+// @todo        "Wildcard subject" : use wildcard for subjects blacklist
+// @todo        "Blacklist messages" : in a topic
+// @todo        "Whitelist threshold" : allow topic in blacklist if the number of messages reach a threshold
 // ==/UserScript==
 
 
