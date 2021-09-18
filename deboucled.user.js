@@ -218,7 +218,8 @@ async function getPageContent(page) {
 }
 
 function addIgnoreButtons() {
-    const forbiddenSvg = '<svg viewBox="2 5 160 160" width="13"><g><ellipse opacity="0.7" stroke-width="20" stroke="red" ry="70" rx="70" cy="80" cx="80" fill="none"/><line opacity="0.7" stroke="red" y2="37.39011" x2="122.60989" y1="122.60989" x1="37.39011" stroke-width="20" fill="none"/></g></svg>';
+    const forbiddenSvg = '<svg><symbol id="forbiddenlogo"><g><ellipse opacity="0.7" stroke-width="20" stroke="red" ry="70" rx="70" cy="80" cx="80" fill="none" /><line opacity="0.7" stroke="red" y2="37.39011" x2="122.60989" y1="122.60989" x1="37.39011" stroke-width="20" fill="none" /></g></symbol></svg>';
+    document.querySelector('.topic-list.topic-list-admin').innerHTML += forbiddenSvg;
 
     let topics = getAllTopics(document);
 
@@ -236,7 +237,7 @@ function addIgnoreButtons() {
         let anchor = document.createElement("a");
         anchor.setAttribute("href", "#");
         anchor.onclick = function () { addTopicIdBlacklist(topicId, topicSubject, true); refreshTopicIdKeys(); };
-        anchor.innerHTML = forbiddenSvg;
+        anchor.innerHTML = '<svg viewBox="2 2 160 160" width="13"><use href="#forbiddenlogo"/></svg>';
         span.appendChild(anchor)
         topic.appendChild(span);
     });
