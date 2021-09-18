@@ -194,7 +194,7 @@ function isTopicBlacklisted(element) {
     }
 
     if (authorBlacklistArray.length > 0) {
-        let authorTag = element.getElementsByClassName("text-user topic-author");
+        let authorTag = element.getElementsByClassName("topic-author");
         if (authorTag != undefined && authorTag.length > 0) {
             let author = authorTag[0].textContent.trim();
             if (author.match(authorsBlacklistReg)) {
@@ -288,8 +288,8 @@ function buildSettingPage() {
 }
 
 function buildSettingEntities() {
-    createAddEntityEvent(entitySubject, /^[ A-Za-z0-9_@./#&+-\?\*]*$/i, function (key) { addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
-    createAddEntityEvent(entityAuthor, /^[A-Za-z0-9-_\[\]]*$/i, function (key) { addEntityBlacklist(authorBlacklistArray, key); refreshAuthorKeys(); });
+    createAddEntityEvent(entitySubject, /^[ A-zÀ-ú0-9_@./#&+-\?\*]*$/i, function (key) { addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
+    createAddEntityEvent(entityAuthor, /^[A-zÀ-ú0-9-_\[\]]*$/i, function (key) { addEntityBlacklist(authorBlacklistArray, key); refreshAuthorKeys(); });
     createAddEntityEvent(entityTopicId, /^[0-9]+$/i, function (key) { addTopicIdBlacklist(key, key, false); refreshTopicIdKeys(); });
 
     refreshSubjectKeys();
