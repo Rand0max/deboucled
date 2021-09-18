@@ -5,11 +5,13 @@
 // @include     http://www.jeuxvideo.com/forums/*
 // @include     https://www.jeuxvideo.com/forums/*
 // @include     http://m.jeuxvideo.com/forums/*
-// @version     1.0.1
-// @author      Randomax
+// @version     1.0.2
+// @author      Rand0max
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
+// @grant       GM_deleteValue
+// @grant       GM_listValues
 // @todo        "Reversed/Highlight option" : highlight elements of interest
 // @todo        "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
 // @todo        "Zap mode" : select author/word directly in the main page to blacklist
@@ -17,6 +19,7 @@
 // @todo        "Wildcard subject" : use wildcard for subjects blacklist
 // @todo        "Blacklist messages" : in a topic
 // @todo        "Whitelist threshold" : allow topic in blacklist if the number of messages reach a threshold
+// @todo        "Backup & Restore" : allow user to backup and restore settings with json file
 // ==/UserScript==
 
 
@@ -154,7 +157,8 @@ function updateTopicsHeader() {
 function removeTopic(element) {
     //element.getElementsByClassName("lien-jv topic-title")[0].style.color = "white";
     //element.style.backgroundColor = "red";
-    element.style.display = "none";
+    //element.style.display = "none";
+    element.remove();
     hiddenTopics++;
 }
 
@@ -293,7 +297,7 @@ function buildSettingPage() {
 }
 
 function buildSettingEntities() {
-    createAddEntityEvent(entitySubject, /^[ A-zÀ-ú0-9_@./#&+-\?\*]*$/i, function (key) { addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
+    createAddEntityEvent(entitySubject, /^[A-zÀ-ú0-9_@./#&+-\?\*\[\]\(\) ]*$/i, function (key) { addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
     createAddEntityEvent(entityAuthor, /^[A-zÀ-ú0-9-_\[\]]*$/i, function (key) { addEntityBlacklist(authorBlacklistArray, key); refreshAuthorKeys(); });
     createAddEntityEvent(entityTopicId, /^[0-9]+$/i, function (key) { addTopicIdBlacklist(key, key, false); refreshTopicIdKeys(); });
 
@@ -354,6 +358,7 @@ function addSettingButton(firstLaunch) {
     document.getElementById('deboucled-option-button').addEventListener('click', function () {
         document.getElementById('deboucled-bg-view').style.display = 'block';
         document.getElementById('deboucled-view').style.display = 'block';
+        clearEntityInputs();
     });
 
     window.addEventListener('click', function (e) {
@@ -361,6 +366,10 @@ function addSettingButton(firstLaunch) {
         document.getElementById('deboucled-bg-view').style.display = 'none';
         document.getElementById('deboucled-view').style.display = 'none';
     });
+}
+
+function clearEntityInputs() {
+    document.querySelectorAll('.deboucled-input').forEach(i => i.value = "");
 }
 
 async function callMe() {
