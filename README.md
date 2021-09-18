@@ -9,7 +9,7 @@
 
 ### **Ce script est fait pour vous !**
 
-## Fonctionalités :
+## Fonctionnalités :
 
 - **Mots-clés à bannir des sujets** : *les topics contenant ces mots seront masqués.*
 - **Auteurs à ignorer complètement** : *les topics créés par ces auteurs seront masqués.*
