@@ -218,7 +218,7 @@ async function getPageContent(page) {
 }
 
 function addIgnoreButtons() {
-    const forbiddenSvg = '<svg><symbol id="forbiddenlogo"><g><ellipse opacity="0.7" stroke-width="20" stroke="red" ry="70" rx="70" cy="80" cx="80" fill="none" /><line opacity="0.7" stroke="red" y2="37.39011" x2="122.60989" y1="122.60989" x1="37.39011" stroke-width="20" fill="none" /></g></symbol></svg>';
+    const forbiddenSvg = '<svg style="display: none;"><symbol id="forbiddenlogo"><g><ellipse opacity="0.7" stroke-width="20" stroke="red" ry="70" rx="70" cy="80" cx="80" fill="none" /><line opacity="0.7" stroke="red" y2="37.39011" x2="122.60989" y1="122.60989" x1="37.39011" stroke-width="20" fill="none" /></g></symbol></svg>';
     document.querySelector('.topic-list.topic-list-admin').innerHTML += forbiddenSvg;
 
     let topics = getAllTopics(document);
