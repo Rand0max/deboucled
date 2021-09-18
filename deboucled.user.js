@@ -244,7 +244,7 @@ function addIgnoreButtons() {
 }
 
 function buildSettingPage() {
-    let globalCss = '.deboucled-input{border:1px solid #d6d6d6;border-radius:3px;height:28px;}.key:first-letter{text-transform:capitalize}.key{padding: 5px 5px 20px 0px; margin: 0px 5px 5px 0px;}#deboucled-subjectList{margin-top:14px}.deboucled-subject-button-delete-key,.deboucled-author-button-delete-key,.deboucled-topicid-button-delete-key,.deboucled-button-delete-sticker{color:#777;font:14px/100% arial,sans-serif;text-decoration:none;text-shadow:0 1px 0 #fff;top:5px;background:0 0;border:none;padding-top:1px;margin:0;cursor:pointer}body,input{font:12px/16px sans-serif}input[type=text]{border:1px solid #d2d2d2;padding:3px;margin-left:-2px}.deboucled-bloc{background-color:#eee;border-radius:0;color:#333;padding:15px 10px 20px 10px;width:auto}.deboucled-bloc-header{font-weight:700;color:#fff;background-color:#035ebf;border-radius:0;margin:0 0 0 0;padding:5px 12px;width:auto}#deboucled-show-exemple:hover{background:#515254;}#deboucled-exemple,#deboucled-exemple2{display:none;padding-top:7px}#deboucled-exemple.show,#deboucled-exemple2.show{display:block}';
+    let globalCss = '.deboucled-input{border:1px solid #d6d6d6;border-radius:3px;height:28px;}.deboucled-add-button{margin:0 0 1px 5px;background-color:#0050a6 !important;height:28px}.key:first-letter{text-transform:capitalize}.key{padding: 5px 5px 20px 0px; margin: 0px 5px 5px 0px;}#deboucled-subjectList{margin-top:14px}.deboucled-subject-button-delete-key,.deboucled-author-button-delete-key,.deboucled-topicid-button-delete-key,.deboucled-button-delete-sticker{color:#777;font:14px/100% arial,sans-serif;text-decoration:none;text-shadow:0 1px 0 #fff;top:5px;background:0 0;border:none;padding-top:1px;margin:0;cursor:pointer}body,input{font:12px/16px sans-serif}input[type=text]{border:1px solid #d2d2d2;padding:3px;margin-left:-2px}.deboucled-bloc{background-color:#eee;border-radius:0;color:#333;padding:15px 10px 20px 10px;width:auto}.deboucled-bloc-header{font-weight:700;color:#fff;background-color:#035ebf;border-radius:0;margin:0 0 0 0;padding:5px 12px;width:auto}#deboucled-show-exemple:hover{background:#515254;}#deboucled-exemple,#deboucled-exemple2{display:none;padding-top:7px}#deboucled-exemple.show,#deboucled-exemple2.show{display:block}';
     GM_addStyle(globalCss);
 
     let bgView = document.createElement('div');
@@ -258,18 +258,21 @@ function buildSettingPage() {
     deboucledHtml += '<div class="deboucled-bloc-header">BLACKLIST SUJETS</div>';
     deboucledHtml += '<div class="deboucled-bloc">';
     deboucledHtml += `<input type="text" id="deboucled-${entitySubject}-input-key" class="deboucled-input" placeholder="Mot-clé" >`;
+    deboucledHtml += `<span id="deboucled-${entitySubject}-input-button" class="btn btn-actu-new-list-forum deboucled-add-button">Ajouter</span>`;
     deboucledHtml += '<br>';
     deboucledHtml += `<div id="deboucled-${entitySubject}List" style="margin-top:10px;"></div>`;
     deboucledHtml += '</div>';
     deboucledHtml += '<div class="deboucled-bloc-header">BLACKLIST AUTEURS</div>';
     deboucledHtml += '<div class="deboucled-bloc">';
     deboucledHtml += `<input type="text" id="deboucled-${entityAuthor}-input-key" class="deboucled-input" placeholder="Pseudo" >`;
+    deboucledHtml += `<span id="deboucled-${entityAuthor}-input-button" class="btn btn-actu-new-list-forum deboucled-add-button">Ajouter</span>`;
     deboucledHtml += '<br>';
     deboucledHtml += `<div id="deboucled-${entityAuthor}List" style="margin-top:10px;"></div>`;
     deboucledHtml += '</div>';
     deboucledHtml += '<div class="deboucled-bloc-header">BLACKLIST TOPICS</div>';
     deboucledHtml += '<div class="deboucled-bloc">';
     deboucledHtml += `<input type="text" id="deboucled-${entityTopicId}-input-key" class="deboucled-input" placeholder="TopicId" >`;
+    deboucledHtml += `<span id="deboucled-${entityTopicId}-input-button" class="btn btn-actu-new-list-forum deboucled-add-button">Ajouter</span>`;
     deboucledHtml += '<br>';
     deboucledHtml += `<div id="deboucled-${entityTopicId}List" style="margin-top:10px;"></div>`;
     deboucledHtml += '</div>';
@@ -313,6 +316,14 @@ function createAddEntityEvent(entity, keyRegex, addCallback) {
         if (key == "" || !key.match(keyRegex)) return;
         addCallback(key);
         document.getElementById(`deboucled-${entity}-input-key`).value = "";
+    });
+
+    document.getElementById(`deboucled-${entity}-input-button`).addEventListener('click', function (e) {
+        let key = document.getElementById(`deboucled-${entity}-input-key`).value;
+        if (key == "" || !key.match(keyRegex)) return;
+        addCallback(key);
+        document.getElementById(`deboucled-${entity}-input-key`).value = "";
+        removeCallback(this.parentNode);
     });
 }
 
