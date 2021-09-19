@@ -1,0 +1,66 @@
+.deboucled-ignored-messages {
+  margin: 5px 0 5px 5px;
+  padding-bottom: 0.5rem;
+  padding-top: 0;
+  text-align: left;
+  font-size: 0.8rem !important;
+}
+.deboucled-input {
+  border: 1px solid #d6d6d6;
+  border-radius: 3px;
+  height: 28px;
+}
+.deboucled-add-button {
+  margin: 0 0 1px 5px;
+  background-color: #0050a6 !important;
+  height: 28px;
+}
+.key:first-letter {
+  text-transform: capitalize;
+}
+.key {
+  padding: 5px 5px 20px 0px;
+  margin: 0px 5px 5px 0px;
+}
+#deboucled-subjectList {
+  margin-top: 14px;
+}
+.deboucled-subject-button-delete-key,
+.deboucled-author-button-delete-key,
+.deboucled-topicid-button-delete-key {
+  color: #777;
+  font: 14px/100% arial, sans-serif;
+  text-decoration: none;
+  text-shadow: 0 1px 0 #fff;
+  top: 5px;
+  background: 0 0;
+  border: none;
+  padding-top: 1px;
+  margin: 0;
+  cursor: pointer;
+}
+body,
+input {
+  font: 12px/16px sans-serif;
+}
+input[type="text"] {
+  border: 1px solid #d2d2d2;
+  padding: 3px;
+  margin-left: -2px;
+}
+.deboucled-bloc {
+  background-color: #eee;
+  border-radius: 0;
+  color: #333;
+  padding: 15px 10px 20px 10px;
+  width: auto;
+}
+.deboucled-bloc-header {
+  font-weight: 700;
+  color: #fff;
+  background-color: #035ebf;
+  border-radius: 0;
+  margin: 0 0 0 0;
+  padding: 5px 12px;
+  width: auto;
+}

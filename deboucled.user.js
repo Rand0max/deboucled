@@ -5,19 +5,18 @@
 // @include     http://www.jeuxvideo.com/forums/*
 // @include     https://www.jeuxvideo.com/forums/*
 // @include     http://m.jeuxvideo.com/forums/*
-// @version     1.0.2
+// @version     1.1.0
 // @author      Rand0max
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
 // @grant       GM_deleteValue
 // @grant       GM_listValues
-// @todo        "Reversed/Highlight option" : highlight elements of interest
-// @todo        "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
-// @todo        "Zap mode" : select author/word directly in the main page to blacklist
 // @todo        "Blacklist author button" : blacklist author directly from a topic with a button
+// @todo        "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
 // @todo        "Wildcard subject" : use wildcard for subjects blacklist
-// @todo        "Blacklist messages" : in a topic
+// @todo        "Reversed/Highlight option" : highlight elements of interest
+// @todo        "Zap mode" : select author/word directly in the main page to blacklist
 // @todo        "Whitelist threshold" : allow topic in blacklist if the number of messages reach a threshold
 // @todo        "Backup & Restore" : allow user to backup and restore settings with json file
 // ==/UserScript==
@@ -29,6 +28,7 @@ let topicIdBlacklistMap = new Map();
 let subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
 let authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
 let hiddenTopics = 0;
+let hiddenMessages = 0;
 const topicByPage = 25;
 const entitySubject = 'subject';
 const entityAuthor = 'author';
@@ -84,6 +84,11 @@ function escapeRegExp(str) {
 function getAllTopics(doc) {
     let allTopics = doc.querySelectorAll('.topic-list.topic-list-admin > li:not(.dfp__atf)');
     return [...allTopics];
+}
+
+function getAllMessages(doc) {
+    let allMessages = doc.querySelectorAll('.conteneur-messages-pagi > div.bloc-message-forum');
+    return [...allMessages];
 }
 
 function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
@@ -148,10 +153,28 @@ async function fillTopics(topics) {
 
 function updateTopicsHeader() {
     let subjectHeader = document.querySelector('.topic-head > span:nth-child(1)');
-    subjectHeader.textContent = `SUJET (${hiddenTopics} ignorés)`;
+    subjectHeader.textContent = `SUJET (${hiddenTopics} ignoré${isPlural(hiddenTopics)})`;
 
     let lastMessageHeader = document.querySelector('.topic-head > span:nth-child(4)');
     lastMessageHeader.style.width = '5.3rem';
+}
+
+function updateMessagesHeader() {
+    if (hiddenMessages <= 0) return;
+    let paginationElement = document.querySelector('div.bloc-pagi-default');
+    let messageHeader = document.createElement('div');
+    messageHeader.setAttribute('class', 'titre-bloc deboucled-ignored-messages'); // titre-head-bloc
+    let pr = isPlural(hiddenMessages);
+    messageHeader.textContent = `${hiddenMessages} message${pr} ignoré${pr}`;
+    insertAfter(messageHeader, paginationElement);
+}
+
+function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
+
+function isPlural(nb) {
+    return nb > 1 ? 's' : '';
 }
 
 function removeTopic(element) {
@@ -160,6 +183,12 @@ function removeTopic(element) {
     //element.style.display = "none";
     element.remove();
     hiddenTopics++;
+}
+
+function removeMessage(element) {
+    element.previousElementSibling.remove();
+    element.remove();
+    hiddenMessages++;
 }
 
 function addTopic(element) {
@@ -193,30 +222,46 @@ function isTopicBlacklisted(element) {
     let topicId = element.getAttribute('data-id');
     if (topicIdBlacklistMap.has(topicId)) return true;
 
-    if (subjectBlacklistArray.length > 0) {
-        let titleTag = element.getElementsByClassName("lien-jv topic-title");
-        if (titleTag != undefined && titleTag.length > 0) {
-            let title = titleTag[0].textContent;
-            if (title.match(subjectsBlacklistReg)) return true;
-        }
+    let titleTag = element.getElementsByClassName("lien-jv topic-title");
+    if (titleTag != undefined && titleTag.length > 0) {
+        let title = titleTag[0].textContent;
+        if (isSubjectBlacklisted(title)) return true;
     }
 
-    if (authorBlacklistArray.length > 0) {
-        let authorTag = element.getElementsByClassName("topic-author");
-        if (authorTag != undefined && authorTag.length > 0) {
-            let author = authorTag[0].textContent.trim();
-            if (author.match(authorsBlacklistReg)) {
-                return true;
-            }
-        }
+    let authorTag = element.getElementsByClassName("topic-author");
+    if (authorTag != undefined && authorTag.length > 0) {
+        let author = authorTag[0].textContent.trim();
+        if (isAuthorBlacklisted(author)) return true;
     }
+
     return false;
 }
 
+function isSubjectBlacklisted(subject) {
+    if (subjectBlacklistArray.length === 0) return false;
+    return subject.match(subjectsBlacklistReg);
+}
+
+function isAuthorBlacklisted(author) {
+    if (authorBlacklistArray.length === 0) return false;
+    return author.match(authorsBlacklistReg);
+}
+
+function getCurrentPageType(url) {
+    let topicListRegex = /\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*/i;
+    if (url.match(topicListRegex)) return 'topiclist';
+    let topicMessagesRegex = /\/forums\/42-[0-9]+-[0-9]+-[0-9]+-0-1-0-.*/i;
+    if (url.match(topicMessagesRegex)) return 'topicmessages';
+    return 'unknown';
+}
+
 async function getPageContent(page) {
-    let urlRegex = /(\/forums\/0-[0-9]+-0-1-0-)([0-9]+)(-0-.*)/i;
+    let urlRegex = /(\/forums\/0-[0-9]+-0-1-0-)(?<pageid>[0-9]+)(-0-.*)/i;
+    //let topicRegex = /\/forums\/42-(?<forumid>[0-9]+)-(?<topicid>[0-9]+)-(?<pageid>[0-9]+)-0-1-0-(?<topicname>.*).htm.*/i;
+
     let currentPath = window.location.pathname;
-    var currentPageId = parseInt(urlRegex.exec(currentPath)[2]);
+    let matches = urlRegex.exec(currentPath);
+    var currentPageId = parseInt(matches.groups.pageid);
 
     let nextPageId = currentPageId + ((page - 1) * topicByPage);
     let nextPageUrl = currentPath.replace(urlRegex, `$1${nextPageId}$3`);
@@ -252,10 +297,12 @@ function addIgnoreButtons() {
     });
 }
 
-function buildSettingPage() {
-    let globalCss = '.deboucled-input{border:1px solid #d6d6d6;border-radius:3px;height:28px;}.deboucled-add-button{margin:0 0 1px 5px;background-color:#0050a6 !important;height:28px}.key:first-letter{text-transform:capitalize}.key{padding: 5px 5px 20px 0px; margin: 0px 5px 5px 0px;}#deboucled-subjectList{margin-top:14px}.deboucled-subject-button-delete-key,.deboucled-author-button-delete-key,.deboucled-topicid-button-delete-key,.deboucled-button-delete-sticker{color:#777;font:14px/100% arial,sans-serif;text-decoration:none;text-shadow:0 1px 0 #fff;top:5px;background:0 0;border:none;padding-top:1px;margin:0;cursor:pointer}body,input{font:12px/16px sans-serif}input[type=text]{border:1px solid #d2d2d2;padding:3px;margin-left:-2px}.deboucled-bloc{background-color:#eee;border-radius:0;color:#333;padding:15px 10px 20px 10px;width:auto}.deboucled-bloc-header{font-weight:700;color:#fff;background-color:#035ebf;border-radius:0;margin:0 0 0 0;padding:5px 12px;width:auto}#deboucled-show-exemple:hover{background:#515254;}#deboucled-exemple,#deboucled-exemple2{display:none;padding-top:7px}#deboucled-exemple.show,#deboucled-exemple2.show{display:block}';
+function addCss() {
+    let globalCss = '.deboucled-ignored-messages{margin:5px 0 5px 5px;padding-bottom:.5rem;padding-top:0;text-align:left;font-size:.8rem!important}.deboucled-input{border:1px solid #d6d6d6;border-radius:3px;height:28px}.deboucled-add-button{margin:0 0 1px 5px;background-color:#0050a6!important;height:28px}.key:first-letter{text-transform:capitalize}.key{padding:5px 5px 20px 0;margin:0 5px 5px 0}#deboucled-subjectList{margin-top:14px}.deboucled-author-button-delete-key,.deboucled-subject-button-delete-key,.deboucled-topicid-button-delete-key{color:#777;font:14px/100% arial,sans-serif;text-decoration:none;text-shadow:0 1px 0 #fff;top:5px;background:0 0;border:none;padding-top:1px;margin:0;cursor:pointer}body,input{font:12px/16px sans-serif}input[type=text]{border:1px solid #d2d2d2;padding:3px;margin-left:-2px}.deboucled-bloc{background-color:#eee;border-radius:0;color:#333;padding:15px 10px 20px 10px;width:auto}.deboucled-bloc-header{font-weight:700;color:#fff;background-color:#035ebf;border-radius:0;margin:0;padding:5px 12px;width:auto}';
     GM_addStyle(globalCss);
+}
 
+function buildSettingPage() {
     let bgView = document.createElement('div');
     bgView.setAttribute("id", "deboucled-bg-view");
     bgView.setAttribute("style", "width:100%;height:100%;z-index:999998;background:transparent;overflow-y: auto;position:fixed");
@@ -372,11 +419,7 @@ function clearEntityInputs() {
     document.querySelectorAll('.deboucled-input').forEach(i => i.value = "");
 }
 
-async function callMe() {
-    let firstLaunch = initStorage();
-    buildSettingPage();
-    addSettingButton(firstLaunch);
-
+async function handleTopicList() {
     let topics = getAllTopics(document);
     if (topics.length === 0) return;
     topics.slice(1).forEach(function (topic) {
@@ -389,6 +432,45 @@ async function callMe() {
     addIgnoreButtons();
 }
 
+function handleTopicMessages() {
+    let allMessages = getAllMessages(document);
+    allMessages.forEach(function (message) {
+        let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+        if (authorElement === null) return;
+        let author = authorElement.textContent.trim();
+        if (isAuthorBlacklisted(author)) removeMessage(message);
+    });
+    updateMessagesHeader();
+}
+
+async function callMe() {
+    let firstLaunch = initStorage();
+    addCss();
+    buildSettingPage();
+    addSettingButton(firstLaunch);
+
+    switch (getCurrentPageType(window.location.pathname)) {
+        case 'topiclist':
+            await handleTopicList();
+            break;
+        case 'topicmessages':
+            handleTopicMessages();
+            break;
+        default:
+            break;
+    }
+}
+
 callMe();
 
 addEventListener("instantclick:newpage", callMe);
+
+/*
+function jvCare(cssClass) {
+    var base16 = '0A12B34C56D78E9F', url = '', s = cssClass.split(' ')[1];
+    for (var i = 0; i < s.length; i += 2) {
+        url += String.fromCharCode(base16.indexOf(s.charAt(i)) * 16 + base16.indexOf(s.charAt(i + 1)));
+    }
+    return url;
+}
+*/
