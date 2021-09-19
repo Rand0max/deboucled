@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.1.1
+// @version     1.1.2
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -250,10 +250,14 @@ function isAuthorBlacklisted(author) {
 }
 
 function getCurrentPageType(url) {
+    if (document.querySelector('.img-erreur') != null) return 'error';
+
     let topicListRegex = /\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*/i;
     if (url.match(topicListRegex)) return 'topiclist';
+
     let topicMessagesRegex = /\/forums\/42-[0-9]+-[0-9]+-[0-9]+-0-1-0-.*/i;
     if (url.match(topicMessagesRegex)) return 'topicmessages';
+    
     return 'unknown';
 }
 
@@ -422,6 +426,7 @@ function clearEntityInputs() {
 }
 
 async function handleTopicList() {
+    init();
     let topics = getAllTopics(document);
     if (topics.length === 0) return;
     topics.slice(1).forEach(function (topic) {
@@ -435,6 +440,7 @@ async function handleTopicList() {
 }
 
 function handleTopicMessages() {
+    init();
     let allMessages = getAllMessages(document);
     allMessages.forEach(function (message) {
         let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
@@ -445,13 +451,16 @@ function handleTopicMessages() {
     updateMessagesHeader();
 }
 
-async function callMe() {
+function init() {
     let firstLaunch = initStorage();
     addCss();
     buildSettingPage();
     addSettingButton(firstLaunch);
+}
 
-    switch (getCurrentPageType(window.location.pathname)) {
+async function callMe() {
+    let currentPageType = getCurrentPageType(window.location.pathname);
+    switch (currentPageType) {
         case 'topiclist':
             await handleTopicList();
             break;
