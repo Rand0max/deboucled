@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.1.2
+// @version     1.2.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -14,7 +14,8 @@
 // @grant       GM_addStyle
 // @grant       GM_deleteValue
 // @grant       GM_listValues
-// @todo        "Blacklist author button" : blacklist author directly from a topic with a button
+// @grant       GM_getResourceText
+// @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
 // @todo        "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
 // @todo        "Wildcard subject" : use wildcard for subjects blacklist
 // @todo        "Reversed/Highlight option" : highlight elements of interest
@@ -257,7 +258,7 @@ function getCurrentPageType(url) {
 
     let topicMessagesRegex = /\/forums\/42-[0-9]+-[0-9]+-[0-9]+-0-1-0-.*/i;
     if (url.match(topicMessagesRegex)) return 'topicmessages';
-    
+
     return 'unknown';
 }
 
@@ -304,7 +305,7 @@ function addIgnoreButtons() {
 }
 
 function addCss() {
-    let globalCss = '.deboucled-ignored-messages{margin:5px 0 5px 5px;padding-bottom:.5rem;padding-top:0;text-align:left;font-size:.8rem!important}.deboucled-input{border:1px solid #d6d6d6;border-radius:3px;height:28px}.deboucled-add-button{margin:0 0 1px 5px;background-color:#0050a6!important;height:28px}.key:first-letter{text-transform:capitalize}.key{padding:5px 5px 20px 0;margin:0 5px 5px 0}#deboucled-subjectList{margin-top:14px}.deboucled-author-button-delete-key,.deboucled-subject-button-delete-key,.deboucled-topicid-button-delete-key{color:#777;font:14px/100% arial,sans-serif;text-decoration:none;text-shadow:0 1px 0 #fff;top:5px;background:0 0;border:none;padding-top:1px;margin:0;cursor:pointer}body,input{font:12px/16px sans-serif}input[type=text]{border:1px solid #d2d2d2;padding:3px;margin-left:-2px}.deboucled-bloc{background-color:#eee;border-radius:0;color:#333;padding:15px 10px 20px 10px;width:auto}.deboucled-bloc-header{font-weight:700;color:#fff;background-color:#035ebf;border-radius:0;margin:0;padding:5px 12px;width:auto}';
+    const globalCss = GM_getResourceText("DEBOUCLED_CSS");
     GM_addStyle(globalCss);
 }
 
@@ -402,9 +403,6 @@ function writeEntityKeys(entity, array, removeCallback) {
 }
 
 function addSettingButton(firstLaunch) {
-    let css = '.blinking { animation: blinker 1.5s linear 7; } @keyframes blinker { 50% { opacity: 0; }}';
-    GM_addStyle(css);
-
     let optionButton = document.createElement("span");
     optionButton.innerHTML = `<span id="deboucled-option-button" style="margin-right:5px;min-width:80px" class="btn btn-actu-new-list-forum ${firstLaunch ? 'blinking' : ''}">Déboucled</span>`;
     document.getElementsByClassName('bloc-pre-right')[0].prepend(optionButton);
@@ -423,6 +421,25 @@ function addSettingButton(firstLaunch) {
 
 function clearEntityInputs() {
     document.querySelectorAll('.deboucled-input').forEach(i => i.value = "");
+}
+
+function upgradeJvcBlacklistButton(messageElement, author) {
+    let blacklistButton = messageElement.querySelector('span.picto-msg-tronche');
+    let mustRefresh = (blacklistButton === null);
+
+    if (blacklistButton === null) {
+        blacklistButton = document.createElement('span');
+        messageElement.querySelector('div.bloc-options-msg').appendChild(blacklistButton);
+    }
+
+    blacklistButton.setAttribute('title', 'Blacklister avec Déboucled');
+    blacklistButton.setAttribute('class', 'picto-msg-tronche deboucled-blacklist-author-button');
+
+    blacklistButton.addEventListener('click', function () {
+        addEntityBlacklist(authorBlacklistArray, author);
+        refreshAuthorKeys()
+        if (mustRefresh) location.reload();
+    });
 }
 
 async function handleTopicList() {
@@ -446,8 +463,11 @@ function handleTopicMessages() {
         let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
         if (authorElement === null) return;
         let author = authorElement.textContent.trim();
+
         if (isAuthorBlacklisted(author)) removeMessage(message);
+        else upgradeJvcBlacklistButton(message, author);
     });
+
     updateMessagesHeader();
 }
 

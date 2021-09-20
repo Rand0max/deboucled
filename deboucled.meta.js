@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.1.2
+// @version     1.2.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -14,4 +14,6 @@
 // @grant       GM_addStyle
 // @grant       GM_deleteValue
 // @grant       GM_listValues
+// @grant       GM_getResourceText
+// @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
 // ==/UserScript==
