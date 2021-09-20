@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.2.0
+// @version     1.2.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -424,10 +424,13 @@ function clearEntityInputs() {
 }
 
 function upgradeJvcBlacklistButton(messageElement, author) {
+    let isSelf = messageElement.querySelector('span.picto-msg-croix') !== null;
+    if (isSelf) return;
+
     let blacklistButton = messageElement.querySelector('span.picto-msg-tronche');
     let mustRefresh = (blacklistButton === null);
 
-    if (blacklistButton === null) {
+    if (mustRefresh) {
         blacklistButton = document.createElement('span');
         messageElement.querySelector('div.bloc-options-msg').appendChild(blacklistButton);
     }
