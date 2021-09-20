@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.2.1
+// @version     1.3.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -16,6 +16,7 @@
 // @grant       GM_listValues
 // @grant       GM_getResourceText
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
+// @todo        "Handle mp and stickers" : handle blacklist for mp and stickers in messages
 // @todo        "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
 // @todo        "Wildcard subject" : use wildcard for subjects blacklist
 // @todo        "Reversed/Highlight option" : highlight elements of interest
@@ -445,6 +446,29 @@ function upgradeJvcBlacklistButton(messageElement, author) {
     });
 }
 
+function addBoucledAuthorButton(messageElement, author) {
+    let backToForumElement = document.querySelector('div.group-two > a:nth-child(2)');
+    if (backToForumElement === null) return;
+
+    let mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
+    if (mpBloc === null) return;
+
+    let forumUrl = backToForumElement.getAttribute('href');
+    let boucledAuthorAnchor = document.createElement('a');
+    boucledAuthorAnchor.setAttribute('class', 'xXx lien-jv deboucled-author-boucled-button');
+    boucledAuthorAnchor.setAttribute('href', `/recherche${forumUrl}?search_in_forum=${author}&type_search_in_forum=auteur_topic`);
+    boucledAuthorAnchor.setAttribute('target', '_blank');
+    boucledAuthorAnchor.setAttribute('title', 'Pseudo complètement boucled ?');
+    boucledAuthorAnchor.innerHTML = '<svg width="18px" viewBox="0 0 24 24"><use href="#spirallogo"/></svg></a>';
+
+    insertAfter(boucledAuthorAnchor, mpBloc);
+}
+
+function createSpiralLogo() {
+    const spiralSvg = '<svg width="24px" viewBox="0 0 24 24"><symbol id="spirallogo"><defs><style>.cls-1{fill:#999;}</style></defs><path class="cls-1" d="M12.71,12.59a1,1,0,0,1-.71-.3,1,1,0,0,0-1.41,0,1,1,0,0,1-1.42,0,1,1,0,0,1,0-1.41,3.08,3.08,0,0,1,4.24,0,1,1,0,0,1,0,1.41A1,1,0,0,1,12.71,12.59Z"/><path class="cls-1" d="M12.71,14a1,1,0,0,1-.71-.29,1,1,0,0,1,0-1.42h0a1,1,0,0,1,1.41-1.41,2,2,0,0,1,0,2.83A1,1,0,0,1,12.71,14Z"/><path class="cls-1" d="M9.88,16.83a1,1,0,0,1-.71-.29,4,4,0,0,1,0-5.66,1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41,2,2,0,0,0,0,2.83,1,1,0,0,1,0,1.42A1,1,0,0,1,9.88,16.83Z"/><path class="cls-1" d="M12.71,18a5,5,0,0,1-3.54-1.46,1,1,0,1,1,1.42-1.42,3.07,3.07,0,0,0,4.24,0,1,1,0,0,1,1.41,0,1,1,0,0,1,0,1.42A5,5,0,0,1,12.71,18Z"/><path class="cls-1" d="M15.54,16.83a1,1,0,0,1-.71-1.71,4,4,0,0,0,0-5.66,1,1,0,0,1,1.41-1.41,6,6,0,0,1,0,8.49A1,1,0,0,1,15.54,16.83Z"/><path class="cls-1" d="M7.05,9.76a1,1,0,0,1-.71-1.71,7,7,0,0,1,9.9,0,1,1,0,1,1-1.41,1.41,5,5,0,0,0-7.07,0A1,1,0,0,1,7.05,9.76Z"/><path class="cls-1" d="M7.05,19.66a1,1,0,0,1-.71-.3,8,8,0,0,1,0-11.31,1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41,6,6,0,0,0,0,8.49,1,1,0,0,1-.71,1.71Z"/><path class="cls-1" d="M12.71,22a9,9,0,0,1-6.37-2.64,1,1,0,0,1,0-1.41,1,1,0,0,1,1.42,0,7,7,0,0,0,9.9,0,1,1,0,0,1,1.41,1.41A8.94,8.94,0,0,1,12.71,22Z"/><path class="cls-1" d="M18.36,19.66a1,1,0,0,1-.7-.3,1,1,0,0,1,0-1.41,8,8,0,0,0,0-11.31,1,1,0,0,1,0-1.42,1,1,0,0,1,1.41,0,10,10,0,0,1,0,14.14A1,1,0,0,1,18.36,19.66Z"/><path class="cls-1" d="M4.22,6.93a1,1,0,0,1-.71-.29,1,1,0,0,1,0-1.42,11,11,0,0,1,15.56,0,1,1,0,0,1,0,1.42,1,1,0,0,1-1.41,0,9,9,0,0,0-12.73,0A1,1,0,0,1,4.22,6.93Z"/></symbol></svg>';
+    document.querySelector('.conteneur-messages-pagi').innerHTML += spiralSvg;
+}
+
 async function handleTopicList() {
     init();
     let topics = getAllTopics(document);
@@ -461,14 +485,20 @@ async function handleTopicList() {
 
 function handleTopicMessages() {
     init();
+    createSpiralLogo();
     let allMessages = getAllMessages(document);
     allMessages.forEach(function (message) {
         let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
         if (authorElement === null) return;
         let author = authorElement.textContent.trim();
 
-        if (isAuthorBlacklisted(author)) removeMessage(message);
-        else upgradeJvcBlacklistButton(message, author);
+        if (isAuthorBlacklisted(author)) {
+            removeMessage(message);
+        }
+        else {
+            upgradeJvcBlacklistButton(message, author);
+            addBoucledAuthorButton(message, author);
+        }
     });
 
     updateMessagesHeader();
@@ -498,13 +528,3 @@ async function callMe() {
 callMe();
 
 addEventListener("instantclick:newpage", callMe);
-
-/*
-function jvCare(cssClass) {
-    var base16 = '0A12B34C56D78E9F', url = '', s = cssClass.split(' ')[1];
-    for (var i = 0; i < s.length; i += 2) {
-        url += String.fromCharCode(base16.indexOf(s.charAt(i)) * 16 + base16.indexOf(s.charAt(i + 1)));
-    }
-    return url;
-}
-*/
