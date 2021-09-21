@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.3.4
+// @version     1.4.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -31,16 +31,23 @@ let authorBlacklistArray = [];
 let topicIdBlacklistMap = new Map();
 let subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
 let authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
+
 let hiddenTopics = 0;
 let hiddenMessages = 0;
+let hiddenAuthorArray = new Set();
+
 const topicByPage = 25;
+
 const entitySubject = 'subject';
 const entityAuthor = 'author';
 const entityTopicId = 'topicid';
+
 const storage_init = 'deboucled_init';
 const storage_blacklistedTopicIds = 'deboucled_blacklistedTopicIds';
 const storage_blacklistedSubjects = 'deboucled_blacklistedSubjects';
 const storage_blacklistedAuthors = 'deboucled_blacklistedAuthors';
+const storage_optionBoucledUseJvarchive = 'deboucled_optionBoucledUseJvarchive';
+const storage_optionHideMessages = 'deboucled_optionHideMessages';
 
 
 function initStorage() {
@@ -166,11 +173,35 @@ function updateTopicsHeader() {
 function updateMessagesHeader() {
     if (hiddenMessages <= 0) return;
     let paginationElement = document.querySelector('div.bloc-pagi-default');
-    let messageHeader = document.createElement('div');
-    messageHeader.setAttribute('class', 'titre-bloc deboucled-ignored-messages'); // titre-head-bloc
+
+    let ignoredMessageHeader = document.createElement('div');
+    ignoredMessageHeader.setAttribute('class', 'titre-bloc deboucled-ignored-messages');
     let pr = isPlural(hiddenMessages);
-    messageHeader.textContent = `${hiddenMessages} message${pr} ignoré${pr}`;
-    insertAfter(messageHeader, paginationElement);
+    ignoredMessageHeader.textContent = `${hiddenMessages} message${pr} ignoré${pr}`;
+
+    let ignoredAuthors = document.createElement('span');
+    ignoredAuthors.setAttribute('class', 'titre-bloc deboucled-messages-ignored-authors');
+    ignoredAuthors.style.display = 'none';
+    ignoredAuthors.textContent = [...hiddenAuthorArray].join(', ');
+
+    let toggleIgnoredAuthors = document.createElement('a');
+    toggleIgnoredAuthors.setAttribute('class', 'titre-bloc deboucled-toggle-ignored-authors');
+    toggleIgnoredAuthors.setAttribute('href', '#');
+    toggleIgnoredAuthors.textContent = '(voir)';
+    toggleIgnoredAuthors.addEventListener('click', function (e) {
+        if (ignoredAuthors.style.display === 'inline') {
+            ignoredAuthors.style.display = 'none';
+            toggleIgnoredAuthors.textContent = '(voir)';
+        }
+        else {
+            ignoredAuthors.style.display = 'inline';
+            toggleIgnoredAuthors.textContent = '(cacher)';
+        }
+    });
+
+    insertAfter(ignoredMessageHeader, paginationElement);
+    ignoredMessageHeader.appendChild(toggleIgnoredAuthors);
+    ignoredMessageHeader.appendChild(ignoredAuthors);
 }
 
 function insertAfter(newNode, referenceNode) {
@@ -319,27 +350,44 @@ function buildSettingPage() {
     document.getElementById('deboucled-bg-view').style.display = 'none';
 
     let deboucledHtml = "";
-    deboucledHtml += '<div class="deboucled-bloc-header">BLACKLIST SUJETS</div>';
+
+    function addOption(title, optionId, defaultValue) {
+        let html = "";
+        html += '<div class="deboucled-option-row">';
+        html += `<div class="deboucled-option-cell">${title}</div>`;
+        html += '<div class="deboucled-option-cell">';
+        html += '<label class="deboucled-switch">';
+        let checked = GM_getValue(optionId, defaultValue) ? 'checked' : '';
+        html += `<input type="checkbox" id="${optionId}" ${checked}>`;
+        html += '<span class="deboucled-slider round"></span>';
+        html += '</label>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
+    deboucledHtml += `<div class="deboucled-bloc-header">OPTIONS</div>`;
     deboucledHtml += '<div class="deboucled-bloc">';
-    deboucledHtml += `<input type="text" id="deboucled-${entitySubject}-input-key" class="deboucled-input" placeholder="Mot-clé" >`;
-    deboucledHtml += `<span id="deboucled-${entitySubject}-input-button" class="btn btn-actu-new-list-forum deboucled-add-button">Ajouter</span>`;
-    deboucledHtml += '<br>';
-    deboucledHtml += `<div id="deboucled-${entitySubject}List" style="margin-top:10px;"></div>`;
+    //deboucledHtml += '<div class="deboucled-bg-img"></div>';
+    deboucledHtml += '<div class="deboucled-option-table">';
+    deboucledHtml += addOption('Cacher les messages des pseudos blacklist', storage_optionHideMessages, true);
+    deboucledHtml += addOption('Utiliser JvArchive pour "Pseudo boucled"', storage_optionBoucledUseJvarchive, false);
     deboucledHtml += '</div>';
-    deboucledHtml += '<div class="deboucled-bloc-header">BLACKLIST AUTEURS</div>';
-    deboucledHtml += '<div class="deboucled-bloc">';
-    deboucledHtml += `<input type="text" id="deboucled-${entityAuthor}-input-key" class="deboucled-input" placeholder="Pseudo" >`;
-    deboucledHtml += `<span id="deboucled-${entityAuthor}-input-button" class="btn btn-actu-new-list-forum deboucled-add-button">Ajouter</span>`;
-    deboucledHtml += '<br>';
-    deboucledHtml += `<div id="deboucled-${entityAuthor}List" style="margin-top:10px;"></div>`;
     deboucledHtml += '</div>';
-    deboucledHtml += '<div class="deboucled-bloc-header">BLACKLIST TOPICS</div>';
-    deboucledHtml += '<div class="deboucled-bloc">';
-    deboucledHtml += `<input type="text" id="deboucled-${entityTopicId}-input-key" class="deboucled-input" placeholder="TopicId" >`;
-    deboucledHtml += `<span id="deboucled-${entityTopicId}-input-button" class="btn btn-actu-new-list-forum deboucled-add-button">Ajouter</span>`;
-    deboucledHtml += '<br>';
-    deboucledHtml += `<div id="deboucled-${entityTopicId}List" style="margin-top:10px;"></div>`;
-    deboucledHtml += '</div>';
+
+    function addEntitySettingSection(entity, header, hint) {
+        let html = "";
+        html += `<div class="deboucled-bloc-header">${header}</div>`;
+        html += '<div class="deboucled-bloc">';
+        html += `<input type="text" id="deboucled-${entity}-input-key" class="deboucled-input" placeholder="${hint}" >`;
+        html += `<span id="deboucled-${entity}-input-button" class="btn btn-actu-new-list-forum deboucled-add-button">Ajouter</span>`;
+        html += '<br>';
+        html += `<div id="deboucled-${entity}List" style="margin-top:10px;"></div>`;
+        html += '</div>';
+        return html;
+    }
+    deboucledHtml += addEntitySettingSection(entitySubject, 'BLACKLIST SUJETS', 'Mot-clé');
+    deboucledHtml += addEntitySettingSection(entityAuthor, 'BLACKLIST AUTEURS', 'Pseudo');
+    deboucledHtml += addEntitySettingSection(entityTopicId, 'BLACKLIST TOPICS', 'TopicId');
 
     let deboucledView = document.createElement('div');
     deboucledView.setAttribute("id", "deboucled-view");
@@ -347,6 +395,16 @@ function buildSettingPage() {
     deboucledView.innerHTML = deboucledHtml;
     document.body.prepend(deboucledView);
     document.getElementById('deboucled-view').style.display = 'none';
+
+    function addCheckboxEvent(id) {
+        const checkbox = document.getElementById(id)
+        checkbox.addEventListener('change', (e) => {
+            GM_setValue(id, e.currentTarget.checked);
+        });
+    }
+
+    addCheckboxEvent(storage_optionHideMessages);
+    addCheckboxEvent(storage_optionBoucledUseJvarchive);
 
     buildSettingEntities();
 }
@@ -446,7 +504,13 @@ function upgradeJvcBlacklistButton(messageElement, author) {
     });
 }
 
-function addBoucledAuthorButton(messageElement, author) {
+function highlightBlacklistedAuthor(messageElement, authorElement) {
+    let isSelf = messageElement.querySelector('span.picto-msg-croix') !== null;
+    if (isSelf) return;
+    authorElement.style.color = 'rgb(230, 0, 0)';
+}
+
+function addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive) {
     let backToForumElement = document.querySelector('div.group-two > a:nth-child(2)');
     if (backToForumElement === null) return;
 
@@ -454,12 +518,15 @@ function addBoucledAuthorButton(messageElement, author) {
     if (mpBloc === null) return;
 
     let forumUrl = backToForumElement.getAttribute('href');
+    let redirectUrl = `/recherche${forumUrl}?search_in_forum=${author}&type_search_in_forum=auteur_topic`;
+    if (optionBoucledUseJvarchive) redirectUrl = `https://jvarchive.com/topic/recherche?search=${author}&searchType=auteur_topic_exact`;
+
     let boucledAuthorAnchor = document.createElement('a');
     boucledAuthorAnchor.setAttribute('class', 'xXx lien-jv deboucled-author-boucled-button');
-    boucledAuthorAnchor.setAttribute('href', `/recherche${forumUrl}?search_in_forum=${author}&type_search_in_forum=auteur_topic`);
+    boucledAuthorAnchor.setAttribute('href', redirectUrl);
     boucledAuthorAnchor.setAttribute('target', '_blank');
     boucledAuthorAnchor.setAttribute('title', 'Pseudo complètement boucled ?');
-    boucledAuthorAnchor.innerHTML = '<svg width="18px" viewBox="0 0 24 24"><use href="#spirallogo"/></svg></a>';
+    boucledAuthorAnchor.innerHTML = '<svg width="16px" viewBox="0 0 24 24"><use href="#spirallogo"/></svg></a>';
 
     insertAfter(boucledAuthorAnchor, mpBloc);
 }
@@ -485,25 +552,39 @@ async function handleTopicList() {
     addIgnoreButtons();
 }
 
+function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
+    let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+    if (authorElement === null) return;
+    let author = authorElement.textContent.trim();
+
+    if (isAuthorBlacklisted(author)) {
+        if (optionHideMessages) {
+            removeMessage(message);
+            hiddenAuthorArray.add(author);
+        }
+        else {
+            highlightBlacklistedAuthor(message, authorElement);
+            addBoucledAuthorButton(message, author, optionBoucledUseJvarchive);
+        }
+    }
+    else {
+        upgradeJvcBlacklistButton(message, author);
+        addBoucledAuthorButton(message, author, optionBoucledUseJvarchive);
+    }
+}
+
 function handleTopicMessages() {
     init();
 
     const spiralSvg = '<svg width="24px" viewBox="0 0 24 24"><symbol id="spirallogo"><defs><style>.cls-1{fill:#999;}</style></defs><path class="cls-1" d="M12.71,12.59a1,1,0,0,1-.71-.3,1,1,0,0,0-1.41,0,1,1,0,0,1-1.42,0,1,1,0,0,1,0-1.41,3.08,3.08,0,0,1,4.24,0,1,1,0,0,1,0,1.41A1,1,0,0,1,12.71,12.59Z"/><path class="cls-1" d="M12.71,14a1,1,0,0,1-.71-.29,1,1,0,0,1,0-1.42h0a1,1,0,0,1,1.41-1.41,2,2,0,0,1,0,2.83A1,1,0,0,1,12.71,14Z"/><path class="cls-1" d="M9.88,16.83a1,1,0,0,1-.71-.29,4,4,0,0,1,0-5.66,1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41,2,2,0,0,0,0,2.83,1,1,0,0,1,0,1.42A1,1,0,0,1,9.88,16.83Z"/><path class="cls-1" d="M12.71,18a5,5,0,0,1-3.54-1.46,1,1,0,1,1,1.42-1.42,3.07,3.07,0,0,0,4.24,0,1,1,0,0,1,1.41,0,1,1,0,0,1,0,1.42A5,5,0,0,1,12.71,18Z"/><path class="cls-1" d="M15.54,16.83a1,1,0,0,1-.71-1.71,4,4,0,0,0,0-5.66,1,1,0,0,1,1.41-1.41,6,6,0,0,1,0,8.49A1,1,0,0,1,15.54,16.83Z"/><path class="cls-1" d="M7.05,9.76a1,1,0,0,1-.71-1.71,7,7,0,0,1,9.9,0,1,1,0,1,1-1.41,1.41,5,5,0,0,0-7.07,0A1,1,0,0,1,7.05,9.76Z"/><path class="cls-1" d="M7.05,19.66a1,1,0,0,1-.71-.3,8,8,0,0,1,0-11.31,1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41,6,6,0,0,0,0,8.49,1,1,0,0,1-.71,1.71Z"/><path class="cls-1" d="M12.71,22a9,9,0,0,1-6.37-2.64,1,1,0,0,1,0-1.41,1,1,0,0,1,1.42,0,7,7,0,0,0,9.9,0,1,1,0,0,1,1.41,1.41A8.94,8.94,0,0,1,12.71,22Z"/><path class="cls-1" d="M18.36,19.66a1,1,0,0,1-.7-.3,1,1,0,0,1,0-1.41,8,8,0,0,0,0-11.31,1,1,0,0,1,0-1.42,1,1,0,0,1,1.41,0,10,10,0,0,1,0,14.14A1,1,0,0,1,18.36,19.66Z"/><path class="cls-1" d="M4.22,6.93a1,1,0,0,1-.71-.29,1,1,0,0,1,0-1.42,11,11,0,0,1,15.56,0,1,1,0,0,1,0,1.42,1,1,0,0,1-1.41,0,9,9,0,0,0-12.73,0A1,1,0,0,1,4.22,6.93Z"/></symbol></svg>';
     addSvg(spiralSvg, '.conteneur-messages-pagi');
 
+    let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, false);
+    let optionHideMessages = GM_getValue(storage_optionHideMessages, true);
+
     let allMessages = getAllMessages(document);
     allMessages.forEach(function (message) {
-        let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
-        if (authorElement === null) return;
-        let author = authorElement.textContent.trim();
-
-        if (isAuthorBlacklisted(author)) {
-            removeMessage(message);
-        }
-        else {
-            upgradeJvcBlacklistButton(message, author);
-            addBoucledAuthorButton(message, author);
-        }
+        handleMessage(message, optionBoucledUseJvarchive, optionHideMessages);
     });
 
     updateMessagesHeader();
