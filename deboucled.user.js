@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.4.0
+// @version     1.5.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -21,7 +21,6 @@
 // @todo        "Wildcard subject" : use wildcard for subjects blacklist
 // @todo        "Reversed/Highlight option" : highlight elements of interest
 // @todo        "Zap mode" : select author/word directly in the main page to blacklist
-// @todo        "Whitelist threshold" : allow topic in blacklist if the number of messages reach a threshold
 // @todo        "Backup & Restore" : allow user to backup and restore settings with json file
 // ==/UserScript==
 
@@ -48,6 +47,8 @@ const storage_blacklistedSubjects = 'deboucled_blacklistedSubjects';
 const storage_blacklistedAuthors = 'deboucled_blacklistedAuthors';
 const storage_optionBoucledUseJvarchive = 'deboucled_optionBoucledUseJvarchive';
 const storage_optionHideMessages = 'deboucled_optionHideMessages';
+const storage_optionAllowDisplayThreshold = 'deboucled_optionAllowDisplayThreshold';
+const storage_optionDisplayThreshold = 'deboucled_optionDisplayThreshold';
 
 
 function initStorage() {
@@ -213,9 +214,6 @@ function isPlural(nb) {
 }
 
 function removeTopic(element) {
-    //element.getElementsByClassName("lien-jv topic-title")[0].style.color = "white";
-    //element.style.backgroundColor = "red";
-    //element.style.display = "none";
     element.remove();
     hiddenTopics++;
 }
@@ -248,28 +246,35 @@ function topicExists(topics, element) {
     */
     let topicId = element.getAttribute("data-id");
     if (topicId === null) return false;
-    return topics.some((elem) => elem.getAttribute("data-id") == topicId);
+    return topics.some((elem) => elem.getAttribute("data-id") === topicId);
 }
 
-function isTopicBlacklisted(element) {
+function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayThreshold) {
     if (!element.hasAttribute('data-id')) return true;
 
     let topicId = element.getAttribute('data-id');
     if (topicIdBlacklistMap.has(topicId)) return true;
 
+    if (optionAllowDisplayThreshold && getTopicMessageCount(element) >= optionDisplayThreshold) return false;
+
     let titleTag = element.getElementsByClassName("lien-jv topic-title");
-    if (titleTag != undefined && titleTag.length > 0) {
+    if (titleTag !== undefined && titleTag.length > 0) {
         let title = titleTag[0].textContent;
         if (isSubjectBlacklisted(title)) return true;
     }
 
     let authorTag = element.getElementsByClassName("topic-author");
-    if (authorTag != undefined && authorTag.length > 0) {
+    if (authorTag !== undefined && authorTag.length > 0) {
         let author = authorTag[0].textContent.trim();
         if (isAuthorBlacklisted(author)) return true;
     }
 
     return false;
+}
+
+function getTopicMessageCount(element) {
+    let messageCountElement = element.querySelector('.topic-count');
+    return parseInt(messageCountElement?.textContent.trim() ?? "0");
 }
 
 function isSubjectBlacklisted(subject) {
@@ -283,7 +288,7 @@ function isAuthorBlacklisted(author) {
 }
 
 function getCurrentPageType(url) {
-    if (document.querySelector('.img-erreur') != null) return 'error';
+    if (document.querySelector('.img-erreur') !== null) return 'error';
 
     let topicListRegex = /\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*/i;
     if (url.match(topicListRegex)) return 'topiclist';
@@ -296,7 +301,6 @@ function getCurrentPageType(url) {
 
 async function getPageContent(page) {
     let urlRegex = /(\/forums\/0-[0-9]+-0-1-0-)(?<pageid>[0-9]+)(-0-.*)/i;
-    //let topicRegex = /\/forums\/42-(?<forumid>[0-9]+)-(?<topicid>[0-9]+)-(?<pageid>[0-9]+)-0-1-0-(?<topicname>.*).htm.*/i;
 
     let currentPath = window.location.pathname;
     let matches = urlRegex.exec(currentPath);
@@ -317,13 +321,13 @@ function addIgnoreButtons() {
 
     let header = topics[0];
     let spanHead = document.createElement("span");
-    spanHead.setAttribute("class", "topic-count");
+    spanHead.setAttribute("class", "deboucled-topic-blacklist");
     spanHead.setAttribute("style", "width:1.75rem");
     header.appendChild(spanHead);
 
     topics.slice(1).forEach(function (topic) {
         let span = document.createElement("span");
-        span.setAttribute("class", "topic-count");
+        span.setAttribute("class", "deboucled-topic-blacklist");
         let topicId = topic.getAttribute('data-id');
         let topicSubject = topic.querySelector('span:nth-child(1) > a:nth-child(2)').textContent.trim();
         let anchor = document.createElement("a");
@@ -344,14 +348,12 @@ function addCss() {
 function buildSettingPage() {
     let bgView = document.createElement('div');
     bgView.setAttribute("id", "deboucled-bg-view");
-    bgView.setAttribute("style", "width:100%;height:100%;z-index:999998;background:transparent;overflow-y: auto;position:fixed");
+    bgView.setAttribute("style", "width:100%;height:100%;z-index:999998;background:transparent;overflow-y:auto;position:fixed");
     bgView.innerHTML = '<div></div>';
     document.body.prepend(bgView);
     document.getElementById('deboucled-bg-view').style.display = 'none';
 
-    let deboucledHtml = "";
-
-    function addOption(title, optionId, defaultValue) {
+    function addToggleOption(title, optionId, defaultValue) {
         let html = "";
         html += '<div class="deboucled-option-row">';
         html += `<div class="deboucled-option-cell">${title}</div>`;
@@ -359,18 +361,36 @@ function buildSettingPage() {
         html += '<label class="deboucled-switch">';
         let checked = GM_getValue(optionId, defaultValue) ? 'checked' : '';
         html += `<input type="checkbox" id="${optionId}" ${checked}>`;
-        html += '<span class="deboucled-slider round"></span>';
+        html += '<span class="deboucled-toggle-slider round"></span>';
         html += '</label>';
         html += '</div>';
         html += '</div>';
         return html;
     }
+    function addRangeOption(title, optionId, defaultValue, minValue, maxValue, enabled) {
+        let html = "";
+        html += `<div id="${optionId}-container" class="deboucled-option-row${enabled ? '' : ' deboucled-disabled'}">`;
+        html += `<div class="deboucled-option-cell deboucled-option-subcell">${title}</div>`;
+        html += '<div class="deboucled-option-cell">';
+        let value = GM_getValue(optionId, defaultValue);
+        html += `<input type="range" id="${optionId}" min="${minValue}" max="${maxValue}" value="${value}" step="10" class="deboucled-range-slider">`;
+        html += '</div>';
+        html += '<div class="deboucled-option-cell">';
+        html += `<span id="${optionId}-value">${value}</span>`;
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
+
+    let deboucledHtml = "";
     deboucledHtml += `<div class="deboucled-bloc-header">OPTIONS</div>`;
     deboucledHtml += '<div class="deboucled-bloc">';
-    //deboucledHtml += '<div class="deboucled-bg-img"></div>';
     deboucledHtml += '<div class="deboucled-option-table">';
-    deboucledHtml += addOption('Cacher les messages des pseudos blacklist', storage_optionHideMessages, true);
-    deboucledHtml += addOption('Utiliser JvArchive pour "Pseudo boucled"', storage_optionBoucledUseJvarchive, false);
+    deboucledHtml += addToggleOption('Utiliser JvArchive pour "Pseudo boucled"', storage_optionBoucledUseJvarchive, false);
+    deboucledHtml += addToggleOption('Cacher les messages des pseudos blacklist', storage_optionHideMessages, true);
+    deboucledHtml += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, false);
+    let allowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
+    deboucledHtml += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, 100, 10, 1000, allowDisplayThreshold);
     deboucledHtml += '</div>';
     deboucledHtml += '</div>';
 
@@ -396,15 +416,31 @@ function buildSettingPage() {
     document.body.prepend(deboucledView);
     document.getElementById('deboucled-view').style.display = 'none';
 
-    function addCheckboxEvent(id) {
-        const checkbox = document.getElementById(id)
-        checkbox.addEventListener('change', (e) => {
+    function addToggleEvent(id, callback) {
+        const toggleSlider = document.getElementById(id)
+        toggleSlider.addEventListener('change', (e) => {
             GM_setValue(id, e.currentTarget.checked);
+            if (callback !== undefined) callback(e.currentTarget.checked);
         });
     }
+    function addRangeEvent(id) {
+        const rangeSlider = document.getElementById(id)
+        rangeSlider.oninput = function () {
+            GM_setValue(id, this.value);
+            document.getElementById(`${id}-value`).innerHTML = this.value;
+        };
+    }
 
-    addCheckboxEvent(storage_optionHideMessages);
-    addCheckboxEvent(storage_optionBoucledUseJvarchive);
+    addToggleEvent(storage_optionHideMessages);
+    addToggleEvent(storage_optionBoucledUseJvarchive);
+    addToggleEvent(storage_optionAllowDisplayThreshold, function (checked) {
+        document.querySelectorAll(`[id = ${storage_optionDisplayThreshold}-container]`).forEach(function (el) {
+            let disabledClass = 'deboucled-disabled';
+            if (checked) el.className = el.className.replace(disabledClass, '').trim();
+            else el.className += ' ' + disabledClass;
+        })
+    });
+    addRangeEvent(storage_optionDisplayThreshold);
 
     buildSettingEntities();
 }
@@ -432,20 +468,20 @@ function refreshTopicIdKeys() {
 }
 
 function createAddEntityEvent(entity, keyRegex, addCallback) {
-    document.getElementById(`deboucled-${entity}-input-key`).addEventListener('keydown', function (event) {
-        if (event.key != "Enter") return;
+    function addEntity(entity, keyRegex, addCallback) {
         let key = document.getElementById(`deboucled-${entity}-input-key`).value;
-        if (key == "" || !key.match(keyRegex)) return;
+        if (key === "" || !key.match(keyRegex)) return;
         addCallback(key);
         document.getElementById(`deboucled-${entity}-input-key`).value = "";
+    }
+
+    document.getElementById(`deboucled-${entity}-input-key`).addEventListener('keydown', function (event) {
+        if (event.key !== "Enter") return;
+        addEntity(entity, keyRegex, addCallback);
     });
 
     document.getElementById(`deboucled-${entity}-input-button`).addEventListener('click', function (e) {
-        let key = document.getElementById(`deboucled-${entity}-input-key`).value;
-        if (key == "" || !key.match(keyRegex)) return;
-        addCallback(key);
-        document.getElementById(`deboucled-${entity}-input-key`).value = "";
-        removeCallback(this.parentNode);
+        addEntity(entity, keyRegex, addCallback);
     });
 }
 
@@ -542,8 +578,12 @@ async function handleTopicList() {
     init();
     let topics = getAllTopics(document);
     if (topics.length === 0) return;
+
+    let optionAllowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
+    let optionDisplayThreshold = GM_getValue(storage_optionDisplayThreshold, 100);
+
     topics.slice(1).forEach(function (topic) {
-        if (isTopicBlacklisted(topic)) { removeTopic(topic); }
+        if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold)) removeTopic(topic);
     });
     await fillTopics(topics);
 
@@ -579,8 +619,8 @@ function handleTopicMessages() {
     const spiralSvg = '<svg width="24px" viewBox="0 0 24 24"><symbol id="spirallogo"><defs><style>.cls-1{fill:#999;}</style></defs><path class="cls-1" d="M12.71,12.59a1,1,0,0,1-.71-.3,1,1,0,0,0-1.41,0,1,1,0,0,1-1.42,0,1,1,0,0,1,0-1.41,3.08,3.08,0,0,1,4.24,0,1,1,0,0,1,0,1.41A1,1,0,0,1,12.71,12.59Z"/><path class="cls-1" d="M12.71,14a1,1,0,0,1-.71-.29,1,1,0,0,1,0-1.42h0a1,1,0,0,1,1.41-1.41,2,2,0,0,1,0,2.83A1,1,0,0,1,12.71,14Z"/><path class="cls-1" d="M9.88,16.83a1,1,0,0,1-.71-.29,4,4,0,0,1,0-5.66,1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41,2,2,0,0,0,0,2.83,1,1,0,0,1,0,1.42A1,1,0,0,1,9.88,16.83Z"/><path class="cls-1" d="M12.71,18a5,5,0,0,1-3.54-1.46,1,1,0,1,1,1.42-1.42,3.07,3.07,0,0,0,4.24,0,1,1,0,0,1,1.41,0,1,1,0,0,1,0,1.42A5,5,0,0,1,12.71,18Z"/><path class="cls-1" d="M15.54,16.83a1,1,0,0,1-.71-1.71,4,4,0,0,0,0-5.66,1,1,0,0,1,1.41-1.41,6,6,0,0,1,0,8.49A1,1,0,0,1,15.54,16.83Z"/><path class="cls-1" d="M7.05,9.76a1,1,0,0,1-.71-1.71,7,7,0,0,1,9.9,0,1,1,0,1,1-1.41,1.41,5,5,0,0,0-7.07,0A1,1,0,0,1,7.05,9.76Z"/><path class="cls-1" d="M7.05,19.66a1,1,0,0,1-.71-.3,8,8,0,0,1,0-11.31,1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41,6,6,0,0,0,0,8.49,1,1,0,0,1-.71,1.71Z"/><path class="cls-1" d="M12.71,22a9,9,0,0,1-6.37-2.64,1,1,0,0,1,0-1.41,1,1,0,0,1,1.42,0,7,7,0,0,0,9.9,0,1,1,0,0,1,1.41,1.41A8.94,8.94,0,0,1,12.71,22Z"/><path class="cls-1" d="M18.36,19.66a1,1,0,0,1-.7-.3,1,1,0,0,1,0-1.41,8,8,0,0,0,0-11.31,1,1,0,0,1,0-1.42,1,1,0,0,1,1.41,0,10,10,0,0,1,0,14.14A1,1,0,0,1,18.36,19.66Z"/><path class="cls-1" d="M4.22,6.93a1,1,0,0,1-.71-.29,1,1,0,0,1,0-1.42,11,11,0,0,1,15.56,0,1,1,0,0,1,0,1.42,1,1,0,0,1-1.41,0,9,9,0,0,0-12.73,0A1,1,0,0,1,4.22,6.93Z"/></symbol></svg>';
     addSvg(spiralSvg, '.conteneur-messages-pagi');
 
-    let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, false);
     let optionHideMessages = GM_getValue(storage_optionHideMessages, true);
+    let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, false);
 
     let allMessages = getAllMessages(document);
     allMessages.forEach(function (message) {

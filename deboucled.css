@@ -23,6 +23,11 @@
   background-color: #0050a6 !important;
   height: 28px;
 }
+.deboucled-topic-blacklist {
+  text-align: center;
+  display: table-cell;
+  padding-bottom: 3px;
+}
 .deboucled-author-boucled-button {
   position: relative;
   top: 0.5rem;
@@ -103,6 +108,10 @@ input[type="text"] {
   display: table-cell;
   vertical-align: middle;
 }
+.deboucled-option-cell.deboucled-option-subcell {
+  padding-left: 5px;
+  font: 14px/16px sans-serif;
+}
 .deboucled-bg-img {
   background-image: url("https://image.noelshack.com/fichiers/2021/38/2/1632251209-1590510677-zinzinboucle.png");
   width: 127px;
@@ -114,7 +123,16 @@ input[type="text"] {
   opacity: 0.8;
   margin: -9px -9px 0 0;
 }
+.deboucled-disabled {
+  pointer-events: none;
+  opacity: 0.3;
+}
+.deboucled-enabled {
+  pointer-events: auto;
+  opacity: 1;
+}
 
+/* Toggle slider */
 .deboucled-switch {
   position: relative;
   display: inline-block;
@@ -126,7 +144,7 @@ input[type="text"] {
   width: 0;
   height: 0;
 }
-.deboucled-slider {
+.deboucled-toggle-slider {
   position: absolute;
   cursor: pointer;
   top: 0;
@@ -137,7 +155,7 @@ input[type="text"] {
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }
-.deboucled-slider:before {
+.deboucled-toggle-slider:before {
   position: absolute;
   content: "";
   height: 16px;
@@ -148,20 +166,49 @@ input[type="text"] {
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }
-input:checked + .deboucled-slider {
+input:checked + .deboucled-toggle-slider {
   background-color: #2196f3;
 }
-input:focus + .deboucled-slider {
+input:focus + .deboucled-toggle-slider {
   box-shadow: 0 0 1px #2196f3;
 }
-input:checked + .deboucled-slider:before {
+input:checked + .deboucled-toggle-slider:before {
   -webkit-transform: translateX(26px);
   -ms-transform: translateX(26px);
   transform: translateX(26px);
 }
-.deboucled-slider.round {
+.deboucled-toggle-slider.round {
   border-radius: 24px;
 }
-.deboucled-slider.round:before {
+.deboucled-toggle-slider.round:before {
   border-radius: 50%;
+}
+
+/* Range slider */
+.deboucled-range-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 15px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 1;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
+}
+.deboucled-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2196f3;
+  cursor: pointer;
+}
+.deboucled-range-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2196f3;
+  cursor: pointer;
 }
