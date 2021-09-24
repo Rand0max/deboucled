@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.5.1
+// @version     1.5.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -16,6 +16,7 @@
 // @grant       GM_listValues
 // @grant       GM_getResourceText
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
+// @todo        Hide entities in settings (too many)
 // @todo        "Handle mp and stickers" : handle blacklist for mp and stickers in messages
 // @todo        "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
 // @todo        "Wildcard subject" : use wildcard for subjects blacklist
@@ -24,6 +25,10 @@
 // @todo        "Backup & Restore" : allow user to backup and restore settings with json file
 // ==/UserScript==
 
+
+///////////////////////////////////////////////////////////////////////////////////////
+// VARIABLES
+///////////////////////////////////////////////////////////////////////////////////////
 
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
@@ -50,6 +55,10 @@ const storage_optionHideMessages = 'deboucled_optionHideMessages';
 const storage_optionAllowDisplayThreshold = 'deboucled_optionAllowDisplayThreshold';
 const storage_optionDisplayThreshold = 'deboucled_optionDisplayThreshold';
 
+
+///////////////////////////////////////////////////////////////////////////////////////
+// STORAGE
+///////////////////////////////////////////////////////////////////////////////////////
 
 function initStorage() {
     if (GM_getValue(storage_init, false)) {
@@ -83,39 +92,6 @@ function saveToStorage() {
     authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
 }
 
-function makeRegex(array, withBoundaries) {
-    let map = withBoundaries ? array.map((e) => `\\b${escapeRegExp(e)}\\b`) : array.map((e) => escapeRegExp(e));
-    let regex = map.join('|');
-    return new RegExp(regex, 'gi');
-}
-
-function escapeRegExp(str) {
-    return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-}
-
-function getAllTopics(doc) {
-    let allTopics = doc.querySelectorAll('.topic-list.topic-list-admin > li:not(.dfp__atf)');
-    return [...allTopics];
-}
-
-function getAllMessages(doc) {
-    let allMessages = doc.querySelectorAll('.conteneur-messages-pagi > div.bloc-message-forum');
-    return [...allMessages];
-}
-
-function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
-    if (!topicIdBlacklistMap.has(topicId)) {
-        topicIdBlacklistMap.set(topicId, topicSubject);
-        saveToStorage();
-        if (refreshTopicList) {
-            let topic = document.querySelector('[data-id="' + topicId + '"]');
-            if (topic === undefined) return;
-            removeTopic(topic);
-            updateTopicsHeader();
-        }
-    }
-}
-
 function removeTopicIdBlacklist(topicId) {
     if (topicIdBlacklistMap.has(topicId)) {
         topicIdBlacklistMap.delete(topicId);
@@ -135,6 +111,29 @@ function removeEntityBlacklist(array, key) {
     if (index > -1) {
         array.splice(index, 1);
         saveToStorage();
+    }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+// TOPICS
+///////////////////////////////////////////////////////////////////////////////////////
+
+function getAllTopics(doc) {
+    let allTopics = doc.querySelectorAll('.topic-list.topic-list-admin > li:not(.dfp__atf)');
+    return [...allTopics];
+}
+
+function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
+    if (!topicIdBlacklistMap.has(topicId)) {
+        topicIdBlacklistMap.set(topicId, topicSubject);
+        saveToStorage();
+        if (refreshTopicList) {
+            let topic = document.querySelector('[data-id="' + topicId + '"]');
+            if (topic === undefined) return;
+            removeTopic(topic);
+            updateTopicsHeader();
+        }
     }
 }
 
@@ -171,57 +170,9 @@ function updateTopicsHeader() {
     lastMessageHeader.style.width = '5.3rem';
 }
 
-function updateMessagesHeader() {
-    if (hiddenMessages <= 0) return;
-    let paginationElement = document.querySelector('div.bloc-pagi-default');
-
-    let ignoredMessageHeader = document.createElement('div');
-    ignoredMessageHeader.setAttribute('class', 'titre-bloc deboucled-ignored-messages');
-    let pr = isPlural(hiddenMessages);
-    ignoredMessageHeader.textContent = `${hiddenMessages} message${pr} ignoré${pr}`;
-
-    let ignoredAuthors = document.createElement('span');
-    ignoredAuthors.setAttribute('class', 'titre-bloc deboucled-messages-ignored-authors');
-    ignoredAuthors.style.display = 'none';
-    ignoredAuthors.textContent = [...hiddenAuthorArray].join(', ');
-
-    let toggleIgnoredAuthors = document.createElement('a');
-    toggleIgnoredAuthors.setAttribute('class', 'titre-bloc deboucled-toggle-ignored-authors');
-    toggleIgnoredAuthors.setAttribute('href', '#');
-    toggleIgnoredAuthors.textContent = '(voir)';
-    toggleIgnoredAuthors.addEventListener('click', function (e) {
-        if (ignoredAuthors.style.display === 'inline') {
-            ignoredAuthors.style.display = 'none';
-            toggleIgnoredAuthors.textContent = '(voir)';
-        }
-        else {
-            ignoredAuthors.style.display = 'inline';
-            toggleIgnoredAuthors.textContent = '(cacher)';
-        }
-    });
-
-    insertAfter(ignoredMessageHeader, paginationElement);
-    ignoredMessageHeader.appendChild(toggleIgnoredAuthors);
-    ignoredMessageHeader.appendChild(ignoredAuthors);
-}
-
-function insertAfter(newNode, referenceNode) {
-    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-}
-
-function isPlural(nb) {
-    return nb > 1 ? 's' : '';
-}
-
 function removeTopic(element) {
     element.remove();
     hiddenTopics++;
-}
-
-function removeMessage(element) {
-    element.previousElementSibling.remove();
-    element.remove();
-    hiddenMessages++;
 }
 
 function addTopic(element) {
@@ -287,235 +238,54 @@ function isAuthorBlacklisted(author) {
     return author.match(authorsBlacklistReg);
 }
 
-function getCurrentPageType(url) {
-    if (document.querySelector('.img-erreur') !== null) return 'error';
 
-    let topicListRegex = /\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*/i;
-    if (url.match(topicListRegex)) return 'topiclist';
+///////////////////////////////////////////////////////////////////////////////////////
+// MESSAGES
+///////////////////////////////////////////////////////////////////////////////////////
 
-    let topicMessagesRegex = /\/forums\/42-[0-9]+-[0-9]+-[0-9]+-0-1-0-.*/i;
-    if (url.match(topicMessagesRegex)) return 'topicmessages';
-
-    return 'unknown';
+function getAllMessages(doc) {
+    let allMessages = doc.querySelectorAll('.conteneur-messages-pagi > div.bloc-message-forum');
+    return [...allMessages];
 }
 
-async function getPageContent(page) {
-    let urlRegex = /(\/forums\/0-[0-9]+-0-1-0-)(?<pageid>[0-9]+)(-0-.*)/i;
+function updateMessagesHeader() {
+    if (hiddenMessages <= 0) return;
+    let paginationElement = document.querySelector('div.bloc-pagi-default');
 
-    let currentPath = window.location.pathname;
-    let matches = urlRegex.exec(currentPath);
-    var currentPageId = parseInt(matches.groups.pageid);
+    let ignoredMessageHeader = document.createElement('div');
+    ignoredMessageHeader.setAttribute('class', 'titre-bloc deboucled-ignored-messages');
+    let pr = isPlural(hiddenMessages);
+    ignoredMessageHeader.textContent = `${hiddenMessages} message${pr} ignoré${pr}`;
 
-    let nextPageId = currentPageId + ((page - 1) * topicByPage);
-    let nextPageUrl = currentPath.replace(urlRegex, `$1${nextPageId}$3`);
+    let ignoredAuthors = document.createElement('span');
+    ignoredAuthors.setAttribute('class', 'titre-bloc deboucled-messages-ignored-authors');
+    ignoredAuthors.style.display = 'none';
+    ignoredAuthors.textContent = [...hiddenAuthorArray].join(', ');
 
-    const response = await fetch(nextPageUrl);
-    return await response.text();
-}
-
-function addIgnoreButtons() {
-    const forbiddenSvg = '<svg style="display: none;"><symbol id="forbiddenlogo"><g><ellipse opacity="0.6" stroke-width="20" stroke="red" ry="70" rx="70" cy="80" cx="80" fill="none" /><line opacity="0.6" stroke="red" y2="37.39011" x2="122.60989" y1="122.60989" x1="37.39011" stroke-width="20" fill="none" /></g></symbol></svg>';
-    addSvg(forbiddenSvg, '.topic-list.topic-list-admin');
-
-    let topics = getAllTopics(document);
-
-    let header = topics[0];
-    let spanHead = document.createElement("span");
-    spanHead.setAttribute("class", "deboucled-topic-blacklist");
-    spanHead.setAttribute("style", "width:1.75rem");
-    header.appendChild(spanHead);
-
-    topics.slice(1).forEach(function (topic) {
-        let span = document.createElement("span");
-        span.setAttribute("class", "deboucled-topic-blacklist");
-        let topicId = topic.getAttribute('data-id');
-        let topicSubject = topic.querySelector('span:nth-child(1) > a:nth-child(2)').textContent.trim();
-        let anchor = document.createElement("a");
-        anchor.setAttribute("href", "#");
-        anchor.setAttribute("title", "Blacklist le topic");
-        anchor.onclick = function () { addTopicIdBlacklist(topicId, topicSubject, true); refreshTopicIdKeys(); };
-        anchor.innerHTML = '<svg viewBox="2 2 160 160" width="13"><use href="#forbiddenlogo"/></svg>';
-        span.appendChild(anchor)
-        topic.appendChild(span);
-    });
-}
-
-function addCss() {
-    const globalCss = GM_getResourceText("DEBOUCLED_CSS");
-    GM_addStyle(globalCss);
-}
-
-function buildSettingPage() {
-    let bgView = document.createElement('div');
-    bgView.setAttribute("id", "deboucled-bg-view");
-    bgView.setAttribute("style", "width:100%;height:100%;z-index:999998;background:transparent;overflow-y:auto;position:fixed");
-    bgView.innerHTML = '<div></div>';
-    document.body.prepend(bgView);
-    document.getElementById('deboucled-bg-view').style.display = 'none';
-
-    function addToggleOption(title, optionId, defaultValue) {
-        let html = "";
-        html += '<div class="deboucled-option-row">';
-        html += `<div class="deboucled-option-cell">${title}</div>`;
-        html += '<div class="deboucled-option-cell">';
-        html += '<label class="deboucled-switch">';
-        let checked = GM_getValue(optionId, defaultValue) ? 'checked' : '';
-        html += `<input type="checkbox" id="${optionId}" ${checked}>`;
-        html += '<span class="deboucled-toggle-slider round"></span>';
-        html += '</label>';
-        html += '</div>';
-        html += '</div>';
-        return html;
-    }
-    function addRangeOption(title, optionId, defaultValue, minValue, maxValue, enabled) {
-        let html = "";
-        html += `<div id="${optionId}-container" class="deboucled-option-row${enabled ? '' : ' deboucled-disabled'}">`;
-        html += `<div class="deboucled-option-cell deboucled-option-subcell">${title}</div>`;
-        html += '<div class="deboucled-option-cell">';
-        let value = GM_getValue(optionId, defaultValue);
-        html += `<input type="range" id="${optionId}" min="${minValue}" max="${maxValue}" value="${value}" step="10" class="deboucled-range-slider">`;
-        html += '</div>';
-        html += '<div class="deboucled-option-cell">';
-        html += `<span id="${optionId}-value">${value}</span>`;
-        html += '</div>';
-        html += '</div>';
-        return html;
-    }
-
-    let deboucledHtml = "";
-    deboucledHtml += `<div class="deboucled-bloc-header">OPTIONS</div>`;
-    deboucledHtml += '<div class="deboucled-bloc">';
-    deboucledHtml += '<div class="deboucled-option-table">';
-    deboucledHtml += addToggleOption('Utiliser JvArchive pour "Pseudo boucled"', storage_optionBoucledUseJvarchive, false);
-    deboucledHtml += addToggleOption('Cacher les messages des pseudos blacklist', storage_optionHideMessages, true);
-    deboucledHtml += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, false);
-    let allowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
-    deboucledHtml += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, 100, 10, 1000, allowDisplayThreshold);
-    deboucledHtml += '</div>';
-    deboucledHtml += '</div>';
-
-    function addEntitySettingSection(entity, header, hint) {
-        let html = "";
-        html += `<div class="deboucled-bloc-header">${header}</div>`;
-        html += '<div class="deboucled-bloc">';
-        html += `<input type="text" id="deboucled-${entity}-input-key" class="deboucled-input" placeholder="${hint}" >`;
-        html += `<span id="deboucled-${entity}-input-button" class="btn btn-actu-new-list-forum deboucled-add-button">Ajouter</span>`;
-        html += '<br>';
-        html += `<div id="deboucled-${entity}List" style="margin-top:10px;"></div>`;
-        html += '</div>';
-        return html;
-    }
-    deboucledHtml += addEntitySettingSection(entitySubject, 'BLACKLIST SUJETS', 'Mot-clé');
-    deboucledHtml += addEntitySettingSection(entityAuthor, 'BLACKLIST AUTEURS', 'Pseudo');
-    deboucledHtml += addEntitySettingSection(entityTopicId, 'BLACKLIST TOPICS', 'TopicId');
-
-    let deboucledView = document.createElement('div');
-    deboucledView.setAttribute("id", "deboucled-view");
-    deboucledView.setAttribute("style", "width:60%;margin-left:20%;top:110px;max-height:calc(100vh - 150px);overflow-y:auto;position:fixed;z-index:999999;background:transparent;border-style:solid;border-color:dimgray;border-radius:4px;border-width:thin;");
-    deboucledView.innerHTML = deboucledHtml;
-    document.body.prepend(deboucledView);
-    document.getElementById('deboucled-view').style.display = 'none';
-
-    function addToggleEvent(id, callback) {
-        const toggleSlider = document.getElementById(id)
-        toggleSlider.addEventListener('change', (e) => {
-            GM_setValue(id, e.currentTarget.checked);
-            if (callback !== undefined) callback(e.currentTarget.checked);
-        });
-    }
-    function addRangeEvent(id) {
-        const rangeSlider = document.getElementById(id)
-        rangeSlider.oninput = function () {
-            GM_setValue(id, this.value);
-            document.getElementById(`${id}-value`).innerHTML = this.value;
-        };
-    }
-
-    addToggleEvent(storage_optionHideMessages);
-    addToggleEvent(storage_optionBoucledUseJvarchive);
-    addToggleEvent(storage_optionAllowDisplayThreshold, function (checked) {
-        document.querySelectorAll(`[id = ${storage_optionDisplayThreshold}-container]`).forEach(function (el) {
-            let disabledClass = 'deboucled-disabled';
-            if (checked) el.className = el.className.replace(disabledClass, '').trim();
-            else el.className += ' ' + disabledClass;
-        })
-    });
-    addRangeEvent(storage_optionDisplayThreshold);
-
-    buildSettingEntities();
-}
-
-function buildSettingEntities() {
-    createAddEntityEvent(entitySubject, /^[A-zÀ-ú0-9_@./#&+-\?\*\[\]\(\) ]*$/i, function (key) { addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
-    createAddEntityEvent(entityAuthor, /^[A-zÀ-ú0-9-_\[\]]*$/i, function (key) { addEntityBlacklist(authorBlacklistArray, key); refreshAuthorKeys(); });
-    createAddEntityEvent(entityTopicId, /^[0-9]+$/i, function (key) { addTopicIdBlacklist(key, key, false); refreshTopicIdKeys(); });
-
-    refreshSubjectKeys();
-    refreshAuthorKeys();
-    refreshTopicIdKeys();
-}
-
-function refreshSubjectKeys() {
-    writeEntityKeys(entitySubject, subjectBlacklistArray, function (node) { removeEntityBlacklist(subjectBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, '')); refreshSubjectKeys(); });
-}
-
-function refreshAuthorKeys() {
-    writeEntityKeys(entityAuthor, authorBlacklistArray, function (node) { removeEntityBlacklist(authorBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, '')); refreshAuthorKeys(); });
-}
-
-function refreshTopicIdKeys() {
-    writeEntityKeys(entityTopicId, topicIdBlacklistMap, function (node) { removeTopicIdBlacklist(node.getAttribute('id').replace(/<[^>]*>/g, '')); refreshTopicIdKeys(); });
-}
-
-function createAddEntityEvent(entity, keyRegex, addCallback) {
-    function addEntity(entity, keyRegex, addCallback) {
-        let key = document.getElementById(`deboucled-${entity}-input-key`).value;
-        if (key === "" || !key.match(keyRegex)) return;
-        addCallback(key);
-        document.getElementById(`deboucled-${entity}-input-key`).value = "";
-    }
-
-    document.getElementById(`deboucled-${entity}-input-key`).addEventListener('keydown', function (event) {
-        if (event.key !== "Enter") return;
-        addEntity(entity, keyRegex, addCallback);
+    let toggleIgnoredAuthors = document.createElement('a');
+    toggleIgnoredAuthors.setAttribute('class', 'titre-bloc deboucled-toggle-ignored-authors');
+    toggleIgnoredAuthors.setAttribute('href', '#');
+    toggleIgnoredAuthors.textContent = '(voir)';
+    toggleIgnoredAuthors.addEventListener('click', function (e) {
+        if (ignoredAuthors.style.display === 'inline') {
+            ignoredAuthors.style.display = 'none';
+            toggleIgnoredAuthors.textContent = '(voir)';
+        }
+        else {
+            ignoredAuthors.style.display = 'inline';
+            toggleIgnoredAuthors.textContent = '(cacher)';
+        }
     });
 
-    document.getElementById(`deboucled-${entity}-input-button`).addEventListener('click', function (e) {
-        addEntity(entity, keyRegex, addCallback);
-    });
+    insertAfter(ignoredMessageHeader, paginationElement);
+    ignoredMessageHeader.appendChild(toggleIgnoredAuthors);
+    ignoredMessageHeader.appendChild(ignoredAuthors);
 }
 
-function writeEntityKeys(entity, array, removeCallback) {
-    let html = '<ul style="margin:0;margin-left:-2px;padding:0;list-style:none;">';
-    array.forEach(function (value, key) {
-        html += `<li class="key" id="${key}" style="border: 1px solid #d6d6d6;border-radius: 3px;display: inline-block;height:20px"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
-    });
-    document.getElementById(`deboucled-${entity}List`).innerHTML = html + '</ul>';
-
-    document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(input => input.addEventListener('click', function (e) {
-        removeCallback(this.parentNode);
-    }));
-}
-
-function addSettingButton(firstLaunch) {
-    let optionButton = document.createElement("span");
-    optionButton.innerHTML = `<span id="deboucled-option-button" style="margin-right:5px;min-width:80px" class="btn btn-actu-new-list-forum ${firstLaunch ? 'blinking' : ''}">Déboucled</span>`;
-    document.getElementsByClassName('bloc-pre-right')[0].prepend(optionButton);
-    document.getElementById('deboucled-option-button').addEventListener('click', function () {
-        document.getElementById('deboucled-bg-view').style.display = 'block';
-        document.getElementById('deboucled-view').style.display = 'block';
-        clearEntityInputs();
-    });
-
-    window.addEventListener('click', function (e) {
-        if (!document.getElementById('deboucled-bg-view').contains(e.target)) return;
-        document.getElementById('deboucled-bg-view').style.display = 'none';
-        document.getElementById('deboucled-view').style.display = 'none';
-    });
-}
-
-function clearEntityInputs() {
-    document.querySelectorAll('.deboucled-input').forEach(i => i.value = "");
+function removeMessage(element) {
+    element.previousElementSibling.remove();
+    element.remove();
+    hiddenMessages++;
 }
 
 function upgradeJvcBlacklistButton(messageElement, author) {
@@ -567,11 +337,303 @@ function addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchiv
     insertAfter(boucledAuthorAnchor, mpBloc);
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////
+// EXTENSIONS
+///////////////////////////////////////////////////////////////////////////////////////
+
+function makeRegex(array, withBoundaries) {
+    let map = withBoundaries ? array.map((e) => `\\b${escapeRegExp(e)}\\b`) : array.map((e) => escapeRegExp(e));
+    let regex = map.join('|');
+    return new RegExp(regex, 'gi');
+}
+
+function escapeRegExp(str) {
+    return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
+function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
+
+function isPlural(nb) {
+    return nb > 1 ? 's' : '';
+}
+
+function addCss() {
+    const globalCss = GM_getResourceText("DEBOUCLED_CSS");
+    GM_addStyle(globalCss);
+}
+
 function addSvg(svgHtml, selector) {
     let svgElement = document.createElement('svg');
     svgElement.innerHTML = svgHtml;
     let selection = document.querySelector(selector)
     if (selection !== null) selection.appendChild(svgElement);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+// SETTINGS
+///////////////////////////////////////////////////////////////////////////////////////
+
+function buildSettingPage() {
+    let bgView = document.createElement('div');
+    bgView.setAttribute("id", "deboucled-settings-bg-view");
+    bgView.setAttribute("class", "deboucled-settings-bg-view");
+    bgView.innerHTML = '<div></div>';
+    document.body.prepend(bgView);
+    document.getElementById('deboucled-settings-bg-view').style.display = 'none';
+
+    function addToggleOption(title, optionId, defaultValue) {
+        let html = "";
+        html += '<div class="deboucled-option-row">';
+        html += `<div class="deboucled-option-cell">${title}</div>`;
+        html += '<div class="deboucled-option-cell">';
+        html += '<label class="deboucled-switch">';
+        let checked = GM_getValue(optionId, defaultValue) ? 'checked' : '';
+        html += `<input type="checkbox" id="${optionId}" ${checked}>`;
+        html += '<span class="deboucled-toggle-slider round"></span>';
+        html += '</label>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
+    function addRangeOption(title, optionId, defaultValue, minValue, maxValue, enabled) {
+        let html = "";
+        html += `<div id="${optionId}-container" class="deboucled-option-row${enabled ? '' : ' deboucled-disabled'}">`;
+        html += `<div class="deboucled-option-cell deboucled-option-subcell">${title}</div>`;
+        html += '<div class="deboucled-option-cell">';
+        let value = GM_getValue(optionId, defaultValue);
+        html += `<input type="range" id="${optionId}" min="${minValue}" max="${maxValue}" value="${value}" step="10" class="deboucled-range-slider">`;
+        html += '</div>';
+        html += '<div class="deboucled-option-cell">';
+        html += `<span id="${optionId}-value">${value}</span>`;
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
+    function addEntitySettingSection(entity, header, hint) {
+        let html = "";
+        html += `<div class="deboucled-bloc-header deboucled-collapsible">${header}</div>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-${entity}-collapsible-content">`;
+        html += '<div class="deboucled-setting-content">';
+        html += `<input type="text" id="deboucled-${entity}-input-key" class="deboucled-input" placeholder="${hint}" >`;
+        html += `<span id="deboucled-${entity}-input-button" class="btn btn-actu-new-list-forum deboucled-add-button">Ajouter</span>`;
+        html += '<br>';
+        html += `<div id="deboucled-${entity}List" style="margin-top:10px;"></div>`;
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
+
+    let settingsHtml = "";
+    settingsHtml += `<div class="deboucled-bloc-header deboucled-collapsible deboucled-collapsible-active">OPTIONS</div>`;
+    settingsHtml += '<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content style="max-height: inherit;">';
+    settingsHtml += '<div class="deboucled-option-table deboucled-setting-content">';
+    settingsHtml += addToggleOption('Utiliser JvArchive pour "Pseudo boucled"', storage_optionBoucledUseJvarchive, false);
+    settingsHtml += addToggleOption('Cacher les messages des pseudos blacklist', storage_optionHideMessages, true);
+    settingsHtml += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, false);
+    let allowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
+    settingsHtml += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, 100, 10, 1000, allowDisplayThreshold);
+    settingsHtml += '</div>';
+    settingsHtml += '</div>';
+
+    settingsHtml += addEntitySettingSection(entitySubject, 'BLACKLIST SUJETS', 'Mot-clé');
+    settingsHtml += addEntitySettingSection(entityAuthor, 'BLACKLIST AUTEURS', 'Pseudo');
+    settingsHtml += addEntitySettingSection(entityTopicId, 'BLACKLIST TOPICS', 'TopicId');
+
+    let settingsView = document.createElement('div');
+    settingsView.setAttribute("id", "deboucled-settings-view");
+    settingsView.setAttribute('class', 'deboucled-settings-view');
+    settingsView.innerHTML = settingsHtml;
+    document.body.prepend(settingsView);
+    document.getElementById('deboucled-settings-view').style.display = 'none';
+
+    function addToggleEvent(id, callback) {
+        const toggleSlider = document.getElementById(id)
+        toggleSlider.addEventListener('change', (e) => {
+            GM_setValue(id, e.currentTarget.checked);
+            if (callback !== undefined) callback();
+        });
+    }
+    function addRangeEvent(id) {
+        const rangeSlider = document.getElementById(id)
+        rangeSlider.oninput = function () {
+            GM_setValue(id, this.value);
+            document.getElementById(`${id}-value`).innerHTML = this.value;
+        };
+    }
+
+    addToggleEvent(storage_optionHideMessages);
+    addToggleEvent(storage_optionBoucledUseJvarchive);
+    addToggleEvent(storage_optionAllowDisplayThreshold, function () {
+        document.querySelectorAll(`[id = ${storage_optionDisplayThreshold}-container]`).forEach(function (el) {
+            el.classList.toggle("deboucled-disabled");
+        })
+    });
+    addRangeEvent(storage_optionDisplayThreshold);
+
+    addCollapsibleEvents();
+
+    buildSettingEntities();
+}
+
+function addCollapsibleEvents() {
+    const activeClass = 'deboucled-collapsible-active';
+    document.querySelectorAll('.deboucled-collapsible').forEach(function (el) {
+        el.addEventListener('click', function () {
+            // collapse every active panel
+            document.querySelectorAll('.' + activeClass).forEach(function (activeEl) {
+                if (activeEl === el) return;
+                activeEl.classList.toggle(activeClass, false);
+                var content = activeEl.nextElementSibling;
+                content.removeAttribute('style');
+            });
+
+            // toggle current panel
+            this.classList.toggle(activeClass);
+            let content = this.nextElementSibling;
+            if (content.style.maxHeight) {
+                content.removeAttribute('style');
+            } else {
+                content.style.maxHeight = content.scrollHeight + 'px';
+            }
+        });
+    });
+}
+
+function buildSettingEntities() {
+    createAddEntityEvent(entitySubject, /^[A-zÀ-ú0-9_@./#&+-\?\*\[\]\(\) ]*$/i, function (key) { addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
+    createAddEntityEvent(entityAuthor, /^[A-zÀ-ú0-9-_\[\]]*$/i, function (key) { addEntityBlacklist(authorBlacklistArray, key); refreshAuthorKeys(); });
+    createAddEntityEvent(entityTopicId, /^[0-9]+$/i, function (key) { addTopicIdBlacklist(key, key, false); refreshTopicIdKeys(); });
+
+    refreshSubjectKeys();
+    refreshAuthorKeys();
+    refreshTopicIdKeys();
+}
+
+function refreshSubjectKeys() {
+    writeEntityKeys(entitySubject, subjectBlacklistArray, function (node) { removeEntityBlacklist(subjectBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, '')); refreshSubjectKeys(); });
+}
+
+function refreshAuthorKeys() {
+    writeEntityKeys(entityAuthor, authorBlacklistArray, function (node) { removeEntityBlacklist(authorBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, '')); refreshAuthorKeys(); });
+}
+
+function refreshTopicIdKeys() {
+    writeEntityKeys(entityTopicId, topicIdBlacklistMap, function (node) { removeTopicIdBlacklist(node.getAttribute('id').replace(/<[^>]*>/g, '')); refreshTopicIdKeys(); });
+}
+
+function createAddEntityEvent(entity, keyRegex, addCallback) {
+    function addEntity(entity, keyRegex, addCallback) {
+        let key = document.getElementById(`deboucled-${entity}-input-key`).value;
+        if (key === "" || !key.match(keyRegex)) return;
+        addCallback(key);
+        document.getElementById(`deboucled-${entity}-input-key`).value = "";
+        let content = document.getElementById(`deboucled-${entity}-collapsible-content`);
+        content.style.maxHeight = content.scrollHeight + 'px';
+    }
+
+    document.getElementById(`deboucled-${entity}-input-key`).addEventListener('keydown', function (event) {
+        if (event.key !== "Enter") return;
+        addEntity(entity, keyRegex, addCallback);
+    });
+
+    document.getElementById(`deboucled-${entity}-input-button`).addEventListener('click', function (e) {
+        addEntity(entity, keyRegex, addCallback);
+    });
+}
+
+function writeEntityKeys(entity, array, removeCallback) {
+    let html = '<ul style="margin:0;margin-left:-2px;padding:0;list-style:none;">';
+    array.forEach(function (value, key) {
+        html += `<li class="key" id="${key}" style="border: 1px solid #d6d6d6;border-radius: 3px;display: inline-block;height:20px"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
+    });
+    document.getElementById(`deboucled-${entity}List`).innerHTML = html + '</ul>';
+
+    document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(input => input.addEventListener('click', function (e) {
+        removeCallback(this.parentNode);
+    }));
+}
+
+function addSettingButton(firstLaunch) {
+    let optionButton = document.createElement("span");
+    optionButton.innerHTML = `<span id="deboucled-option-button" style="margin-right:5px;min-width:80px" class="btn btn-actu-new-list-forum ${firstLaunch ? 'blinking' : ''}">Déboucled</span>`;
+    document.getElementsByClassName('bloc-pre-right')[0].prepend(optionButton);
+    document.getElementById('deboucled-option-button').addEventListener('click', function () {
+        document.getElementById('deboucled-settings-bg-view').style.display = 'block';
+        document.getElementById('deboucled-settings-view').style.display = 'block';
+        clearEntityInputs();
+    });
+
+    window.addEventListener('click', function (e) {
+        if (!document.getElementById('deboucled-settings-bg-view').contains(e.target)) return;
+        document.getElementById('deboucled-settings-bg-view').style.display = 'none';
+        document.getElementById('deboucled-settings-view').style.display = 'none';
+    });
+}
+
+function clearEntityInputs() {
+    document.querySelectorAll('.deboucled-input').forEach(i => i.value = "");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+// MAIN PAGE
+///////////////////////////////////////////////////////////////////////////////////////
+
+function getCurrentPageType(url) {
+    if (document.querySelector('.img-erreur') !== null) return 'error';
+
+    let topicListRegex = /\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*/i;
+    if (url.match(topicListRegex)) return 'topiclist';
+
+    let topicMessagesRegex = /\/forums\/42-[0-9]+-[0-9]+-[0-9]+-0-1-0-.*/i;
+    if (url.match(topicMessagesRegex)) return 'topicmessages';
+
+    return 'unknown';
+}
+
+async function getPageContent(page) {
+    let urlRegex = /(\/forums\/0-[0-9]+-0-1-0-)(?<pageid>[0-9]+)(-0-.*)/i;
+
+    let currentPath = window.location.pathname;
+    let matches = urlRegex.exec(currentPath);
+    var currentPageId = parseInt(matches.groups.pageid);
+
+    let nextPageId = currentPageId + ((page - 1) * topicByPage);
+    let nextPageUrl = currentPath.replace(urlRegex, `$1${nextPageId}$3`);
+
+    const response = await fetch(nextPageUrl);
+    return await response.text();
+}
+
+function addIgnoreButtons() {
+    const forbiddenSvg = '<svg style="display: none;"><symbol id="forbiddenlogo"><g><ellipse opacity="0.6" stroke-width="20" stroke="red" ry="70" rx="70" cy="80" cx="80" fill="none" /><line opacity="0.6" stroke="red" y2="37.39011" x2="122.60989" y1="122.60989" x1="37.39011" stroke-width="20" fill="none" /></g></symbol></svg>';
+    addSvg(forbiddenSvg, '.topic-list.topic-list-admin');
+
+    let topics = getAllTopics(document);
+
+    let header = topics[0];
+    let spanHead = document.createElement("span");
+    spanHead.setAttribute("class", "deboucled-topic-blacklist");
+    spanHead.setAttribute("style", "width:1.75rem");
+    header.appendChild(spanHead);
+
+    topics.slice(1).forEach(function (topic) {
+        let span = document.createElement("span");
+        span.setAttribute("class", "deboucled-topic-blacklist");
+        let topicId = topic.getAttribute('data-id');
+        let topicSubject = topic.querySelector('span:nth-child(1) > a:nth-child(2)').textContent.trim();
+        let anchor = document.createElement("a");
+        anchor.setAttribute("href", "#");
+        anchor.setAttribute("title", "Blacklist le topic");
+        anchor.onclick = function () { addTopicIdBlacklist(topicId, topicSubject, true); refreshTopicIdKeys(); };
+        anchor.innerHTML = '<svg viewBox="2 2 160 160" width="13"><use href="#forbiddenlogo"/></svg>';
+        span.appendChild(anchor)
+        topic.appendChild(span);
+    });
 }
 
 async function handleTopicList() {
