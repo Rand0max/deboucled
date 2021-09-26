@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.6.0
+// @version     1.6.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -76,9 +76,9 @@ function initStorage() {
 }
 
 function loadFromStorage() {
-    topicIdBlacklistMap = new Map([...topicIdBlacklistMap, ...JSON.parse(GM_getValue(storage_blacklistedTopicIds))]);
     subjectBlacklistArray = [...new Set(subjectBlacklistArray.concat(JSON.parse(GM_getValue(storage_blacklistedSubjects))))];
     authorBlacklistArray = [...new Set(authorBlacklistArray.concat(JSON.parse(GM_getValue(storage_blacklistedAuthors))))];
+    topicIdBlacklistMap = new Map([...topicIdBlacklistMap, ...JSON.parse(GM_getValue(storage_blacklistedTopicIds))]);
 
     subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
@@ -87,12 +87,14 @@ function loadFromStorage() {
 }
 
 function saveToStorage() {
-    GM_setValue(storage_blacklistedTopicIds, JSON.stringify([...topicIdBlacklistMap]));
     GM_setValue(storage_blacklistedSubjects, JSON.stringify([...new Set(subjectBlacklistArray)]));
     GM_setValue(storage_blacklistedAuthors, JSON.stringify([...new Set(authorBlacklistArray)]));
+    GM_setValue(storage_blacklistedTopicIds, JSON.stringify([...topicIdBlacklistMap]));
 
     subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
+
+    refreshEntityCounts();
 }
 
 function removeTopicIdBlacklist(topicId) {
@@ -423,14 +425,15 @@ function buildSettingPage() {
         html += '<div class="deboucled-setting-content">';
         html += '<table class="deboucled-option-table-entities">';
         html += '<tr>';
-        html += '<td style="width: 70%;">';
+        html += '<td>';
         html += `<input type="text" id="deboucled-${entity}-input-key" class="deboucled-input-key" placeholder="${hint}" >`;
         html += `<span id="deboucled-${entity}-input-button" class="btn btn-actu-new-list-forum deboucled-add-button">Ajouter</span>`;
-        html += '</td>';
-        html += '<td style="width: 30%; text-align: right;">';
-        html += `<input type="search" id="deboucled-${entity}-search-key" class="deboucled-input-search" placeholder="Rechercher..." >`;
+        html += `<input type="search" id="deboucled-${entity}-search-key" class="deboucled-input-search" style="float: right;" placeholder="Rechercher..." >`;
         html += '</td>';
         html += '</tr>';
+        html += '<td style="padding-top: 12px;padding-bottom: 0;">';
+        html += `<span id="deboucled-${entity}-entity-count" class="deboucled-entity-count"></span>`;
+        html += '</td>';
         html += '<tr>';
         html += '<td colspan="2">';
         html += `<div id="deboucled-${entity}List" style="margin-top:10px;"></div>`;
@@ -500,6 +503,8 @@ function buildSettingPage() {
     addCollapsibleEvents();
 
     buildSettingEntities();
+
+    refreshEntityCounts();
 }
 
 function addCollapsibleEvents() {
@@ -622,11 +627,11 @@ function createSearchEntitiesEvent(entity, keyRegex, refreshCallback) {
 }
 
 function writeEntityKeys(entity, array, filter, removeCallback) {
-    let html = '<ul style="margin:0;margin-left:-2px;padding:0;list-style:none;">';
+    let html = '<ul class="deboucled-entity-list">';
     let keys = array;
     if (filter) keys = keys.filter(k => k.toUpperCase().includes(filter));
     keys.forEach(function (value, key) {
-        html += `<li class="key" id="${key}" style="border: 1px solid #d6d6d6;border-radius: 3px;display: inline-block;height:20px"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
+        html += `<li class="key deboucled-entity-element" id="${key}"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
     });
     document.getElementById(`deboucled-${entity}List`).innerHTML = html + '</ul>';
 
@@ -635,9 +640,20 @@ function writeEntityKeys(entity, array, filter, removeCallback) {
     }));
 }
 
+function refreshEntityCounts() {
+    let subjectCount = document.getElementById(`deboucled-${entitySubject}-entity-count`);
+    if (subjectCount !== null) subjectCount.textContent = `${subjectBlacklistArray.length} sujet${isPlural(subjectBlacklistArray.length)} blacklist`;
+
+    let authorCount = document.getElementById(`deboucled-${entityAuthor}-entity-count`);
+    if (authorCount !== null) authorCount.textContent = `${authorBlacklistArray.length} pseudo${isPlural(authorBlacklistArray.length)} blacklist`;
+
+    let topicCount = document.getElementById(`deboucled-${entityTopicId}-entity-count`)
+    if (topicCount !== null) topicCount.textContent = `${topicIdBlacklistMap.size} topic${isPlural(topicIdBlacklistMap.size)} blacklist`;
+}
+
 function refreshCollapsibleContentHeight(entity) {
     let content = document.getElementById(`deboucled-${entity}-collapsible-content`);
-    if (content === undefined) return;
+    if (content === null) return;
     content.style.maxHeight = content.scrollHeight + 'px';
 }
 

@@ -9,13 +9,11 @@
   border: 1px solid #d6d6d6;
   border-radius: 3px;
   height: 28px;
-  margin-bottom: 5px;
 }
 .deboucled-input-search {
   border: 1px solid #d6d6d6;
   border-radius: 3px;
   height: 28px;
-  margin: 0 20px 0 7px !important;
 }
 .blinking {
   animation: blinker 1.5s linear 7;
@@ -31,18 +29,12 @@
 .deboucled-topic-blacklist {
   text-align: center;
   display: table-cell;
-  /* padding-bottom: 3px; */
 }
 @media (max-width: 807.98px) {
   .deboucled-logo-forbidden {
     width: 16px;
   }
   .deboucled-topic-blacklist {
-    /*
-    text-align: right;
-    display: block;
-    margin-left: 15px; 
-    */
     position: absolute;
     bottom: 0.4375rem;
     display: block;
@@ -57,6 +49,13 @@
   margin-left: 5px;
   background-color: #0050a6 !important;
   height: 28px;
+}
+@media (max-width: 483px) {
+  .deboucled-add-button {
+    margin: 5px;
+    background-color: #0050a6 !important;
+    height: 28px;
+  }
 }
 .deboucled-author-boucled-button {
   position: relative;
@@ -76,6 +75,23 @@
   margin-left: 5px;
   font-size: 0.8rem;
   color: gray;
+}
+.deboucled-entity-list {
+  margin: 0;
+  margin-left: -2px;
+  padding: 0;
+  list-style: none;
+}
+.deboucled-entity-element {
+  border: 1px solid #d6d6d6;
+  border-radius: 4px;
+  display: inline-block;
+  height: 20px;
+  background-color: #00000008;
+}
+.deboucled-entity-count {
+  color: #000000b1;
+  margin-left: 3px;
 }
 .key:first-letter {
   text-transform: capitalize;
@@ -113,7 +129,6 @@ input[type="text"] {
 input[type="search"] {
   border: 1px solid #d2d2d2;
   padding: 3px;
-  margin-left: -2px;
 }
 .deboucled-settings-bg-view {
   width: 100%;
