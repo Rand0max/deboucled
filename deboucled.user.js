@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.6.1
+// @version     1.6.2
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -117,6 +117,51 @@ function removeEntityBlacklist(array, key) {
         array.splice(index, 1);
         saveToStorage();
     }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+// EXTENSIONS
+///////////////////////////////////////////////////////////////////////////////////////
+
+if (typeof String.prototype.normalizeDiacritic !== "function") {
+    String.prototype.normalizeDiacritic = function () {
+        return this.normalize("NFD").replace(/\p{Diacritic}/gu, "");
+    };
+}
+
+if (typeof String.prototype.escapeRegexPattern !== "function") {
+    String.prototype.escapeRegexPattern = function () {
+        return this.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    };
+}
+
+function makeRegex(array, withBoundaries) {
+    let map = withBoundaries
+        ? array.map((e) => `\\b${e.escapeRegexPattern().normalizeDiacritic()}\\b`)
+        : array.map((e) => e.escapeRegexPattern().normalizeDiacritic());
+    let regex = map.join('|');
+    return new RegExp(regex, 'gi');
+}
+
+function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
+
+function isPlural(nb) {
+    return nb > 1 ? 's' : '';
+}
+
+function addCss() {
+    const globalCss = GM_getResourceText("DEBOUCLED_CSS");
+    GM_addStyle(globalCss);
+}
+
+function addSvg(svgHtml, selector) {
+    let svgElement = document.createElement('svg');
+    svgElement.innerHTML = svgHtml;
+    let selection = document.querySelector(selector)
+    if (selection !== null) selection.appendChild(svgElement);
 }
 
 
@@ -340,41 +385,6 @@ function addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchiv
     boucledAuthorAnchor.innerHTML = '<svg width="16px" viewBox="0 0 24 24"><use href="#spirallogo"/></svg></a>';
 
     insertAfter(boucledAuthorAnchor, mpBloc);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////
-// EXTENSIONS
-///////////////////////////////////////////////////////////////////////////////////////
-
-function makeRegex(array, withBoundaries) {
-    let map = withBoundaries ? array.map((e) => `\\b${escapeRegExp(e)}\\b`) : array.map((e) => escapeRegExp(e));
-    let regex = map.join('|');
-    return new RegExp(regex, 'gi');
-}
-
-function escapeRegExp(str) {
-    return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-}
-
-function insertAfter(newNode, referenceNode) {
-    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-}
-
-function isPlural(nb) {
-    return nb > 1 ? 's' : '';
-}
-
-function addCss() {
-    const globalCss = GM_getResourceText("DEBOUCLED_CSS");
-    GM_addStyle(globalCss);
-}
-
-function addSvg(svgHtml, selector) {
-    let svgElement = document.createElement('svg');
-    svgElement.innerHTML = svgHtml;
-    let selection = document.querySelector(selector)
-    if (selection !== null) selection.appendChild(svgElement);
 }
 
 
