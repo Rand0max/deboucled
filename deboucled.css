@@ -170,6 +170,11 @@ input[type="search"] {
   border-style: solid;
   border-width: thin;
 }
+.deboucled-version {
+  float: right;
+  color: gray;
+  user-select: none;
+}
 
 /* Div Table */
 .deboucled-setting-content {

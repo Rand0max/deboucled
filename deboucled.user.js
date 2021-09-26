@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.6.2
+// @version     1.6.3
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -42,6 +42,7 @@ let hiddenTopics = 0;
 let hiddenMessages = 0;
 let hiddenAuthorArray = new Set();
 
+const deboucledVersion = '1.6.3'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -459,6 +460,7 @@ function buildSettingPage() {
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">OPTIONS</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
         html += '<div class="deboucled-setting-content">';
+        html += `<span class="deboucled-version">v${deboucledVersion}</span>`;
         html += '<table class="deboucled-option-table">';
         html += addToggleOption('Utiliser JvArchive pour "Pseudo boucled"', storage_optionBoucledUseJvarchive, false);
         html += addToggleOption('Cacher les messages des pseudos blacklist', storage_optionHideMessages, true);
