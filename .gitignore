@@ -1,3 +1,7 @@
 *.min.css
 *.min.js
 node_modules/**
+changelogs/**
+tampermonkey-module.d.ts
+tampermonkey-reference.d.ts
+tsconfig.json

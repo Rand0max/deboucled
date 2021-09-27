@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.6.4
+// @version     1.6.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -208,7 +208,7 @@ function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
     }
 }
 
-async function fillTopics(topics) {
+async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold) {
     let actualTopics = topics.length - hiddenTotalTopics - 1;
     let pageBrowse = 1;
     let domParser = new DOMParser();
@@ -220,7 +220,7 @@ async function fillTopics(topics) {
             let nextPageTopics = getAllTopics(nextDoc);
 
             nextPageTopics.slice(1).forEach(function (topic) {
-                if (isTopicBlacklisted(topic)) {
+                if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold)) {
                     hiddenTotalTopics++;
                     return;
                 }
@@ -550,11 +550,11 @@ function buildSettingPage() {
     document.body.prepend(settingsView);
     document.getElementById('deboucled-settings-view').style.display = 'none';
 
-    function addToggleEvent(id, callback) {
+    function addToggleEvent(id, callback = undefined) {
         const toggleSlider = document.getElementById(id)
         toggleSlider.addEventListener('change', (e) => {
             GM_setValue(id, e.currentTarget.checked);
-            if (callback !== undefined) callback();
+            if (callback) callback();
         });
     }
     function addRangeEvent(id) {
@@ -625,7 +625,21 @@ function buildSettingEntities() {
     refreshTopicIdKeys();
 }
 
-function refreshSubjectKeys(filter) {
+function writeEntityKeys(entity, array, filter, removeCallback) {
+    let html = '<ul class="deboucled-entity-list">';
+    let keys = array;
+    if (filter) keys = keys.filter(k => k.toUpperCase().includes(filter));
+    keys.forEach(function (value, key) {
+        html += `<li class="key deboucled-entity-element" id="${key}"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
+    });
+    document.getElementById(`deboucled-${entity}List`).innerHTML = html + '</ul>';
+
+    document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(input => input.addEventListener('click', function (e) {
+        removeCallback(this.parentNode);
+    }));
+}
+
+function refreshSubjectKeys(filter = null) {
     writeEntityKeys(entitySubject, subjectBlacklistArray, filter, function (node) {
         removeEntityBlacklist(subjectBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
         refreshSubjectKeys();
@@ -633,7 +647,7 @@ function refreshSubjectKeys(filter) {
     });
 }
 
-function refreshAuthorKeys(filter) {
+function refreshAuthorKeys(filter = null) {
     writeEntityKeys(entityAuthor, authorBlacklistArray, filter, function (node) {
         removeEntityBlacklist(authorBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
         refreshAuthorKeys();
@@ -641,7 +655,7 @@ function refreshAuthorKeys(filter) {
     });
 }
 
-function refreshTopicIdKeys(filter) {
+function refreshTopicIdKeys(filter = null) {
     writeEntityKeys(entityTopicId, topicIdBlacklistMap, filter, function (node) {
         removeTopicIdBlacklist(node.getAttribute('id').replace(/<[^>]*>/g, ''));
         refreshTopicIdKeys();
@@ -673,10 +687,11 @@ function keyIsAllowed(key, ctrlKey) {
 
 function createAddEntityEvent(entity, keyRegex, addCallback) {
     function addEntity(entity, keyRegex, addCallback) {
-        let key = document.getElementById(`deboucled-${entity}-input-key`).value;
+        let input = document.getElementById(`deboucled-${entity}-input-key`);
+        let key = input.value;
         if (key === '' || !key.match(keyRegex)) return;
         addCallback(key);
-        document.getElementById(`deboucled-${entity}-input-key`).value = '';
+        input.value = '';
         refreshCollapsibleContentHeight(entity);
     }
 
@@ -699,20 +714,6 @@ function createSearchEntitiesEvent(entity, keyRegex, refreshCallback) {
         refreshCallback(event.target.value.toUpperCase());
         refreshCollapsibleContentHeight(entity);
     });
-}
-
-function writeEntityKeys(entity, array, filter, removeCallback) {
-    let html = '<ul class="deboucled-entity-list">';
-    let keys = array;
-    if (filter) keys = keys.filter(k => k.toUpperCase().includes(filter));
-    keys.forEach(function (value, key) {
-        html += `<li class="key deboucled-entity-element" id="${key}"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
-    });
-    document.getElementById(`deboucled-${entity}List`).innerHTML = html + '</ul>';
-
-    document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(input => input.addEventListener('click', function (e) {
-        removeCallback(this.parentNode);
-    }));
 }
 
 function refreshEntityCounts() {
@@ -823,7 +824,7 @@ async function handleTopicList() {
     topics.slice(1).forEach(function (topic) {
         if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold)) removeTopic(topic);
     });
-    await fillTopics(topics);
+    await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold);
 
     updateTopicsHeader();
 
