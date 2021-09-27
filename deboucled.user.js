@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.6.3
+// @version     1.6.4
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -38,16 +38,24 @@ let topicIdBlacklistMap = new Map();
 let subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
 let authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
 
-let hiddenTopics = 0;
+let hiddenTotalTopics = 0;
+let hiddenSubjects = 0;
+let hiddenTopicsIds = 0;
 let hiddenMessages = 0;
+let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.6.3'
+const deboucledVersion = '1.6.4'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
 const entityAuthor = 'author';
 const entityTopicId = 'topicid';
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+// STORAGE
+///////////////////////////////////////////////////////////////////////////////////////
 
 const storage_init = 'deboucled_init';
 const storage_blacklistedTopicIds = 'deboucled_blacklistedTopicIds';
@@ -58,11 +66,11 @@ const storage_optionHideMessages = 'deboucled_optionHideMessages';
 const storage_optionAllowDisplayThreshold = 'deboucled_optionAllowDisplayThreshold';
 const storage_optionDisplayThreshold = 'deboucled_optionDisplayThreshold';
 const storage_optionDisplayBlacklistTopicButton = 'deboucled_optionDisplayBlacklistTopicButton';
+const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
+const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
+const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
+const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 
-
-///////////////////////////////////////////////////////////////////////////////////////
-// STORAGE
-///////////////////////////////////////////////////////////////////////////////////////
 
 function initStorage() {
     if (GM_getValue(storage_init, false)) {
@@ -118,6 +126,18 @@ function removeEntityBlacklist(array, key) {
         array.splice(index, 1);
         saveToStorage();
     }
+}
+
+function incrementTotalHidden(settingKey, value) {
+    let currentValue = parseInt(GM_getValue(settingKey, '0'));
+    GM_setValue(settingKey, currentValue + value);
+}
+
+function saveTotalHidden() {
+    incrementTotalHidden(storage_totalHiddenTopicIds, hiddenTopicsIds);
+    incrementTotalHidden(storage_totalHiddenSubjects, hiddenSubjects);
+    incrementTotalHidden(storage_totalHiddenAuthors, hiddenAuthors);
+    incrementTotalHidden(storage_totalHiddenMessages, hiddenMessages);
 }
 
 
@@ -189,7 +209,7 @@ function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
 }
 
 async function fillTopics(topics) {
-    let actualTopics = topics.length - hiddenTopics - 1;
+    let actualTopics = topics.length - hiddenTotalTopics - 1;
     let pageBrowse = 1;
     let domParser = new DOMParser();
 
@@ -201,7 +221,7 @@ async function fillTopics(topics) {
 
             nextPageTopics.slice(1).forEach(function (topic) {
                 if (isTopicBlacklisted(topic)) {
-                    hiddenTopics++;
+                    hiddenTotalTopics++;
                     return;
                 }
                 if (actualTopics < topicByPage && !topicExists(topics, topic)) {
@@ -215,7 +235,7 @@ async function fillTopics(topics) {
 
 function updateTopicsHeader() {
     let subjectHeader = document.querySelector('.topic-head > span:nth-child(1)');
-    subjectHeader.textContent = `SUJET (${hiddenTopics} ignoré${isPlural(hiddenTopics)})`;
+    subjectHeader.textContent = `SUJET (${hiddenTotalTopics} ignoré${isPlural(hiddenTotalTopics)})`;
 
     let lastMessageHeader = document.querySelector('.topic-head > span:nth-child(4)');
     lastMessageHeader.style.width = '5.3rem';
@@ -223,7 +243,7 @@ function updateTopicsHeader() {
 
 function removeTopic(element) {
     element.remove();
-    hiddenTopics++;
+    hiddenTotalTopics++;
 }
 
 function addTopic(element) {
@@ -251,32 +271,41 @@ function topicExists(topics, element) {
     return topics.some((elem) => elem.getAttribute("data-id") === topicId);
 }
 
+function getTopicMessageCount(element) {
+    let messageCountElement = element.querySelector('.topic-count');
+    return parseInt(messageCountElement?.textContent.trim() ?? "0");
+}
+
 function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayThreshold) {
     if (!element.hasAttribute('data-id')) return true;
 
     let topicId = element.getAttribute('data-id');
-    if (topicIdBlacklistMap.has(topicId)) return true;
+    if (topicIdBlacklistMap.has(topicId)) {
+        hiddenTopicsIds++;
+        return true;
+    }
 
     if (optionAllowDisplayThreshold && getTopicMessageCount(element) >= optionDisplayThreshold) return false;
 
     let titleTag = element.getElementsByClassName("lien-jv topic-title");
     if (titleTag !== undefined && titleTag.length > 0) {
         let title = titleTag[0].textContent;
-        if (isSubjectBlacklisted(title)) return true;
+        if (isSubjectBlacklisted(title)) {
+            hiddenSubjects++;
+            return true;
+        }
     }
 
     let authorTag = element.getElementsByClassName("topic-author");
     if (authorTag !== undefined && authorTag.length > 0) {
         let author = authorTag[0].textContent.trim();
-        if (isAuthorBlacklisted(author)) return true;
+        if (isAuthorBlacklisted(author)) {
+            hiddenAuthors++;
+            return true;
+        }
     }
 
     return false;
-}
-
-function getTopicMessageCount(element) {
-    let messageCountElement = element.querySelector('.topic-count');
-    return parseInt(messageCountElement?.textContent.trim() ?? "0");
 }
 
 function isSubjectBlacklisted(subject) {
@@ -336,7 +365,6 @@ function updateMessagesHeader() {
 function removeMessage(element) {
     element.previousElementSibling.remove();
     element.remove();
-    hiddenMessages++;
 }
 
 function upgradeJvcBlacklistButton(messageElement, author) {
@@ -401,6 +429,18 @@ function buildSettingPage() {
     document.body.prepend(bgView);
     document.getElementById('deboucled-settings-bg-view').style.display = 'none';
 
+    function addStat(title, content) {
+        let html = "";
+        html += '<tr>';
+        html += '<td style="text-align: right;">';
+        html += `<span class="deboucled-stat-title">${title}</span>`;
+        html += '</td>';
+        html += '<td>';
+        html += `<span class="deboucled-stat-value">${content}</span>`;
+        html += '</td>';
+        html += '</tr>';
+        return html;
+    }
     function addToggleOption(title, optionId, defaultValue) {
         let html = "";
         html += '<tr>';
@@ -429,6 +469,7 @@ function buildSettingPage() {
         html += '</tr>';
         return html;
     }
+
     function addEntitySettingSection(entity, header, hint, sectionIsActive) {
         let html = "";
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">${header}</div>`;
@@ -473,12 +514,34 @@ function buildSettingPage() {
         html += '</div>';
         return html;
     }
+    function addStatsSection(sectionIsActive) {
+        let html = "";
+        html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">STATISTIQUES</div>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
+        html += '<div class="deboucled-setting-content">';
+        html += '<table class="deboucled-option-table">';
+        let totalHiddenSubjects = GM_getValue(storage_totalHiddenSubjects, '0');
+        let totalHiddenAuthors = GM_getValue(storage_totalHiddenAuthors, '0');
+        let totalHiddenTopicIds = GM_getValue(storage_totalHiddenTopicIds, '0');
+        let totalHiddenMessages = GM_getValue(storage_totalHiddenMessages, '0');
+        let totalHidden = parseInt(totalHiddenSubjects + totalHiddenAuthors + totalHiddenTopicIds + totalHiddenMessages);
+        html += addStat('Sujets ignorés', totalHiddenSubjects);
+        html += addStat('Pseudos ignorés', totalHiddenAuthors);
+        html += addStat('Topics ignorés', totalHiddenTopicIds);
+        html += addStat('Messages ignorés', totalHiddenMessages);
+        html += addStat('Total ignorés', totalHidden);
+        html += '</table>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
 
     let settingsHtml = "";
     settingsHtml += addOptionsSection(false);
     settingsHtml += addEntitySettingSection(entitySubject, 'BLACKLIST SUJETS', 'Mot-clé', true);
     settingsHtml += addEntitySettingSection(entityAuthor, 'BLACKLIST AUTEURS', 'Pseudo', false);
     settingsHtml += addEntitySettingSection(entityTopicId, 'BLACKLIST TOPICS', 'TopicId', false);
+    settingsHtml += addStatsSection(false);
 
     let settingsView = document.createElement('div');
     settingsView.setAttribute("id", "deboucled-settings-view");
@@ -750,6 +813,7 @@ function addIgnoreButtons() {
 
 async function handleTopicList() {
     init();
+
     let topics = getAllTopics(document);
     if (topics.length === 0) return;
 
@@ -765,6 +829,8 @@ async function handleTopicList() {
 
     let optionDisplayBlacklistTopicButton = GM_getValue(storage_optionDisplayBlacklistTopicButton, true);
     if (optionDisplayBlacklistTopicButton) addIgnoreButtons();
+
+    saveTotalHidden();
 }
 
 function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
@@ -775,6 +841,7 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
     if (isAuthorBlacklisted(author)) {
         if (optionHideMessages) {
             removeMessage(message);
+            hiddenMessages++;
             hiddenAuthorArray.add(author);
         }
         else {
@@ -803,6 +870,7 @@ function handleTopicMessages() {
     });
 
     updateMessagesHeader();
+    saveTotalHidden();
 }
 
 function init() {

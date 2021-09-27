@@ -175,6 +175,16 @@ input[type="search"] {
   color: gray;
   user-select: none;
 }
+.deboucled-stat-title {
+  text-align: right;
+  font: 14px/16px sans-serif;
+  color: rgb(70, 70, 70);
+  user-select: none;
+}
+.deboucled-stat-value {
+  color: rgb(40, 40, 40);
+  user-select: none;
+}
 
 /* Div Table */
 .deboucled-setting-content {
