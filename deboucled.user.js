@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.6.6
+// @version     1.7.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -24,7 +24,6 @@
 * todo : "Wildcard subject" : use wildcard for subjects blacklist
 * todo : "Reversed/Highlight option" : highlight elements of interest
 * todo : "Zap mode" : select author/word directly in the main page to blacklist
-* todo : "Backup & Restore" : allow user to backup and restore settings with json file
 */
 
 
@@ -45,7 +44,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.6.6'
+const deboucledVersion = '1.7.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -70,6 +69,8 @@ const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
 const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
 const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
+
+const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
 
 
 function initStorage() {
@@ -138,6 +139,60 @@ function saveTotalHidden() {
     incrementTotalHidden(storage_totalHiddenSubjects, hiddenSubjects);
     incrementTotalHidden(storage_totalHiddenAuthors, hiddenAuthors);
     incrementTotalHidden(storage_totalHiddenMessages, hiddenMessages);
+}
+
+function backupStorage() {
+    function blobToFile(blob, fileName) {
+        let file = new File([blob], fileName);
+        file.lastModifiedDate = new Date();
+        file.name = fileName;
+        return file;
+    }
+
+    let map = new Map();
+    GM_listValues().forEach(key => { map.set(key, JSON.parse(GM_getValue(key))); });
+    let json = JSON.stringify(Object.fromEntries(map));
+    var file = blobToFile(new Blob([json], { type: 'application/json' }), 'deboucled');
+    var anchor = document.createElement('a');
+    anchor.download = 'deboucled-settings.json';
+    anchor.href = window.URL.createObjectURL(file);
+    anchor.style = 'display:none;';
+    anchor.click();
+}
+
+function loadFile(fileEvent) {
+    var file = fileEvent.target.files[0];
+    if (!file) return;
+    let reader = new FileReader();
+    reader.onload = function (e) {
+        let content = e.target.result;
+        restoreStorage(content);
+    };
+    reader.readAsText(file);
+}
+
+function restoreStorage(fileContent) {
+    // On parse le JSON du fichier pour en faire un objet
+    let settingsObj = JSON.parse(fileContent);
+
+    // On parcours les clés/valeurs
+    for (const [key, value] of Object.entries(settingsObj)) {
+        // Si une clé est inconnue on ignore
+        if (!storage_Keys.includes(key)) continue;
+
+        // Type object = array/map donc il faut déserialiser
+        if (typeof (value) === 'object') {
+            GM_setValue(key, JSON.stringify(value));
+        }
+        else {
+            // Valeur normale (boolean/string/int/etc)
+            GM_setValue(key, value);
+        }
+    }
+
+    let msg = document.getElementById('deboucled-impexp-message');
+    setTimeout(() => { msg.classList.toggle('active'); }, 5000);
+    msg.classList.toggle('active');
 }
 
 
@@ -458,13 +513,28 @@ function buildSettingPage() {
     function addRangeOption(title, optionId, defaultValue, minValue, maxValue, enabled) {
         let html = "";
         html += `<tr id="${optionId}-container" class="${enabled ? '' : 'deboucled-disabled'}">`;
-        html += `<td>${title}</td>`;
-        html += '<td class="deboucled-option-cell deboucled-option-table-subcell">';
+        html += `<td class="deboucled-option-cell deboucled-option-table-subcell" style="padding-left: 5px;">${title}</td>`;
+        html += '<td class="deboucled-option-cell deboucled-option-table-subcell" style="padding-top: 7px;">';
         let value = GM_getValue(optionId, defaultValue);
         html += `<input type="range" id="${optionId}" min="${minValue}" max="${maxValue}" value="${value}" step="10" class="deboucled-range-slider">`;
         html += '</div>';
         html += '<td>';
         html += `<span id="${optionId}-value">${value}</span>`;
+        html += '</td>';
+        html += '</tr>';
+        return html;
+    }
+    function addImportExportButtons() {
+        let html = "";
+        html += '<tr>';
+        html += '<td>Restaurer/sauvegarder les préférences</td>';
+        html += '<td>';
+        html += `<label for="deboucled-import-button" class="btn btn-actu-new-list-forum deboucled-setting-button">Restaurer</label>`;
+        html += `<input type="file" accept="application/JSON" id="deboucled-import-button" style="display: none;"></input>`;
+        html += `<span id="deboucled-export-button" class="btn btn-actu-new-list-forum deboucled-setting-button">Sauvegarder</span>`;
+        html += '</td>';
+        html += '<td>';
+        html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message">Restauration terminée ⚠ Veuillez rafraichir la page ⚠</span>`;
         html += '</td>';
         html += '</tr>';
         return html;
@@ -500,7 +570,7 @@ function buildSettingPage() {
         let html = "";
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">OPTIONS</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
-        html += '<div class="deboucled-setting-content">';
+        html += '<div class="deboucled-setting-content" style="margin-bottom: 0;">';
         html += `<span class="deboucled-version">v${deboucledVersion}</span>`;
         html += '<table class="deboucled-option-table">';
         html += addToggleOption('Utiliser JvArchive pour "Pseudo boucled"', storage_optionBoucledUseJvarchive, false);
@@ -509,6 +579,7 @@ function buildSettingPage() {
         html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, false);
         let allowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
         html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, 100, 10, 1000, allowDisplayThreshold);
+        html += addImportExportButtons();
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -560,7 +631,7 @@ function buildSettingPage() {
     function addRangeEvent(id) {
         const rangeSlider = document.getElementById(id)
         rangeSlider.oninput = function () {
-            GM_setValue(id, this.value);
+            GM_setValue(id, parseInt(this.value));
             document.getElementById(`${id}-value`).innerHTML = this.value;
         };
     }
@@ -575,11 +646,18 @@ function buildSettingPage() {
     });
     addRangeEvent(storage_optionDisplayThreshold);
 
+    addImportExportEvent();
+
     addCollapsibleEvents();
 
     buildSettingEntities();
 
     refreshEntityCounts();
+}
+
+function addImportExportEvent() {
+    document.getElementById('deboucled-export-button').addEventListener('click', backupStorage);
+    document.getElementById('deboucled-import-button').addEventListener('change', loadFile);
 }
 
 function addCollapsibleEvents() {
@@ -751,7 +829,7 @@ function addSettingButton(firstLaunch) {
 }
 
 function clearEntityInputs() {
-    document.querySelectorAll('.deboucled-input-key').forEach(el => el.value = '');
+    document.querySelectorAll('.deboucled-input-key').forEach(el => { el.value = '' });
 }
 
 

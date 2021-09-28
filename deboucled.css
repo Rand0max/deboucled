@@ -45,15 +45,33 @@
     width: auto;
   }
 }
+.deboucled-setting-button {
+  background-color: #0050a6d1 !important;
+  height: 28px;
+  margin: 15px 10px 15px 0;
+}
+.deboucled-setting-impexp-message {
+  font: bold 11px/100% arial, sans-serif;
+  color: rgba(180, 0, 0, 0.9);
+  pointer-events: none;
+  user-select: none;
+  visibility: hidden;
+  opacity: 1;
+  transition: opacity 1s ease-out 4s;
+}
+.deboucled-setting-impexp-message.active {
+  visibility: visible;
+  opacity: 0;
+}
 .deboucled-add-button {
   margin-left: 5px;
-  background-color: #0050a6 !important;
+  background-color: #0050a6e1 !important;
   height: 28px;
 }
 @media (max-width: 483px) {
   .deboucled-add-button {
     margin: 5px;
-    background-color: #0050a6 !important;
+    background-color: #0050a6e1 !important;
     height: 28px;
   }
 }
@@ -204,6 +222,7 @@ input[type="search"] {
 }
 .deboucled-option-div-cell.deboucled-option-div-subcell {
   padding-left: 5px;
+  padding-top: 5px;
   font: 14px/16px sans-serif;
 }
 
@@ -214,7 +233,6 @@ input[type="search"] {
   border-collapse: separate;
 }
 .deboucled-option-table-subcell {
-  padding-left: 5px;
   font: 14px/16px sans-serif;
 }
 .deboucled-option-table-entities {
@@ -234,6 +252,7 @@ input[type="search"] {
 }
 .deboucled-disabled {
   pointer-events: none;
+  user-select: none;
   opacity: 0.3;
 }
 .deboucled-enabled {
