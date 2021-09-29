@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.7.5
+// @version     1.7.6
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -44,7 +44,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.7.5'
+const deboucledVersion = '1.7.6'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -832,6 +832,10 @@ function addSettingButton(firstLaunch) {
     });
     window.addEventListener('click', function (e) {
         if (!document.getElementById('deboucled-settings-bg-view').contains(e.target)) return;
+        hideSettings();
+    });
+    window.addEventListener('keydown', function (e) {
+        if (!document.getElementById('deboucled-settings-bg-view').contains(e.target) && e.key !== 'Escape') return;
         hideSettings();
     });
 }
