@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.7.0
+// @version     1.7.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -44,7 +44,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.7.0'
+const deboucledVersion = '1.7.5'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -200,17 +200,17 @@ function restoreStorage(fileContent) {
 // EXTENSIONS
 ///////////////////////////////////////////////////////////////////////////////////////
 
-if (typeof String.prototype.normalizeDiacritic !== "function") {
-    String.prototype.normalizeDiacritic = function () {
-        return this.normalize("NFD").replace(/\p{Diacritic}/gu, "");
-    };
-}
+String.prototype.normalizeDiacritic = function () {
+    return this.normalize("NFD").replace(/\p{Diacritic}/gu, "");
+};
 
-if (typeof String.prototype.escapeRegexPattern !== "function") {
-    String.prototype.escapeRegexPattern = function () {
-        return this.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-    };
-}
+String.prototype.escapeRegexPattern = function () {
+    return this.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+};
+
+function normalizeValue(value) {
+    return value.toString().toUpperCase().normalizeDiacritic();
+};
 
 function makeRegex(array, withBoundaries) {
     let map = withBoundaries
@@ -619,7 +619,6 @@ function buildSettingPage() {
     settingsView.setAttribute('class', 'deboucled-settings-view');
     settingsView.innerHTML = settingsHtml;
     document.body.prepend(settingsView);
-    document.getElementById('deboucled-settings-view').style.display = 'none';
 
     function addToggleEvent(id, callback = undefined) {
         const toggleSlider = document.getElementById(id)
@@ -686,17 +685,17 @@ function addCollapsibleEvents() {
 }
 
 function buildSettingEntities() {
-    const regexSubject = /^[A-zÀ-ú0-9_@./#&+-\?\*\[\]\(\) ]*$/i;
-    const regexAuthor = /^[A-zÀ-ú0-9-_\[\]]*$/i;
-    const regexTopicId = /^[0-9]+$/i;
+    const regexAllowedSubject = /^[A-zÀ-ú0-9_@./#&+-\?\*\[\]\(\) ]*$/i;
+    const regexAllowedAuthor = /^[A-zÀ-ú0-9-_\[\]]*$/i;
+    const regexAllowedTopicId = /^[0-9]+$/i;
 
-    createAddEntityEvent(entitySubject, regexSubject, function (key) { addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
-    createAddEntityEvent(entityAuthor, regexAuthor, function (key) { addEntityBlacklist(authorBlacklistArray, key); refreshAuthorKeys(); });
-    createAddEntityEvent(entityTopicId, regexTopicId, function (key) { addTopicIdBlacklist(key, key, false); refreshTopicIdKeys(); });
+    createAddEntityEvent(entitySubject, regexAllowedSubject, function (key) { addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
+    createAddEntityEvent(entityAuthor, regexAllowedAuthor, function (key) { addEntityBlacklist(authorBlacklistArray, key); refreshAuthorKeys(); });
+    createAddEntityEvent(entityTopicId, regexAllowedTopicId, function (key) { addTopicIdBlacklist(key, key, false); refreshTopicIdKeys(); });
 
-    createSearchEntitiesEvent(entitySubject, regexSubject, refreshSubjectKeys);
-    createSearchEntitiesEvent(entityAuthor, regexAuthor, refreshAuthorKeys);
-    createSearchEntitiesEvent(entityTopicId, regexTopicId, refreshTopicIdKeys);
+    createSearchEntitiesEvent(entitySubject, regexAllowedSubject, refreshSubjectKeys);
+    createSearchEntitiesEvent(entityAuthor, regexAllowedAuthor, refreshAuthorKeys);
+    createSearchEntitiesEvent(entityTopicId, regexAllowedSubject, refreshTopicIdKeys); // On peut filter sur le titre du topic
 
     refreshSubjectKeys();
     refreshAuthorKeys();
@@ -704,10 +703,19 @@ function buildSettingEntities() {
 }
 
 function writeEntityKeys(entity, array, filter, removeCallback) {
+
+    let entries = array;
+    if (filter) {
+        if (entries instanceof Array) {
+            entries = entries.filter((value) => normalizeValue(value).includes(filter));
+        }
+        else if (entries instanceof Map) {
+            entries = new Map([...entries].filter((value, key) => normalizeValue(value).includes(filter) || normalizeValue(key).includes(filter)));
+        }
+    }
+
     let html = '<ul class="deboucled-entity-list">';
-    let keys = array;
-    if (filter) keys = keys.filter(k => k.toUpperCase().includes(filter));
-    keys.forEach(function (value, key) {
+    entries.forEach(function (value, key) {
         html += `<li class="key deboucled-entity-element" id="${key}"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
     });
     document.getElementById(`deboucled-${entity}List`).innerHTML = html + '</ul>';
@@ -722,6 +730,7 @@ function refreshSubjectKeys(filter = null) {
         removeEntityBlacklist(subjectBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
         refreshSubjectKeys();
         refreshCollapsibleContentHeight(entitySubject);
+        clearSearchInputs();
     });
 }
 
@@ -730,6 +739,7 @@ function refreshAuthorKeys(filter = null) {
         removeEntityBlacklist(authorBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
         refreshAuthorKeys();
         refreshCollapsibleContentHeight(entityAuthor);
+        clearSearchInputs();
     });
 }
 
@@ -738,6 +748,7 @@ function refreshTopicIdKeys(filter = null) {
         removeTopicIdBlacklist(node.getAttribute('id').replace(/<[^>]*>/g, ''));
         refreshTopicIdKeys();
         refreshCollapsibleContentHeight(entityTopicId);
+        clearSearchInputs();
     });
 }
 
@@ -789,7 +800,7 @@ function createSearchEntitiesEvent(entity, keyRegex, refreshCallback) {
         if (!keyIsAllowed(event.key, event.ctrlKey) && !event.key.match(keyRegex)) event.preventDefault();
     });
     document.getElementById(`deboucled-${entity}-search-key`).addEventListener('input', function (event) {
-        refreshCallback(event.target.value.toUpperCase());
+        refreshCallback(normalizeValue(event.target.value));
         refreshCollapsibleContentHeight(entity);
     });
 }
@@ -813,23 +824,43 @@ function refreshCollapsibleContentHeight(entity) {
 
 function addSettingButton(firstLaunch) {
     let optionButton = document.createElement("span");
-    optionButton.innerHTML = `<span id="deboucled-option-button" style="margin-right:5px;min-width:80px" class="btn btn-actu-new-list-forum ${firstLaunch ? 'blinking' : ''}">Déboucled</span>`;
+    optionButton.innerHTML = `<span id="deboucled-option-button" class="btn btn-actu-new-list-forum deboucled-option-button ${firstLaunch ? 'blinking' : ''}">Déboucled</span>`;
     document.getElementsByClassName('bloc-pre-right')[0].prepend(optionButton);
     document.getElementById('deboucled-option-button').addEventListener('click', function () {
-        document.getElementById('deboucled-settings-bg-view').style.display = 'block';
-        document.getElementById('deboucled-settings-view').style.display = 'block';
         clearEntityInputs();
+        showSettings();
     });
-
     window.addEventListener('click', function (e) {
         if (!document.getElementById('deboucled-settings-bg-view').contains(e.target)) return;
-        document.getElementById('deboucled-settings-bg-view').style.display = 'none';
-        document.getElementById('deboucled-settings-view').style.display = 'none';
+        hideSettings();
     });
+}
+
+function showSettings() {
+    let bgView = document.getElementById('deboucled-settings-bg-view');
+    bgView.style.display = 'block'
+
+    let view = document.getElementById('deboucled-settings-view');
+    view.classList.add('visible');
+    view.clientWidth; // force display
+    view.classList.add('active');
+}
+
+function hideSettings() {
+    let bgView = document.getElementById('deboucled-settings-bg-view');
+    bgView.style.display = 'none';
+
+    let view = document.getElementById('deboucled-settings-view');
+    view.classList.remove('active');
+    setTimeout(() => view.classList.remove('visible'), 200); // wait transition (flemme d'utiliser l'event)
 }
 
 function clearEntityInputs() {
     document.querySelectorAll('.deboucled-input-key').forEach(el => { el.value = '' });
+}
+
+function clearSearchInputs() {
+    document.querySelectorAll('.deboucled-input-search').forEach(el => { el.value = '' });
 }
 
 
