@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.7.6
+// @version     1.7.7
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -44,7 +44,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.7.6'
+const deboucledVersion = '1.7.7'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -213,9 +213,8 @@ function normalizeValue(value) {
 };
 
 function makeRegex(array, withBoundaries) {
-    let map = withBoundaries
-        ? array.map((e) => `\\b${e.escapeRegexPattern().normalizeDiacritic()}\\b`)
-        : array.map((e) => e.escapeRegexPattern().normalizeDiacritic());
+    let b = withBoundaries ? '\\b' : '';
+    let map = array.map((e) => `${b}${e.escapeRegexPattern().normalizeDiacritic()}${b}`)
     let regex = map.join('|');
     return new RegExp(regex, 'gi');
 }
@@ -224,7 +223,7 @@ function insertAfter(newNode, referenceNode) {
     referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
-function isPlural(nb) {
+function plural(nb) {
     return nb > 1 ? 's' : '';
 }
 
@@ -290,7 +289,7 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
 
 function updateTopicsHeader() {
     let subjectHeader = document.querySelector('.topic-head > span:nth-child(1)');
-    subjectHeader.textContent = `SUJET (${hiddenTotalTopics} ignoré${isPlural(hiddenTotalTopics)})`;
+    subjectHeader.textContent = `SUJET (${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)})`;
 
     let lastMessageHeader = document.querySelector('.topic-head > span:nth-child(4)');
     lastMessageHeader.style.width = '5.3rem';
@@ -389,7 +388,7 @@ function updateMessagesHeader() {
 
     let ignoredMessageHeader = document.createElement('div');
     ignoredMessageHeader.setAttribute('class', 'titre-bloc deboucled-ignored-messages');
-    let pr = isPlural(hiddenMessages);
+    let pr = plural(hiddenMessages);
     ignoredMessageHeader.textContent = `${hiddenMessages} message${pr} ignoré${pr}`;
 
     let ignoredAuthors = document.createElement('span');
@@ -685,8 +684,8 @@ function addCollapsibleEvents() {
 }
 
 function buildSettingEntities() {
-    const regexAllowedSubject = /^[A-zÀ-ú0-9_@./#&+-\?\*\[\]\(\) ]*$/i;
-    const regexAllowedAuthor = /^[A-zÀ-ú0-9-_\[\]]*$/i;
+    const regexAllowedSubject = /^[A-z\u00C0-\u02AF0-9_@./#&+-\?\*\[\]\(\) ]*$/i;
+    const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]]*$/i;
     const regexAllowedTopicId = /^[0-9]+$/i;
 
     createAddEntityEvent(entitySubject, regexAllowedSubject, function (key) { addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
@@ -807,13 +806,13 @@ function createSearchEntitiesEvent(entity, keyRegex, refreshCallback) {
 
 function refreshEntityCounts() {
     let subjectCount = document.getElementById(`deboucled-${entitySubject}-entity-count`);
-    if (subjectCount !== null) subjectCount.textContent = `${subjectBlacklistArray.length} sujet${isPlural(subjectBlacklistArray.length)} blacklist`;
+    if (subjectCount !== null) subjectCount.textContent = `${subjectBlacklistArray.length} sujet${plural(subjectBlacklistArray.length)} blacklist`;
 
     let authorCount = document.getElementById(`deboucled-${entityAuthor}-entity-count`);
-    if (authorCount !== null) authorCount.textContent = `${authorBlacklistArray.length} pseudo${isPlural(authorBlacklistArray.length)} blacklist`;
+    if (authorCount !== null) authorCount.textContent = `${authorBlacklistArray.length} pseudo${plural(authorBlacklistArray.length)} blacklist`;
 
     let topicCount = document.getElementById(`deboucled-${entityTopicId}-entity-count`)
-    if (topicCount !== null) topicCount.textContent = `${topicIdBlacklistMap.size} topic${isPlural(topicIdBlacklistMap.size)} blacklist`;
+    if (topicCount !== null) topicCount.textContent = `${topicIdBlacklistMap.size} topic${plural(topicIdBlacklistMap.size)} blacklist`;
 }
 
 function refreshCollapsibleContentHeight(entity) {
