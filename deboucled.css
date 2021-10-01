@@ -245,7 +245,7 @@ input[type="search"] {
 /* Table */
 .deboucled-option-table {
   font: bold 14px/16px sans-serif;
-  border-spacing: 1rem 0.5rem;
+  border-spacing: 1rem 0.7rem;
   border-collapse: separate;
 }
 .deboucled-option-table-subcell {

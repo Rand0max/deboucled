@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.7.7
+// @version     1.8.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -44,7 +44,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.7.7'
+const deboucledVersion = '1.8.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -65,12 +65,13 @@ const storage_optionHideMessages = 'deboucled_optionHideMessages';
 const storage_optionAllowDisplayThreshold = 'deboucled_optionAllowDisplayThreshold';
 const storage_optionDisplayThreshold = 'deboucled_optionDisplayThreshold';
 const storage_optionDisplayBlacklistTopicButton = 'deboucled_optionDisplayBlacklistTopicButton';
+const storage_optionShowJvcBlacklistButton = 'deboucled_optionShowJvcBlacklistButton';
 const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
 const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
 const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 
-const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
+const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
 
 
 function initStorage() {
@@ -421,26 +422,25 @@ function removeMessage(element) {
     element.remove();
 }
 
-function upgradeJvcBlacklistButton(messageElement, author) {
+function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton) {
     let isSelf = messageElement.querySelector('span.picto-msg-croix') !== null;
     if (isSelf) return;
 
-    let blacklistButton = messageElement.querySelector('span.picto-msg-tronche');
-    let mustRefresh = (blacklistButton === null);
-
-    if (mustRefresh) {
-        blacklistButton = document.createElement('span');
-        messageElement.querySelector('div.bloc-options-msg').appendChild(blacklistButton);
-    }
-
-    blacklistButton.setAttribute('title', 'Blacklister avec Déboucled');
-    blacklistButton.setAttribute('class', 'picto-msg-tronche deboucled-blacklist-author-button');
-
-    blacklistButton.addEventListener('click', function () {
+    let dbcBlacklistButton = document.createElement('span');
+    dbcBlacklistButton.setAttribute('title', 'Blacklister avec Déboucled');
+    dbcBlacklistButton.setAttribute('class', 'picto-msg-tronche deboucled-blacklist-author-button');
+    dbcBlacklistButton.addEventListener('click', function () {
         addEntityBlacklist(authorBlacklistArray, author);
         refreshAuthorKeys()
-        if (mustRefresh) location.reload();
+        location.reload();
     });
+
+    let jvcBlacklistButton = messageElement.querySelector('span.picto-msg-tronche');
+    let logged = (jvcBlacklistButton !== null);
+    if (logged) insertAfter(dbcBlacklistButton, jvcBlacklistButton);
+    else messageElement.querySelector('div.bloc-options-msg').appendChild(dbcBlacklistButton);
+
+    if (!optionShowJvcBlacklistButton && logged) jvcBlacklistButton.style.display = 'none';
 }
 
 function highlightBlacklistedAuthor(messageElement, authorElement) {
@@ -495,10 +495,10 @@ function buildSettingPage() {
         html += '</tr>';
         return html;
     }
-    function addToggleOption(title, optionId, defaultValue) {
+    function addToggleOption(title, optionId, defaultValue, hint) {
         let html = "";
         html += '<tr>';
-        html += `<td>${title}</td>`;
+        html += `<td title="${hint}">${title}</td>`;
         html += '<td>';
         html += '<label class="deboucled-switch">';
         let checked = GM_getValue(optionId, defaultValue) ? 'checked' : '';
@@ -509,10 +509,10 @@ function buildSettingPage() {
         html += '</tr>';
         return html;
     }
-    function addRangeOption(title, optionId, defaultValue, minValue, maxValue, enabled) {
+    function addRangeOption(title, optionId, defaultValue, minValue, maxValue, enabled, hint) {
         let html = "";
         html += `<tr id="${optionId}-container" class="${enabled ? '' : 'deboucled-disabled'}">`;
-        html += `<td class="deboucled-option-cell deboucled-option-table-subcell" style="padding-left: 5px;">${title}</td>`;
+        html += `<td class="deboucled-option-cell deboucled-option-table-subcell" style="padding-left: 5px;" title="${hint}">${title}</td>`;
         html += '<td class="deboucled-option-cell deboucled-option-table-subcell" style="padding-top: 7px;">';
         let value = GM_getValue(optionId, defaultValue);
         html += `<input type="range" id="${optionId}" min="${minValue}" max="${maxValue}" value="${value}" step="10" class="deboucled-range-slider">`;
@@ -572,12 +572,13 @@ function buildSettingPage() {
         html += '<div class="deboucled-setting-content" style="margin-bottom: 0;">';
         html += `<span class="deboucled-version">v${deboucledVersion}</span>`;
         html += '<table class="deboucled-option-table">';
-        html += addToggleOption('Utiliser JvArchive pour "Pseudo boucled"', storage_optionBoucledUseJvarchive, false);
-        html += addToggleOption('Cacher les messages des pseudos blacklist', storage_optionHideMessages, true);
-        html += addToggleOption('Afficher les boutons "Blacklist le topic"', storage_optionDisplayBlacklistTopicButton, true);
-        html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, false);
+        html += addToggleOption('Utiliser JvArchive pour "Pseudo boucled"', storage_optionBoucledUseJvarchive, false, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
+        html += addToggleOption('Cacher les messages des pseudos blacklist', storage_optionHideMessages, true, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.');
+        html += addToggleOption('Afficher les boutons "Blacklist le topic"', storage_optionDisplayBlacklistTopicButton, true, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics voulu.');
+        html += addToggleOption('Afficher le bouton "Blacklist pseudo" de JVC', storage_optionShowJvcBlacklistButton, false, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
+        html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, false, 'Autoriser l\'affichage des topics même si le sujet est blacklist, à partir d\'un certain nombre de messages.');
         let allowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
-        html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, 100, 10, 1000, allowDisplayThreshold);
+        html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, 100, 10, 1000, allowDisplayThreshold, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.');
         html += addImportExportButtons();
         html += '</table>';
         html += '</div>';
@@ -637,6 +638,7 @@ function buildSettingPage() {
     addToggleEvent(storage_optionHideMessages);
     addToggleEvent(storage_optionBoucledUseJvarchive);
     addToggleEvent(storage_optionDisplayBlacklistTopicButton);
+    addToggleEvent(storage_optionShowJvcBlacklistButton);
     addToggleEvent(storage_optionAllowDisplayThreshold, function () {
         document.querySelectorAll(`[id = ${storage_optionDisplayThreshold}-container]`).forEach(function (el) {
             el.classList.toggle("deboucled-disabled");
@@ -963,7 +965,8 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
         }
     }
     else {
-        upgradeJvcBlacklistButton(message, author);
+        let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, false);
+        upgradeJvcBlacklistButton(message, author, optionShowJvcBlacklistButton);
         addBoucledAuthorButton(message, author, optionBoucledUseJvarchive);
     }
 }
