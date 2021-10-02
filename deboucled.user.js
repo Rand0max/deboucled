@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.8.0
+// @version     1.8.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
-// @description Censure les topics eclatax et vous sort de la boucle
+// @description Censure les topics éclatax et vous sort de la boucle
 // @include     http://www.jeuxvideo.com/forums/*
 // @include     https://www.jeuxvideo.com/forums/*
 // @include     http://m.jeuxvideo.com/forums/*
@@ -44,7 +44,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.8.0'
+const deboucledVersion = '1.8.1'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -280,7 +280,7 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
                     return;
                 }
                 if (actualTopics < topicByPage && !topicExists(topics, topic)) {
-                    addTopic(topic);
+                    addTopic(topic, topics);
                     actualTopics++;
                 }
             });
@@ -301,9 +301,9 @@ function removeTopic(element) {
     hiddenTotalTopics++;
 }
 
-function addTopic(element) {
-    if (element.getElementsByClassName("xXx text-user topic-author").length === 0) // jvcare
-    {
+function addTopic(element, topics) {
+    if (element.getElementsByClassName("xXx text-user topic-author").length === 0) {
+        // jvcare supprime le lien vers le profil et le lien dans la date du topic
         let topicAuthorSpan = element.children[1];
         let author = topicAuthorSpan.textContent.trim();
         topicAuthorSpan.outerHTML = `<a href="https://www.jeuxvideo.com/profil/${author.toLowerCase()}?mode=infos" target="_blank" class="xXx text-user topic-author">${author}</a>`;
@@ -314,6 +314,7 @@ function addTopic(element) {
         topicDateSpan.innerHTML = `<a href="${topicUrl}" class="xXx lien-jv">${topicDate}</a>`;
     }
     document.getElementsByClassName("topic-list topic-list-admin")[0].appendChild(element);
+    topics.push(element); // on rajoute le nouveau topic à la liste en cours de remplissage pour éviter de le reprendre sur les pages suivantes
 }
 
 function topicExists(topics, element) {
@@ -321,9 +322,9 @@ function topicExists(topics, element) {
     * Le temps de charger la page certains sujets peuvent se retrouver à la page précédente.
     * Cela peut provoquer des doublons à l'affichage.
     */
-    let topicId = element.getAttribute("data-id");
+    let topicId = element.getAttribute('data-id');
     if (topicId === null) return false;
-    return topics.some((elem) => elem.getAttribute("data-id") === topicId);
+    return topics.some((elem) => elem.getAttribute('data-id') === topicId);
 }
 
 function getTopicMessageCount(element) {
@@ -399,7 +400,7 @@ function updateMessagesHeader() {
 
     let toggleIgnoredAuthors = document.createElement('a');
     toggleIgnoredAuthors.setAttribute('class', 'titre-bloc deboucled-toggle-ignored-authors');
-    toggleIgnoredAuthors.setAttribute('href', '#');
+    toggleIgnoredAuthors.setAttribute('role', 'button');
     toggleIgnoredAuthors.textContent = '(voir)';
     toggleIgnoredAuthors.addEventListener('click', function (e) {
         if (ignoredAuthors.style.display === 'inline') {
