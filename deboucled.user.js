@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.8.1
+// @version     1.8.2
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -24,6 +24,8 @@
 * todo : "Wildcard subject" : use wildcard for subjects blacklist
 * todo : "Reversed/Highlight option" : highlight elements of interest
 * todo : "Zap mode" : select author/word directly in the main page to blacklist
+* todo : "Export BL" : export blacklists only to share with users
+* todo : "Handle JvChat"
 */
 
 
@@ -44,7 +46,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.8.1'
+const deboucledVersion = '1.8.2'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -680,7 +682,10 @@ function addCollapsibleEvents() {
                 content.removeAttribute('style');
             }
             else {
+                let view = document.getElementById('deboucled-settings-view');
+                view.style.overflowY = 'scroll';
                 content.style.maxHeight = content.scrollHeight + 'px';
+                view.removeAttribute('style');
             }
         });
     });
