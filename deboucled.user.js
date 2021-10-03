@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.8.2
+// @version     1.8.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -19,13 +19,14 @@
 // ==/UserScript==
 
 /*
+* todo : button to clean 410 blacklisted topics
 * todo : "Handle mp and stickers" : handle blacklist for mp and stickers in messages
 * todo : "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
 * todo : "Wildcard subject" : use wildcard for subjects blacklist
 * todo : "Reversed/Highlight option" : highlight elements of interest
 * todo : "Zap mode" : select author/word directly in the main page to blacklist
 * todo : "Export BL" : export blacklists only to share with users
-* todo : "Handle JvChat"
+* todo : "PréBlacklists" : have built-in blacklists like "COVID" or "BOUCLEURS connus" etc
 */
 
 
@@ -46,7 +47,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.8.2'
+const deboucledVersion = '1.8.5'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -473,6 +474,18 @@ function addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchiv
     insertAfter(boucledAuthorAnchor, mpBloc);
 }
 
+function handleJvChat() {
+    addEventListener("jvchat:newmessage", function (event) {
+        // L'id du message est stocké dans event.detail.id
+        // L'attribut event.detail.isEdit est mis à "true" s'il s'agit d'un message édité
+        let message = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
+        let authorElem = message.querySelector('h5.jvchat-author');
+        if (authorElem === null) return;
+        let author = authorElem.textContent.trim();
+        if (isAuthorBlacklisted(author)) message.parentElement.style.display = 'none';
+    });
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // SETTINGS
@@ -830,13 +843,16 @@ function refreshCollapsibleContentHeight(entity) {
 }
 
 function addSettingButton(firstLaunch) {
-    let optionButton = document.createElement("span");
-    optionButton.innerHTML = `<span id="deboucled-option-button" class="btn btn-actu-new-list-forum deboucled-option-button ${firstLaunch ? 'blinking' : ''}">Déboucled</span>`;
+    let optionButton = document.createElement("button");
+    optionButton.setAttribute('id', 'deboucled-option-button');
+    optionButton.setAttribute('class', `btn btn-actu-new-list-forum deboucled-option-button ${firstLaunch ? 'blinking' : ''}`);
+    optionButton.innerHTML = 'Déboucled';
     document.getElementsByClassName('bloc-pre-right')[0].prepend(optionButton);
-    document.getElementById('deboucled-option-button').addEventListener('click', function () {
+    optionButton.addEventListener('click', function () {
         clearEntityInputs();
         showSettings();
     });
+
     window.addEventListener('click', function (e) {
         if (!document.getElementById('deboucled-settings-bg-view').contains(e.target)) return;
         hideSettings();
@@ -985,6 +1001,8 @@ function handleTopicMessages() {
 
     let optionHideMessages = GM_getValue(storage_optionHideMessages, true);
     let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, false);
+
+    if (optionHideMessages) handleJvChat();
 
     let allMessages = getAllMessages(document);
     allMessages.forEach(function (message) {
