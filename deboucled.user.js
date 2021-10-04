@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.9.0
+// @version     1.9.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -51,7 +51,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.9.0'
+const deboucledVersion = '1.9.1'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -84,17 +84,17 @@ const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blackli
 
 function initStorage() {
     if (GM_getValue(storage_init, false)) {
-        loadFromStorage();
+        loadBlacklists();
         return false;
     }
     else {
-        saveToStorage();
+        saveBlacklists();
         GM_setValue(storage_init, true);
         return true;
     }
 }
 
-function loadFromStorage() {
+function loadBlacklists() {
     subjectBlacklistArray = [...new Set(subjectBlacklistArray.concat(JSON.parse(GM_getValue(storage_blacklistedSubjects))))];
     authorBlacklistArray = [...new Set(authorBlacklistArray.concat(JSON.parse(GM_getValue(storage_blacklistedAuthors))))];
     topicIdBlacklistMap = new Map([...topicIdBlacklistMap, ...JSON.parse(GM_getValue(storage_blacklistedTopicIds))]);
@@ -102,10 +102,10 @@ function loadFromStorage() {
     subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
 
-    saveToStorage();
+    saveBlacklists();
 }
 
-function saveToStorage() {
+function saveBlacklists() {
     GM_setValue(storage_blacklistedSubjects, JSON.stringify([...new Set(subjectBlacklistArray)]));
     GM_setValue(storage_blacklistedAuthors, JSON.stringify([...new Set(authorBlacklistArray)]));
     GM_setValue(storage_blacklistedTopicIds, JSON.stringify([...topicIdBlacklistMap]));
@@ -119,14 +119,14 @@ function saveToStorage() {
 function removeTopicIdBlacklist(topicId) {
     if (topicIdBlacklistMap.has(topicId)) {
         topicIdBlacklistMap.delete(topicId);
-        saveToStorage();
+        saveBlacklists();
     }
 }
 
 function addEntityBlacklist(array, key) {
     if (array.indexOf(key) === -1) {
         array.push(key);
-        saveToStorage();
+        saveBlacklists();
     }
 }
 
@@ -134,7 +134,7 @@ function removeEntityBlacklist(array, key) {
     let index = array.indexOf(key);
     if (index > -1) {
         array.splice(index, 1);
-        saveToStorage();
+        saveBlacklists();
     }
 }
 
@@ -261,7 +261,7 @@ function getAllTopics(doc) {
 function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
     if (!topicIdBlacklistMap.has(topicId)) {
         topicIdBlacklistMap.set(topicId, topicSubject);
-        saveToStorage();
+        saveBlacklists();
         if (refreshTopicList) {
             let topic = document.querySelector('[data-id="' + topicId + '"]');
             if (topic === undefined) return;
@@ -989,7 +989,7 @@ function addIgnoreButtons() {
     });
 }
 
-async function handleTopicList() {
+async function handleTopicList(canFillTopics) {
     let topics = getAllTopics(document);
     if (topics.length === 0) return;
 
@@ -999,7 +999,7 @@ async function handleTopicList() {
     topics.slice(1).forEach(function (topic) {
         if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold)) removeTopic(topic);
     });
-    await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold);
+    if (canFillTopics) await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold);
 
     updateTopicsHeader();
 
@@ -1063,7 +1063,7 @@ async function handleSearch() {
             // Not implemented yet
             break;
         default:
-            await handleTopicList();
+            await handleTopicList(false);
             break;
     }
 }
@@ -1089,7 +1089,7 @@ async function callMe() {
     switch (currentPageType) {
         case 'topiclist':
             init();
-            await handleTopicList();
+            await handleTopicList(true);
             break;
         case 'topicmessages':
             init();
