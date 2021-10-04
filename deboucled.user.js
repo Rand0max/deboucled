@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.8.6
+// @version     1.8.7
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -16,6 +16,7 @@
 // @grant       GM_listValues
 // @grant       GM_getResourceText
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
+// @icon        https://image.noelshack.com/fichiers/2021/38/6/1632606701-deboucled.png
 // ==/UserScript==
 
 /*
@@ -47,7 +48,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.8.6'
+const deboucledVersion = '1.8.7'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -338,13 +339,13 @@ function getTopicMessageCount(element) {
 function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayThreshold) {
     if (!element.hasAttribute('data-id')) return true;
 
+    if (optionAllowDisplayThreshold && getTopicMessageCount(element) >= optionDisplayThreshold) return false;
+
     let topicId = element.getAttribute('data-id');
     if (topicIdBlacklistMap.has(topicId)) {
         hiddenTopicsIds++;
         return true;
     }
-
-    if (optionAllowDisplayThreshold && getTopicMessageCount(element) >= optionDisplayThreshold) return false;
 
     let titleTag = element.getElementsByClassName("lien-jv topic-title");
     if (titleTag !== undefined && titleTag.length > 0) {
