@@ -333,6 +333,12 @@ input[type="search"] {
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }
+input:checked + .deboucled-toggle-slider.red {
+  background-color: #df3a3a;
+}
+input:focus + .deboucled-toggle-slider.red {
+  box-shadow: 0 0 1px #df3a3a;
+}
 input:checked + .deboucled-toggle-slider {
   background-color: #2196f3;
 }

@@ -1,14 +1,17 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.8.8
+// @version     1.9.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
 // @description Censure les topics éclatax et vous sort de la boucle
-// @include     http://www.jeuxvideo.com/forums/*
-// @include     https://www.jeuxvideo.com/forums/*
-// @include     http://m.jeuxvideo.com/forums/*
+// @match       http://www.jeuxvideo.com/forums/*
+// @match       https://www.jeuxvideo.com/forums/*
+// @match       http://m.jeuxvideo.com/forums/*
+// @match       https://m.jeuxvideo.com/forums/*
+// @match       http://www.jeuxvideo.com/recherche/forums/*
+// @match       https://www.jeuxvideo.com/recherche/forums/*
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
@@ -20,7 +23,6 @@
 // ==/UserScript==
 
 /*
-* todo : button to clean 410 blacklisted topics
 * todo : "Handle mp and stickers" : handle blacklist for mp and stickers in messages
 * todo : "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
 * todo : "Wildcard subject" : use wildcard for subjects blacklist
@@ -28,6 +30,7 @@
 * todo : "Zap mode" : select author/word directly in the main page to blacklist
 * todo : "Export BL" : export blacklists only to share with users
 * todo : "PréBlacklists" : have built-in blacklists like "COVID" or "BOUCLEURS connus" etc
+* todo : "button to clean 410 blacklisted topics"
 */
 
 
@@ -48,7 +51,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.8.8'
+const deboucledVersion = '1.9.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -70,12 +73,13 @@ const storage_optionAllowDisplayThreshold = 'deboucled_optionAllowDisplayThresho
 const storage_optionDisplayThreshold = 'deboucled_optionDisplayThreshold';
 const storage_optionDisplayBlacklistTopicButton = 'deboucled_optionDisplayBlacklistTopicButton';
 const storage_optionShowJvcBlacklistButton = 'deboucled_optionShowJvcBlacklistButton';
+const storage_optionFilterResearch = 'deboucled_optionFilterResearch';
 const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
 const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
 const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 
-const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
+const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
 
 
 function initStorage() {
@@ -857,7 +861,7 @@ function refreshCollapsibleContentHeight(entity) {
 function addSettingButton(firstLaunch) {
     let optionButton = document.createElement("button");
     optionButton.setAttribute('id', 'deboucled-option-button');
-    optionButton.setAttribute('class', `btn btn-actu-new-list-forum deboucled-option-button ${firstLaunch ? 'blinking' : ''}`);
+    optionButton.setAttribute('class', `btn btn-actu-new-list-forum btn-actualiser-forum deboucled-option-button ${firstLaunch ? 'blinking' : ''}`);
     optionButton.innerHTML = 'Déboucled';
     document.getElementsByClassName('bloc-pre-right')[0].prepend(optionButton);
     optionButton.addEventListener('click', function () {
@@ -873,6 +877,24 @@ function addSettingButton(firstLaunch) {
         if (!document.getElementById('deboucled-settings-bg-view').contains(e.target) && e.key !== 'Escape') return;
         hideSettings();
     });
+}
+
+function addSearchFilterToggle() {
+    let optionFilterResearch = GM_getValue(storage_optionFilterResearch, true);
+
+    let toggleElem = document.createElement('label');
+    toggleElem.className = 'deboucled-switch';
+    toggleElem.style.marginBottom = '2px';
+    toggleElem.title = 'Filter les résultats avec Déboucled';
+    toggleElem.innerHTML = `<input type="checkbox" id="deboucled-search-filter-toggle" ${optionFilterResearch ? 'checked' : ''}><span class="deboucled-toggle-slider round red"></span>`;
+    document.querySelector('.form-rech-forum').appendChild(toggleElem);
+
+    document.querySelector('#deboucled-search-filter-toggle').addEventListener('change', (e) => {
+        GM_setValue(storage_optionFilterResearch, e.currentTarget.checked);
+        location.reload();
+    });
+
+    return optionFilterResearch;
 }
 
 function showSettings() {
@@ -910,13 +932,22 @@ function clearSearchInputs() {
 function getCurrentPageType(url) {
     if (document.querySelector('.img-erreur') !== null) return 'error';
 
-    let topicListRegex = /\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*/i;
+    let topicListRegex = /^\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*\.htm$/i;
     if (url.match(topicListRegex)) return 'topiclist';
 
-    let topicMessagesRegex = /\/forums\/42-[0-9]+-[0-9]+-[0-9]+-0-1-0-.*/i;
+    let topicMessagesRegex = /^\/forums\/42-[0-9]+-[0-9]+-[0-9]+-0-1-0-.*\.htm$/i;
     if (url.match(topicMessagesRegex)) return 'topicmessages';
 
+    let searchRegex = /^\/recherche\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*/i;
+    if (url.match(searchRegex)) return 'search';
+
     return 'unknown';
+}
+
+function getSearchType(urlSearch) {
+    let searchRegex = /(\?search_in_forum=)(?<searchvalue>.*)(&type_search_in_forum=)(?<searchtype>.*)/i;
+    let matches = searchRegex.exec(urlSearch);
+    return matches.groups.searchtype.trim();
 }
 
 async function getPageContent(page) {
@@ -959,8 +990,6 @@ function addIgnoreButtons() {
 }
 
 async function handleTopicList() {
-    init();
-
     let topics = getAllTopics(document);
     if (topics.length === 0) return;
 
@@ -1004,8 +1033,6 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
 }
 
 function handleTopicMessages() {
-    init();
-
     let optionHideMessages = GM_getValue(storage_optionHideMessages, true);
     let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, false);
 
@@ -1018,6 +1045,27 @@ function handleTopicMessages() {
 
     updateMessagesHeader();
     saveTotalHidden();
+}
+
+async function handleSearch() {
+    let optionFilterResearch = addSearchFilterToggle();
+    if (!optionFilterResearch) return;
+
+    let searchType = getSearchType(window.location.search);
+    switch (searchType) {
+        /*
+        case 'titre_topic':
+            break;
+        case 'auteur_topic':
+            break;
+        */
+        case 'texte_message':
+            // Not implemented yet
+            break;
+        default:
+            await handleTopicList();
+            break;
+    }
 }
 
 function addSvgs() {
@@ -1040,10 +1088,16 @@ async function callMe() {
     let currentPageType = getCurrentPageType(window.location.pathname);
     switch (currentPageType) {
         case 'topiclist':
+            init();
             await handleTopicList();
             break;
         case 'topicmessages':
+            init();
             handleTopicMessages();
+            break;
+        case 'search':
+            init();
+            await handleSearch();
             break;
         default:
             break;
