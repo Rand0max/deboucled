@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.8.7
+// @version     1.8.8
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -48,7 +48,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.8.7'
+const deboucledVersion = '1.8.8'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -717,7 +717,7 @@ function addCollapsibleEvents() {
 }
 
 function buildSettingEntities() {
-    const regexAllowedSubject = /^[A-z\u00C0-\u02AF0-9_@./#&+-\?\*\[\]\(\) ]*$/i;
+    const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u00A1-\u02AF]*$/i;
     const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]]*$/i;
     const regexAllowedTopicId = /^[0-9]+$/i;
 
