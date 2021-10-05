@@ -222,7 +222,28 @@ input[type="search"] {
 .deboucled-option-button {
   margin-right: 5px;
   min-width: 80px;
+
+  /* 
+  border: none !important;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25) !important;
+  background: #303030;
+  background: #46556d;
+  color: #ddd;
+
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0;
+  font-size: 0.625rem;
+  height: 1.75rem;
+  line-height: 1.6875rem;
+  border-radius: 0.25rem; 
+  */
 }
+/*
+.deboucled-option-button:hover {
+  color: #ddd;
+} 
+*/
 
 /* SVG */
 .deboucled-svg-forbidden-red #deboucled-forbidden-logo {

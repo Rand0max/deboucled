@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.9.1
+// @version     1.9.2
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -23,6 +23,7 @@
 // ==/UserScript==
 
 /*
+* todo : "Highlight PoC" : hide or highlight topics with "post ou cancer" first message
 * todo : "Handle mp and stickers" : handle blacklist for mp and stickers in messages
 * todo : "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
 * todo : "Wildcard subject" : use wildcard for subjects blacklist
@@ -51,7 +52,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.9.1'
+const deboucledVersion = '1.9.2'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -380,6 +381,35 @@ function isSubjectBlacklisted(subject) {
 function isAuthorBlacklisted(author) {
     if (authorBlacklistArray.length === 0) return false;
     return author.normalizeDiacritic().match(authorsBlacklistReg);
+}
+
+function addIgnoreButtons() {
+    let topics = getAllTopics(document);
+
+    let header = topics[0];
+    let spanHead = document.createElement("span");
+    spanHead.setAttribute('class', 'deboucled-topic-blacklist');
+    spanHead.setAttribute('style', 'width: 1.75rem');
+    header.appendChild(spanHead);
+
+    topics.slice(1).forEach(function (topic) {
+        let span = document.createElement('span');
+        span.setAttribute('class', 'deboucled-topic-blacklist');
+        let topicId = topic.getAttribute('data-id');
+        let topicSubject = topic.querySelector('span:nth-child(1) > a:nth-child(2)').textContent.trim();
+        let anchor = document.createElement('a');
+        anchor.setAttribute('role', 'button');
+        anchor.setAttribute('title', 'Blacklist le topic');
+        anchor.setAttribute('class', 'deboucled-svg-forbidden-red');
+        anchor.onclick = function () { addTopicIdBlacklist(topicId, topicSubject, true); refreshTopicIdKeys(); };
+        anchor.innerHTML = '<svg viewBox="2 2 160 160" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg>';
+        span.appendChild(anchor)
+        topic.appendChild(span);
+    });
+}
+
+function isTopicPoC(element) {
+
 }
 
 
@@ -861,10 +891,11 @@ function refreshCollapsibleContentHeight(entity) {
 function addSettingButton(firstLaunch) {
     let optionButton = document.createElement("button");
     optionButton.setAttribute('id', 'deboucled-option-button');
-    optionButton.setAttribute('class', `btn btn-actu-new-list-forum btn-actualiser-forum deboucled-option-button ${firstLaunch ? 'blinking' : ''}`);
+    optionButton.setAttribute('class', `btn btn-actu-new-list-forum deboucled-option-button${firstLaunch ? ' blinking' : ''}`);
     optionButton.innerHTML = 'Déboucled';
-    document.getElementsByClassName('bloc-pre-right')[0].prepend(optionButton);
-    optionButton.addEventListener('click', function () {
+    document.querySelector('.bloc-pre-right').prepend(optionButton);
+    optionButton.addEventListener('click', function (e) {
+        e.preventDefault();
         clearEntityInputs();
         showSettings();
     });
@@ -962,31 +993,6 @@ async function getPageContent(page) {
 
     const response = await fetch(nextPageUrl);
     return await response.text();
-}
-
-function addIgnoreButtons() {
-    let topics = getAllTopics(document);
-
-    let header = topics[0];
-    let spanHead = document.createElement("span");
-    spanHead.setAttribute('class', 'deboucled-topic-blacklist');
-    spanHead.setAttribute('style', 'width: 1.75rem');
-    header.appendChild(spanHead);
-
-    topics.slice(1).forEach(function (topic) {
-        let span = document.createElement('span');
-        span.setAttribute('class', 'deboucled-topic-blacklist');
-        let topicId = topic.getAttribute('data-id');
-        let topicSubject = topic.querySelector('span:nth-child(1) > a:nth-child(2)').textContent.trim();
-        let anchor = document.createElement('a');
-        anchor.setAttribute('role', 'button');
-        anchor.setAttribute('title', 'Blacklist le topic');
-        anchor.setAttribute('class', 'deboucled-svg-forbidden-red');
-        anchor.onclick = function () { addTopicIdBlacklist(topicId, topicSubject, true); refreshTopicIdKeys(); };
-        anchor.innerHTML = '<svg viewBox="2 2 160 160" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg>';
-        span.appendChild(anchor)
-        topic.appendChild(span);
-    });
 }
 
 async function handleTopicList(canFillTopics) {
