@@ -88,6 +88,16 @@
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFuSURBVDhPnVNBSwJRGJw1tczAYJUOhufOHQrq5G/w1LH7/pwuXtKb6ElBf4MQ+AO6JUGgIAhCa6ZuM293ZXeFEAfGfW/e9+bNfvu03oFzAC/kE3lGHoIl2SIdGbxy8Cz1CDRk4HJw6MlJLGXgBRNsSGVbkVkydE1qJ2SIVPA0UGGx18O956E4GJi5aHe7MS2KWIJ5KoW7jXL4eMtkgO12T7tcr4NZIkGWxeNOx4w/+31kWCjto932NSaQFsVeD37IVTptCsMeJLVoD2IGx2DP4JfUd1XXwwWLPCV146KnC7EeKOq8XMbNZIIHdv0xoMbXoxFmuZwxjmKXQO/vViq4HY81xWI6hTubwbIs5GwbF6USKz2MCgXkF4vdyTsDRbfrdXw1m/geDk3UMK7MxXy1iqtaDXPHQdqs+AbmKm/5oyI5i3rvKHSKakQZBwmWeupfZQReG7OY3CxI05pqgs1CS2OHbJDJW/ofVMs9cP4ASlyLOHdkP2sAAAAASUVORK5CYII=)
     0 no-repeat;
 }
+.deboucled-poc-logo {
+  background: url(data:image/png;base64,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)
+    0 no-repeat;
+  width: 22px;
+  height: 22px;
+  background-size: 22px;
+  display: inline-block;
+  vertical-align: bottom;
+  opacity: 0.9;
+}
 .deboucled-messages-ignored-authors {
   margin-left: 5px;
   font-size: 0.8rem;
@@ -222,7 +232,6 @@ input[type="search"] {
 .deboucled-option-button {
   margin-right: 5px;
   min-width: 80px;
-
   /* 
   border: none !important;
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25) !important;
@@ -244,6 +253,13 @@ input[type="search"] {
   color: #ddd;
 } 
 */
+
+.deboucled-title-poc {
+  color: #ff0000e1;
+}
+.deboucled-title-poc:hover {
+  color: #ff0000;
+}
 
 /* SVG */
 .deboucled-svg-forbidden-red #deboucled-forbidden-logo {
@@ -429,4 +445,63 @@ input:checked + .deboucled-toggle-slider:before {
 }
 .deboucled-collapsible-content-collapsed {
   max-height: 0;
+}
+
+/* Dropdown */
+select.deboucled-dropdown {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  outline: 0;
+  box-shadow: none;
+  border: 0 !important;
+  background: #f3f3f3;
+  background-image: none;
+}
+.deboucled-dropdown.select {
+  position: relative;
+  display: block;
+  width: 12em;
+  height: 2em;
+  line-height: 2;
+  background: #2c3e50;
+  overflow: hidden;
+  border-radius: 0.3em;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 1px 0 black inset, 0 0 1px 0 black;
+}
+select.deboucled-dropdown {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0 0 0 0.5em;
+  color: #333;
+  cursor: pointer;
+}
+select.deboucled-dropdown::-ms-expand {
+  display: none;
+}
+.deboucled-dropdown.select::after {
+  content: "\25BC";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0 1em;
+  color: white;
+  background: #2773c4;
+  pointer-events: none;
+}
+.deboucled-dropdown.select:hover::after {
+  color: #e6e6e6;
+}
+.deboucled-dropdown.select::after {
+  -webkit-transition: 0.25s all ease;
+  transition: 0.25s all ease;
+}
+.deboucled-dropdown-option {
+  background: #f3f3f3;
+  color: #222;
+  cursor: pointer;
 }

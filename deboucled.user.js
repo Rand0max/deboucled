@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.9.2
+// @version     1.10.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -23,7 +23,6 @@
 // ==/UserScript==
 
 /*
-* todo : "Highlight PoC" : hide or highlight topics with "post ou cancer" first message
 * todo : "Handle mp and stickers" : handle blacklist for mp and stickers in messages
 * todo : "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
 * todo : "Wildcard subject" : use wildcard for subjects blacklist
@@ -45,6 +44,8 @@ let topicIdBlacklistMap = new Map();
 let subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
 let authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
 
+let pocTopicMap = new Map();
+
 let hiddenTotalTopics = 0;
 let hiddenSubjects = 0;
 let hiddenTopicsIds = 0;
@@ -52,17 +53,21 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.9.2'
+const deboucledVersion = '1.10.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
 const entityAuthor = 'author';
 const entityTopicId = 'topicid';
 
+const domParser = new DOMParser();
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // STORAGE
 ///////////////////////////////////////////////////////////////////////////////////////
+
+const localstorage_pocTopics = 'deboucled_pocTopics';
 
 const storage_init = 'deboucled_init';
 const storage_blacklistedTopicIds = 'deboucled_blacklistedTopicIds';
@@ -75,27 +80,29 @@ const storage_optionDisplayThreshold = 'deboucled_optionDisplayThreshold';
 const storage_optionDisplayBlacklistTopicButton = 'deboucled_optionDisplayBlacklistTopicButton';
 const storage_optionShowJvcBlacklistButton = 'deboucled_optionShowJvcBlacklistButton';
 const storage_optionFilterResearch = 'deboucled_optionFilterResearch';
+const storage_optionDetectPocMode = 'deboucled_optionDetectPocMode';
 const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
 const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
 const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 
-const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
+const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
 
 
 function initStorage() {
-    if (GM_getValue(storage_init, false)) {
-        loadBlacklists();
+    let isInit = GM_getValue(storage_init, false);
+    if (isInit) {
+        loadStorage();
         return false;
     }
     else {
-        saveBlacklists();
+        saveStorage();
         GM_setValue(storage_init, true);
         return true;
     }
 }
 
-function loadBlacklists() {
+function loadStorage() {
     subjectBlacklistArray = [...new Set(subjectBlacklistArray.concat(JSON.parse(GM_getValue(storage_blacklistedSubjects))))];
     authorBlacklistArray = [...new Set(authorBlacklistArray.concat(JSON.parse(GM_getValue(storage_blacklistedAuthors))))];
     topicIdBlacklistMap = new Map([...topicIdBlacklistMap, ...JSON.parse(GM_getValue(storage_blacklistedTopicIds))]);
@@ -103,10 +110,12 @@ function loadBlacklists() {
     subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
 
-    saveBlacklists();
+    loadLocalStorage();
+
+    saveStorage();
 }
 
-function saveBlacklists() {
+function saveStorage() {
     GM_setValue(storage_blacklistedSubjects, JSON.stringify([...new Set(subjectBlacklistArray)]));
     GM_setValue(storage_blacklistedAuthors, JSON.stringify([...new Set(authorBlacklistArray)]));
     GM_setValue(storage_blacklistedTopicIds, JSON.stringify([...topicIdBlacklistMap]));
@@ -114,20 +123,31 @@ function saveBlacklists() {
     subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
 
+    saveLocalStorage();
+
     refreshEntityCounts();
+}
+
+function loadLocalStorage() {
+    if (!localStorage.localstorage_pocTopics) return;
+    pocTopicMap = new Map([...pocTopicMap, ...JSON.parse(localStorage.localstorage_pocTopics)]);
+}
+
+function saveLocalStorage() {
+    localStorage.localstorage_pocTopics = JSON.stringify([...pocTopicMap]);
 }
 
 function removeTopicIdBlacklist(topicId) {
     if (topicIdBlacklistMap.has(topicId)) {
         topicIdBlacklistMap.delete(topicId);
-        saveBlacklists();
+        saveStorage();
     }
 }
 
 function addEntityBlacklist(array, key) {
     if (array.indexOf(key) === -1) {
         array.push(key);
-        saveBlacklists();
+        saveStorage();
     }
 }
 
@@ -135,7 +155,7 @@ function removeEntityBlacklist(array, key) {
     let index = array.indexOf(key);
     if (index > -1) {
         array.splice(index, 1);
-        saveBlacklists();
+        saveStorage();
     }
 }
 
@@ -166,7 +186,7 @@ function backupStorage() {
     var anchor = document.createElement('a');
     anchor.download = 'deboucled-settings.json';
     anchor.href = window.URL.createObjectURL(file);
-    anchor.style = 'display:none;';
+    anchor.style.display = 'none';
     anchor.click();
 }
 
@@ -262,7 +282,7 @@ function getAllTopics(doc) {
 function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
     if (!topicIdBlacklistMap.has(topicId)) {
         topicIdBlacklistMap.set(topicId, topicSubject);
-        saveBlacklists();
+        saveStorage();
         if (refreshTopicList) {
             let topic = document.querySelector('[data-id="' + topicId + '"]');
             if (topic === undefined) return;
@@ -275,7 +295,7 @@ function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
 async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold) {
     let actualTopics = topics.length - hiddenTotalTopics - 1;
     let pageBrowse = 1;
-    let domParser = new DOMParser();
+    let filledTopics = [];
 
     while (actualTopics < topicByPage && pageBrowse <= 10) {
         pageBrowse++;
@@ -291,10 +311,12 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
                 if (actualTopics < topicByPage && !topicExists(topics, topic)) {
                     addTopic(topic, topics);
                     actualTopics++;
+                    filledTopics.push(topic);
                 }
             });
         });
     }
+    return filledTopics;
 }
 
 function updateTopicsHeader() {
@@ -408,8 +430,60 @@ function addIgnoreButtons() {
     });
 }
 
-function isTopicPoC(element) {
+async function isTopicPoC(element, optionDetectPocMode) {
+    if (!element.hasAttribute('data-id')) return false;
+    let topicId = element.getAttribute('data-id');
 
+    if (pocTopicMap.has(topicId)) {
+        return pocTopicMap.get(topicId);
+    }
+
+    let titleElem = element.querySelector('.lien-jv.topic-title');
+    if (!titleElem) return false;
+
+    const title = titleElem.textContent.trim().normalizeDiacritic();
+    //const isTitlePocRegex = /pos(t|te|tez|tou)(")?$/i;
+    const isTitlePocRegex = /(pos(t|te|tez|tou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan/i;
+    let isTitlePoc = isTitlePocRegex.test(title);
+
+    if (optionDetectPocMode === 1 && !isTitlePoc) {
+        // Inutile de continuer si le titre n'est pas détecté PoC et qu'on n'est pas en deep mode
+        return false;
+    }
+
+    function topicCallback(r) {
+        const doc = domParser.parseFromString(r, "text/html");
+
+        const firstMessageElem = doc.querySelector('.txt-msg');
+        const firstMessage = firstMessageElem.textContent.trim().normalizeDiacritic();
+
+        const isMessagePocRegex = /pos(t|te|tez) ou/i;
+        const maladies = ['cancer', 'torsion', 'testiculaire', 'cholera', 'sida', 'corona', 'coronavirus', 'covid', 'covid19'];
+        const isMessagePoc = isMessagePocRegex.test(firstMessage) || (isTitlePoc && maladies.some(s => firstMessage.includes(s)));
+
+        pocTopicMap.set(topicId, isMessagePoc);
+
+        return isMessagePoc;
+    }
+
+    const url = titleElem.getAttribute('href');
+
+    let isPoc = await fetch(url).then(function (response) {
+        if (!response.ok) throw Error(response.statusText);
+        return response.text();
+    }).then(function (r) {
+        return topicCallback(r);
+    }).catch(function (err) {
+        console.warn(err);
+        return false;
+    });
+
+    return isPoc;
+}
+
+function markTopicPoc(element) {
+    let titleElem = element.querySelector('.lien-jv.topic-title');
+    titleElem.innerHTML = '<span class="deboucled-title-poc">[PoC] </span>' + titleElem.innerHTML;
 }
 
 
@@ -567,9 +641,26 @@ function buildSettingPage() {
         html += '<td class="deboucled-option-cell deboucled-option-table-subcell" style="padding-top: 7px;">';
         let value = GM_getValue(optionId, defaultValue);
         html += `<input type="range" id="${optionId}" min="${minValue}" max="${maxValue}" value="${value}" step="10" class="deboucled-range-slider">`;
-        html += '</div>';
         html += '<td>';
         html += `<span id="${optionId}-value">${value}</span>`;
+        html += '</td>';
+        html += '</tr>';
+        return html;
+    }
+    function addDropdownOption(title, optionId, hint, defaultValue, values) {
+        let html = "";
+        html += '<tr>';
+        html += `<td title="${hint}" style="vertical-align: top;">${title}</td>`;
+        html += '<td>';
+        html += '<span class="deboucled-dropdown select">';
+        html += `<select class="deboucled-dropdown" id="${optionId}">`;
+        let selectedOption = GM_getValue(optionId, defaultValue);
+        values.forEach(function (value, key) {
+            let selected = selectedOption === key ? ' selected' : '';
+            html += `<option class="deboucled-dropdown-option" value="${key}"${selected}>${value}</option>`;
+        })
+        html += '</select>';
+        html += '</span>';
         html += '</td>';
         html += '</tr>';
         return html;
@@ -590,6 +681,44 @@ function buildSettingPage() {
         return html;
     }
 
+    function addOptionsSection(sectionIsActive) {
+        let html = "";
+        html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">OPTIONS</div>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
+        html += '<div class="deboucled-setting-content" style="margin-bottom: 0;">';
+        html += `<span class="deboucled-version">v${deboucledVersion}</span>`;
+        html += '<table class="deboucled-option-table">';
+
+        let spiral = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
+        html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiral}`, storage_optionBoucledUseJvarchive, false, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
+
+        html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, true, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.');
+
+        let forbidden = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
+        html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbidden}`, storage_optionDisplayBlacklistTopicButton, true, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics voulu.');
+
+        let blJvc = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
+        html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvc} de JVC`, storage_optionShowJvcBlacklistButton, false, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
+
+        let poc = '<span class="deboucled-poc-logo"></span>'
+        html += addDropdownOption(`Protection contre les <i>PoC</i> ${poc} <span style="opacity: 0.3;font-style: italic;font-size: xx-small;">(beta)</span>`,
+            storage_optionDetectPocMode,
+            'Protection contre les topics &quot;post ou cancer&quot; et les dérivés.\n• Désactivé : aucune protection\n• Mode simple (rapide) : recherche dans le message si le titre contient un indice\n• Mode approfondi (plus lent) : recherche systématiquement dans le message et le titre',
+            0,
+            ['Désactivé', 'Mode simple', 'Mode approfondi']);
+
+        html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, false, 'Autoriser l\'affichage des topics même si le sujet est blacklist, à partir d\'un certain nombre de messages.');
+
+        let allowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
+        html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, 100, 10, 1000, allowDisplayThreshold, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.');
+
+        html += addImportExportButtons();
+
+        html += '</table>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
     function addEntitySettingSection(entity, header, hint, sectionIsActive) {
         let html = "";
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">${header}</div>`;
@@ -611,37 +740,6 @@ function buildSettingPage() {
         html += `<div id="deboucled-${entity}List" style="margin-top:10px;"></div>`;
         html += '</td>';
         html += '</tr>';
-        html += '</table>';
-        html += '</div>';
-        html += '</div>';
-        return html;
-    }
-    function addOptionsSection(sectionIsActive) {
-        let html = "";
-        html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">OPTIONS</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
-        html += '<div class="deboucled-setting-content" style="margin-bottom: 0;">';
-        html += `<span class="deboucled-version">v${deboucledVersion}</span>`;
-        html += '<table class="deboucled-option-table">';
-
-        let spiral = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
-        html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiral}`, storage_optionBoucledUseJvarchive, false, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
-
-        html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, true, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.');
-
-        let forbidden = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
-        html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbidden}`, storage_optionDisplayBlacklistTopicButton, true, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics voulu.');
-
-        let blJvc = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
-        html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvc} de JVC`, storage_optionShowJvcBlacklistButton, false, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
-
-        html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, false, 'Autoriser l\'affichage des topics même si le sujet est blacklist, à partir d\'un certain nombre de messages.');
-
-        let allowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
-        html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, 100, 10, 1000, allowDisplayThreshold, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.');
-
-        html += addImportExportButtons();
-
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -683,18 +781,24 @@ function buildSettingPage() {
     document.body.prepend(settingsView);
 
     function addToggleEvent(id, callback = undefined) {
-        const toggleSlider = document.getElementById(id)
+        const toggleSlider = document.getElementById(id);
         toggleSlider.addEventListener('change', (e) => {
             GM_setValue(id, e.currentTarget.checked);
             if (callback) callback();
         });
     }
     function addRangeEvent(id) {
-        const rangeSlider = document.getElementById(id)
+        const rangeSlider = document.getElementById(id);
         rangeSlider.oninput = function () {
             GM_setValue(id, parseInt(this.value));
             document.getElementById(`${id}-value`).innerHTML = this.value;
         };
+    }
+    function addSelectEvent(id) {
+        const select = document.getElementById(id);
+        select.addEventListener('change', (e) => {
+            GM_setValue(id, parseInt(e.currentTarget.value));
+        });
     }
 
     addToggleEvent(storage_optionHideMessages);
@@ -707,6 +811,7 @@ function buildSettingPage() {
         })
     });
     addRangeEvent(storage_optionDisplayThreshold);
+    addSelectEvent(storage_optionDetectPocMode);
 
     addImportExportEvent();
 
@@ -1002,10 +1107,14 @@ async function handleTopicList(canFillTopics) {
     let optionAllowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
     let optionDisplayThreshold = GM_getValue(storage_optionDisplayThreshold, 100);
 
+    let finalTopics = [];
     topics.slice(1).forEach(function (topic) {
         if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold)) removeTopic(topic);
+        else finalTopics.push(topic);
     });
-    if (canFillTopics) await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold);
+    if (canFillTopics) {
+        finalTopics = finalTopics.concat(await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold));
+    }
 
     updateTopicsHeader();
 
@@ -1013,6 +1122,22 @@ async function handleTopicList(canFillTopics) {
     if (optionDisplayBlacklistTopicButton) addIgnoreButtons();
 
     saveTotalHidden();
+
+    await handlePoc(finalTopics);
+}
+
+async function handlePoc(finalTopics) {
+    // 0 = désactivé ; 1 = recherche simple ; 2 = recherche approfondie
+    let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, 0);
+    if (optionDetectPocMode === 0) return;
+
+    // On gère les PoC à la fin pour pas figer la page pendant le traitement
+    await Promise.all(finalTopics.map(async function (topic) {
+        let poc = await isTopicPoC(topic, optionDetectPocMode);
+        if (poc) markTopicPoc(topic);
+    }));
+
+    saveLocalStorage();
 }
 
 function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
