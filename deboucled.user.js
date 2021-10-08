@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.10.0
+// @version     1.10.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -19,18 +19,21 @@
 // @grant       GM_listValues
 // @grant       GM_getResourceText
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
+// @require     https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js
 // @icon        https://image.noelshack.com/fichiers/2021/38/6/1632606701-deboucled.png
 // ==/UserScript==
 
 /*
+* todo : "Topic Previsualizer"
+* todo : "Wildcard subject" : use wildcard for subjects blacklist
 * todo : "Handle mp and stickers" : handle blacklist for mp and stickers in messages
 * todo : "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
-* todo : "Wildcard subject" : use wildcard for subjects blacklist
 * todo : "Reversed/Highlight option" : highlight elements of interest
 * todo : "Zap mode" : select author/word directly in the main page to blacklist
 * todo : "Export BL" : export blacklists only to share with users
 * todo : "PréBlacklists" : have built-in blacklists like "COVID" or "BOUCLEURS connus" etc
 * todo : "button to clean 410 blacklisted topics"
+* todo : Study TBL
 */
 
 
@@ -53,7 +56,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.10.0'
+const deboucledVersion = '1.10.1'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -129,12 +132,25 @@ function saveStorage() {
 }
 
 function loadLocalStorage() {
-    if (!localStorage.localstorage_pocTopics) return;
-    pocTopicMap = new Map([...pocTopicMap, ...JSON.parse(localStorage.localstorage_pocTopics)]);
+    //if (!localStorage.localstorage_pocTopics) return;
+    //pocTopicMap = new Map([...pocTopicMap, ...JSON.parse(localStorage.localstorage_pocTopics)]);
+
+    localforage.getItem(localstorage_pocTopics)
+        .then(function (value) {
+            if (value) pocTopicMap = new Map([...pocTopicMap, ...JSON.parse(value)]);
+            //console.log(pocTopicMap);
+        }).catch(function (err) {
+            console.error(err);
+        });
 }
 
 function saveLocalStorage() {
-    localStorage.localstorage_pocTopics = JSON.stringify([...pocTopicMap]);
+    //localStorage.localstorage_pocTopics = JSON.stringify([...pocTopicMap]);
+
+    localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]))
+        .catch(function (err) {
+            console.error(err);
+        });
 }
 
 function removeTopicIdBlacklist(topicId) {
