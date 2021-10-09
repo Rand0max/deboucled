@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.10.1
+// @version     1.10.2
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -92,10 +92,10 @@ const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
 
 
-function initStorage() {
+async function initStorage() {
     let isInit = GM_getValue(storage_init, false);
     if (isInit) {
-        loadStorage();
+        await loadStorage();
         return false;
     }
     else {
@@ -105,7 +105,7 @@ function initStorage() {
     }
 }
 
-function loadStorage() {
+async function loadStorage() {
     subjectBlacklistArray = [...new Set(subjectBlacklistArray.concat(JSON.parse(GM_getValue(storage_blacklistedSubjects))))];
     authorBlacklistArray = [...new Set(authorBlacklistArray.concat(JSON.parse(GM_getValue(storage_blacklistedAuthors))))];
     topicIdBlacklistMap = new Map([...topicIdBlacklistMap, ...JSON.parse(GM_getValue(storage_blacklistedTopicIds))]);
@@ -113,12 +113,12 @@ function loadStorage() {
     subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
 
-    loadLocalStorage();
+    await loadLocalStorage();
 
-    saveStorage();
+    await saveStorage();
 }
 
-function saveStorage() {
+async function saveStorage() {
     GM_setValue(storage_blacklistedSubjects, JSON.stringify([...new Set(subjectBlacklistArray)]));
     GM_setValue(storage_blacklistedAuthors, JSON.stringify([...new Set(authorBlacklistArray)]));
     GM_setValue(storage_blacklistedTopicIds, JSON.stringify([...topicIdBlacklistMap]));
@@ -126,31 +126,18 @@ function saveStorage() {
     subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
 
-    saveLocalStorage();
+    await saveLocalStorage();
 
     refreshEntityCounts();
 }
 
-function loadLocalStorage() {
-    //if (!localStorage.localstorage_pocTopics) return;
-    //pocTopicMap = new Map([...pocTopicMap, ...JSON.parse(localStorage.localstorage_pocTopics)]);
-
-    localforage.getItem(localstorage_pocTopics)
-        .then(function (value) {
-            if (value) pocTopicMap = new Map([...pocTopicMap, ...JSON.parse(value)]);
-            //console.log(pocTopicMap);
-        }).catch(function (err) {
-            console.error(err);
-        });
+async function loadLocalStorage() {
+    const storagePocTopics = await localforage.getItem(localstorage_pocTopics);
+    if (storagePocTopics) pocTopicMap = new Map([...pocTopicMap, ...JSON.parse(storagePocTopics)]);
 }
 
-function saveLocalStorage() {
-    //localStorage.localstorage_pocTopics = JSON.stringify([...pocTopicMap]);
-
-    localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]))
-        .catch(function (err) {
-            console.error(err);
-        });
+async function saveLocalStorage() {
+    await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
 }
 
 function removeTopicIdBlacklist(topicId) {
@@ -1153,7 +1140,7 @@ async function handlePoc(finalTopics) {
         if (poc) markTopicPoc(topic);
     }));
 
-    saveLocalStorage();
+    await saveLocalStorage();
 }
 
 function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
@@ -1223,8 +1210,8 @@ function addSvgs() {
     addSvg(forbiddenSvg, '#forum-main-col');
 }
 
-function init() {
-    let firstLaunch = initStorage();
+async function init() {
+    let firstLaunch = await initStorage();
     addCss();
     addSvgs();
     buildSettingPage();
@@ -1235,15 +1222,15 @@ async function callMe() {
     let currentPageType = getCurrentPageType(window.location.pathname);
     switch (currentPageType) {
         case 'topiclist':
-            init();
+            await init();
             await handleTopicList(true);
             break;
         case 'topicmessages':
-            init();
+            await init();
             handleTopicMessages();
             break;
         case 'search':
-            init();
+            await init();
             await handleSearch();
             break;
         default:
