@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.11.1
+// @version     1.11.2
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -55,7 +55,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.11.1'
+const deboucledVersion = '1.11.2'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -489,8 +489,13 @@ function addIgnoreButtons(topics) {
 
 function addPrevisualizeTopicEvent(topics) {
     topics.slice(1).forEach(function (topic) {
-        let anchor = document.createElement('span');
-        anchor.setAttribute('title', 'Aperçu du topic');
+        let topicTitle = topic.querySelector('.topic-title');
+        topicTitle.classList.add('deboucled-topic-title');
+
+        let topicUrl = topicTitle.getAttribute('href');
+
+        let anchor = document.createElement('a');
+        anchor.setAttribute('href', topicUrl);
         anchor.setAttribute('class', 'deboucled-topic-preview-col');
         anchor.innerHTML = '<svg viewBox="0 0 30 30" id="deboucled-preview-logo" class="deboucled-logo-preview"><use href="#previewlogo"/></svg>';
         let topicImg = topic.querySelector('.topic-img');
@@ -499,19 +504,27 @@ function addPrevisualizeTopicEvent(topics) {
         let previewDiv = document.createElement('div');
         previewDiv.className = 'deboucled-preview-content bloc-message-forum';
         previewDiv.innerHTML = '<img class="deboucled-spinner" src="http://s3.noelshack.com/uploads/images/20188032684831_loading.gif" alt="Loading" />';
+        previewDiv.onclick = function (e) { e.preventDefault(); }
         anchor.appendChild(previewDiv);
 
-        let topicTitle = topic.querySelector('.topic-title');
-        topicTitle.classList.add('deboucled-topic-title');
+        function prepareMessagePreview(page) {
+            let messagePreview = page.querySelector('.bloc-message-forum');
+            messagePreview.querySelector('.bloc-options-msg').remove();
+            const avatar = messagePreview.querySelector('.user-avatar-msg');  // JvCare
+            if (avatar && avatar.hasAttribute('data-srcset') && avatar.hasAttribute('src')) {
+                avatar.setAttribute('src', avatar.getAttribute('data-srcset'));
+                avatar.removeAttribute('data-srcset');
+            }
+            return messagePreview;
+        }
 
-        let topicUrl = topicTitle.getAttribute('href');
         async function previewTopicCallback() {
             return await fetch(topicUrl).then(function (response) {
                 if (!response.ok) throw Error(response.statusText);
                 return response.text();
             }).then(function (r) {
                 const html = domParser.parseFromString(r, "text/html");
-                return html.querySelector('.bloc-message-forum');
+                return prepareMessagePreview(html);
             }).catch(function (err) {
                 console.error(err);
                 return null;
@@ -823,6 +836,8 @@ function buildSettingPage() {
     settingsView.setAttribute('class', 'deboucled-settings-view');
     settingsView.innerHTML = settingsHtml;
     document.body.prepend(settingsView);
+
+    document.querySelector('.deboucled-version').onclick = function () { alert('En dépit des boucleurs --> ent :)'); };
 
     function addToggleEvent(id, callback = undefined) {
         const toggleSlider = document.getElementById(id);
