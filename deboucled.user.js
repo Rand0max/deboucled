@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.10.3
+// @version     1.11.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -24,7 +24,6 @@
 // ==/UserScript==
 
 /*
-* todo : "Topic Previsualizer"
 * todo : "Wildcard subject" : use wildcard for subjects blacklist
 * todo : "Handle mp and stickers" : handle blacklist for mp and stickers in messages
 * todo : "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
@@ -32,7 +31,7 @@
 * todo : "Zap mode" : select author/word directly in the main page to blacklist
 * todo : "Export BL" : export blacklists only to share with users
 * todo : "PréBlacklists" : have built-in blacklists like "COVID" or "BOUCLEURS connus" etc
-* todo : "button to clean 410 blacklisted topics"
+* todo : "button to clean 410 blacklisted topics" (can recreate url with topicid and any title)
 * todo : Study TBL
 */
 
@@ -56,7 +55,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.10.3'
+const deboucledVersion = '1.11.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -84,12 +83,13 @@ const storage_optionDisplayBlacklistTopicButton = 'deboucled_optionDisplayBlackl
 const storage_optionShowJvcBlacklistButton = 'deboucled_optionShowJvcBlacklistButton';
 const storage_optionFilterResearch = 'deboucled_optionFilterResearch';
 const storage_optionDetectPocMode = 'deboucled_optionDetectPocMode';
+const storage_optionPrevisualizeTopic = 'deboucled_optionPrevisualizeTopic';
 const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
 const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
 const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 
-const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
+const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
 
 
 async function initStorage() {
@@ -408,31 +408,6 @@ function isAuthorBlacklisted(author) {
     return author.normalizeDiacritic().match(authorsBlacklistReg);
 }
 
-function addIgnoreButtons() {
-    let topics = getAllTopics(document);
-
-    let header = topics[0];
-    let spanHead = document.createElement("span");
-    spanHead.setAttribute('class', 'deboucled-topic-blacklist');
-    spanHead.setAttribute('style', 'width: 1.75rem');
-    header.appendChild(spanHead);
-
-    topics.slice(1).forEach(function (topic) {
-        let span = document.createElement('span');
-        span.setAttribute('class', 'deboucled-topic-blacklist');
-        let topicId = topic.getAttribute('data-id');
-        let topicSubject = topic.querySelector('span:nth-child(1) > a:nth-child(2)').textContent.trim();
-        let anchor = document.createElement('a');
-        anchor.setAttribute('role', 'button');
-        anchor.setAttribute('title', 'Blacklist le topic');
-        anchor.setAttribute('class', 'deboucled-svg-forbidden-red');
-        anchor.onclick = function () { addTopicIdBlacklist(topicId, topicSubject, true); refreshTopicIdKeys(); };
-        anchor.innerHTML = '<svg viewBox="2 2 160 160" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg>';
-        span.appendChild(anchor)
-        topic.appendChild(span);
-    });
-}
-
 async function isTopicPoC(element, optionDetectPocMode) {
     if (!element.hasAttribute('data-id')) return false;
     let topicId = element.getAttribute('data-id');
@@ -487,6 +462,69 @@ async function isTopicPoC(element, optionDetectPocMode) {
 function markTopicPoc(element) {
     let titleElem = element.querySelector('.lien-jv.topic-title');
     titleElem.innerHTML = '<span class="deboucled-title-poc">[PoC] </span>' + titleElem.innerHTML;
+}
+
+function addIgnoreButtons(topics) {
+    let header = topics[0];
+    let spanHead = document.createElement("span");
+    spanHead.setAttribute('class', 'deboucled-topic-blacklist');
+    spanHead.setAttribute('style', 'width: 1.75rem');
+    header.appendChild(spanHead);
+
+    topics.slice(1).forEach(function (topic) {
+        let span = document.createElement('span');
+        span.setAttribute('class', 'deboucled-topic-blacklist');
+        let topicId = topic.getAttribute('data-id');
+        let topicSubject = topic.querySelector('span:nth-child(1) > a:nth-child(2)').textContent.trim();
+        let anchor = document.createElement('a');
+        anchor.setAttribute('role', 'button');
+        anchor.setAttribute('title', 'Blacklist le topic');
+        anchor.setAttribute('class', 'deboucled-svg-forbidden-red');
+        anchor.onclick = function () { addTopicIdBlacklist(topicId, topicSubject, true); refreshTopicIdKeys(); };
+        anchor.innerHTML = '<svg viewBox="0 0 160 160" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg>';
+        span.appendChild(anchor)
+        topic.appendChild(span);
+    });
+}
+
+function addPrevisualizeTopicEvent(topics) {
+    topics.slice(1).forEach(function (topic) {
+        let anchor = document.createElement('span');
+        anchor.setAttribute('title', 'Aperçu du topic');
+        anchor.setAttribute('class', 'deboucled-topic-preview-col');
+        anchor.innerHTML = '<svg viewBox="0 0 30 30" id="deboucled-preview-logo" class="deboucled-logo-preview"><use href="#previewlogo"/></svg>';
+        let topicImg = topic.querySelector('.topic-img');
+        insertAfter(anchor, topicImg);
+
+        let previewDiv = document.createElement('div');
+        previewDiv.className = 'deboucled-preview-content bloc-message-forum';
+        previewDiv.innerHTML = '<img class="deboucled-spinner" src="http://s3.noelshack.com/uploads/images/20188032684831_loading.gif" alt="Loading" />';
+        anchor.appendChild(previewDiv);
+
+        let topicTitle = topic.querySelector('.topic-title');
+        topicTitle.classList.add('deboucled-topic-title');
+
+        let topicUrl = topicTitle.getAttribute('href');
+        async function previewTopicCallback() {
+            return await fetch(topicUrl).then(function (response) {
+                if (!response.ok) throw Error(response.statusText);
+                return response.text();
+            }).then(function (r) {
+                const html = domParser.parseFromString(r, "text/html");
+                return html.querySelector('.bloc-message-forum');
+            }).catch(function (err) {
+                console.error(err);
+                return null;
+            });
+        }
+
+        anchor.onmouseenter = async function () {
+            if (previewDiv.querySelector('.bloc-message-forum')) return;
+            const topicContent = await previewTopicCallback();
+            previewDiv.firstChild.remove();
+            previewDiv.appendChild(topicContent);
+        };
+    });
 }
 
 
@@ -700,6 +738,9 @@ function buildSettingPage() {
         let forbidden = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbidden}`, storage_optionDisplayBlacklistTopicButton, true, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics voulu.');
 
+        let preview = '<span><svg width="16px" viewBox="0 0 30 30" id="deboucled-preview-logo"><use href="#previewlogo"/></svg></span>';
+        html += addToggleOption(`Afficher les boutons pour avoir un <i>aperçu du topic</i> ${preview}`, storage_optionPrevisualizeTopic, true, 'Afficher ou non l\'icone \'loupe\' à côté du sujet pour prévisualiser le topic.');
+
         let blJvc = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
         html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvc} de JVC`, storage_optionShowJvcBlacklistButton, false, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
 
@@ -807,6 +848,7 @@ function buildSettingPage() {
     addToggleEvent(storage_optionHideMessages);
     addToggleEvent(storage_optionBoucledUseJvarchive);
     addToggleEvent(storage_optionDisplayBlacklistTopicButton);
+    addToggleEvent(storage_optionPrevisualizeTopic);
     addToggleEvent(storage_optionShowJvcBlacklistButton);
     addToggleEvent(storage_optionAllowDisplayThreshold, function () {
         document.querySelectorAll(`[id = ${storage_optionDisplayThreshold}-container]`).forEach(function (el) {
@@ -1111,6 +1153,7 @@ async function handleTopicList(canFillTopics) {
     let optionDisplayThreshold = GM_getValue(storage_optionDisplayThreshold, 100);
 
     let finalTopics = [];
+    finalTopics.push(topics[0]); // header
     topics.slice(1).forEach(function (topic) {
         if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold)) removeTopic(topic);
         else finalTopics.push(topic);
@@ -1122,7 +1165,10 @@ async function handleTopicList(canFillTopics) {
     updateTopicsHeader();
 
     let optionDisplayBlacklistTopicButton = GM_getValue(storage_optionDisplayBlacklistTopicButton, true);
-    if (optionDisplayBlacklistTopicButton) addIgnoreButtons();
+    if (optionDisplayBlacklistTopicButton) addIgnoreButtons(finalTopics);
+
+    let optionPrevisualizeTopic = GM_getValue(storage_optionPrevisualizeTopic, true);
+    if (optionPrevisualizeTopic) addPrevisualizeTopicEvent(finalTopics);
 
     saveTotalHidden();
 
@@ -1135,7 +1181,7 @@ async function handlePoc(finalTopics) {
     if (optionDetectPocMode === 0) return;
 
     // On gère les PoC à la fin pour pas figer la page pendant le traitement
-    await Promise.all(finalTopics.map(async function (topic) {
+    await Promise.all(finalTopics.slice(1).map(async function (topic) {
         let poc = await isTopicPoC(topic, optionDetectPocMode);
         if (poc) markTopicPoc(topic);
     }));
@@ -1203,11 +1249,14 @@ async function handleSearch() {
 }
 
 function addSvgs() {
-    const spiralSvg = '<svg width="24px" viewBox="0 0 24 24"><symbol id="spirallogo"><path d="M12.71,12.59a1,1,0,0,1-.71-.3,1,1,0,0,0-1.41,0,1,1,0,0,1-1.42,0,1,1,0,0,1,0-1.41,3.08,3.08,0,0,1,4.24,0,1,1,0,0,1,0,1.41A1,1,0,0,1,12.71,12.59Z"/><path d="M12.71,14a1,1,0,0,1-.71-.29,1,1,0,0,1,0-1.42h0a1,1,0,0,1,1.41-1.41,2,2,0,0,1,0,2.83A1,1,0,0,1,12.71,14Z"/><path d="M9.88,16.83a1,1,0,0,1-.71-.29,4,4,0,0,1,0-5.66,1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41,2,2,0,0,0,0,2.83,1,1,0,0,1,0,1.42A1,1,0,0,1,9.88,16.83Z"/><path d="M12.71,18a5,5,0,0,1-3.54-1.46,1,1,0,1,1,1.42-1.42,3.07,3.07,0,0,0,4.24,0,1,1,0,0,1,1.41,0,1,1,0,0,1,0,1.42A5,5,0,0,1,12.71,18Z"/><path d="M15.54,16.83a1,1,0,0,1-.71-1.71,4,4,0,0,0,0-5.66,1,1,0,0,1,1.41-1.41,6,6,0,0,1,0,8.49A1,1,0,0,1,15.54,16.83Z"/><path d="M7.05,9.76a1,1,0,0,1-.71-1.71,7,7,0,0,1,9.9,0,1,1,0,1,1-1.41,1.41,5,5,0,0,0-7.07,0A1,1,0,0,1,7.05,9.76Z"/><path d="M7.05,19.66a1,1,0,0,1-.71-.3,8,8,0,0,1,0-11.31,1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41,6,6,0,0,0,0,8.49,1,1,0,0,1-.71,1.71Z"/><path d="M12.71,22a9,9,0,0,1-6.37-2.64,1,1,0,0,1,0-1.41,1,1,0,0,1,1.42,0,7,7,0,0,0,9.9,0,1,1,0,0,1,1.41,1.41A8.94,8.94,0,0,1,12.71,22Z"/><path d="M18.36,19.66a1,1,0,0,1-.7-.3,1,1,0,0,1,0-1.41,8,8,0,0,0,0-11.31,1,1,0,0,1,0-1.42,1,1,0,0,1,1.41,0,10,10,0,0,1,0,14.14A1,1,0,0,1,18.36,19.66Z"/><path d="M4.22,6.93a1,1,0,0,1-.71-.29,1,1,0,0,1,0-1.42,11,11,0,0,1,15.56,0,1,1,0,0,1,0,1.42,1,1,0,0,1-1.41,0,9,9,0,0,0-12.73,0A1,1,0,0,1,4.22,6.93Z"/></symbol></svg>';
+    const spiralSvg = '<svg width="24px" viewBox="0 0 24 24" style="display: none;"><symbol id="spirallogo"><path d="M12.71,12.59a1,1,0,0,1-.71-.3,1,1,0,0,0-1.41,0,1,1,0,0,1-1.42,0,1,1,0,0,1,0-1.41,3.08,3.08,0,0,1,4.24,0,1,1,0,0,1,0,1.41A1,1,0,0,1,12.71,12.59Z"/><path d="M12.71,14a1,1,0,0,1-.71-.29,1,1,0,0,1,0-1.42h0a1,1,0,0,1,1.41-1.41,2,2,0,0,1,0,2.83A1,1,0,0,1,12.71,14Z"/><path d="M9.88,16.83a1,1,0,0,1-.71-.29,4,4,0,0,1,0-5.66,1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41,2,2,0,0,0,0,2.83,1,1,0,0,1,0,1.42A1,1,0,0,1,9.88,16.83Z"/><path d="M12.71,18a5,5,0,0,1-3.54-1.46,1,1,0,1,1,1.42-1.42,3.07,3.07,0,0,0,4.24,0,1,1,0,0,1,1.41,0,1,1,0,0,1,0,1.42A5,5,0,0,1,12.71,18Z"/><path d="M15.54,16.83a1,1,0,0,1-.71-1.71,4,4,0,0,0,0-5.66,1,1,0,0,1,1.41-1.41,6,6,0,0,1,0,8.49A1,1,0,0,1,15.54,16.83Z"/><path d="M7.05,9.76a1,1,0,0,1-.71-1.71,7,7,0,0,1,9.9,0,1,1,0,1,1-1.41,1.41,5,5,0,0,0-7.07,0A1,1,0,0,1,7.05,9.76Z"/><path d="M7.05,19.66a1,1,0,0,1-.71-.3,8,8,0,0,1,0-11.31,1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41,6,6,0,0,0,0,8.49,1,1,0,0,1-.71,1.71Z"/><path d="M12.71,22a9,9,0,0,1-6.37-2.64,1,1,0,0,1,0-1.41,1,1,0,0,1,1.42,0,7,7,0,0,0,9.9,0,1,1,0,0,1,1.41,1.41A8.94,8.94,0,0,1,12.71,22Z"/><path d="M18.36,19.66a1,1,0,0,1-.7-.3,1,1,0,0,1,0-1.41,8,8,0,0,0,0-11.31,1,1,0,0,1,0-1.42,1,1,0,0,1,1.41,0,10,10,0,0,1,0,14.14A1,1,0,0,1,18.36,19.66Z"/><path d="M4.22,6.93a1,1,0,0,1-.71-.29,1,1,0,0,1,0-1.42,11,11,0,0,1,15.56,0,1,1,0,0,1,0,1.42,1,1,0,0,1-1.41,0,9,9,0,0,0-12.73,0A1,1,0,0,1,4.22,6.93Z"/></symbol></svg>';
     addSvg(spiralSvg, '#forum-main-col');
 
     const forbiddenSvg = '<svg style="display: none;"><symbol id="forbiddenlogo"><g><ellipse stroke-width="20" ry="70" rx="70" cy="80" cx="80" /><line y2="37.39011" x2="122.60989" y1="122.60989" x1="37.39011" stroke-width="20" /></g></symbol></svg>';
     addSvg(forbiddenSvg, '#forum-main-col');
+
+    const previewSvg = '<svg viewBox="0 0 30 30" width="30px" height="30px"><symbol id="previewlogo"><path fill="#b6c9d6" d="M2.931,28.5c-0.382,0-0.742-0.149-1.012-0.419c-0.558-0.558-0.558-1.466,0-2.024l14.007-13.353 l1.375,1.377L3.935,28.089C3.673,28.351,3.313,28.5,2.931,28.5z"/><path fill="#788b9c" d="M15.917,13.403l0.685,0.686L3.589,27.727C3.413,27.903,3.18,28,2.931,28 c-0.249,0-0.482-0.097-0.658-0.273c-0.363-0.363-0.363-0.953-0.017-1.3L15.917,13.403 M15.934,12.005L1.565,25.704 c-0.754,0.754-0.754,1.977,0,2.731C1.943,28.811,2.437,29,2.931,29c0.494,0,0.988-0.189,1.365-0.566L18,14.073L15.934,12.005 L15.934,12.005z"/><g><path fill="#d1edff" d="M19,20.5c-5.238,0-9.5-4.262-9.5-9.5s4.262-9.5,9.5-9.5s9.5,4.262,9.5,9.5S24.238,20.5,19,20.5z"/><path fill="#788b9c" d="M19,2c4.963,0,9,4.037,9,9s-4.037,9-9,9s-9-4.037-9-9S14.037,2,19,2 M19,1C13.477,1,9,5.477,9,11 s4.477,10,10,10s10-4.477,10-10S24.523,1,19,1L19,1z"/></g></symbol></svg>';
+    addSvg(previewSvg, '#forum-main-col');
 }
 
 async function init() {
