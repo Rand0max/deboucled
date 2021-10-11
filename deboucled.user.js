@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.11.2
+// @version     1.11.3
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -24,6 +24,7 @@
 // ==/UserScript==
 
 /*
+* todo : Better preview (taller top border (not visible) to browse inside)
 * todo : "Wildcard subject" : use wildcard for subjects blacklist
 * todo : "Handle mp and stickers" : handle blacklist for mp and stickers in messages
 * todo : "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
@@ -55,7 +56,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.11.2'
+const deboucledVersion = '1.11.3'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -760,7 +761,7 @@ function buildSettingPage() {
         let poc = '<span class="deboucled-poc-logo"></span>'
         html += addDropdownOption(`Protection contre les <i>PoC</i> ${poc} <span style="opacity: 0.3;font-style: italic;font-size: xx-small;">(beta)</span>`,
             storage_optionDetectPocMode,
-            'Protection contre les topics &quot;post ou cancer&quot; et les dérivés.\n• Désactivé : aucune protection\n• Mode simple (rapide) : recherche dans le message si le titre contient un indice\n• Mode approfondi (plus lent) : recherche systématiquement dans le message et le titre',
+            'Protection contre les topics &quot;post ou cancer&quot; et les dérivés.\n• Désactivé : aucune protection\n• Mode simple (rapide) : recherche dans le message uniquement si le titre contient un indice\n• Mode approfondi (plus lent) : recherche systématiquement dans le message et le titre',
             0,
             ['Désactivé', 'Mode simple', 'Mode approfondi']);
 
@@ -1131,7 +1132,7 @@ function getCurrentPageType(url) {
     let topicListRegex = /^\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*\.htm$/i;
     if (url.match(topicListRegex)) return 'topiclist';
 
-    let topicMessagesRegex = /^\/forums\/42-[0-9]+-[0-9]+-[0-9]+-0-1-0-.*\.htm$/i;
+    let topicMessagesRegex = /^\/forums\/(42|1)-[0-9]+-[0-9]+-[0-9]+-0-1-0-.*\.htm$/i;
     if (url.match(topicMessagesRegex)) return 'topicmessages';
 
     let searchRegex = /^\/recherche\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*/i;
