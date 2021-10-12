@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.11.4
+// @version     1.11.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.11.4'
+const deboucledVersion = '1.11.5'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -271,6 +271,14 @@ function addSvg(svgHtml, selector) {
     svgElement.innerHTML = svgHtml;
     let selection = document.querySelector(selector)
     if (selection !== null) selection.appendChild(svgElement);
+}
+
+function decryptJvCare(jvCareClass) {
+    let base16 = '0A12B34C56D78E9F', url = '', s = jvCareClass.split(' ')[1];
+    for (let i = 0; i < s.length; i += 2) {
+        url += String.fromCharCode(base16.indexOf(s.charAt(i)) * 16 + base16.indexOf(s.charAt(i + 1)));
+    }
+    return url;
 }
 
 
@@ -510,12 +518,22 @@ function addPrevisualizeTopicEvent(topics) {
 
         function prepareMessagePreview(page) {
             let messagePreview = page.querySelector('.bloc-message-forum');
-            messagePreview.querySelector('.bloc-options-msg').remove();
-            const avatar = messagePreview.querySelector('.user-avatar-msg');  // JvCare
+            messagePreview.querySelector('.bloc-options-msg').remove(); // remove buttons
+
+            // JvCare
+            const avatar = messagePreview.querySelector('.user-avatar-msg');
             if (avatar && avatar.hasAttribute('data-srcset') && avatar.hasAttribute('src')) {
                 avatar.setAttribute('src', avatar.getAttribute('data-srcset'));
                 avatar.removeAttribute('data-srcset');
             }
+            messagePreview.querySelectorAll('.JvCare').forEach(function (m) {
+                let anchor = document.createElement('a');
+                anchor.setAttribute('target', '_blank');
+                anchor.setAttribute('href', decryptJvCare(m.getAttribute('class')));
+                anchor.className = m.className.split(' ').splice(2).join(' ');
+                anchor.innerHTML = m.innerHTML;
+                m.outerHTML = anchor.outerHTML;
+            });
             return messagePreview;
         }
 
