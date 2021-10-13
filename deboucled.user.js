@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.11.5
+// @version     1.12.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -43,7 +43,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.11.5'
+const deboucledVersion = '1.12.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -543,6 +543,20 @@ function addPrevisualizeTopicEvent(topics) {
             previewDiv.firstChild.remove();
             previewDiv.appendChild(topicContent);
         };
+    });
+}
+
+function addTopicLogo(topics) {
+    topics.slice(1).forEach(function (topic) {
+        const topicImg = topic.querySelector('.topic-img');
+        const topicCount = topic.querySelector('.topic-count');
+        if (!topicImg || !topicCount) return;
+        const nbMessage = parseInt(topicCount.textContent);
+        if (nbMessage < 100) return;
+        let span = document.createElement('span');
+        span.className = 'topic-img deboucled-topic-black-logo';
+        insertAfter(span, topicImg);
+        topicImg.remove();
     });
 }
 
@@ -1201,6 +1215,8 @@ async function handleTopicList(canFillTopics) {
 
     let optionPrevisualizeTopic = GM_getValue(storage_optionPrevisualizeTopic, true);
     if (optionPrevisualizeTopic) addPrevisualizeTopicEvent(finalTopics);
+
+    addTopicLogo(finalTopics);
 
     saveTotalHidden();
 
