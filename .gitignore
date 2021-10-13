@@ -1,5 +1,7 @@
 node_modules/**
 changelogs/**
+documentation/**
+resources/**
 tampermonkey-module.d.ts
 tampermonkey-reference.d.ts
 tsconfig.json

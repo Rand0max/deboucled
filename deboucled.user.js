@@ -23,19 +23,6 @@
 // @icon        https://image.noelshack.com/fichiers/2021/38/6/1632606701-deboucled.png
 // ==/UserScript==
 
-/*
-* todo : Better preview (taller top border (not visible) to browse inside)
-* todo : "Wildcard subject" : use wildcard for subjects blacklist
-* todo : "Handle mp and stickers" : handle blacklist for mp and stickers in messages
-* todo : "Hiding mode option" : show blacklisted elements in red (not hidden) or in light gray (?)
-* todo : "Reversed/Highlight option" : highlight elements of interest
-* todo : "Zap mode" : select author/word directly in the main page to blacklist
-* todo : "Export BL" : export blacklists only to share with users
-* todo : "PréBlacklists" : have built-in blacklists like "COVID" or "BOUCLEURS connus" etc
-* todo : "button to clean 410 blacklisted topics" (can recreate url with topicid and any title)
-* todo : Study TBL
-*/
-
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // VARIABLES
