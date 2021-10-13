@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.12.0
+// @version     1.12.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -43,7 +43,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.12.0'
+const deboucledVersion = '1.12.1'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -551,6 +551,7 @@ function addTopicLogo(topics) {
         const topicImg = topic.querySelector('.topic-img');
         const topicCount = topic.querySelector('.topic-count');
         if (!topicImg || !topicCount) return;
+        if (topicImg.title.toLowerCase() !== 'topic hot') return;
         const nbMessage = parseInt(topicCount.textContent);
         if (nbMessage < 100) return;
         let span = document.createElement('span');
