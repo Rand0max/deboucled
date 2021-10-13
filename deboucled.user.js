@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.12.1
+// @version     1.12.2
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -43,7 +43,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.12.1'
+const deboucledVersion = '1.12.2'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -72,12 +72,13 @@ const storage_optionShowJvcBlacklistButton = 'deboucled_optionShowJvcBlacklistBu
 const storage_optionFilterResearch = 'deboucled_optionFilterResearch';
 const storage_optionDetectPocMode = 'deboucled_optionDetectPocMode';
 const storage_optionPrevisualizeTopic = 'deboucled_optionPrevisualizeTopic';
+const storage_optionDisplayBlackTopic = 'deboucled_optionDisplayBlackTopic';
 const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
 const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
 const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 
-const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
+const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
 
 
 async function initStorage() {
@@ -546,7 +547,7 @@ function addPrevisualizeTopicEvent(topics) {
     });
 }
 
-function addTopicLogo(topics) {
+function addBlackTopicLogo(topics) {
     topics.slice(1).forEach(function (topic) {
         const topicImg = topic.querySelector('.topic-img');
         const topicCount = topic.querySelector('.topic-count');
@@ -772,6 +773,9 @@ function buildSettingPage() {
         let forbidden = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbidden}`, storage_optionDisplayBlacklistTopicButton, true, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics voulu.');
 
+        let blackTopic = '<span class="topic-img deboucled-topic-black-logo" style="display: inline-block; vertical-align: middle;"></span>'
+        html += addToggleOption(`Afficher le pictogramme pour les <i>topics noirs</i> ${blackTopic}`, storage_optionDisplayBlackTopic, true, 'Afficher les topics de plus de 100 messages avec le pictogramme noir (en plus du jaune, rouge, résolu, épinglé etc).');
+
         let preview = '<span><svg width="16px" viewBox="0 0 30 30" id="deboucled-preview-logo"><use href="#previewlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour avoir un <i>aperçu du topic</i> ${preview}`, storage_optionPrevisualizeTopic, true, 'Afficher ou non l\'icone \'loupe\' à côté du sujet pour prévisualiser le topic.');
 
@@ -884,6 +888,7 @@ function buildSettingPage() {
     addToggleEvent(storage_optionHideMessages);
     addToggleEvent(storage_optionBoucledUseJvarchive);
     addToggleEvent(storage_optionDisplayBlacklistTopicButton);
+    addToggleEvent(storage_optionDisplayBlackTopic);
     addToggleEvent(storage_optionPrevisualizeTopic);
     addToggleEvent(storage_optionShowJvcBlacklistButton);
     addToggleEvent(storage_optionAllowDisplayThreshold, function () {
@@ -1217,7 +1222,8 @@ async function handleTopicList(canFillTopics) {
     let optionPrevisualizeTopic = GM_getValue(storage_optionPrevisualizeTopic, true);
     if (optionPrevisualizeTopic) addPrevisualizeTopicEvent(finalTopics);
 
-    addTopicLogo(finalTopics);
+    let optionDisplayBlackTopic = GM_getValue(storage_optionDisplayBlackTopic, true);
+    if (optionDisplayBlackTopic) addBlackTopicLogo(finalTopics);
 
     saveTotalHidden();
 
