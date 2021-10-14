@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.12.7
+// @version     1.12.8
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -43,7 +43,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.12.7'
+const deboucledVersion = '1.12.8'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -172,7 +172,9 @@ function backupStorage() {
     }
 
     let map = new Map();
-    GM_listValues().forEach(key => { map.set(key, JSON.parse(GM_getValue(key))); });
+    GM_listValues().forEach(key => {
+        map.set(key, JSON.parse(GM_getValue(key)));
+    });
     let json = JSON.stringify(Object.fromEntries(map));
     var file = blobToFile(new Blob([json], { type: 'application/json' }), 'deboucled');
     var anchor = document.createElement('a');
@@ -590,7 +592,7 @@ function updateMessagesHeader() {
     toggleIgnoredAuthors.setAttribute('class', 'titre-bloc deboucled-toggle-ignored-authors');
     toggleIgnoredAuthors.setAttribute('role', 'button');
     toggleIgnoredAuthors.textContent = '(voir)';
-    toggleIgnoredAuthors.addEventListener('click', function (e) {
+    toggleIgnoredAuthors.onclick = function () {
         if (ignoredAuthors.style.display === 'inline') {
             ignoredAuthors.style.display = 'none';
             toggleIgnoredAuthors.textContent = '(voir)';
@@ -599,7 +601,7 @@ function updateMessagesHeader() {
             ignoredAuthors.style.display = 'inline';
             toggleIgnoredAuthors.textContent = '(cacher)';
         }
-    });
+    };
 
     insertAfter(ignoredMessageHeader, paginationElement);
     ignoredMessageHeader.appendChild(toggleIgnoredAuthors);
@@ -618,11 +620,11 @@ function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklis
     let dbcBlacklistButton = document.createElement('span');
     dbcBlacklistButton.setAttribute('title', 'Blacklister avec Déboucled');
     dbcBlacklistButton.setAttribute('class', 'picto-msg-tronche deboucled-blacklist-author-button');
-    dbcBlacklistButton.addEventListener('click', function () {
+    dbcBlacklistButton.onclick = function () {
         addEntityBlacklist(authorBlacklistArray, author);
         refreshAuthorKeys()
         location.reload();
-    });
+    };
 
     let jvcBlacklistButton = messageElement.querySelector('span.picto-msg-tronche');
     let logged = (jvcBlacklistButton !== null);
@@ -866,10 +868,10 @@ function buildSettingPage() {
 
     function addToggleEvent(id, callback = undefined) {
         const toggleSlider = document.getElementById(id);
-        toggleSlider.addEventListener('change', (e) => {
+        toggleSlider.onchange = (e) => {
             GM_setValue(id, e.currentTarget.checked);
             if (callback) callback();
-        });
+        };
     }
     function addRangeEvent(id) {
         const rangeSlider = document.getElementById(id);
@@ -880,9 +882,9 @@ function buildSettingPage() {
     }
     function addSelectEvent(id) {
         const select = document.getElementById(id);
-        select.addEventListener('change', (e) => {
+        select.onchange = (e) => {
             GM_setValue(id, parseInt(e.currentTarget.value));
-        });
+        };
     }
 
     addToggleEvent(storage_optionHideMessages);
@@ -909,14 +911,14 @@ function buildSettingPage() {
 }
 
 function addImportExportEvent() {
-    document.getElementById('deboucled-export-button').addEventListener('click', backupStorage);
-    document.getElementById('deboucled-import-button').addEventListener('change', loadFile);
+    document.getElementById('deboucled-export-button').onclick = backupStorage;
+    document.getElementById('deboucled-import-button').onchange = loadFile;
 }
 
 function addCollapsibleEvents() {
     const activeClass = 'deboucled-collapsible-active';
     document.querySelectorAll('.deboucled-collapsible').forEach(function (el) {
-        el.addEventListener('click', function () {
+        el.onclick = function () {
             // collapse every active panel
             document.querySelectorAll('.' + activeClass).forEach(function (activeEl) {
                 if (activeEl === el) return;
@@ -937,7 +939,7 @@ function addCollapsibleEvents() {
                 content.style.maxHeight = content.scrollHeight + 'px';
                 view.removeAttribute('style');
             }
-        });
+        };
     });
 }
 
@@ -977,9 +979,9 @@ function writeEntityKeys(entity, array, filter, removeCallback) {
     });
     document.getElementById(`deboucled-${entity}List`).innerHTML = html + '</ul>';
 
-    document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(input => input.addEventListener('click', function (e) {
+    document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(input => input.onclick = function () {
         removeCallback(this.parentNode);
-    }));
+    });
 }
 
 function refreshSubjectKeys(filter = null) {
@@ -1041,25 +1043,25 @@ function createAddEntityEvent(entity, keyRegex, addCallback) {
         refreshCollapsibleContentHeight(entity);
     }
 
-    document.getElementById(`deboucled-${entity}-input-key`).addEventListener('keydown', function (event) {
+    document.getElementById(`deboucled-${entity}-input-key`).onkeydown = function (event) {
         if (!keyIsAllowed(event.key, event.ctrlKey) && !event.key.match(keyRegex)) event.preventDefault();
         if (event.key !== "Enter") return;
         addEntity(entity, keyRegex, addCallback);
-    });
+    };
 
-    document.getElementById(`deboucled-${entity}-input-button`).addEventListener('click', function (e) {
+    document.getElementById(`deboucled-${entity}-input-button`).onclick = function () {
         addEntity(entity, keyRegex, addCallback);
-    });
+    };
 }
 
 function createSearchEntitiesEvent(entity, keyRegex, refreshCallback) {
-    document.getElementById(`deboucled-${entity}-search-key`).addEventListener('keydown', function (event) {
+    document.getElementById(`deboucled-${entity}-search-key`).onkeydown = function (event) {
         if (!keyIsAllowed(event.key, event.ctrlKey) && !event.key.match(keyRegex)) event.preventDefault();
-    });
-    document.getElementById(`deboucled-${entity}-search-key`).addEventListener('input', function (event) {
+    };
+    document.getElementById(`deboucled-${entity}-search-key`).oninput = function (event) {
         refreshCallback(normalizeValue(event.target.value));
         refreshCollapsibleContentHeight(entity);
-    });
+    };
 }
 
 function refreshEntityCounts() {
@@ -1085,20 +1087,20 @@ function addSettingButton(firstLaunch) {
     optionButton.setAttribute('class', `btn btn-actu-new-list-forum deboucled-option-button${firstLaunch ? ' blinking' : ''}`);
     optionButton.innerHTML = 'Déboucled';
     document.querySelector('.bloc-pre-right').prepend(optionButton);
-    optionButton.addEventListener('click', function (e) {
+    optionButton.onclick = function (e) {
         e.preventDefault();
         clearEntityInputs();
         showSettings();
-    });
+    };
 
-    window.addEventListener('click', function (e) {
+    window.onclick = function (e) {
         if (!document.getElementById('deboucled-settings-bg-view').contains(e.target)) return;
         hideSettings();
-    });
-    window.addEventListener('keydown', function (e) {
+    };
+    window.onkeydown = function (e) {
         if (!document.getElementById('deboucled-settings-bg-view').contains(e.target) && e.key !== 'Escape') return;
         hideSettings();
-    });
+    };
 }
 
 function addSearchFilterToggle() {
@@ -1111,10 +1113,10 @@ function addSearchFilterToggle() {
     toggleElem.innerHTML = `<input type="checkbox" id="deboucled-search-filter-toggle" ${optionFilterResearch ? 'checked' : ''}><span class="deboucled-toggle-slider round red"></span>`;
     document.querySelector('.form-rech-forum').appendChild(toggleElem);
 
-    document.querySelector('#deboucled-search-filter-toggle').addEventListener('change', (e) => {
+    document.querySelector('#deboucled-search-filter-toggle').onchange = (e) => {
         GM_setValue(storage_optionFilterResearch, e.currentTarget.checked);
         location.reload();
-    });
+    };
 
     return optionFilterResearch;
 }
