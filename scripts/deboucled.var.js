@@ -17,7 +17,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.12.5'
+const deboucledVersion = '1.12.6'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
