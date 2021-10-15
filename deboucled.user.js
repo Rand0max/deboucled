@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.12.10
+// @version     1.14.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -43,7 +43,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.12.10'
+const deboucledVersion = '1.14.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -1182,7 +1182,7 @@ function getCurrentPageType(url) {
 function getSearchType(urlSearch) {
     let searchRegex = /(\?search_in_forum=)(?<searchvalue>.*)(&type_search_in_forum=)(?<searchtype>.*)/i;
     let matches = searchRegex.exec(urlSearch);
-    return matches.groups.searchtype.trim();
+    return matches.groups.searchtype.trim().toLowerCase();
 }
 
 async function getPageContent(page) {
@@ -1218,18 +1218,22 @@ async function handleTopicList(canFillTopics) {
 
     updateTopicsHeader();
 
-    let optionDisplayBlacklistTopicButton = GM_getValue(storage_optionDisplayBlacklistTopicButton, true);
-    if (optionDisplayBlacklistTopicButton) addIgnoreButtons(finalTopics);
-
-    let optionPrevisualizeTopic = GM_getValue(storage_optionPrevisualizeTopic, true);
-    if (optionPrevisualizeTopic) addPrevisualizeTopicEvent(finalTopics);
-
-    let optionDisplayBlackTopic = GM_getValue(storage_optionDisplayBlackTopic, true);
-    if (optionDisplayBlackTopic) addBlackTopicLogo(finalTopics);
-
     saveTotalHidden();
 
-    await handlePoc(finalTopics);
+    return finalTopics;
+}
+
+async function handleTopicListOptions(topics) {
+    let optionDisplayBlacklistTopicButton = GM_getValue(storage_optionDisplayBlacklistTopicButton, true);
+    if (optionDisplayBlacklistTopicButton) addIgnoreButtons(topics);
+
+    let optionPrevisualizeTopic = GM_getValue(storage_optionPrevisualizeTopic, true);
+    if (optionPrevisualizeTopic) addPrevisualizeTopicEvent(topics);
+
+    let optionDisplayBlackTopic = GM_getValue(storage_optionDisplayBlackTopic, true);
+    if (optionDisplayBlackTopic) addBlackTopicLogo(topics);
+
+    await handlePoc(topics);
 }
 
 async function handlePoc(finalTopics) {
@@ -1286,23 +1290,27 @@ function handleTopicMessages() {
 
 async function handleSearch() {
     let optionFilterResearch = addSearchFilterToggle();
-    if (!optionFilterResearch) return;
-
-    let searchType = getSearchType(window.location.search);
-    switch (searchType) {
-        /*
-        case 'titre_topic':
-            break;
-        case 'auteur_topic':
-            break;
-        */
-        case 'texte_message':
-            // Not implemented yet
-            break;
-        default:
-            await handleTopicList(false);
-            break;
+    if (optionFilterResearch) {
+        let searchType = getSearchType(window.location.search);
+        switch (searchType) {
+            /*
+            case 'titre_topic':
+                break;
+            case 'auteur_topic':
+                break;
+            */
+            case 'texte_message':
+                // Not implemented yet
+                break;
+            default:
+                await handleTopicList(false);
+                break;
+        }
     }
+
+    let topics = getAllTopics(document);
+    if (topics.length === 0) return;
+    await handleTopicListOptions(topics);
 }
 
 function handleError() {
@@ -1334,7 +1342,8 @@ async function callMe() {
     switch (currentPageType) {
         case 'topiclist':
             await init();
-            await handleTopicList(true);
+            const finalTopics = await handleTopicList(true);
+            await handleTopicListOptions(finalTopics);
             break;
         case 'topicmessages':
             await init();
