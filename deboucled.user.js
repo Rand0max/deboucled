@@ -1340,22 +1340,26 @@ async function init() {
 async function callMe() {
     let currentPageType = getCurrentPageType(window.location.pathname);
     switch (currentPageType) {
-        case 'topiclist':
+        case 'topiclist': {
             await init();
             const finalTopics = await handleTopicList(true);
             await handleTopicListOptions(finalTopics);
             break;
-        case 'topicmessages':
+        }
+        case 'topicmessages': {
             await init();
             handleTopicMessages();
             break;
-        case 'search':
+        }
+        case 'search': {
             await init();
             await handleSearch();
             break;
-        case 'error':
+        }
+        case 'error': {
             handleError();
             break;
+        }
         default:
             break;
     }
