@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.12.8
+// @version     1.12.9
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
 // @description Censure les topics éclatax et vous sort de la boucle
+// @icon        https://image.noelshack.com/fichiers/2021/38/6/1632606701-deboucled.png
 // @match       http://www.jeuxvideo.com/forums/*
 // @match       https://www.jeuxvideo.com/forums/*
 // @match       http://m.jeuxvideo.com/forums/*
@@ -20,7 +21,6 @@
 // @grant       GM_getResourceText
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
 // @require     https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js
-// @icon        https://image.noelshack.com/fichiers/2021/38/6/1632606701-deboucled.png
 // ==/UserScript==
 
 
@@ -43,7 +43,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.12.8'
+const deboucledVersion = '1.12.9'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -420,7 +420,7 @@ async function isTopicPoC(element, optionDetectPocMode) {
 
     const title = titleElem.textContent.trim().normalizeDiacritic();
     //const isTitlePocRegex = /pos(t|te|tez|tou)(")?$/i;
-    const isTitlePocRegex = /(pos(t|te|tez|tou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan/i;
+    const isTitlePocRegex = /(pos(t|te|tez|to|too|tou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan/i;
     let isTitlePoc = isTitlePocRegex.test(title);
 
     if (optionDetectPocMode === 1 && !isTitlePoc) {
