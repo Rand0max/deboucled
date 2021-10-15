@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.14.0
+// @version     1.14.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -42,8 +42,9 @@ let hiddenTopicsIds = 0;
 let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
+let stopHighlightModeratedTopics = false;
 
-const deboucledVersion = '1.14.0'
+const deboucledVersion = '1.14.5'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -271,6 +272,9 @@ function decryptJvCare(jvCareClass) {
     return url;
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // TOPICS
@@ -301,7 +305,7 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
 
     while (actualTopics < topicByPage && pageBrowse <= 10) {
         pageBrowse++;
-        await getPageContent(pageBrowse).then((res) => {
+        await getForumPageContent(pageBrowse).then((res) => {
             let nextDoc = domParser.parseFromString(res, "text/html");
             let nextPageTopics = getAllTopics(nextDoc);
 
@@ -562,6 +566,22 @@ function addBlackTopicLogo(topics) {
         insertAfter(span, topicImg);
         topicImg.remove();
     });
+}
+
+async function topicIsModerated(topicId) {
+    async function isModerated(url) {
+        return await fetch(url).then(function (response) {
+            return response.status === 410;
+        }).catch(function () {
+            return false;
+        });
+    }
+    let url42 = `/forums/42-1-${topicId}-1-0-1-0-topic.htm`;
+    return await isModerated(url42);
+
+    //if (await isModerated(url42)) return true;
+    //let url1 = `/forums/1-1-${topicId}-1-0-1-0-topic.htm`;
+    //return await isModerated(url1);
 }
 
 
@@ -908,6 +928,8 @@ function buildSettingPage() {
     buildSettingEntities();
 
     refreshEntityCounts();
+
+    addHighlightModeratedButton();
 }
 
 function addImportExportEvent() {
@@ -975,9 +997,10 @@ function writeEntityKeys(entity, array, filter, removeCallback) {
 
     let html = '<ul class="deboucled-entity-list">';
     entries.forEach(function (value, key) {
-        html += `<li class="key deboucled-entity-element" id="${key}"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
+        html += `<li class="deboucled-entity-key deboucled-entity-element" id="${key}"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
     });
-    document.getElementById(`deboucled-${entity}List`).innerHTML = html + '</ul>';
+    html += '</ul>';
+    document.getElementById(`deboucled-${entity}List`).innerHTML = html;
 
     document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(input => input.onclick = function () {
         removeCallback(this.parentNode);
@@ -1148,6 +1171,48 @@ function clearSearchInputs() {
     document.querySelectorAll('.deboucled-input-search').forEach(el => { el.value = '' });
 }
 
+function addHighlightModeratedButton() {
+    const buttonText = '410 ?';
+    const buttonStopText = 'STOP';
+    let anchor = document.createElement('a');
+    anchor.className = 'titre-bloc deboucled-entity-moderated-button';
+    anchor.setAttribute('role', 'button');
+    anchor.innerHTML = buttonText;
+    anchor.onclick = async function () {
+        if (this.textContent === buttonStopText) {
+            stopHighlightModeratedTopics = true;
+            this.innerHTML = buttonText;
+        }
+        else {
+            this.innerHTML = `<b>${buttonStopText}</b>`;
+            await highlightModeratedTopics();
+            stopHighlightModeratedTopics = false;
+            this.innerHTML = buttonText;
+        }
+    };
+    const labelCount = document.querySelector('#deboucled-topicid-entity-count');
+    insertAfter(anchor, labelCount);
+}
+
+async function highlightModeratedTopics() {
+    const entityRoot = document.querySelector('#deboucled-topicidList').firstElementChild;
+    let entities = entityRoot.querySelectorAll('.deboucled-entity-key.deboucled-entity-element');
+    for (const entity of entities) {
+        if (stopHighlightModeratedTopics) break;
+
+        entity.style.backgroundColor = '#69ceff70';
+        let key = entity.id;
+        let isModerated = await topicIsModerated(key);
+        await sleep(500);
+
+        if (isModerated) {
+            entity.style.backgroundColor = '#e61414';
+            entity.style.color = '#ffffff';
+        }
+        else entity.removeAttribute('style');
+    }
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // MAIN PAGE
@@ -1185,7 +1250,7 @@ function getSearchType(urlSearch) {
     return matches.groups.searchtype.trim().toLowerCase();
 }
 
-async function getPageContent(page) {
+async function getForumPageContent(page) {
     let urlRegex = /(\/forums\/0-[0-9]+-0-1-0-)(?<pageid>[0-9]+)(-0-.*)/i;
 
     let currentPath = window.location.pathname;

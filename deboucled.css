@@ -186,10 +186,26 @@
   color: #000000b1;
   margin-left: 3px;
 }
-.key:first-letter {
+.deboucled-entity-moderated-button {
+  float: right;
+  color: #404040 !important;
+  font-size: 0.8rem;
+}
+.deboucled-entity-moderated-button.disabled {
+  pointer-events: none;
+  user-select: none;
+  color: #b0b0b0 !important;
+}
+.deboucled-entity-moderated-button:hover {
+  color: #909090 !important;
+}
+.deboucled-entity-moderated-button:active {
+  color: #b0b0b0 !important;
+}
+.deboucled-entity-key:first-letter {
   text-transform: capitalize;
 }
-.key {
+.deboucled-entity-key {
   padding: 5px 5px 20px 0px;
   margin: 0px 5px 5px 0px;
 }
