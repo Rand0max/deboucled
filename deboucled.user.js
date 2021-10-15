@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.14.5
+// @version     1.14.6
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -43,8 +43,9 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 let stopHighlightModeratedTopics = false;
+let moderatedTopics = new Map();
 
-const deboucledVersion = '1.14.5'
+const deboucledVersion = '1.14.6'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -983,7 +984,7 @@ function buildSettingEntities() {
     refreshTopicIdKeys();
 }
 
-function writeEntityKeys(entity, array, filter, removeCallback) {
+function writeEntityKeys(entity, array, filter, removeCallback, entityClassCallback) {
 
     let entries = array;
     if (filter) {
@@ -997,7 +998,8 @@ function writeEntityKeys(entity, array, filter, removeCallback) {
 
     let html = '<ul class="deboucled-entity-list">';
     entries.forEach(function (value, key) {
-        html += `<li class="deboucled-entity-key deboucled-entity-element" id="${key}"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
+        let cls = entityClassCallback ? entityClassCallback(key) : '';
+        html += `<li class="deboucled-entity-key deboucled-entity-element${cls}" id="${key}"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
     });
     html += '</ul>';
     document.getElementById(`deboucled-${entity}List`).innerHTML = html;
@@ -1026,12 +1028,19 @@ function refreshAuthorKeys(filter = null) {
 }
 
 function refreshTopicIdKeys(filter = null) {
-    writeEntityKeys(entityTopicId, topicIdBlacklistMap, filter, function (node) {
-        removeTopicIdBlacklist(node.getAttribute('id').replace(/<[^>]*>/g, ''));
-        refreshTopicIdKeys();
-        refreshCollapsibleContentHeight(entityTopicId);
-        clearSearchInputs();
-    });
+    writeEntityKeys(
+        entityTopicId,
+        topicIdBlacklistMap,
+        filter,
+        function (node) {
+            removeTopicIdBlacklist(node.getAttribute('id').replace(/<[^>]*>/g, ''));
+            refreshTopicIdKeys();
+            refreshCollapsibleContentHeight(entityTopicId);
+            clearSearchInputs();
+        },
+        function (key) {
+            return moderatedTopics.has(key) && moderatedTopics.get(key) ? ' deboucled-entity-moderated-key' : '';
+        });
 }
 
 function keyIsAllowed(key, ctrlKey) {
@@ -1196,20 +1205,19 @@ function addHighlightModeratedButton() {
 
 async function highlightModeratedTopics() {
     const entityRoot = document.querySelector('#deboucled-topicidList').firstElementChild;
-    let entities = entityRoot.querySelectorAll('.deboucled-entity-key.deboucled-entity-element');
+    let entities = [...entityRoot.querySelectorAll('.deboucled-entity-key.deboucled-entity-element')];
     for (const entity of entities) {
         if (stopHighlightModeratedTopics) break;
 
-        entity.style.backgroundColor = '#69ceff70';
         let key = entity.id;
-        let isModerated = await topicIsModerated(key);
-        await sleep(500);
-
-        if (isModerated) {
-            entity.style.backgroundColor = '#e61414';
-            entity.style.color = '#ffffff';
+        if (!moderatedTopics.has(key)) {
+            entity.style.backgroundColor = '#69ceff70';
+            let isModerated = await topicIsModerated(key);
+            await sleep(500);
+            entity.removeAttribute('style');
+            moderatedTopics.set(key, isModerated);
         }
-        else entity.removeAttribute('style');
+        entity.classList.toggle('deboucled-entity-moderated-key', moderatedTopics.get(key));
     }
 }
 

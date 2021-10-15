@@ -202,6 +202,10 @@
 .deboucled-entity-moderated-button:active {
   color: #b0b0b0 !important;
 }
+.deboucled-entity-moderated-key {
+  background-color: #e61414;
+  color: #ffffff;
+}
 .deboucled-entity-key:first-letter {
   text-transform: capitalize;
 }
