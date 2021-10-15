@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.12.9
+// @version     1.12.10
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -43,7 +43,7 @@ let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 
-const deboucledVersion = '1.12.9'
+const deboucledVersion = '1.12.10'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -432,7 +432,7 @@ async function isTopicPoC(element, optionDetectPocMode) {
         const doc = domParser.parseFromString(r, "text/html");
 
         const firstMessageElem = doc.querySelector('.txt-msg');
-        const firstMessage = firstMessageElem.textContent.trim().normalizeDiacritic();
+        const firstMessage = firstMessageElem.textContent.trim().toLowerCase().normalizeDiacritic();
 
         const isMessagePocRegex = /pos(t|te|tez) ou/i;
         const maladies = ['cancer', 'torsion', 'testiculaire', 'cholera', 'sida', 'corona', 'coronavirus', 'covid', 'covid19'];
