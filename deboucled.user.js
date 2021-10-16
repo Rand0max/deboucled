@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.14.6
+// @version     1.14.7
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -45,7 +45,7 @@ let hiddenAuthorArray = new Set();
 let stopHighlightModeratedTopics = false;
 let moderatedTopics = new Map();
 
-const deboucledVersion = '1.14.6'
+const deboucledVersion = '1.14.7'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -231,7 +231,11 @@ String.prototype.normalizeDiacritic = function () {
 };
 
 String.prototype.escapeRegexPattern = function () {
-    return this.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    return this.replace(/[-[\]{}()+?.,\\^$|#\s]/g, '\\$&');
+};
+
+String.prototype.handleGenericChar = function () {
+    return this.replace('*', '.*');
 };
 
 function normalizeValue(value) {
@@ -240,7 +244,10 @@ function normalizeValue(value) {
 
 function makeRegex(array, withBoundaries) {
     let b = withBoundaries ? '\\b' : '';
-    let map = array.map((e) => `${b}${e.escapeRegexPattern().normalizeDiacritic()}${b}`)
+    let map = array.map((e) => {
+        let word = e.escapeRegexPattern().handleGenericChar().normalizeDiacritic();
+        return `${b}${word}${b}`;
+    })
     let regex = map.join('|');
     return new RegExp(regex, 'gi');
 }
