@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.14.7
+// @version     1.14.8
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -45,7 +45,7 @@ let hiddenAuthorArray = new Set();
 let stopHighlightModeratedTopics = false;
 let moderatedTopics = new Map();
 
-const deboucledVersion = '1.14.7'
+const deboucledVersion = '1.14.8'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -431,8 +431,7 @@ async function isTopicPoC(element, optionDetectPocMode) {
     if (!titleElem) return false;
 
     const title = titleElem.textContent.trim().normalizeDiacritic();
-    //const isTitlePocRegex = /pos(t|te|tez|tou)(")?$/i;
-    const isTitlePocRegex = /(pos(t|te|tez|to|too|tou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan/i;
+    const isTitlePocRegex = /(pos(t|te|tez|to|too|tou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan|pose.*toucan/i;
     let isTitlePoc = isTitlePocRegex.test(title);
 
     if (optionDetectPocMode === 1 && !isTitlePoc) {
@@ -447,7 +446,7 @@ async function isTopicPoC(element, optionDetectPocMode) {
         const firstMessage = firstMessageElem.textContent.trim().toLowerCase().normalizeDiacritic();
 
         const isMessagePocRegex = /pos(t|te|tez) ou/i;
-        const maladies = ['cancer', 'torsion', 'testiculaire', 'cholera', 'sida', 'corona', 'coronavirus', 'covid', 'covid19'];
+        const maladies = ['cancer', 'torsion', 'testiculaire', 'tumeur', 'cholera', 'sida', 'corona', 'coronavirus', 'covid', 'covid19', 'cerf', 'serf', 'phimosis', 'trisomie', 'diarrhee', 'charcot', 'lyme', 'avc', 'cirrhose', 'diabete', 'parkinson', 'alzheimer', 'mucoviscidose', 'lepre', 'tuberculose'];
         const isMessagePoc = isMessagePocRegex.test(firstMessage) || (isTitlePoc && maladies.some(s => firstMessage.includes(s)));
 
         pocTopicMap.set(topicId, isMessagePoc);
@@ -729,8 +728,8 @@ function buildSettingPage() {
     function addToggleOption(title, optionId, defaultValue, hint) {
         let html = "";
         html += '<tr>';
-        html += `<td title="${hint}">${title}</td>`;
-        html += '<td>';
+        html += `<td class="deboucled-td-left" title="${hint}">${title}</td>`;
+        html += '<td class="deboucled-td-right">';
         html += '<label class="deboucled-switch">';
         let checked = GM_getValue(optionId, defaultValue) ? 'checked' : '';
         html += `<input type="checkbox" id="${optionId}" ${checked}>`;
@@ -743,21 +742,19 @@ function buildSettingPage() {
     function addRangeOption(title, optionId, defaultValue, minValue, maxValue, enabled, hint) {
         let html = "";
         html += `<tr id="${optionId}-container" class="${enabled ? '' : 'deboucled-disabled'}">`;
-        html += `<td class="deboucled-option-cell deboucled-option-table-subcell" style="padding-left: 5px;" title="${hint}">${title}</td>`;
-        html += '<td class="deboucled-option-cell deboucled-option-table-subcell" style="padding-top: 7px;">';
+        html += `<td class="deboucled-option-cell deboucled-option-table-subcell deboucled-td-left" style="padding-left: 5px;" title="${hint}">${title}</td>`;
+        html += '<td class="deboucled-option-cell deboucled-option-table-subcell deboucled-td-right" style="padding-top: 7px;">';
         let value = GM_getValue(optionId, defaultValue);
         html += `<input type="range" id="${optionId}" min="${minValue}" max="${maxValue}" value="${value}" step="10" class="deboucled-range-slider">`;
-        html += '<td>';
-        html += `<span id="${optionId}-value">${value}</span>`;
-        html += '</td>';
+        html += `<span class="deboucled-range-title-value" id="${optionId}-value">${value}</span>`;
         html += '</tr>';
         return html;
     }
     function addDropdownOption(title, optionId, hint, defaultValue, values) {
         let html = "";
         html += '<tr>';
-        html += `<td title="${hint}" style="vertical-align: top;">${title}</td>`;
-        html += '<td>';
+        html += `<td class="deboucled-td-left" title="${hint}" style="vertical-align: top;">${title}</td>`;
+        html += '<td class="deboucled-td-right">';
         html += '<span class="deboucled-dropdown select">';
         html += `<select class="deboucled-dropdown" id="${optionId}">`;
         let selectedOption = GM_getValue(optionId, defaultValue);
@@ -774,8 +771,8 @@ function buildSettingPage() {
     function addImportExportButtons() {
         let html = "";
         html += '<tr>';
-        html += '<td>Restaurer/sauvegarder les préférences</td>';
-        html += '<td>';
+        html += '<td class="deboucled-td-left">Restaurer/sauvegarder les préférences</td>';
+        html += '<td class="deboucled-td-right">';
         html += `<label for="deboucled-import-button" class="btn btn-actu-new-list-forum deboucled-setting-button">Restaurer</label>`;
         html += `<input type="file" accept="application/JSON" id="deboucled-import-button" style="display: none;"></input>`;
         html += `<span id="deboucled-export-button" class="btn btn-actu-new-list-forum deboucled-setting-button">Sauvegarder</span>`;

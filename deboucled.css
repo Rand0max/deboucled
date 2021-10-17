@@ -1,3 +1,15 @@
+.deboucled-td-left {
+  white-space: nowrap;
+}
+.deboucled-td-right {
+  width: 99%;
+}
+@media (max-width: 500px) {
+  .deboucled-td-left {
+    white-space: break-spaces;
+  }
+}
+
 .deboucled-ignored-messages {
   margin: 5px 0 5px 5px;
   padding-bottom: 0.5rem;
@@ -276,6 +288,12 @@ input[type="search"] {
 .deboucled-settings-view.active {
   opacity: 1;
 }
+@media (max-width: 999px) {
+  .deboucled-settings-view {
+    width: 96%;
+    margin-left: 2%;
+  }
+}
 
 .deboucled-bloc {
   background-color: #eee;
@@ -376,6 +394,14 @@ input[type="search"] {
 .deboucled-option-table-entities {
   width: 100%;
 }
+@media (max-width: 420px) {
+  .deboucled-option-table {
+    font: bold 11px/14px sans-serif;
+  }
+  .deboucled-option-table-subcell {
+    font: 11px/14px sans-serif;
+  }
+}
 
 .deboucled-bg-img {
   background-image: url("https://image.noelshack.com/fichiers/2021/38/2/1632251209-1590510677-zinzinboucle.png");
@@ -457,9 +483,14 @@ input:checked + .deboucled-toggle-slider:before {
 }
 
 /* Range slider */
+.deboucled-range-title-value {
+  margin-left: 10px;
+  vertical-align: top;
+  font: bold 14px/16px sans-serif;
+}
 .deboucled-range-slider {
   -webkit-appearance: none;
-  width: 100%;
+  min-width: 60%;
   height: 15px;
   border-radius: 5px;
   background: #d3d3d3;
