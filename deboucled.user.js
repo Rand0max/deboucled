@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.14.8
+// @version     1.15.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -42,10 +42,14 @@ let hiddenTopicsIds = 0;
 let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
+
 let stopHighlightModeratedTopics = false;
 let moderatedTopics = new Map();
+let sortModeSubject = 0;
+let sortModeAuthor = 0;
+let sortModeTopicId = 0;
 
-const deboucledVersion = '1.14.8'
+const deboucledVersion = '1.15.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -284,6 +288,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////////////
 // TOPICS
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -380,13 +385,14 @@ function getTopicMessageCount(element) {
 function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayThreshold) {
     if (!element.hasAttribute('data-id')) return true;
 
-    if (optionAllowDisplayThreshold && getTopicMessageCount(element) >= optionDisplayThreshold) return false;
-
     let topicId = element.getAttribute('data-id');
     if (topicIdBlacklistMap.has(topicId)) {
         hiddenTopicsIds++;
         return true;
     }
+
+    // Seuil d'affichage valable uniquement pour les BL sujets et auteurs
+    if (optionAllowDisplayThreshold && getTopicMessageCount(element) >= optionDisplayThreshold) return false;
 
     let titleTag = element.getElementsByClassName("lien-jv topic-title");
     if (titleTag !== undefined && titleTag.length > 0) {
@@ -842,6 +848,7 @@ function buildSettingPage() {
         html += '</td>';
         html += '</tr>';
         html += '<td style="padding-top: 12px;padding-bottom: 0;">';
+        html += `<a id="deboucled-${entity}-sortmode" class="deboucled-sort-button deboucled-sort-undefined-logo" role="button" title="Tri par défaut"></a>`;
         html += `<span id="deboucled-${entity}-entity-count" class="deboucled-entity-count"></span>`;
         html += '</td>';
         html += '<tr>';
@@ -935,6 +942,42 @@ function buildSettingPage() {
     refreshEntityCounts();
 
     addHighlightModeratedButton();
+
+    addSortEvent();
+}
+
+function addSortEvent() {
+    function switchSortMode(sortModeEntity, element) {
+        switch (sortModeEntity) {
+            case 0:
+                element.classList.toggle('deboucled-sort-undefined-logo', false);
+                element.classList.toggle('deboucled-sort-alpha-logo', true);
+                element.title = 'Tri par ordre alphabétique';
+                return 1;
+            case 1:
+                element.classList.toggle('deboucled-sort-alpha-logo', false);
+                element.classList.toggle('deboucled-sort-reversealpha-logo', true);
+                element.title = 'Tri par ordre alphabétique inversé';
+                return 2;
+            case 2:
+                element.classList.toggle('deboucled-sort-reversealpha-logo', false);
+                element.classList.toggle('deboucled-sort-undefined-logo', true);
+                element.title = 'Tri par défaut';
+                return 0;
+        }
+    }
+    document.querySelector(`#deboucled-${entitySubject}-sortmode`).onclick = function () {
+        sortModeSubject = switchSortMode(sortModeSubject, this);
+        refreshSubjectKeys();
+    };
+    document.querySelector(`#deboucled-${entityAuthor}-sortmode`).onclick = function () {
+        sortModeAuthor = switchSortMode(sortModeAuthor, this);
+        refreshAuthorKeys();
+    };
+    document.querySelector(`#deboucled-${entityTopicId}-sortmode`).onclick = function () {
+        sortModeTopicId = switchSortMode(sortModeTopicId, this);
+        refreshTopicIdKeys();
+    };
 }
 
 function addImportExportEvent() {
@@ -988,17 +1031,9 @@ function buildSettingEntities() {
     refreshTopicIdKeys();
 }
 
-function writeEntityKeys(entity, array, filter, removeCallback, entityClassCallback) {
-
-    let entries = array;
-    if (filter) {
-        if (entries instanceof Array) {
-            entries = entries.filter((value) => normalizeValue(value).includes(filter));
-        }
-        else if (entries instanceof Map) {
-            entries = new Map([...entries].filter((value, key) => normalizeValue(value).includes(filter) || normalizeValue(key).includes(filter)));
-        }
-    }
+function writeEntityKeys(entity, entries, filterCallback, removeCallback, entityClassCallback, sortCallback) {
+    if (filterCallback) entries = filterCallback(entries);
+    if (sortCallback) entries = sortCallback(entries);
 
     let html = '<ul class="deboucled-entity-list">';
     entries.forEach(function (value, key) {
@@ -1008,34 +1043,78 @@ function writeEntityKeys(entity, array, filter, removeCallback, entityClassCallb
     html += '</ul>';
     document.getElementById(`deboucled-${entity}List`).innerHTML = html;
 
-    document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(input => input.onclick = function () {
-        removeCallback(this.parentNode);
+    document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(function (input) {
+        input.onclick = function () { removeCallback(this.parentNode) };
     });
 }
 
 function refreshSubjectKeys(filter = null) {
-    writeEntityKeys(entitySubject, subjectBlacklistArray, filter, function (node) {
-        removeEntityBlacklist(subjectBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
-        refreshSubjectKeys();
-        refreshCollapsibleContentHeight(entitySubject);
-        clearSearchInputs();
-    });
+    let sortCallback = null;
+    switch (sortModeSubject) {
+        case 1:
+            sortCallback = (array) => array.sort();
+            break;
+        case 2:
+            sortCallback = (array) => array.sort().reverse();
+            break;
+    }
+
+    writeEntityKeys(
+        entitySubject,
+        [...subjectBlacklistArray],
+        filter ? (array) => array.filter((value) => normalizeValue(value).includes(filter)) : null,
+        function (node) {
+            removeEntityBlacklist(subjectBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
+            refreshSubjectKeys();
+            refreshCollapsibleContentHeight(entitySubject);
+            clearSearchInputs();
+        },
+        null,
+        sortCallback
+    );
 }
 
 function refreshAuthorKeys(filter = null) {
-    writeEntityKeys(entityAuthor, authorBlacklistArray, filter, function (node) {
-        removeEntityBlacklist(authorBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
-        refreshAuthorKeys();
-        refreshCollapsibleContentHeight(entityAuthor);
-        clearSearchInputs();
-    });
+    let sortCallback = null;
+    switch (sortModeAuthor) {
+        case 1:
+            sortCallback = (array) => array.sort();
+            break;
+        case 2:
+            sortCallback = (array) => array.sort().reverse();
+            break;
+    }
+
+    writeEntityKeys(
+        entityAuthor,
+        [...authorBlacklistArray],
+        filter ? (array) => array.filter((value) => normalizeValue(value).includes(filter)) : null,
+        function (node) {
+            removeEntityBlacklist(authorBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
+            refreshAuthorKeys();
+            refreshCollapsibleContentHeight(entityAuthor);
+            clearSearchInputs();
+        },
+        null,
+        sortCallback
+    );
 }
 
 function refreshTopicIdKeys(filter = null) {
+    let sortCallback = null;
+    switch (sortModeTopicId) {
+        case 1:
+            sortCallback = (map) => new Map([...map].sort((a, b) => String(a[1]).localeCompare(b[1])));
+            break;
+        case 2:
+            sortCallback = (map) => new Map([...map].sort((a, b) => String(b[1]).localeCompare(a[1])));
+            break;
+    }
+
     writeEntityKeys(
         entityTopicId,
-        topicIdBlacklistMap,
-        filter,
+        new Map(topicIdBlacklistMap),
+        filter ? (map) => new Map([...map].filter((value, key) => normalizeValue(value).includes(filter) || normalizeValue(key).includes(filter))) : null,
         function (node) {
             removeTopicIdBlacklist(node.getAttribute('id').replace(/<[^>]*>/g, ''));
             refreshTopicIdKeys();
@@ -1044,7 +1123,9 @@ function refreshTopicIdKeys(filter = null) {
         },
         function (key) {
             return moderatedTopics.has(key) && moderatedTopics.get(key) ? ' deboucled-entity-moderated-key' : '';
-        });
+        },
+        sortCallback
+    );
 }
 
 function keyIsAllowed(key, ctrlKey) {

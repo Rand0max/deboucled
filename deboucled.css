@@ -147,6 +147,30 @@
   top: 0.5rem;
   left: 0.2rem;
 }
+.deboucled-sort-button {
+  display: inline-block;
+  background-size: 18px 18px !important;
+  width: 18px;
+  height: 18px;
+  margin: 0 8px 0 0;
+  opacity: 0.6;
+  vertical-align: middle;
+}
+.deboucled-sort-button:hover {
+  opacity: 1;
+}
+.deboucled-sort-undefined-logo {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAYklEQVRIiWNgGAUkAg8GBobHDAwM/8nEj6Bm4ASPKDAc2RKcAKaIXIChn4kCw4gCoxYMvAUsBOSJTVGMuCQG3Ac4XUYsGPqRPGoByRY8htLkFtXIZmAFHgyU1QkEK5xRgAEAniZHF+piND8AAAAASUVORK5CYII=)
+    0 no-repeat;
+}
+.deboucled-sort-alpha-logo {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABGklEQVRIie3Vu0oDURAG4M+ggk0knYWFokLKvIWl6ANo6wvYWVh6g4CVpWCvvoOQysLaW6FCsBXEQrwUewJH2Y3Zw6YRfxj2MDP//Gd2dlj+MWTs4BrNFPI6rjBREG/jM1i3rEgNN4G82qd4N3qWElkMxFd0fsT2Q6yNrXBuRiLzgwic4gkboUArit1hL5x7AoLIPdZ+Kz6NN1xgOxQ4LMiNBQZGjxTbM+opArUcXwNHGAnWks2iUfamVSCpg0oxmuMbly1ZvGAdnFclOiMbajzk44LcpK8oxgleMJcqkPeKeljBsmzZblNu1w91POISY33ykjvYxRSWZFtdKRbw7vuQDwpykzp4wCYmI99ZAf8j2NAwK/9/8YfwBfiDS7zHpm6uAAAAAElFTkSuQmCC)
+    0 no-repeat;
+}
+.deboucled-sort-reversealpha-logo {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABJElEQVRIie3TvUoDURCG4YcgKloLlhGDBPECxHT2gmClhRYB0RvQTiz9g2ArFoJ4E9Yp7OwVFWyC2AkWghqLnMBGziYbTRrxg2XnzM6Zd3b3O/yrz9rHLYrdbMrjBfXEdRKpqySe17qBDGILe7gKDTZSmtcS964gMIZnVJFL5I9C0wp2Q1xMQApZAed4w/S3/D0OQ9wECJBHrGVpPo/P0KCdkoCocpHcCE7xHiDbmM0yVVZN4lWri45Taju+wUAkd4fRXwzYotgn6qnaAfJY6SfgABeY6QdgHIshXu8HoKxhgCpW9fCnN6EPuERJw4bllNqONo1pQesZqOP6p4DYOVjGE87CuoAlTOGm22ljKmEusR7GJoYitTv46AU0TRMaJvjD+gKo5UNzpeLB/gAAAABJRU5ErkJggg==)
+    0 no-repeat;
+}
 .deboucled-topic-black-logo {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADdUAAA3VAT3WWPEAAAB/SURBVDhPY6AUMP7//382lI0VMDIypkKZWAHYAB119YTPP36wQMXAgJeD48+VmzcXgNj4DAEbIC8vnwLlowBeTo4PV27cXAPlYgV4DcAHYC5kgvJJBjAvEwxEQoBsL4DAw4cP55DtBRgYNQBqAC8H+z8wjwQA00NxOqAQMDAAAF+1NSmKmNFMAAAAAElFTkSuQmCC)
     0 no-repeat;
