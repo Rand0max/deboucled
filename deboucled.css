@@ -221,6 +221,7 @@
 .deboucled-entity-count {
   color: #000000b1;
   margin-left: 3px;
+  vertical-align: bottom;
 }
 .deboucled-entity-moderated-button {
   float: right;
