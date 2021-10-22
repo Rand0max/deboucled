@@ -336,12 +336,15 @@ input[type="search"] {
   border-color: #023f80;
   border-style: solid;
   border-width: thin;
+  position: relative;
 }
 .deboucled-version {
-  float: right;
   color: gray;
   user-select: none;
   cursor: pointer;
+  top: 45px;
+  right: 20px;
+  position: absolute;
 }
 .deboucled-stat-title {
   text-align: right;
@@ -455,8 +458,14 @@ input[type="search"] {
   width: 50px;
   height: 24px;
 }
+.deboucled-switch.little {
+  margin-left: 5px;
+  width: 40px;
+  height: 18px;
+  vertical-align: middle;
+}
 .deboucled-switch input {
-  opacity: 0;
+  opacity: 0 !important;
   width: 0;
   height: 0;
 }
@@ -482,6 +491,12 @@ input[type="search"] {
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }
+.deboucled-toggle-slider.little:before {
+  height: 11px;
+  width: 11px;
+  left: 4px;
+  bottom: 4px;
+}
 input:checked + .deboucled-toggle-slider.red {
   background-color: #df3a3a;
 }
@@ -499,11 +514,22 @@ input:checked + .deboucled-toggle-slider:before {
   -ms-transform: translateX(26px);
   transform: translateX(26px);
 }
+input:checked + .deboucled-toggle-slider.little:before {
+  -webkit-transform: translateX(20px);
+  -ms-transform: translateX(20px);
+  transform: translateX(20px);
+}
 .deboucled-toggle-slider.round {
   border-radius: 24px;
 }
 .deboucled-toggle-slider.round:before {
   border-radius: 50%;
+}
+.deboucled-toggle-title-right {
+  font: bold 10px/10px sans-serif;
+  vertical-align: middle;
+  margin-left: 5px;
+  color: #000000c9;
 }
 
 /* Range slider */

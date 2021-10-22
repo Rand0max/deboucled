@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.15.1
+// @version     1.15.2
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -49,7 +49,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.15.1'
+const deboucledVersion = '1.15.2'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -85,6 +85,8 @@ const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 
 const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
+
+const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors];
 
 
 async function initStorage() {
@@ -177,8 +179,11 @@ function backupStorage() {
         return file;
     }
 
+    const onlyBlacklists = document.querySelector('#deboucled-impexp-blonly').checked;
+
     let map = new Map();
     GM_listValues().forEach(key => {
+        if (onlyBlacklists && !storage_Keys_Blacklists.includes(key)) return;
         map.set(key, JSON.parse(GM_getValue(key)));
     });
     let json = JSON.stringify(Object.fromEntries(map));
@@ -190,18 +195,9 @@ function backupStorage() {
     anchor.click();
 }
 
-function loadFile(fileEvent) {
-    var file = fileEvent.target.files[0];
-    if (!file) return;
-    let reader = new FileReader();
-    reader.onload = function (e) {
-        let content = e.target.result;
-        restoreStorage(content);
-    };
-    reader.readAsText(file);
-}
-
 function restoreStorage(fileContent) {
+    const onlyBlacklists = document.querySelector('#deboucled-impexp-blonly').checked;
+
     // On parse le JSON du fichier pour en faire un objet
     let settingsObj = JSON.parse(fileContent);
 
@@ -209,6 +205,9 @@ function restoreStorage(fileContent) {
     for (const [key, value] of Object.entries(settingsObj)) {
         // Si une clé est inconnue on ignore
         if (!storage_Keys.includes(key)) continue;
+
+        // Si on importe uniquement les blacklists
+        if (onlyBlacklists && !storage_Keys_Blacklists.includes(key)) continue;
 
         // Type object = array/map donc il faut déserialiser
         if (typeof (value) === 'object') {
@@ -220,9 +219,21 @@ function restoreStorage(fileContent) {
         }
     }
 
-    let msg = document.getElementById('deboucled-impexp-message');
-    setTimeout(() => { msg.classList.toggle('active'); }, 5000);
-    msg.classList.toggle('active');
+    document.querySelectorAll('#deboucled-impexp-message').forEach(function (e) {
+        setTimeout(() => { e.classList.toggle('active'); }, 5000);
+        e.classList.toggle('active');
+    });
+}
+
+function loadFile(fileEvent) {
+    var file = fileEvent.target.files[0];
+    if (!file) return;
+    let reader = new FileReader();
+    reader.onload = function (e) {
+        let content = e.target.result;
+        restoreStorage(content);
+    };
+    reader.readAsText(file);
 }
 
 
@@ -738,7 +749,7 @@ function buildSettingPage() {
         html += '<td class="deboucled-td-right">';
         html += '<label class="deboucled-switch">';
         let checked = GM_getValue(optionId, defaultValue) ? 'checked' : '';
-        html += `<input type="checkbox" id="${optionId}" ${checked}>`;
+        html += `<input type="checkbox" id="${optionId}" ${checked}></input>`;
         html += '<span class="deboucled-toggle-slider round"></span>';
         html += '</label>';
         html += '</td>';
@@ -778,13 +789,21 @@ function buildSettingPage() {
         let html = "";
         html += '<tr>';
         html += '<td class="deboucled-td-left">Restaurer/sauvegarder les préférences</td>';
-        html += '<td class="deboucled-td-right">';
+        html += '<td class="deboucled-td-left">';
         html += `<label for="deboucled-import-button" class="btn btn-actu-new-list-forum deboucled-setting-button">Restaurer</label>`;
         html += `<input type="file" accept="application/JSON" id="deboucled-import-button" style="display: none;"></input>`;
         html += `<span id="deboucled-export-button" class="btn btn-actu-new-list-forum deboucled-setting-button">Sauvegarder</span>`;
+
+        html += '<label class="deboucled-switch little">';
+        html += '<input type="checkbox" id="deboucled-impexp-blonly"></input>';
+        html += '<span class="deboucled-toggle-slider little round"></span>';
+        html += '</label>';
+        html += `<span class="deboucled-toggle-title-right">Uniquement les blacklists</span>`;
+
         html += '</td>';
-        html += '<td>';
-        html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message">Restauration terminée ⚠ Veuillez rafraichir la page ⚠</span>`;
+        html += '<td class="deboucled-td-right" style="white-space: nowrap;">';
+        html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message" style="display: block; text-align: center;">Restauration terminée</span>`;
+        html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message">⚠ Veuillez rafraichir la page ⚠</span>`;
         html += '</td>';
         html += '</tr>';
         return html;
