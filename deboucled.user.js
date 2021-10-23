@@ -20,6 +20,7 @@
 // @grant       GM_listValues
 // @grant       GM_getResourceText
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
+// @resource    CHARTS_CSS https://unpkg.com/charts.css/dist/charts.min.css
 // @require     https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js
 // ==/UserScript==
 
@@ -42,6 +43,7 @@ let hiddenTopicsIds = 0;
 let hiddenMessages = 0;
 let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
+let deboucledTopicStatsMap = new Map();
 
 let stopHighlightModeratedTopics = false;
 let moderatedTopics = new Map();
@@ -49,7 +51,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.15.4'
+const deboucledVersion = '1.16.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -79,12 +81,14 @@ const storage_optionFilterResearch = 'deboucled_optionFilterResearch';
 const storage_optionDetectPocMode = 'deboucled_optionDetectPocMode';
 const storage_optionPrevisualizeTopic = 'deboucled_optionPrevisualizeTopic';
 const storage_optionDisplayBlackTopic = 'deboucled_optionDisplayBlackTopic';
+const storage_optionDisplayTopicCharts = 'deboucled_optionDisplayTopicCharts';
 const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
 const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
 const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
+const storage_TopicStats = 'deboucled_TopicStats';
 
-const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages];
+const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
 
 const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors];
 
@@ -109,6 +113,9 @@ async function loadStorage() {
 
     subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
+
+    let topicStats = GM_getValue(storage_TopicStats);
+    if (topicStats) deboucledTopicStatsMap = new Map([...JSON.parse(topicStats)]);
 
     await loadLocalStorage();
 
@@ -276,8 +283,8 @@ function plural(nb) {
 }
 
 function addCss() {
-    const globalCss = GM_getResourceText("DEBOUCLED_CSS");
-    GM_addStyle(globalCss);
+    const deboucledCss = GM_getResourceText('DEBOUCLED_CSS');
+    GM_addStyle(deboucledCss);
 }
 
 function addSvg(svgHtml, selector) {
@@ -297,6 +304,118 @@ function decryptJvCare(jvCareClass) {
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function groupBy(arr, criteria) {
+    const newObj = arr.reduce(function (acc, currentValue) {
+        if (!acc[currentValue[criteria]]) {
+            acc[currentValue[criteria]] = [];
+        }
+        acc[currentValue[criteria]].push(currentValue);
+        return acc;
+    }, {});
+    return newObj;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+// STATS/CHARTS
+///////////////////////////////////////////////////////////////////////////////////////
+
+function addRightBlocStats() {
+    let optionDisplayTopicCharts = GM_getValue(storage_optionDisplayTopicCharts, true);
+    if (!optionDisplayTopicCharts || deboucledTopicStatsMap.size === 0) return;
+
+    let html = '';
+    html += '<div class="card card-jv-forum card-forum-margin" style="max-height: 130px;">';
+    html += '<div class="card-header">TENDANCE DE FILTRAGE</div>';
+    html += '<div class="card-body" style="max-height: 130px;">';
+    html += '<div class="scrollable">';
+    html += '<div class="scrollable-wrapper">';
+    html += '<div id="deboucled-chart-content" class="scrollable-content bloc-info-forum" style="padding: .3rem;">';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    let chart = document.createElement('div');
+    document.querySelector('#forum-right-col').append(chart);
+    chart.outerHTML = html;
+
+    buildStatsChart();
+}
+
+function buildStatsChart() {
+    const maxValues = 73;
+    const selectedStats = [...deboucledTopicStatsMap].splice(Math.max(deboucledTopicStatsMap.size - maxValues, 0), maxValues);
+
+    function addChartStyles() {
+        const css = GM_getResourceText('CHARTS_CSS');
+        let html = '';
+        html += `<style>${css}</style>`;
+        html += `<style>#deboucled-stats-chart {--color-1: linear-gradient(rgba(240, 50, 50, 0.8), rgba(240, 50, 50, 0.3));} .data {font: bold 12px/10px sans-serif;color: #999999;width: 14px;height: 18px;} .charts-css.area tbody tr th {width: 47px;font: bold 10px/10px sans-serif;color: #999999;}</style>`;
+        return html;
+    }
+
+    // Qui peut s'assoir à la table du JS et dire "j'ai un framework plus merdique que toi ?"
+    function formatDate(d) {
+        return `${d.getDate()}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear().toString().substr(-2)}`; // ${d.getHours()}h`;
+    }
+
+    const statsWithDate = [...selectedStats].map(function (v) {
+        let d = new Date(v[0]);
+        return { key: formatDate(d), value: v[1] };
+    });
+    const groupedByDate = groupBy(statsWithDate, 'key');
+
+    let chartTableHtml = '';
+    chartTableHtml += addChartStyles();
+    chartTableHtml += '<table class="charts-css area show-data-on-hover show-labels" id="deboucled-stats-chart" style="width: 340px; height: 75px;">';
+
+    chartTableHtml += '<thead>';
+    for (const [rowKey, stat] of Object.entries(groupedByDate)) {
+        chartTableHtml += `<th scope="col">${rowKey}</th>`;
+    }
+    chartTableHtml += '</thead>';
+
+    const selectedValues = selectedStats.map((v) => v[1]);
+    const coefValue = Math.max(...selectedValues) + 2;
+    let previousValue = Math.max(selectedValues[0] - 1, 0);
+
+    chartTableHtml += '<tbody>'
+    for (const [rowKey, stats] of Object.entries(groupedByDate)) {
+        let firstEntry = true;
+        for (const [statKey, stat] of Object.entries(stats)) {
+            chartTableHtml += `<tr${firstEntry ? '' : ' class="hide-label"'}>`;
+            chartTableHtml += `<th scope="row">${rowKey}</th>`;
+            chartTableHtml += `<td style="--start: ${previousValue / coefValue}; --size: ${stat.value / coefValue}"><span class="data">${stat.value}</span></td>`;
+            chartTableHtml += '</tr>';
+            previousValue = stat.value;
+            firstEntry = false;
+        }
+    }
+    chartTableHtml += '</tbody>';
+    chartTableHtml += '</table>';
+
+    let iframe = document.createElement('iframe');
+    iframe.id = 'deboucled-iframe-chart';
+    iframe.style = 'width: 100%; height: 100%;';
+    iframe.border = 'none';
+    iframe.scrolling = 'no';
+    iframe.overflowY = 'hidden';
+    iframe.margin = '0';
+    iframe.srcdoc = chartTableHtml;
+
+    document.querySelector('#deboucled-chart-content').append(iframe);
+}
+
+function updateTopicHiddenAtDate() {
+    deboucledTopicStatsMap.set(Date.now(), hiddenTotalTopics);
+    const maxElem = 100; // on ne garde que les 100 dernières stats
+    if (deboucledTopicStatsMap.size > maxElem) {
+        deboucledTopicStatsMap = new Map([...deboucledTopicStatsMap].slice(deboucledTopicStatsMap.size - maxElem));
+    }
+    GM_setValue(storage_TopicStats, JSON.stringify([...deboucledTopicStatsMap]));
 }
 
 
@@ -834,6 +953,9 @@ function buildSettingPage() {
         let blJvc = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
         html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvc} de JVC`, storage_optionShowJvcBlacklistButton, false, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
 
+        let stats = '<span class="deboucled-chart-logo"></span>'
+        html += addToggleOption(`Afficher la <i>tendance de filtrage</i> ${stats} des topics`, storage_optionDisplayTopicCharts, true, 'Afficher ou non le graphique des tendances de filtrage de topics sur la droite de la page.');
+
         let poc = '<span class="deboucled-poc-logo"></span>'
         html += addDropdownOption(`Protection contre les <i>PoC</i> ${poc} <span style="opacity: 0.3;font-style: italic;font-size: xx-small;">(beta)</span>`,
             storage_optionDetectPocMode,
@@ -944,6 +1066,7 @@ function buildSettingPage() {
     addToggleEvent(storage_optionDisplayBlackTopic);
     addToggleEvent(storage_optionPrevisualizeTopic);
     addToggleEvent(storage_optionShowJvcBlacklistButton);
+    addToggleEvent(storage_optionDisplayTopicCharts);
     addToggleEvent(storage_optionAllowDisplayThreshold, function () {
         document.querySelectorAll(`[id = ${storage_optionDisplayThreshold}-container]`).forEach(function (el) {
             el.classList.toggle("deboucled-disabled");
@@ -1397,6 +1520,8 @@ async function handleTopicList(canFillTopics) {
 
     saveTotalHidden();
 
+    updateTopicHiddenAtDate();
+
     return finalTopics;
 }
 
@@ -1521,6 +1646,7 @@ async function callMe() {
             await init();
             const finalTopics = await handleTopicList(true);
             await handleTopicListOptions(finalTopics);
+            addRightBlocStats();
             break;
         }
         case 'topicmessages': {
