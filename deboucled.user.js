@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.16.0
+// @version     1.16.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -51,7 +51,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.16.0'
+const deboucledVersion = '1.16.1'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -346,25 +346,33 @@ function addRightBlocStats() {
 }
 
 function buildStatsChart() {
-    const maxValues = 73;
-    const selectedStats = [...deboucledTopicStatsMap].splice(Math.max(deboucledTopicStatsMap.size - maxValues, 0), maxValues);
 
     function addChartStyles() {
         const css = GM_getResourceText('CHARTS_CSS');
         let html = '';
         html += `<style>${css}</style>`;
-        html += `<style>#deboucled-stats-chart {--color-1: linear-gradient(rgba(240, 50, 50, 0.8), rgba(240, 50, 50, 0.3));} .data {font: bold 12px/10px sans-serif;color: #999999;width: 14px;height: 18px;} .charts-css.area tbody tr th {width: 47px;font: bold 10px/10px sans-serif;color: #999999;}</style>`;
+        html += `<style>#deboucled-stats-chart {--color-1: linear-gradient(rgba(240, 50, 50, 0.8), rgba(240, 50, 50, 0.3));} .data {font: bold 16px/0px sans-serif;color: #999999;width: 27px;height: 18px;text-align: center;} .data-datetime {width: 35px;font-size: 11px;font-weight: normal;font-family: monospace;} .charts-css.area tbody tr th {width: 47px;font: bold 10px/10px sans-serif;color: #999999;}</style>`;
         return html;
     }
 
-    // Qui peut s'assoir à la table du JS et dire "j'ai un framework plus merdique que toi ?"
-    function formatDate(d) {
-        return `${d.getDate()}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear().toString().substr(-2)}`; // ${d.getHours()}h`;
+    function formatDateToGroup(d) {
+        var dateOptions = { day: '2-digit', month: '2-digit', year: '2-digit' };
+        return `${d.toLocaleDateString(undefined, dateOptions)}`;
     }
+
+    function formatDateToDisplay(d) {
+        //var dateOptions = { day: '2-digit', month: '2-digit', year: '2-digit' };
+        // ${d.toLocaleDateString(undefined, dateOptions)}
+        var timeOptions = { hour12: false, hour: '2-digit', minute: '2-digit' };
+        return `${d.toLocaleTimeString(undefined, timeOptions)}`;
+    }
+
+    const maxValues = 73;
+    const selectedStats = [...deboucledTopicStatsMap].splice(Math.max(deboucledTopicStatsMap.size - maxValues, 0), maxValues);
 
     const statsWithDate = [...selectedStats].map(function (v) {
         let d = new Date(v[0]);
-        return { key: formatDate(d), value: v[1] };
+        return { key: formatDateToGroup(d), value: v[1], datetime: d };
     });
     const groupedByDate = groupBy(statsWithDate, 'key');
 
@@ -388,7 +396,7 @@ function buildStatsChart() {
         for (const [statKey, stat] of Object.entries(stats)) {
             chartTableHtml += `<tr${firstEntry ? '' : ' class="hide-label"'}>`;
             chartTableHtml += `<th scope="row">${rowKey}</th>`;
-            chartTableHtml += `<td style="--start: ${previousValue / coefValue}; --size: ${stat.value / coefValue}"><span class="data">${stat.value}</span></td>`;
+            chartTableHtml += `<td style="--start: ${previousValue / coefValue}; --size: ${stat.value / coefValue}"><span class="data data-datetime">${formatDateToDisplay(stat.datetime)}</span><span class="data">${stat.value}</span></td>`;
             chartTableHtml += '</tr>';
             previousValue = stat.value;
             firstEntry = false;
@@ -1156,8 +1164,9 @@ function addCollapsibleEvents() {
 }
 
 function buildSettingEntities() {
-    const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u00A1-\u02AF]*$/i;
-    const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]]*$/i;
+    //const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u00A1-\u02AF]*$/i;
+    const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u00A1-\u02AF\u{1F300}-\u{1FAD6}]*$/iu;
+    const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]]*$/iu;
     const regexAllowedTopicId = /^[0-9]+$/i;
 
     createAddEntityEvent(entitySubject, regexAllowedSubject, function (key) { addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
