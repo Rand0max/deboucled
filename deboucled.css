@@ -208,11 +208,13 @@
 .deboucled-messages-ignored-authors {
   margin-left: 5px;
   font-size: 0.8rem;
+  line-height: normal;
   color: rgba(255, 0, 0, 0.9) !important;
 }
 .deboucled-toggle-ignored-authors {
   margin-left: 5px;
   font-size: 0.8rem;
+  line-height: normal;
   color: gray;
 }
 .deboucled-entity-list {

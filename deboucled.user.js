@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.16.1
+// @version     1.16.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -51,7 +51,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.16.1'
+const deboucledVersion = '1.16.5'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -745,22 +745,23 @@ function getAllMessages(doc) {
     return [...allMessages];
 }
 
-function updateMessagesHeader() {
-    if (hiddenMessages <= 0) return;
-    let paginationElement = document.querySelector('div.bloc-pagi-default');
+function buildMessagesHeader() {
+    if (hiddenMessages <= 0 || hiddenAuthorArray.length === 0) return;
 
     let ignoredMessageHeader = document.createElement('div');
-    ignoredMessageHeader.setAttribute('class', 'titre-bloc deboucled-ignored-messages');
+    ignoredMessageHeader.id = 'deboucled-ignored-messages-header';
+    ignoredMessageHeader.className = 'titre-bloc deboucled-ignored-messages';
     let pr = plural(hiddenMessages);
     ignoredMessageHeader.textContent = `${hiddenMessages} message${pr} ignoré${pr}`;
 
     let ignoredAuthors = document.createElement('span');
-    ignoredAuthors.setAttribute('class', 'titre-bloc deboucled-messages-ignored-authors');
+    ignoredAuthors.id = 'deboucled-ignored-messages-authors-header';
+    ignoredAuthors.className = 'titre-bloc deboucled-messages-ignored-authors';
     ignoredAuthors.style.display = 'none';
     ignoredAuthors.textContent = [...hiddenAuthorArray].join(', ');
 
     let toggleIgnoredAuthors = document.createElement('a');
-    toggleIgnoredAuthors.setAttribute('class', 'titre-bloc deboucled-toggle-ignored-authors');
+    toggleIgnoredAuthors.className = 'titre-bloc deboucled-toggle-ignored-authors';
     toggleIgnoredAuthors.setAttribute('role', 'button');
     toggleIgnoredAuthors.textContent = '(voir)';
     toggleIgnoredAuthors.onclick = function () {
@@ -774,9 +775,25 @@ function updateMessagesHeader() {
         }
     };
 
+    let paginationElement = document.querySelector('div.bloc-pagi-default');
     insertAfter(ignoredMessageHeader, paginationElement);
     ignoredMessageHeader.appendChild(toggleIgnoredAuthors);
     ignoredMessageHeader.appendChild(ignoredAuthors);
+}
+
+function updateMessagesHeader() {
+    if (hiddenMessages <= 0 || hiddenAuthorArray.length === 0) return;
+
+    let ignoredMessageHeader = document.querySelector('#deboucled-ignored-messages-header');
+    if (ignoredMessageHeader) {
+        let pr = plural(hiddenMessages);
+        ignoredMessageHeader.firstChild.textContent = `${hiddenMessages} message${pr} ignoré${pr}`;
+    }
+
+    let ignoredAuthors = document.querySelector('#deboucled-ignored-messages-authors-header');
+    if (ignoredAuthors) {
+        ignoredAuthors.textContent = [...hiddenAuthorArray].join(', ');
+    }
 }
 
 function removeMessage(element) {
@@ -832,15 +849,45 @@ function addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchiv
     insertAfter(boucledAuthorAnchor, mpBloc);
 }
 
-function handleJvChat() {
-    addEventListener("jvchat:newmessage", function (event) {
-        // L'id du message est stocké dans event.detail.id
-        // L'attribut event.detail.isEdit est mis à "true" s'il s'agit d'un message édité
-        let message = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
-        let authorElem = message.querySelector('h5.jvchat-author');
-        if (authorElem === null) return;
-        let author = authorElem.textContent.trim();
-        if (isAuthorBlacklisted(author)) message.parentElement.style.display = 'none';
+function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive) {
+    function handleLiveMessage(message, author, upgradeMessage) {
+        if (isAuthorBlacklisted(author)) {
+            if (optionHideMessages) {
+                removeMessage(message);
+                hiddenMessages++;
+                hiddenAuthorArray.add(author);
+            }
+            else {
+                highlightBlacklistedAuthor(message, authorElement);
+                addBoucledAuthorButton(message, author, optionBoucledUseJvarchive);
+            }
+            updateMessagesHeader();
+            saveTotalHidden();
+        }
+        else if (upgradeMessage) {
+            let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, false);
+            upgradeJvcBlacklistButton(message, author, optionShowJvcBlacklistButton);
+            addBoucledAuthorButton(message, author, optionBoucledUseJvarchive);
+        }
+    }
+
+    if (optionHideMessages) { // pour JvChat on ne changera pas le message de toute façon
+        addEventListener("jvchat:newmessage", function (event) {
+            let message = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
+            let authorElem = message.querySelector('h5.jvchat-author');
+            if (authorElem === null) return;
+            let author = authorElem.textContent.trim();
+            handleLiveMessage(message, author, false);
+        });
+    }
+
+    addEventListener("topiclive:newmessage", function (event) {
+        let message = document.querySelector(`.bloc-message-forum[data-id="${event.detail.id}"]`);
+        if (!message) return;
+        let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+        if (authorElement === null) return;
+        let author = authorElement.textContent.trim();
+        handleLiveMessage(message, author, true);
     });
 }
 
@@ -1588,14 +1635,14 @@ function handleTopicMessages() {
     let optionHideMessages = GM_getValue(storage_optionHideMessages, true);
     let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, false);
 
-    if (optionHideMessages) handleJvChat();
+    handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive);
 
     let allMessages = getAllMessages(document);
     allMessages.forEach(function (message) {
         handleMessage(message, optionBoucledUseJvarchive, optionHideMessages);
     });
 
-    updateMessagesHeader();
+    buildMessagesHeader();
     saveTotalHidden();
 }
 
