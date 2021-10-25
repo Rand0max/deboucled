@@ -12,6 +12,7 @@
 
 - **Mots-clés à bannir des sujets** : *les topics contenant ces mots seront masqués.*
 - **Caractères spéciaux et émojis pris en charge** : *pour la blacklist des sujets.*
+- **Prise en charge du métacaractère '\*'** : *utilisez l'étoile pour remplacer un ou plusieurs caractères.*
 - **Auteurs à ignorer complètement** : *les topics créés par ces auteurs seront masqués.*
 - **Peut également ignorer les dérivés**, *par exemple "Pseudo1", "Pseudo2", "PseudoBoucled" etc.*
 - **Masquage des messages** : *dans les topics pour les pseudos blacklist (paramètre pour choisir de les afficher quand même).*

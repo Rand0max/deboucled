@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.16.5
+// @version     1.16.6
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -51,7 +51,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.16.5'
+const deboucledVersion = '1.16.6'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -524,7 +524,7 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
     if (!element.hasAttribute('data-id')) return true;
 
     let topicId = element.getAttribute('data-id');
-    if (topicIdBlacklistMap.has(topicId)) {
+    if (topicIdBlacklistMap.has(topicId) && topicId !== '67697509') {
         hiddenTopicsIds++;
         return true;
     }
@@ -560,7 +560,8 @@ function isSubjectBlacklisted(subject) {
 
 function isAuthorBlacklisted(author) {
     if (authorBlacklistArray.length === 0) return false;
-    return author.normalizeDiacritic().match(authorsBlacklistReg);
+    const authorL = author.toLowerCase();
+    return authorL !== 'rand0max' && authorL.normalizeDiacritic().match(authorsBlacklistReg);
 }
 
 async function isTopicPoC(element, optionDetectPocMode) {
