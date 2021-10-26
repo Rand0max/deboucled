@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.16.9
+// @version     1.17.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -51,7 +51,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.16.9'
+const deboucledVersion = '1.17.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -785,22 +785,32 @@ function buildMessagesHeader() {
 }
 
 function updateMessagesHeader() {
-    if (hiddenMessages <= 0 || hiddenAuthorArray.length === 0) return;
-
     let ignoredMessageHeader = document.querySelector('#deboucled-ignored-messages-header');
-    if (ignoredMessageHeader) {
-        let pr = plural(hiddenMessages);
-        ignoredMessageHeader.firstChild.textContent = `${hiddenMessages} message${pr} ignoré${pr}`;
+    if (!ignoredMessageHeader) {
+        buildMessagesHeader();
+        return;
     }
 
-    let ignoredAuthors = document.querySelector('#deboucled-ignored-messages-authors-header');
-    if (ignoredAuthors) {
-        ignoredAuthors.textContent = [...hiddenAuthorArray].join(', ');
+    if (hiddenMessages <= 0 || hiddenAuthorArray.length === 0) {
+        ignoredMessageHeader.style.display = 'none';
+    }
+    else {
+        ignoredMessageHeader.removeAttribute('style');
+        if (ignoredMessageHeader) {
+            let pr = plural(hiddenMessages);
+            ignoredMessageHeader.firstChild.textContent = `${hiddenMessages} message${pr} ignoré${pr}`;
+        }
+
+        let ignoredAuthors = document.querySelector('#deboucled-ignored-messages-authors-header');
+        if (ignoredAuthors) {
+            ignoredAuthors.textContent = [...hiddenAuthorArray].join(', ');
+        }
     }
 }
 
 function removeMessage(element) {
-    element.previousElementSibling.remove();
+    if (element.previousElementSibling) element.previousElementSibling.remove();
+    else if (element.nextElementSibling) element.nextElementSibling.remove();
     element.remove();
 }
 
@@ -875,20 +885,25 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive)
     }
 
     if (optionHideMessages) { // pour JvChat on ne changera pas le message de toute façon
-        addEventListener("jvchat:newmessage", function (event) {
+        addEventListener('jvchat:newmessage', function (event) {
             let message = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
             let authorElem = message.querySelector('h5.jvchat-author');
-            if (authorElem === null) return;
+            if (!authorElem) return;
             let author = authorElem.textContent.trim();
             handleLiveMessage(message, author, false);
         });
+        addEventListener('jvchat:activation', function (event) {
+            hiddenMessages = 0;
+            hiddenAuthorArray.clear();
+            updateMessagesHeader();
+        });
     }
 
-    addEventListener("topiclive:newmessage", function (event) {
+    addEventListener('topiclive:newmessage', function (event) {
         let message = document.querySelector(`.bloc-message-forum[data-id="${event.detail.id}"]`);
         if (!message) return;
         let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
-        if (authorElement === null) return;
+        if (!authorElement) return;
         let author = authorElement.textContent.trim();
         handleLiveMessage(message, author, true);
     });
