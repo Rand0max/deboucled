@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.16.8
+// @version     1.16.9
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -51,7 +51,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.16.8'
+const deboucledVersion = '1.16.9'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -438,19 +438,6 @@ function getAllTopics(doc) {
     return [...allTopics];
 }
 
-function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
-    if (!topicIdBlacklistMap.has(topicId)) {
-        topicIdBlacklistMap.set(topicId, topicSubject);
-        saveStorage();
-        if (refreshTopicList) {
-            let topic = document.querySelector('[data-id="' + topicId + '"]');
-            if (topic === undefined) return;
-            removeTopic(topic);
-            updateTopicsHeader();
-        }
-    }
-}
-
 async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold) {
     let actualTopics = topics.length - hiddenTotalTopics - 1;
     let pageBrowse = 1;
@@ -478,6 +465,19 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
     return filledTopics;
 }
 
+function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
+    if (!topicIdBlacklistMap.has(topicId)) {
+        topicIdBlacklistMap.set(topicId, topicSubject);
+        saveStorage();
+
+        if (!refreshTopicList) return;
+        let topic = document.querySelector('[data-id="' + topicId + '"]');
+        if (!topic) return;
+        removeTopic(topic);
+        updateTopicsHeader();
+    }
+}
+
 function updateTopicsHeader() {
     let subjectHeader = document.querySelector('.topic-head > span:nth-child(1)');
     subjectHeader.textContent = `SUJET (${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)})`;
@@ -492,18 +492,18 @@ function removeTopic(element) {
 }
 
 function addTopic(element, topics) {
-    if (element.getElementsByClassName("xXx text-user topic-author").length === 0) {
+    if (!element.querySelector('.xXx.text-user.topic-author')) {
         // jvcare supprime le lien vers le profil et le lien dans la date du topic
         let topicAuthorSpan = element.children[1];
         let author = topicAuthorSpan.textContent.trim();
         topicAuthorSpan.outerHTML = `<a href="https://www.jeuxvideo.com/profil/${author.toLowerCase()}?mode=infos" target="_blank" class="xXx text-user topic-author">${author}</a>`;
 
         let topicDateSpan = element.children[3];
-        let topicUrl = element.children[0].lastElementChild.getAttribute('href').trim();
+        let topicUrl = decryptJvCare(topicDateSpan.firstElementChild.className);
         let topicDate = topicDateSpan.firstElementChild.textContent.trim();
         topicDateSpan.innerHTML = `<a href="${topicUrl}" class="xXx lien-jv">${topicDate}</a>`;
     }
-    document.getElementsByClassName("topic-list topic-list-admin")[0].appendChild(element);
+    document.querySelector('.topic-list.topic-list-admin').appendChild(element);
     topics.push(element); // on rajoute le nouveau topic à la liste en cours de remplissage pour éviter de le reprendre sur les pages suivantes
 }
 
@@ -534,18 +534,18 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
     // Seuil d'affichage valable uniquement pour les BL sujets et auteurs
     if (optionAllowDisplayThreshold && getTopicMessageCount(element) >= optionDisplayThreshold) return false;
 
-    let titleTag = element.getElementsByClassName("lien-jv topic-title");
-    if (titleTag !== undefined && titleTag.length > 0) {
-        let title = titleTag[0].textContent;
+    let titleTag = element.querySelector('.lien-jv.topic-title');
+    if (titleTag) {
+        let title = titleTag.textContent;
         if (isSubjectBlacklisted(title)) {
             hiddenSubjects++;
             return true;
         }
     }
 
-    let authorTag = element.getElementsByClassName("topic-author");
-    if (authorTag !== undefined && authorTag.length > 0) {
-        let author = authorTag[0].textContent.trim();
+    let authorTag = element.querySelector('.topic-author');
+    if (authorTag) {
+        let author = authorTag.textContent.trim();
         if (isAuthorBlacklisted(author)) {
             hiddenAuthors++;
             return true;
@@ -905,7 +905,7 @@ function buildSettingPage() {
     bgView.setAttribute("class", "deboucled-settings-bg-view");
     bgView.innerHTML = '<div></div>';
     document.body.prepend(bgView);
-    document.getElementById('deboucled-settings-bg-view').style.display = 'none';
+    document.querySelector('#deboucled-settings-bg-view').style.display = 'none';
 
     function addStat(title, content) {
         let html = "";
@@ -1019,7 +1019,7 @@ function buildSettingPage() {
             storage_optionDetectPocMode,
             'Protection contre les topics &quot;post ou cancer&quot; et les dérivés.\n• Désactivé : aucune protection\n• Mode simple (rapide) : recherche dans le message uniquement si le titre contient un indice\n• Mode approfondi (plus lent) : recherche systématiquement dans le message et le titre',
             0,
-            ['Désactivé', 'Mode simple', 'Mode approfondi']);
+            ['Désactivé', 'Mode simple', 'Mode approfondi ⚠']);
 
         html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, false, 'Autoriser l\'affichage des topics même si le sujet est blacklist, à partir d\'un certain nombre de messages.');
 
@@ -1095,24 +1095,24 @@ function buildSettingPage() {
     settingsView.innerHTML = settingsHtml;
     document.body.prepend(settingsView);
 
-    document.querySelector('.deboucled-version').onclick = function () { alert('En dépit des boucleurs --> ent :)'); };
+    document.querySelector('.deboucled-version').onclick = () => alert('Paix sur la boucle nonobstant.');
 
     function addToggleEvent(id, callback = undefined) {
-        const toggleSlider = document.getElementById(id);
+        const toggleSlider = document.querySelector('#' + id);
         toggleSlider.onchange = (e) => {
             GM_setValue(id, e.currentTarget.checked);
             if (callback) callback();
         };
     }
     function addRangeEvent(id) {
-        const rangeSlider = document.getElementById(id);
+        const rangeSlider = document.querySelector('#' + id);
         rangeSlider.oninput = function () {
             GM_setValue(id, parseInt(this.value));
-            document.getElementById(`${id}-value`).innerHTML = this.value;
+            document.querySelector(`#${id}-value`).innerHTML = this.value;
         };
     }
     function addSelectEvent(id) {
-        const select = document.getElementById(id);
+        const select = document.querySelector('#' + id);
         select.onchange = (e) => {
             GM_setValue(id, parseInt(e.currentTarget.value));
         };
@@ -1181,8 +1181,8 @@ function addSortEvent() {
 }
 
 function addImportExportEvent() {
-    document.getElementById('deboucled-export-button').onclick = backupStorage;
-    document.getElementById('deboucled-import-button').onchange = loadFile;
+    document.querySelector('#deboucled-export-button').onclick = backupStorage;
+    document.querySelector('#deboucled-import-button').onchange = loadFile;
 }
 
 function addCollapsibleEvents() {
@@ -1204,7 +1204,7 @@ function addCollapsibleEvents() {
                 content.removeAttribute('style');
             }
             else {
-                let view = document.getElementById('deboucled-settings-view');
+                let view = document.querySelector('#deboucled-settings-view');
                 view.style.overflowY = 'scroll';
                 content.style.maxHeight = content.scrollHeight + 'px';
                 view.removeAttribute('style');
@@ -1242,7 +1242,7 @@ function writeEntityKeys(entity, entries, filterCallback, removeCallback, entity
         html += `<li class="deboucled-entity-key deboucled-entity-element${cls}" id="${key}"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
     });
     html += '</ul>';
-    document.getElementById(`deboucled-${entity}List`).innerHTML = html;
+    document.querySelector(`#deboucled-${entity}List`).innerHTML = html;
 
     document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(function (input) {
         input.onclick = function () { removeCallback(this.parentNode) };
@@ -1353,7 +1353,7 @@ function keyIsAllowed(key, ctrlKey) {
 
 function createAddEntityEvent(entity, keyRegex, addCallback) {
     function addEntity(entity, keyRegex, addCallback) {
-        let input = document.getElementById(`deboucled-${entity}-input-key`);
+        let input = document.querySelector(`#deboucled-${entity}-input-key`);
         let key = input.value;
         if (key === '' || !key.match(keyRegex)) return;
         addCallback(key);
@@ -1361,42 +1361,41 @@ function createAddEntityEvent(entity, keyRegex, addCallback) {
         refreshCollapsibleContentHeight(entity);
     }
 
-    document.getElementById(`deboucled-${entity}-input-key`).onkeydown = function (event) {
+    document.querySelector(`#deboucled-${entity}-input-key`).onkeydown = function (event) {
         if (!keyIsAllowed(event.key, event.ctrlKey) && !event.key.match(keyRegex)) event.preventDefault();
         if (event.key !== "Enter") return;
         addEntity(entity, keyRegex, addCallback);
     };
 
-    document.getElementById(`deboucled-${entity}-input-button`).onclick = function () {
+    document.querySelector(`#deboucled-${entity}-input-button`).onclick = function () {
         addEntity(entity, keyRegex, addCallback);
     };
 }
 
 function createSearchEntitiesEvent(entity, keyRegex, refreshCallback) {
-    document.getElementById(`deboucled-${entity}-search-key`).onkeydown = function (event) {
+    document.querySelector(`#deboucled-${entity}-search-key`).onkeydown = function (event) {
         if (!keyIsAllowed(event.key, event.ctrlKey) && !event.key.match(keyRegex)) event.preventDefault();
     };
-    document.getElementById(`deboucled-${entity}-search-key`).oninput = function (event) {
+    document.querySelector(`#deboucled-${entity}-search-key`).oninput = function (event) {
         refreshCallback(normalizeValue(event.target.value));
         refreshCollapsibleContentHeight(entity);
     };
 }
 
 function refreshEntityCounts() {
-    let subjectCount = document.getElementById(`deboucled-${entitySubject}-entity-count`);
-    if (subjectCount !== null) subjectCount.textContent = `${subjectBlacklistArray.length} sujet${plural(subjectBlacklistArray.length)} blacklist`;
+    let subjectCount = document.querySelector(`#deboucled-${entitySubject}-entity-count`);
+    if (subjectCount) subjectCount.textContent = `${subjectBlacklistArray.length} sujet${plural(subjectBlacklistArray.length)} blacklist`;
 
-    let authorCount = document.getElementById(`deboucled-${entityAuthor}-entity-count`);
-    if (authorCount !== null) authorCount.textContent = `${authorBlacklistArray.length} pseudo${plural(authorBlacklistArray.length)} blacklist`;
+    let authorCount = document.querySelector(`#deboucled-${entityAuthor}-entity-count`);
+    if (authorCount) authorCount.textContent = `${authorBlacklistArray.length} pseudo${plural(authorBlacklistArray.length)} blacklist`;
 
-    let topicCount = document.getElementById(`deboucled-${entityTopicId}-entity-count`)
-    if (topicCount !== null) topicCount.textContent = `${topicIdBlacklistMap.size} topic${plural(topicIdBlacklistMap.size)} blacklist`;
+    let topicCount = document.querySelector(`#deboucled-${entityTopicId}-entity-count`)
+    if (topicCount) topicCount.textContent = `${topicIdBlacklistMap.size} topic${plural(topicIdBlacklistMap.size)} blacklist`;
 }
 
 function refreshCollapsibleContentHeight(entity) {
-    let content = document.getElementById(`deboucled-${entity}-collapsible-content`);
-    if (content === null) return;
-    content.style.maxHeight = content.scrollHeight + 'px';
+    let content = document.querySelector(`#deboucled-${entity}-collapsible-content`);
+    if (content) content.style.maxHeight = content.scrollHeight + 'px';
 }
 
 function addSettingButton(firstLaunch) {
@@ -1412,11 +1411,11 @@ function addSettingButton(firstLaunch) {
     };
 
     window.onclick = function (e) {
-        if (!document.getElementById('deboucled-settings-bg-view').contains(e.target)) return;
+        if (!document.querySelector('#deboucled-settings-bg-view').contains(e.target)) return;
         hideSettings();
     };
     window.onkeydown = function (e) {
-        if (!document.getElementById('deboucled-settings-bg-view').contains(e.target) && e.key !== 'Escape') return;
+        if (!document.querySelector('#deboucled-settings-bg-view').contains(e.target) && e.key !== 'Escape') return;
         hideSettings();
     };
 }
@@ -1440,20 +1439,20 @@ function addSearchFilterToggle() {
 }
 
 function showSettings() {
-    let bgView = document.getElementById('deboucled-settings-bg-view');
+    let bgView = document.querySelector('#deboucled-settings-bg-view');
     bgView.style.display = 'block'
 
-    let view = document.getElementById('deboucled-settings-view');
+    let view = document.querySelector('#deboucled-settings-view');
     view.classList.add('visible');
     view.clientWidth; // force display
     view.classList.add('active');
 }
 
 function hideSettings() {
-    let bgView = document.getElementById('deboucled-settings-bg-view');
+    let bgView = document.querySelector('#deboucled-settings-bg-view');
     bgView.style.display = 'none';
 
-    let view = document.getElementById('deboucled-settings-view');
+    let view = document.querySelector('#deboucled-settings-view');
     view.classList.remove('active');
     setTimeout(() => view.classList.remove('visible'), 200); // wait transition (flemme d'utiliser l'event)
 }
