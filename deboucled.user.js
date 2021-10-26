@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.16.6
+// @version     1.16.7
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -51,7 +51,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.16.6'
+const deboucledVersion = '1.16.7'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -265,10 +265,12 @@ function normalizeValue(value) {
 };
 
 function makeRegex(array, withBoundaries) {
-    let b = withBoundaries ? '\\b' : '';
+    // \b ne fonctionne pas avec les caractères spéciaux
+    let b1 = withBoundaries ? '(?<=\W|^)' : '';
+    let b2 = withBoundaries ? '(?=\W|$)' : '';
     let map = array.map((e) => {
         let word = e.escapeRegexPattern().handleGenericChar().normalizeDiacritic();
-        return `${b}${word}${b}`;
+        return `${b1}${word}${b2}`;
     })
     let regex = map.join('|');
     return new RegExp(regex, 'gi');
