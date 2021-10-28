@@ -45,8 +45,8 @@
   width: 25%;
 }
 .deboucled-topic-subject {
-  color: #bbb;
   margin-left: 6px;
+  opacity: 0.7;
 }
 .deboucled-logo-preview {
   width: 14px;
