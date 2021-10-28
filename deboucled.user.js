@@ -480,7 +480,7 @@ function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
 
 function updateTopicsHeader() {
     let subjectHeader = document.querySelector('.topic-head > span:nth-child(1)');
-    subjectHeader.textContent = `SUJET (${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)})`;
+    subjectHeader.innerHTML = `SUJET<span class="deboucled-topic-subject">(${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)})</span>`;
 
     let lastMessageHeader = document.querySelector('.topic-head > span:nth-child(4)');
     lastMessageHeader.style.width = '5.3rem';
@@ -1526,6 +1526,10 @@ async function highlightModeratedTopics() {
 // MAIN PAGE
 ///////////////////////////////////////////////////////////////////////////////////////
 
+function toggleDarkTheme() {
+    document.body.classList.toggle('deboucled-dark-theme');
+}
+
 function addSvgs() {
     const spiralSvg = '<svg width="24px" viewBox="0 0 24 24" style="display: none;"><symbol id="spirallogo"><path d="M12.71,12.59a1,1,0,0,1-.71-.3,1,1,0,0,0-1.41,0,1,1,0,0,1-1.42,0,1,1,0,0,1,0-1.41,3.08,3.08,0,0,1,4.24,0,1,1,0,0,1,0,1.41A1,1,0,0,1,12.71,12.59Z"/><path d="M12.71,14a1,1,0,0,1-.71-.29,1,1,0,0,1,0-1.42h0a1,1,0,0,1,1.41-1.41,2,2,0,0,1,0,2.83A1,1,0,0,1,12.71,14Z"/><path d="M9.88,16.83a1,1,0,0,1-.71-.29,4,4,0,0,1,0-5.66,1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41,2,2,0,0,0,0,2.83,1,1,0,0,1,0,1.42A1,1,0,0,1,9.88,16.83Z"/><path d="M12.71,18a5,5,0,0,1-3.54-1.46,1,1,0,1,1,1.42-1.42,3.07,3.07,0,0,0,4.24,0,1,1,0,0,1,1.41,0,1,1,0,0,1,0,1.42A5,5,0,0,1,12.71,18Z"/><path d="M15.54,16.83a1,1,0,0,1-.71-1.71,4,4,0,0,0,0-5.66,1,1,0,0,1,1.41-1.41,6,6,0,0,1,0,8.49A1,1,0,0,1,15.54,16.83Z"/><path d="M7.05,9.76a1,1,0,0,1-.71-1.71,7,7,0,0,1,9.9,0,1,1,0,1,1-1.41,1.41,5,5,0,0,0-7.07,0A1,1,0,0,1,7.05,9.76Z"/><path d="M7.05,19.66a1,1,0,0,1-.71-.3,8,8,0,0,1,0-11.31,1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41,6,6,0,0,0,0,8.49,1,1,0,0,1-.71,1.71Z"/><path d="M12.71,22a9,9,0,0,1-6.37-2.64,1,1,0,0,1,0-1.41,1,1,0,0,1,1.42,0,7,7,0,0,0,9.9,0,1,1,0,0,1,1.41,1.41A8.94,8.94,0,0,1,12.71,22Z"/><path d="M18.36,19.66a1,1,0,0,1-.7-.3,1,1,0,0,1,0-1.41,8,8,0,0,0,0-11.31,1,1,0,0,1,0-1.42,1,1,0,0,1,1.41,0,10,10,0,0,1,0,14.14A1,1,0,0,1,18.36,19.66Z"/><path d="M4.22,6.93a1,1,0,0,1-.71-.29,1,1,0,0,1,0-1.42,11,11,0,0,1,15.56,0,1,1,0,0,1,0,1.42,1,1,0,0,1-1.41,0,9,9,0,0,0-12.73,0A1,1,0,0,1,4.22,6.93Z"/></symbol></svg>';
     addSvg(spiralSvg, '#forum-main-col');
@@ -1702,6 +1706,16 @@ function handleError() {
 
     homepageButton.textContent = 'Retour au forum';
     homepageButton.href = forumUrl;
+
+    let jvArchiveButton = document.createElement('a');
+    jvArchiveButton.className = 'btn btn-primary';
+    jvArchiveButton.href = `https://jvarchive.com${window.location.pathname.slice(0, -4)}`;
+    jvArchiveButton.alt = 'JvArchive';
+    jvArchiveButton.target = '_blank';
+    jvArchiveButton.style.marginLeft = '15px';
+    jvArchiveButton.textContent = 'Consulter JvArchive';
+
+    insertAfter(jvArchiveButton, homepageButton);
 }
 
 async function init() {
