@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.17.3
+// @version     1.17.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -51,7 +51,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.17.3'
+const deboucledVersion = '1.17.5'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -71,6 +71,7 @@ const storage_init = 'deboucled_init';
 const storage_blacklistedTopicIds = 'deboucled_blacklistedTopicIds';
 const storage_blacklistedSubjects = 'deboucled_blacklistedSubjects';
 const storage_blacklistedAuthors = 'deboucled_blacklistedAuthors';
+const storage_optionEnableDarkTheme = 'deboucled_optionEnableDarkTheme';
 const storage_optionBoucledUseJvarchive = 'deboucled_optionBoucledUseJvarchive';
 const storage_optionHideMessages = 'deboucled_optionHideMessages';
 const storage_optionAllowDisplayThreshold = 'deboucled_optionAllowDisplayThreshold';
@@ -88,7 +89,7 @@ const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 const storage_TopicStats = 'deboucled_TopicStats';
 
-const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
+const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
 
 const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors];
 
@@ -1009,6 +1010,9 @@ function buildSettingPage() {
         html += `<span class="deboucled-version">v${deboucledVersion}</span>`;
         html += '<table class="deboucled-option-table">';
 
+        let dark = '<span class="deboucled-dark-logo"></span>'
+        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${dark} pour Déboucled`, storage_optionEnableDarkTheme, false, 'Permet de basculer entre le thème normal et le thème sombre pour script Déboucled.');
+
         let spiral = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
         html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiral}`, storage_optionBoucledUseJvarchive, false, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
 
@@ -1115,8 +1119,9 @@ function buildSettingPage() {
     function addToggleEvent(id, callback = undefined) {
         const toggleSlider = document.querySelector('#' + id);
         toggleSlider.onchange = (e) => {
-            GM_setValue(id, e.currentTarget.checked);
-            if (callback) callback();
+            const checked = e.currentTarget.checked;
+            GM_setValue(id, checked);
+            if (callback) callback(checked);
         };
     }
     function addRangeEvent(id) {
@@ -1133,8 +1138,9 @@ function buildSettingPage() {
         };
     }
 
-    addToggleEvent(storage_optionHideMessages);
+    addToggleEvent(storage_optionEnableDarkTheme, toggleDarkTheme);
     addToggleEvent(storage_optionBoucledUseJvarchive);
+    addToggleEvent(storage_optionHideMessages);
     addToggleEvent(storage_optionDisplayBlacklistTopicButton);
     addToggleEvent(storage_optionDisplayBlackTopic);
     addToggleEvent(storage_optionPrevisualizeTopic);
@@ -1526,8 +1532,8 @@ async function highlightModeratedTopics() {
 // MAIN PAGE
 ///////////////////////////////////////////////////////////////////////////////////////
 
-function toggleDarkTheme() {
-    document.body.classList.toggle('deboucled-dark-theme');
+function toggleDarkTheme(enabled) {
+    document.body.classList.toggle('deboucled-dark-theme', enabled);
 }
 
 function addSvgs() {
@@ -1594,10 +1600,8 @@ async function handleTopicList(canFillTopics) {
     }
 
     updateTopicsHeader();
-
     saveTotalHidden();
-
-    updateTopicHiddenAtDate();
+    if (canFillTopics) updateTopicHiddenAtDate();
 
     return finalTopics;
 }
@@ -1722,6 +1726,8 @@ async function init() {
     let firstLaunch = await initStorage();
     addCss();
     addSvgs();
+    const enableDarkTheme = GM_getValue(storage_optionEnableDarkTheme, false);
+    toggleDarkTheme(enableDarkTheme);
     buildSettingPage();
     addSettingButton(firstLaunch);
 }
