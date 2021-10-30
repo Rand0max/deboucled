@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.18.0
+// @version     1.18.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -51,7 +51,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.18.0'
+const deboucledVersion = '1.18.1'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -910,7 +910,7 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive)
     });
 }
 
-function addQuoteEvent() {
+function addMessageQuoteEvent() {
     function getAuthorFromCitationBtn(e) {
         return e.querySelector('.bloc-pseudo-msg.text-user').textContent.trim();
     }
@@ -1695,7 +1695,7 @@ function handleTopicMessages() {
 
     buildMessagesHeader();
     saveTotalHidden();
-    addQuoteEvent();
+    //addMessageQuoteEvent();
 }
 
 async function handleSearch() {
