@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.17.5
+// @version     1.18.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -51,7 +51,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.17.5'
+const deboucledVersion = '1.18.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -910,6 +910,32 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive)
     });
 }
 
+function addQuoteEvent() {
+    function getAuthorFromCitationBtn(e) {
+        return e.querySelector('.bloc-pseudo-msg.text-user').textContent.trim();
+    }
+
+    function getDateFromCitationBtn(e) {
+        return e.querySelector('.bloc-date-msg').textContent.trim();
+    }
+
+    const textArea = document.querySelector('#message_topic');
+
+    document.querySelectorAll('.picto-msg-quote').forEach(function (btn) {
+        btn.addEventListener('click', (e) => {
+            const parentHeader = btn.parentElement.parentElement;
+            if (!parentHeader) return;
+            setTimeout(() => {
+                const author = getAuthorFromCitationBtn(parentHeader);
+                const date = getDateFromCitationBtn(parentHeader);
+
+                const regex = new RegExp(`> Le\\s+?${date}\\s+?:`);
+                textArea.value = textArea.value.replace(regex, `> Le ${date} ${author} a écrit : `);
+            }, 200);
+        });
+    });
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // SETTINGS
@@ -1013,10 +1039,10 @@ function buildSettingPage() {
         let dark = '<span class="deboucled-dark-logo"></span>'
         html += addToggleOption(`Utiliser le <i>thème sombre</i> ${dark} pour Déboucled`, storage_optionEnableDarkTheme, false, 'Permet de basculer entre le thème normal et le thème sombre pour script Déboucled.');
 
+        html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, true, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.');
+
         let spiral = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
         html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiral}`, storage_optionBoucledUseJvarchive, false, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
-
-        html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, true, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.');
 
         let forbidden = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbidden}`, storage_optionDisplayBlacklistTopicButton, true, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics voulu.');
@@ -1139,8 +1165,8 @@ function buildSettingPage() {
     }
 
     addToggleEvent(storage_optionEnableDarkTheme, toggleDarkTheme);
-    addToggleEvent(storage_optionBoucledUseJvarchive);
     addToggleEvent(storage_optionHideMessages);
+    addToggleEvent(storage_optionBoucledUseJvarchive);
     addToggleEvent(storage_optionDisplayBlacklistTopicButton);
     addToggleEvent(storage_optionDisplayBlackTopic);
     addToggleEvent(storage_optionPrevisualizeTopic);
@@ -1669,6 +1695,7 @@ function handleTopicMessages() {
 
     buildMessagesHeader();
     saveTotalHidden();
+    addQuoteEvent();
 }
 
 async function handleSearch() {
