@@ -148,7 +148,7 @@ body.deboucled-dark-theme {
 .deboucled-setting-button {
   background-color: #0050a6d1 !important;
   height: 28px;
-  margin: 15px 10px 15px 0;
+  margin: 15px 10px 0px 0;
 }
 .deboucled-setting-impexp-message {
   font: bold 11px/100% arial, sans-serif;

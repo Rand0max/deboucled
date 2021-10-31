@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.18.1
+// @version     1.18.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
-// @description Censure les topics éclatax et vous sort de la boucle
+// @description Censure les topics et les auteurs éclatax et vous sort de la boucle
 // @icon        https://image.noelshack.com/fichiers/2021/38/6/1632606701-deboucled.png
 // @match       http://www.jeuxvideo.com/forums/*
 // @match       https://www.jeuxvideo.com/forums/*
@@ -51,7 +51,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.18.1'
+const deboucledVersion = '1.18.5'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -227,6 +227,10 @@ function restoreStorage(fileContent) {
         }
     }
 
+    showRestoreCompleted()
+}
+
+function showRestoreCompleted() {
     document.querySelectorAll('#deboucled-impexp-message').forEach(function (e) {
         setTimeout(() => { e.classList.toggle('active'); }, 5000);
         e.classList.toggle('active');
@@ -242,6 +246,16 @@ function loadFile(fileEvent) {
         restoreStorage(content);
     };
     reader.readAsText(file);
+}
+
+function importFromTotalBlacklist() {
+    var blacklistFromTbl = localStorage.getItem('blacklisted');
+    if (!blacklistFromTbl) return;
+    blacklistFromTblArray = JSON.parse(blacklistFromTbl).filter(function (val) { return val !== 'forums' });
+    authorBlacklistArray = [...new Set(authorBlacklistArray.concat(blacklistFromTblArray))];
+    saveStorage()
+    refreshAuthorKeys();
+    showRestoreCompleted();
 }
 
 
@@ -1007,22 +1021,26 @@ function buildSettingPage() {
     function addImportExportButtons() {
         let html = "";
         html += '<tr>';
-        html += '<td class="deboucled-td-left">Restaurer/sauvegarder les préférences</td>';
+        html += '<td class="deboucled-td-left" rowspan="2">Restaurer/sauvegarder les préférences</td>';
         html += '<td class="deboucled-td-left">';
         html += `<label for="deboucled-import-button" class="btn btn-actu-new-list-forum deboucled-setting-button">Restaurer</label>`;
         html += `<input type="file" accept="application/JSON" id="deboucled-import-button" style="display: none;"></input>`;
         html += `<span id="deboucled-export-button" class="btn btn-actu-new-list-forum deboucled-setting-button">Sauvegarder</span>`;
+        html += `<span id="deboucled-import-tbl" class="btn btn-actu-new-list-forum deboucled-setting-button" style="min-width: 10rem;">Importer TotalBlacklist</span>`;
+        html += '</td>';
+        html += '<td class="deboucled-td-right" style="white-space: nowrap;">';
+        html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message" style="display: block; text-align: center;">Restauration terminée</span>`;
+        html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message">⚠ Veuillez rafraichir la page ⚠</span>`;
+        html += '</td>';
+        html += '</tr>';
 
+        html += '<tr>';
+        html += '<td class="deboucled-td-left">';
         html += '<label class="deboucled-switch little">';
         html += '<input type="checkbox" id="deboucled-impexp-blonly"></input>';
         html += '<span class="deboucled-toggle-slider little round"></span>';
         html += '</label>';
         html += `<span class="deboucled-toggle-title-right">Uniquement les blacklists</span>`;
-
-        html += '</td>';
-        html += '<td class="deboucled-td-right" style="white-space: nowrap;">';
-        html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message" style="display: block; text-align: center;">Restauration terminée</span>`;
-        html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message">⚠ Veuillez rafraichir la page ⚠</span>`;
         html += '</td>';
         html += '</tr>';
         return html;
@@ -1230,6 +1248,7 @@ function addSortEvent() {
 function addImportExportEvent() {
     document.querySelector('#deboucled-export-button').onclick = backupStorage;
     document.querySelector('#deboucled-import-button').onchange = loadFile;
+    document.querySelector('#deboucled-import-tbl').onclick = importFromTotalBlacklist;
 }
 
 function addCollapsibleEvents() {
