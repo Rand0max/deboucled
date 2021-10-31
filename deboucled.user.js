@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.18.5
+// @version     1.18.6
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -51,7 +51,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.18.5'
+const deboucledVersion = '1.18.6'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -250,12 +250,16 @@ function loadFile(fileEvent) {
 
 function importFromTotalBlacklist() {
     var blacklistFromTbl = localStorage.getItem('blacklisted');
-    if (!blacklistFromTbl) return;
+    if (!blacklistFromTbl) {
+        alert('Aucune blacklist détectée dans TotalBlacklist.');
+        return;
+    }
     blacklistFromTblArray = JSON.parse(blacklistFromTbl).filter(function (val) { return val !== 'forums' });
     authorBlacklistArray = [...new Set(authorBlacklistArray.concat(blacklistFromTblArray))];
     saveStorage()
     refreshAuthorKeys();
     showRestoreCompleted();
+    alert(`${blacklistFromTblArray.length} pseudos TotalBlacklist ont été importés dans Déboucled avec succès.`);
 }
 
 
