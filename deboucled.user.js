@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.18.7
+// @version     1.19.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -51,7 +51,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.18.7'
+const deboucledVersion = '1.19.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -465,7 +465,7 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
     while (actualTopics < topicByPage && pageBrowse <= 10) {
         pageBrowse++;
         await getForumPageContent(pageBrowse).then((res) => {
-            let nextDoc = domParser.parseFromString(res, "text/html");
+            let nextDoc = domParser.parseFromString(res, 'text/html');
             let nextPageTopics = getAllTopics(nextDoc);
 
             nextPageTopics.slice(1).forEach(function (topic) {
@@ -484,6 +484,29 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
     return filledTopics;
 }
 
+function createTopicListOverlay() {
+    let topicTable = document.querySelector('.topic-list.topic-list-admin');
+    if (!topicTable) return;
+
+    const wrapperDiv = document.createElement('div');
+    wrapperDiv.id = 'deboucled-topic-list-wrapper';
+    topicTable.parentElement.insertBefore(wrapperDiv, topicTable);
+    wrapperDiv.appendChild(topicTable);
+
+    const overylayDiv = document.createElement('div');
+    overylayDiv.className = 'deboucled-overlay active';
+    wrapperDiv.appendChild(overylayDiv);
+
+    const spinnerDiv = document.createElement('div');
+    spinnerDiv.className = 'deboucled-overlay-spinner active';
+    wrapperDiv.appendChild(spinnerDiv);
+}
+
+function toggleTopicOverlay(active) {
+    document.querySelector('.deboucled-overlay').classList.toggle('active', active);
+    document.querySelector('.deboucled-overlay-spinner').classList.toggle('active', active);
+}
+
 function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
     if (!topicIdBlacklistMap.has(topicId)) {
         topicIdBlacklistMap.set(topicId, topicSubject);
@@ -493,6 +516,7 @@ function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
         let topic = document.querySelector('[data-id="' + topicId + '"]');
         if (!topic) return;
         removeTopic(topic);
+        hiddenTotalTopics++;
         updateTopicsHeader();
     }
 }
@@ -507,7 +531,6 @@ function updateTopicsHeader() {
 
 function removeTopic(element) {
     element.remove();
-    hiddenTotalTopics++;
 }
 
 function addTopic(element, topics) {
@@ -1037,7 +1060,6 @@ function buildSettingPage() {
         html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message">⚠ Veuillez rafraichir la page ⚠</span>`;
         html += '</td>';
         html += '</tr>';
-
         html += '<tr>';
         html += '<td class="deboucled-td-left">';
         html += '<label class="deboucled-switch little">';
@@ -1055,34 +1077,41 @@ function buildSettingPage() {
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">OPTIONS</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
         html += '<div class="deboucled-setting-content" style="margin-bottom: 0;">';
-        html += `<span class="deboucled-version">v${deboucledVersion}</span>`;
+
+        let jvcLogo = '<span class="deboucled-jvc-logo"></span>';
+        html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/forums/42-51-67697509-1-0-1-0-officiel-nouveau-script-deboucled-censure-les-topics-et-la-boucle-du-forum.htm" target="_blank" title="Topic officiel JVC">${jvcLogo}</a>`;
+
+        let githubLogo = '<span class="deboucled-svg-github"><svg width="20px" viewBox="0 0 16 16" id="deboucled-github-logo"><use href="#githublogo"/></svg></span>';
+        html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/deboucled" target="_blank" title="Github Officiel Déboucled">${githubLogo}</a>`;
+        html += `<span class="deboucled-about-version">v${deboucledVersion}</span>`;
+
         html += '<table class="deboucled-option-table">';
 
-        let dark = '<span class="deboucled-dark-logo"></span>'
-        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${dark} pour Déboucled`, storage_optionEnableDarkTheme, false, 'Permet de basculer entre le thème normal et le thème sombre pour script Déboucled.');
+        let darkLogo = '<span class="deboucled-dark-logo"></span>'
+        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, false, 'Permet de basculer entre le thème normal et le thème sombre pour script Déboucled.');
 
         html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, true, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.');
 
-        let spiral = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
-        html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiral}`, storage_optionBoucledUseJvarchive, false, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
+        let spiralLogo = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
+        html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiralLogo}`, storage_optionBoucledUseJvarchive, false, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
 
-        let forbidden = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
-        html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbidden}`, storage_optionDisplayBlacklistTopicButton, true, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics voulu.');
+        let forbiddenLogo = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
+        html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbiddenLogo}`, storage_optionDisplayBlacklistTopicButton, true, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics voulu.');
 
-        let blackTopic = '<span class="topic-img deboucled-topic-black-logo" style="display: inline-block; vertical-align: middle;"></span>'
-        html += addToggleOption(`Afficher le pictogramme pour les <i>topics noirs</i> ${blackTopic}`, storage_optionDisplayBlackTopic, true, 'Afficher les topics de plus de 100 messages avec le pictogramme noir (en plus du jaune, rouge, résolu, épinglé etc).');
+        let blackTopicLogo = '<span class="topic-img deboucled-topic-black-logo" style="display: inline-block; vertical-align: middle;"></span>'
+        html += addToggleOption(`Afficher le pictogramme pour les <i>topics noirs</i> ${blackTopicLogo}`, storage_optionDisplayBlackTopic, true, 'Afficher les topics de plus de 100 messages avec le pictogramme noir (en plus du jaune, rouge, résolu, épinglé etc).');
 
-        let preview = '<span><svg width="16px" viewBox="0 0 30 30" id="deboucled-preview-logo"><use href="#previewlogo"/></svg></span>';
-        html += addToggleOption(`Afficher les boutons pour avoir un <i>aperçu du topic</i> ${preview}`, storage_optionPrevisualizeTopic, true, 'Afficher ou non l\'icone \'loupe\' à côté du sujet pour prévisualiser le topic.');
+        let previewLogo = '<span><svg width="16px" viewBox="0 0 30 30" id="deboucled-preview-logo"><use href="#previewlogo"/></svg></span>';
+        html += addToggleOption(`Afficher les boutons pour avoir un <i>aperçu du topic</i> ${previewLogo}`, storage_optionPrevisualizeTopic, true, 'Afficher ou non l\'icone \'loupe\' à côté du sujet pour prévisualiser le topic.');
 
-        let blJvc = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
-        html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvc} de JVC`, storage_optionShowJvcBlacklistButton, false, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
+        let blJvcLogo = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
+        html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvcLogo} de JVC`, storage_optionShowJvcBlacklistButton, false, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
 
-        let stats = '<span class="deboucled-chart-logo"></span>'
-        html += addToggleOption(`Afficher la <i>tendance de filtrage</i> ${stats} des topics`, storage_optionDisplayTopicCharts, true, 'Afficher ou non le graphique des tendances de filtrage de topics sur la droite de la page.');
+        let statsLogo = '<span class="deboucled-chart-logo"></span>'
+        html += addToggleOption(`Afficher la <i>tendance de filtrage</i> ${statsLogo} des topics`, storage_optionDisplayTopicCharts, true, 'Afficher ou non le graphique des tendances de filtrage de topics sur la droite de la page.');
 
-        let poc = '<span class="deboucled-poc-logo"></span>'
-        html += addDropdownOption(`Protection contre les <i>PoC</i> ${poc} <span style="opacity: 0.3;font-style: italic;font-size: xx-small;">(beta)</span>`,
+        let pocLogo = '<span class="deboucled-poc-logo"></span>'
+        html += addDropdownOption(`Protection contre les <i>PoC</i> ${pocLogo} <span style="opacity: 0.3;font-style: italic;font-size: xx-small;">(beta)</span>`,
             storage_optionDetectPocMode,
             'Protection contre les topics &quot;post ou cancer&quot; et les dérivés.\n• Désactivé : aucune protection\n• Mode simple (rapide) : recherche dans le message uniquement si le titre contient un indice\n• Mode approfondi (plus lent) : recherche systématiquement dans le message et le titre',
             0,
@@ -1162,7 +1191,7 @@ function buildSettingPage() {
     settingsView.innerHTML = settingsHtml;
     document.body.prepend(settingsView);
 
-    document.querySelector('.deboucled-version').onclick = () => alert('Paix sur la boucle nonobstant.');
+    document.querySelector('.deboucled-about-version').onclick = () => alert('Paix sur la boucle nonobstant.');
 
     function addToggleEvent(id, callback = undefined) {
         const toggleSlider = document.querySelector('#' + id);
@@ -1594,6 +1623,9 @@ function addSvgs() {
 
     const previewSvg = '<svg viewBox="0 0 30 30" width="30px" height="30px"><symbol id="previewlogo"><path fill="#b6c9d6" d="M2.931,28.5c-0.382,0-0.742-0.149-1.012-0.419c-0.558-0.558-0.558-1.466,0-2.024l14.007-13.353 l1.375,1.377L3.935,28.089C3.673,28.351,3.313,28.5,2.931,28.5z"/><path fill="#788b9c" d="M15.917,13.403l0.685,0.686L3.589,27.727C3.413,27.903,3.18,28,2.931,28 c-0.249,0-0.482-0.097-0.658-0.273c-0.363-0.363-0.363-0.953-0.017-1.3L15.917,13.403 M15.934,12.005L1.565,25.704 c-0.754,0.754-0.754,1.977,0,2.731C1.943,28.811,2.437,29,2.931,29c0.494,0,0.988-0.189,1.365-0.566L18,14.073L15.934,12.005 L15.934,12.005z"/><g><path fill="#d1edff" d="M19,20.5c-5.238,0-9.5-4.262-9.5-9.5s4.262-9.5,9.5-9.5s9.5,4.262,9.5,9.5S24.238,20.5,19,20.5z"/><path fill="#788b9c" d="M19,2c4.963,0,9,4.037,9,9s-4.037,9-9,9s-9-4.037-9-9S14.037,2,19,2 M19,1C13.477,1,9,5.477,9,11 s4.477,10,10,10s10-4.477,10-10S24.523,1,19,1L19,1z"/></g></symbol></svg>';
     addSvg(previewSvg, '#forum-main-col');
+
+    const githubSvg = '<svg viewBox="0 0 16 16" height="32" width="32"><symbol id="githublogo"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></symbol></svg>';
+    addSvg(githubSvg, '#forum-main-col');
 }
 
 function getCurrentPageType(url) {
@@ -1638,15 +1670,21 @@ async function handleTopicList(canFillTopics) {
     let optionAllowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
     let optionDisplayThreshold = GM_getValue(storage_optionDisplayThreshold, 100);
 
+    let topicsToRemove = [];
     let finalTopics = [];
     finalTopics.push(topics[0]); // header
     topics.slice(1).forEach(function (topic) {
-        if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold)) removeTopic(topic);
+        if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold)) {
+            topicsToRemove.push(topic);
+            hiddenTotalTopics++;
+        }
         else finalTopics.push(topic);
     });
     if (canFillTopics) {
-        finalTopics = finalTopics.concat(await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold));
+        filledTopics = await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold);
+        finalTopics = finalTopics.concat(filledTopics);
     }
+    topicsToRemove.forEach(removeTopic);
 
     updateTopicsHeader();
     saveTotalHidden();
@@ -1718,7 +1756,7 @@ function handleTopicMessages() {
 
     buildMessagesHeader();
     saveTotalHidden();
-    //addMessageQuoteEvent();
+    addMessageQuoteEvent();
 }
 
 async function handleSearch() {
@@ -1787,9 +1825,11 @@ async function callMe() {
     switch (currentPageType) {
         case 'topiclist': {
             await init();
+            createTopicListOverlay();
             const finalTopics = await handleTopicList(true);
             await handleTopicListOptions(finalTopics);
             addRightBlocStats();
+            toggleTopicOverlay(false);
             break;
         }
         case 'topicmessages': {
