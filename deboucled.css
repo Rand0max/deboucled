@@ -191,12 +191,12 @@ body.deboucled-dark-theme {
 .deboucled-topic-title {
   margin-left: 2.4rem !important;
 }
-
 .deboucled-topic-blacklist {
   text-align: center;
   vertical-align: top;
   display: table-cell;
 }
+
 @media (max-width: 807.98px) {
   .deboucled-logo-forbidden {
     width: 16px;
@@ -218,7 +218,22 @@ body.deboucled-dark-theme {
     left: 1.7rem;
     top: 0.9rem;
   }
+  .deboucled-overlay-spinner {
+    left: 45%;
+    top: 10%;
+  }
+  .deboucled-overlay {
+    left: -12px;
+    width: 104%;
+  }
 }
+@media (max-width: 558px) {
+  .deboucled-overlay {
+    left: -12px;
+    width: 108%;
+  }
+}
+
 .deboucled-setting-button {
   background-color: #0050a6d1 !important;
   height: 28px;
