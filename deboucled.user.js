@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.19.1
+// @version     1.19.2
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -22,6 +22,7 @@
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
 // @resource    CHARTS_CSS https://unpkg.com/charts.css/dist/charts.min.css
 // @require     https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js
+// @run-at      document-end
 // ==/UserScript==
 
 
@@ -51,7 +52,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.19.1'
+const deboucledVersion = '1.19.2'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
