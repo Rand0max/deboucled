@@ -12,6 +12,7 @@ body {
   --deboucled-anchor-moderated-color: #000;
   --deboucled-filter-invert: 0%;
   --deboucled-text-shadow: none;
+  --deboucled-overylay-background-color: #fff;
 }
 body.deboucled-dark-theme {
   --deboucled-background-color: #333;
@@ -27,6 +28,7 @@ body.deboucled-dark-theme {
   --deboucled-anchor-moderated-color: #fff;
   --deboucled-filter-invert: 100%;
   --deboucled-text-shadow: 1px 1px #000;
+  --deboucled-overylay-background-color: #000;
 }
 
 .deboucled-td-left {
@@ -47,7 +49,8 @@ body.deboucled-dark-theme {
 }
 .deboucled-overlay {
   position: absolute;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: var(--deboucled-overylay-background-color);
+  opacity: 0.3;
   top: 0;
   left: 0;
   width: 100%;
