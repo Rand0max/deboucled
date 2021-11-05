@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.19.3
+// @version     1.20.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -33,8 +33,8 @@
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
 let topicIdBlacklistMap = new Map();
-let subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
-let authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
+let subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
+let authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
 
 let pocTopicMap = new Map();
 
@@ -46,13 +46,17 @@ let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 let deboucledTopicStatsMap = new Map();
 
+let matchedSubjects = new Set();
+let matchedAuthors = new Set();
+let matchedTopics = new Set();
+
 let stopHighlightModeratedTopics = false;
 let moderatedTopics = new Map();
 let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.19.3'
+const deboucledVersion = '1.20.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -113,8 +117,8 @@ async function loadStorage() {
     authorBlacklistArray = [...new Set(authorBlacklistArray.concat(JSON.parse(GM_getValue(storage_blacklistedAuthors))))];
     topicIdBlacklistMap = new Map([...topicIdBlacklistMap, ...JSON.parse(GM_getValue(storage_blacklistedTopicIds))]);
 
-    subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
-    authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
+    subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
+    authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
 
     let topicStats = GM_getValue(storage_TopicStats);
     if (topicStats) deboucledTopicStatsMap = new Map([...JSON.parse(topicStats)]);
@@ -129,8 +133,8 @@ async function saveStorage() {
     GM_setValue(storage_blacklistedAuthors, JSON.stringify([...new Set(authorBlacklistArray)]));
     GM_setValue(storage_blacklistedTopicIds, JSON.stringify([...topicIdBlacklistMap]));
 
-    subjectsBlacklistReg = makeRegex(subjectBlacklistArray, true);
-    authorsBlacklistReg = makeRegex(authorBlacklistArray, false);
+    subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
+    authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
 
     await saveLocalStorage();
 
@@ -280,17 +284,33 @@ String.prototype.handleGenericChar = function () {
     return this.replace('*', '.*');
 };
 
+Set.prototype.addArray = function (array) {
+    return array.forEach(this.add, this);
+};
+
+Set.prototype.hasAny = function () {
+    return this.size > 0;
+};
+
+Array.prototype.sortNormalize = function () {
+    return this.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+}
+
+Map.prototype.anyValue = function (callback) {
+    return [...this.values()].some(callback);
+};
+
 function normalizeValue(value) {
     return value.toString().toUpperCase().normalizeDiacritic();
 };
 
-function makeRegex(array, withBoundaries) {
+function buildRegex(array, withBoundaries) {
     // \b ne fonctionne pas avec les caractères spéciaux
-    let b1 = withBoundaries ? '(?<=\\W|^)' : '';
-    let b2 = withBoundaries ? '(?=\\W|$)' : '';
+    let bStart = withBoundaries ? '(?<=\\W|^)' : '';
+    let bEnd = withBoundaries ? '(?=\\W|$)' : '';
     let map = array.map((e) => {
         let word = e.escapeRegexPattern().handleGenericChar().normalizeDiacritic();
-        return `${b1}${word}${b2}`;
+        return `${bStart}${word}${bEnd}`;
     })
     let regex = map.join('|');
     return new RegExp(regex, 'gi');
@@ -341,12 +361,44 @@ function groupBy(arr, criteria) {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// STATS/CHARTS
+// RIGHT COLUMN - STATS/CHARTS
 ///////////////////////////////////////////////////////////////////////////////////////
+
+function addRightBlocMatches() {
+    if (!matchedTopics.hasAny() && !matchedSubjects.hasAny() && !matchedAuthors.hasAny()) return;
+
+    let html = '';
+    html += '<div class="card card-jv-forum card-forum-margin">';
+    html += `<div class="card-header">CORRESPONDANCES<span class="deboucled-matched-total">${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)}</span></div>`;
+    html += '<div class="card-body">';
+    html += '<div class="scrollable">';
+    html += '<div class="scrollable-wrapper">';
+    html += '<div id="deboucled-matches-content" class="scrollable-content bloc-info-forum">';
+    if (matchedSubjects.hasAny()) {
+        html += '<h4 class="titre-info-fofo">Sujets</h4>';
+        html += `<div>${[...matchedSubjects].sortNormalize().join(', ')}</div>`;
+    }
+    if (matchedAuthors.hasAny()) {
+        html += '<h4 class="titre-info-fofo">Auteurs</h4>';
+        html += `<div>${[...matchedAuthors].sortNormalize().join(', ')}</div>`;
+    }
+    if (matchedTopics.hasAny()) {
+        html += '<h4 class="titre-info-fofo">Topics</h4>';
+        html += `<div>${[...matchedTopics].sortNormalize().join(', ')}</div>`;
+    }
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    let matches = document.createElement('div');
+    document.querySelector('#forum-right-col').append(matches);
+    matches.outerHTML = html;
+}
 
 function addRightBlocStats() {
     let optionDisplayTopicCharts = GM_getValue(storage_optionDisplayTopicCharts, true);
-    if (!optionDisplayTopicCharts || deboucledTopicStatsMap.size === 0) return;
+    if (!optionDisplayTopicCharts || deboucledTopicStatsMap.size === 0 || !deboucledTopicStatsMap.anyValue((v) => v > 0)) return;
 
     let html = '';
     html += '<div class="card card-jv-forum card-forum-margin" style="max-height: 130px;">';
@@ -354,7 +406,7 @@ function addRightBlocStats() {
     html += '<div class="card-body" style="max-height: 130px;">';
     html += '<div class="scrollable">';
     html += '<div class="scrollable-wrapper">';
-    html += '<div id="deboucled-chart-content" class="scrollable-content bloc-info-forum" style="padding: .3rem;">';
+    html += '<div id="deboucled-chart-content" class="scrollable-content bloc-info-forum">';
     html += '</div>';
     html += '</div>';
     html += '</div>';
@@ -489,6 +541,8 @@ function createTopicListOverlay() {
     let topicTable = document.querySelector('.topic-list.topic-list-admin');
     if (!topicTable) return;
 
+    topicTable.style.opacity = '0.3';
+
     const wrapperDiv = document.createElement('div');
     wrapperDiv.id = 'deboucled-topic-list-wrapper';
     topicTable.parentElement.insertBefore(wrapperDiv, topicTable);
@@ -506,6 +560,7 @@ function createTopicListOverlay() {
 function toggleTopicOverlay(active) {
     document.querySelector('.deboucled-overlay').classList.toggle('active', active);
     document.querySelector('.deboucled-overlay-spinner').classList.toggle('active', active);
+    document.querySelector('.topic-list.topic-list-admin').removeAttribute('style');
 }
 
 function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
@@ -570,6 +625,7 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
 
     let topicId = element.getAttribute('data-id');
     if (topicIdBlacklistMap.has(topicId) && topicId !== '67697509') {
+        matchedTopics.add(topicIdBlacklistMap.get(topicId));
         hiddenTopicsIds++;
         return true;
     }
@@ -580,7 +636,9 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
     let titleTag = element.querySelector('.lien-jv.topic-title');
     if (titleTag) {
         let title = titleTag.textContent;
-        if (isSubjectBlacklisted(title)) {
+        const subjectBlacklisted = isSubjectBlacklisted(title);
+        if (subjectBlacklisted) {
+            matchedSubjects.addArray(subjectBlacklisted);
             hiddenSubjects++;
             return true;
         }
@@ -589,7 +647,9 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
     let authorTag = element.querySelector('.topic-author');
     if (authorTag) {
         let author = authorTag.textContent.trim();
-        if (isAuthorBlacklisted(author)) {
+        const authorBlacklisted = isAuthorBlacklisted(author);
+        if (authorBlacklisted) {
+            matchedAuthors.addArray(authorBlacklisted);
             hiddenAuthors++;
             return true;
         }
@@ -733,7 +793,7 @@ function addPrevisualizeTopicEvent(topics) {
                 if (!response.ok) throw Error(response.statusText);
                 return response.text();
             }).then(function (r) {
-                const html = domParser.parseFromString(r, "text/html");
+                const html = domParser.parseFromString(r, 'text/html');
                 return prepareMessagePreview(html);
             }).catch(function (err) {
                 console.error(err);
@@ -744,6 +804,7 @@ function addPrevisualizeTopicEvent(topics) {
         anchor.onmouseenter = async function () {
             if (previewDiv.querySelector('.bloc-message-forum')) return;
             const topicContent = await previewTopicCallback();
+            if (!topicContent) return;
             previewDiv.firstChild.remove();
             previewDiv.appendChild(topicContent);
         };
@@ -1829,6 +1890,7 @@ async function callMe() {
             createTopicListOverlay();
             const finalTopics = await handleTopicList(true);
             await handleTopicListOptions(finalTopics);
+            addRightBlocMatches();
             addRightBlocStats();
             toggleTopicOverlay(false);
             break;

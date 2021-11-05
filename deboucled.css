@@ -50,7 +50,7 @@ body.deboucled-dark-theme {
 .deboucled-overlay {
   position: absolute;
   background-color: var(--deboucled-overylay-background-color);
-  opacity: 0.3;
+  opacity: 0;
   top: 0;
   left: 0;
   width: 100%;
@@ -441,6 +441,17 @@ input[type="text"] {
 input[type="search"] {
   border: 1px solid #d2d2d2;
   padding: 3px;
+}
+#deboucled-chart-content {
+  padding: 0.3rem;
+  height: 100px;
+}
+.deboucled-matched-total {
+  float: right;
+  text-transform: uppercase;
+  padding-right: 0.625rem;
+  font-size: 0.875rem;
+  opacity: 0.7;
 }
 
 .deboucled-settings-bg-view {
