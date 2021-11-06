@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.20.0
+// @version     1.20.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.20.0'
+const deboucledVersion = '1.20.5'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -89,13 +89,14 @@ const storage_optionPrevisualizeTopic = 'deboucled_optionPrevisualizeTopic';
 const storage_optionDisplayBlackTopic = 'deboucled_optionDisplayBlackTopic';
 const storage_optionDisplayTopicCharts = 'deboucled_optionDisplayTopicCharts';
 const storage_optionDisplayTopicMatches = 'deboucled_optionDisplayTopicMatches';
+const storage_optionClickToShowTopicMatches = 'deboucled_optionClickToShowTopicMatches';
 const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
 const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
 const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 const storage_TopicStats = 'deboucled_TopicStats';
 
-const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
+const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
 
 const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors];
 
@@ -421,11 +422,20 @@ function addRightBlocMatches() {
         m = [...m.keys()].map(capitalize);
         return m.join(', ');
     }
+
+    let optionClickToShowTopicMatches = GM_getValue(storage_optionClickToShowTopicMatches, false);
     function addMatches(matches, entity, title) {
         let matchesHtml = '';
         matchesHtml += `<h4 class="titre-info-fofo">${title}</h4>`;
-        matchesHtml += `<div id="deboucled-matches-${entity}-wrapper" class="deboucled-matches-wrapper">(Afficher)`;
-        matchesHtml += `<span id="deboucled-matched-${entity}" style="display:none;">${formatMatches(matches)}</span>`;
+        if (optionClickToShowTopicMatches) {
+            matchesHtml += `<div id="deboucled-matches-${entity}-wrapper" class="deboucled-matches-wrapper">`;
+            matchesHtml += `<span class="deboucled-eye-logo deboucled-display-matches"></span>`;
+            matchesHtml += `<span id="deboucled-matched-${entity}" style="display:none;">${formatMatches(matches)}</span>`;
+        }
+        else {
+            matchesHtml += `<div id="deboucled-matches-${entity}-wrapper">`;
+            matchesHtml += `<span id="deboucled-matched-${entity}">${formatMatches(matches)}</span>`;
+        }
         matchesHtml += '</div>';
         return matchesHtml;
     }
@@ -443,6 +453,7 @@ function addRightBlocMatches() {
     document.querySelector('#forum-right-col').append(matches);
     matches.outerHTML = html;
 
+    if (!optionClickToShowTopicMatches) return;
     function addMatchesToggleEvent(entity) {
         const wrapper = document.querySelector(`#deboucled-matches-${entity}-wrapper`);
         wrapper.onclick = function () {
@@ -1125,10 +1136,10 @@ function buildSettingPage() {
         html += '</tr>';
         return html;
     }
-    function addToggleOption(title, optionId, defaultValue, hint) {
+    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false) {
         let html = "";
-        html += '<tr>';
-        html += `<td class="deboucled-td-left" title="${hint}">${title}</td>`;
+        html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
+        html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}" title="${hint}">${title}</td>`;
         html += '<td class="deboucled-td-right">';
         html += '<label class="deboucled-switch">';
         let checked = GM_getValue(optionId, defaultValue) ? 'checked' : '';
@@ -1141,9 +1152,9 @@ function buildSettingPage() {
     }
     function addRangeOption(title, optionId, defaultValue, minValue, maxValue, enabled, hint) {
         let html = "";
-        html += `<tr id="${optionId}-container" class="${enabled ? '' : 'deboucled-disabled'}">`;
-        html += `<td class="deboucled-option-cell deboucled-option-table-subcell deboucled-td-left" style="padding-left: 5px;" title="${hint}">${title}</td>`;
-        html += '<td class="deboucled-option-cell deboucled-option-table-subcell deboucled-td-right" style="padding-top: 7px;">';
+        html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
+        html += `<td class="deboucled-td-left deboucled-option-table-subcell" title="${hint}">${title}</td>`;
+        html += '<td class="deboucled-td-right" style="padding-top: 7px;">';
         let value = GM_getValue(optionId, defaultValue);
         html += `<input type="range" id="${optionId}" min="${minValue}" max="${maxValue}" value="${value}" step="10" class="deboucled-range-slider">`;
         html += `<span class="deboucled-range-title-value" id="${optionId}-value">${value}</span>`;
@@ -1173,10 +1184,10 @@ function buildSettingPage() {
         html += '<tr>';
         html += '<td class="deboucled-td-left" rowspan="2">Restaurer/sauvegarder les préférences</td>';
         html += '<td class="deboucled-td-left">';
-        html += `<label for="deboucled-import-button" class="btn btn-actu-new-list-forum deboucled-setting-button">Restaurer</label>`;
+        html += `<label for="deboucled-import-button" class="btn deboucled-button deboucled-setting-button">Restaurer</label>`;
         html += `<input type="file" accept="application/JSON" id="deboucled-import-button" style="display: none;"></input>`;
-        html += `<span id="deboucled-export-button" class="btn btn-actu-new-list-forum deboucled-setting-button">Sauvegarder</span>`;
-        html += `<span id="deboucled-import-tbl" class="btn btn-actu-new-list-forum deboucled-setting-button" style="min-width: 10rem;">Importer TotalBlacklist</span>`;
+        html += `<span id="deboucled-export-button" class="btn deboucled-button deboucled-setting-button">Sauvegarder</span>`;
+        html += `<span id="deboucled-import-tbl" class="btn deboucled-button deboucled-setting-button" style="min-width: 10rem;">Importer TotalBlacklist</span>`;
         html += '</td>';
         html += '<td class="deboucled-td-right" style="white-space: nowrap;">';
         html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message" style="display: block; text-align: center;">Restauration terminée</span>`;
@@ -1233,6 +1244,10 @@ function buildSettingPage() {
         let matchesLogo = '<span class="deboucled-list-logo"></span>'
         html += addToggleOption(`Afficher les <i>détails du filtrage</i> ${matchesLogo} des topics`, storage_optionDisplayTopicMatches, true, 'Afficher ou non le tableau des détails de filtrage des topics sur la droite de la page.');
 
+        let optionDisplayTopicMatches = GM_getValue(storage_optionDisplayTopicMatches, true);
+        let eyeLogo = '<span class="deboucled-eye-logo"></span>'
+        html += addToggleOption(`Cliquer sur l'oeil ${eyeLogo} pour <i>afficher les détails</i>`, storage_optionClickToShowTopicMatches, false, 'Cliquer sur l\'icone en oeil pour afficher le détail du filtrage par catégorie.', optionDisplayTopicMatches, true);
+
         let statsLogo = '<span class="deboucled-chart-logo"></span>'
         html += addToggleOption(`Afficher la <i>tendance de filtrage</i> ${statsLogo} des topics`, storage_optionDisplayTopicCharts, true, 'Afficher ou non le graphique des tendances de filtrage de topics sur la droite de la page.');
 
@@ -1264,7 +1279,7 @@ function buildSettingPage() {
         html += '<tr>';
         html += '<td>';
         html += `<input type="text" id="deboucled-${entity}-input-key" class="deboucled-input-key" placeholder="${hint}" >`;
-        html += `<span id="deboucled-${entity}-input-button" class="btn btn-actu-new-list-forum deboucled-add-button">Ajouter</span>`;
+        html += `<span id="deboucled-${entity}-input-button" class="btn deboucled-button deboucled-add-button">Ajouter</span>`;
         html += `<input type="search" id="deboucled-${entity}-search-key" class="deboucled-input-search" style="float: right;" placeholder="Rechercher..." >`;
         html += '</td>';
         html += '</tr>';
@@ -1349,7 +1364,12 @@ function buildSettingPage() {
     addToggleEvent(storage_optionPrevisualizeTopic);
     addToggleEvent(storage_optionShowJvcBlacklistButton);
     addToggleEvent(storage_optionDisplayTopicCharts);
-    addToggleEvent(storage_optionDisplayTopicMatches);
+    addToggleEvent(storage_optionDisplayTopicMatches, function () {
+        document.querySelectorAll(`[id = ${storage_optionClickToShowTopicMatches}-container]`).forEach(function (el) {
+            el.classList.toggle("deboucled-disabled");
+        })
+    });
+    addToggleEvent(storage_optionClickToShowTopicMatches);
     addToggleEvent(storage_optionAllowDisplayThreshold, function () {
         document.querySelectorAll(`[id = ${storage_optionDisplayThreshold}-container]`).forEach(function (el) {
             el.classList.toggle("deboucled-disabled");
@@ -1627,7 +1647,7 @@ function refreshCollapsibleContentHeight(entity) {
 function addSettingButton(firstLaunch) {
     let optionButton = document.createElement("button");
     optionButton.setAttribute('id', 'deboucled-option-button');
-    optionButton.setAttribute('class', `btn btn-actu-new-list-forum deboucled-option-button${firstLaunch ? ' blinking' : ''}`);
+    optionButton.setAttribute('class', `btn deboucled-button deboucled-option-button${firstLaunch ? ' blinking' : ''}`);
     optionButton.innerHTML = 'Déboucled';
     document.querySelector('.bloc-pre-right').prepend(optionButton);
     optionButton.onclick = function (e) {
