@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.20.5
+// @version     1.20.6
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.20.5'
+const deboucledVersion = '1.20.6'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -1470,7 +1470,7 @@ function addCollapsibleEvents() {
 function buildSettingEntities() {
     //const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u00A1-\u02AF]*$/i;
     const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u00A1-\u02AF\u{1F300}-\u{1FAD6}]*$/iu;
-    const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]]*$/iu;
+    const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]\*]*$/iu;
     const regexAllowedTopicId = /^[0-9]+$/i;
 
     createAddEntityEvent(entitySubject, regexAllowedSubject, function (key) { addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
