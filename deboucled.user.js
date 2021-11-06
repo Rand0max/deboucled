@@ -88,13 +88,14 @@ const storage_optionDetectPocMode = 'deboucled_optionDetectPocMode';
 const storage_optionPrevisualizeTopic = 'deboucled_optionPrevisualizeTopic';
 const storage_optionDisplayBlackTopic = 'deboucled_optionDisplayBlackTopic';
 const storage_optionDisplayTopicCharts = 'deboucled_optionDisplayTopicCharts';
+const storage_optionDisplayTopicMatches = 'deboucled_optionDisplayTopicMatches';
 const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
 const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
 const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 const storage_TopicStats = 'deboucled_TopicStats';
 
-const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
+const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
 
 const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors];
 
@@ -284,6 +285,10 @@ String.prototype.handleGenericChar = function () {
     return this.replace('*', '.*');
 };
 
+Array.prototype.sortNormalize = function () {
+    return this.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+}
+
 Set.prototype.addArray = function (array) {
     return array.forEach(this.add, this);
 };
@@ -292,9 +297,9 @@ Set.prototype.hasAny = function () {
     return this.size > 0;
 };
 
-Array.prototype.sortNormalize = function () {
-    return this.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-}
+Map.prototype.hasAny = function () {
+    return this.size > 0;
+};
 
 Map.prototype.anyValue = function (callback) {
     return [...this.values()].some(callback);
@@ -365,7 +370,8 @@ function groupBy(arr, criteria) {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function addRightBlocMatches() {
-    if (!matchedTopics.hasAny() && !matchedSubjects.hasAny() && !matchedAuthors.hasAny()) return;
+    let optionDisplayTopicMatches = GM_getValue(storage_optionDisplayTopicMatches, true);
+    if (!optionDisplayTopicMatches || (!matchedTopics.hasAny() && !matchedSubjects.hasAny() && !matchedAuthors.hasAny())) return;
 
     let html = '';
     html += '<div class="card card-jv-forum card-forum-margin">';
@@ -374,31 +380,44 @@ function addRightBlocMatches() {
     html += '<div class="scrollable">';
     html += '<div class="scrollable-wrapper">';
     html += '<div id="deboucled-matches-content" class="scrollable-content bloc-info-forum">';
-    if (matchedSubjects.hasAny()) {
-        html += '<h4 class="titre-info-fofo">Sujets</h4>';
-        html += `<div>${[...matchedSubjects].sortNormalize().join(', ')}</div>`;
+    function addMatches(matches, entity, title) {
+        let matchesHtml = '';
+        matchesHtml += `<h4 class="titre-info-fofo">${title}</h4>`;
+        matchesHtml += `<div id="deboucled-matches-${entity}-wrapper" class="deboucled-matches-wrapper">(Afficher)`;
+        matchesHtml += `<span id="deboucled-matched-${entity}" style="display:none;">${[...matches].sortNormalize().join(', ')}</span>`;
+        matchesHtml += '</div>';
+        return matchesHtml;
     }
-    if (matchedAuthors.hasAny()) {
-        html += '<h4 class="titre-info-fofo">Auteurs</h4>';
-        html += `<div>${[...matchedAuthors].sortNormalize().join(', ')}</div>`;
-    }
-    if (matchedTopics.hasAny()) {
-        html += '<h4 class="titre-info-fofo">Topics</h4>';
-        html += `<div>${[...matchedTopics].sortNormalize().join(', ')}</div>`;
-    }
+    if (matchedSubjects.hasAny()) html += addMatches(matchedSubjects, entitySubject, 'Sujets');
+    if (matchedAuthors.hasAny()) html += addMatches(matchedAuthors, entityAuthor, 'Auteurs');
+    if (matchedTopics.hasAny()) html += addMatches(matchedTopics, entityTopicId, 'Topics');
     html += '</div>';
     html += '</div>';
     html += '</div>';
     html += '</div>';
     html += '</div>';
+
     let matches = document.createElement('div');
     document.querySelector('#forum-right-col').append(matches);
     matches.outerHTML = html;
+
+    function addMatchesToggleEvent(entity) {
+        const wrapper = document.querySelector(`#deboucled-matches-${entity}-wrapper`);
+        wrapper.onclick = function () {
+            this.firstChild.remove();
+            this.removeAttribute('class');
+            document.querySelector(`#deboucled-matched-${entity}`).removeAttribute('style');
+            wrapper.onclick = null;
+        }
+    }
+    if (matchedSubjects.hasAny()) addMatchesToggleEvent(entitySubject);
+    if (matchedAuthors.hasAny()) addMatchesToggleEvent(entityAuthor);
+    if (matchedTopics.hasAny()) addMatchesToggleEvent(entityTopicId);
 }
 
 function addRightBlocStats() {
     let optionDisplayTopicCharts = GM_getValue(storage_optionDisplayTopicCharts, true);
-    if (!optionDisplayTopicCharts || deboucledTopicStatsMap.size === 0 || !deboucledTopicStatsMap.anyValue((v) => v > 0)) return;
+    if (!optionDisplayTopicCharts || !deboucledTopicStatsMap.hasAny() || !deboucledTopicStatsMap.anyValue((v) => v > 0)) return;
 
     let html = '';
     html += '<div class="card card-jv-forum card-forum-margin" style="max-height: 130px;">';
@@ -1169,6 +1188,9 @@ function buildSettingPage() {
         let blJvcLogo = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
         html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvcLogo} de JVC`, storage_optionShowJvcBlacklistButton, false, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
 
+        let matchesLogo = '<span class="deboucled-list-logo"></span>'
+        html += addToggleOption(`Afficher les <i>détails du filtrage</i> ${matchesLogo} des topics`, storage_optionDisplayTopicMatches, true, 'Afficher ou non le tableau des détails de filtrage des topics sur la droite de la page.');
+
         let statsLogo = '<span class="deboucled-chart-logo"></span>'
         html += addToggleOption(`Afficher la <i>tendance de filtrage</i> ${statsLogo} des topics`, storage_optionDisplayTopicCharts, true, 'Afficher ou non le graphique des tendances de filtrage de topics sur la droite de la page.');
 
@@ -1285,6 +1307,7 @@ function buildSettingPage() {
     addToggleEvent(storage_optionPrevisualizeTopic);
     addToggleEvent(storage_optionShowJvcBlacklistButton);
     addToggleEvent(storage_optionDisplayTopicCharts);
+    addToggleEvent(storage_optionDisplayTopicMatches);
     addToggleEvent(storage_optionAllowDisplayThreshold, function () {
         document.querySelectorAll(`[id = ${storage_optionDisplayThreshold}-container]`).forEach(function (el) {
             el.classList.toggle("deboucled-disabled");
