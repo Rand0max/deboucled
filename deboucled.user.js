@@ -418,27 +418,34 @@ function addRightBlocMatches() {
 
     function formatMatches(matches) {
         capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-        let m = matches.sortByValueThenKey(true);
-        m = [...m.keys()].map(capitalize);
-        return m.join(', ');
+        let matchesSorted = matches.sortByValueThenKey(true);
+        let matchesHtml = '';
+        let index = 0;
+        matchesSorted.forEach((occ, match) => {
+            matchesHtml += `<span class="deboucled-match${index < matchesSorted.size - 1 ? '' : '-last'}" title="${occ} occurence${plural(occ)}">${capitalize(match)}</span>`;
+            index++;
+        });
+        return matchesHtml;
     }
 
     let optionClickToShowTopicMatches = GM_getValue(storage_optionClickToShowTopicMatches, false);
+
     function addMatches(matches, entity, title) {
         let matchesHtml = '';
         matchesHtml += `<h4 class="titre-info-fofo">${title}</h4>`;
         if (optionClickToShowTopicMatches) {
             matchesHtml += `<div id="deboucled-matches-${entity}-wrapper" class="deboucled-matches-wrapper">`;
             matchesHtml += `<span class="deboucled-eye-logo deboucled-display-matches"></span>`;
-            matchesHtml += `<span id="deboucled-matched-${entity}" style="display:none;">${formatMatches(matches)}</span>`;
+            matchesHtml += `<div id="deboucled-matched-${entity}" style="display:none;">${formatMatches(matches)}</div>`;
         }
         else {
             matchesHtml += `<div id="deboucled-matches-${entity}-wrapper">`;
-            matchesHtml += `<span id="deboucled-matched-${entity}">${formatMatches(matches)}</span>`;
+            matchesHtml += `<div id="deboucled-matched-${entity}">${formatMatches(matches)}</div>`;
         }
         matchesHtml += '</div>';
         return matchesHtml;
     }
+
     if (matchedSubjects.hasAny()) html += addMatches(matchedSubjects, entitySubject, 'Sujets');
     if (matchedAuthors.hasAny()) html += addMatches(matchedAuthors, entityAuthor, 'Auteurs');
     if (matchedTopics.hasAny()) html += addMatches(matchedTopics, entityTopicId, 'Topics');
@@ -454,6 +461,7 @@ function addRightBlocMatches() {
     matches.outerHTML = html;
 
     if (!optionClickToShowTopicMatches) return;
+
     function addMatchesToggleEvent(entity) {
         const wrapper = document.querySelector(`#deboucled-matches-${entity}-wrapper`);
         wrapper.onclick = function () {

@@ -511,6 +511,17 @@ input[type="search"] {
   font: 11px/16px sans-serif;
   opacity: 0.7;
 }
+.deboucled-match {
+  margin-right: 5px;
+  cursor: pointer;
+}
+.deboucled-match::after {
+  content: ",";
+}
+.deboucled-match-last {
+  margin-right: 5px;
+  cursor: pointer;
+}
 
 .deboucled-settings-bg-view {
   width: 100%;
