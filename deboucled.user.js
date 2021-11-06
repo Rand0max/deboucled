@@ -46,9 +46,9 @@ let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 let deboucledTopicStatsMap = new Map();
 
-let matchedSubjects = new Set();
-let matchedAuthors = new Set();
-let matchedTopics = new Set();
+let matchedSubjects = new Map();
+let matchedAuthors = new Map();
+let matchedTopics = new Map();
 
 let stopHighlightModeratedTopics = false;
 let moderatedTopics = new Map();
@@ -290,7 +290,7 @@ Array.prototype.sortNormalize = function () {
 }
 
 Set.prototype.addArray = function (array) {
-    return array.forEach(this.add, this);
+    array.forEach(this.add, this);
 };
 
 Set.prototype.hasAny = function () {
@@ -304,6 +304,40 @@ Map.prototype.hasAny = function () {
 Map.prototype.anyValue = function (callback) {
     return [...this.values()].some(callback);
 };
+
+Map.prototype.addIncrement = function (key) {
+    this.set(key.toLowerCase(), (this.get(key.toLowerCase()) ?? 0) + 1);
+};
+
+Map.prototype.addArrayIncrement = function (array) {
+    array.forEach(this.addIncrement, this);
+};
+
+Map.prototype.sortByValue = function (desc = false) {
+    if (desc) return new Map([...this].sort((a, b) => String(b[1]).localeCompare(a[1])));
+    return new Map([...this].sort((a, b) => String(a[1]).localeCompare(b[1])));
+}
+
+Map.prototype.sortByValueThenKey = function (descValue = false) {
+    if (descValue) return new Map([...this]
+        .sort((a, b) => {
+            if (a[1] > b[1]) return -1;
+            if (a[1] < b[1]) return 1;
+            if (a[0].toLowerCase() > b[0].toLowerCase()) return 1;
+            if (a[0].toLowerCase() < b[0].toLowerCase()) return -1;
+            return 0;
+        }));
+
+    return new Map([...this]
+        .sort((a, b) => {
+            if (a[1] > b[1]) return 1;
+            if (a[1] < b[1]) return -1;
+            if (a[0].toLowerCase() > b[0].toLowerCase()) return 1;
+            if (a[0].toLowerCase() < b[0].toLowerCase()) return -1;
+            return 0;
+        }));
+}
+
 
 function normalizeValue(value) {
     return value.toString().toUpperCase().normalizeDiacritic();
@@ -380,17 +414,25 @@ function addRightBlocMatches() {
     html += '<div class="scrollable">';
     html += '<div class="scrollable-wrapper">';
     html += '<div id="deboucled-matches-content" class="scrollable-content bloc-info-forum">';
+
+    function formatMatches(matches) {
+        capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+        let m = matches.sortByValueThenKey(true);
+        m = [...m.keys()].map(capitalize);
+        return m.join(', ');
+    }
     function addMatches(matches, entity, title) {
         let matchesHtml = '';
         matchesHtml += `<h4 class="titre-info-fofo">${title}</h4>`;
         matchesHtml += `<div id="deboucled-matches-${entity}-wrapper" class="deboucled-matches-wrapper">(Afficher)`;
-        matchesHtml += `<span id="deboucled-matched-${entity}" style="display:none;">${[...matches].sortNormalize().join(', ')}</span>`;
+        matchesHtml += `<span id="deboucled-matched-${entity}" style="display:none;">${formatMatches(matches)}</span>`;
         matchesHtml += '</div>';
         return matchesHtml;
     }
     if (matchedSubjects.hasAny()) html += addMatches(matchedSubjects, entitySubject, 'Sujets');
     if (matchedAuthors.hasAny()) html += addMatches(matchedAuthors, entityAuthor, 'Auteurs');
     if (matchedTopics.hasAny()) html += addMatches(matchedTopics, entityTopicId, 'Topics');
+
     html += '</div>';
     html += '</div>';
     html += '</div>';
@@ -644,7 +686,7 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
 
     let topicId = element.getAttribute('data-id');
     if (topicIdBlacklistMap.has(topicId) && topicId !== '67697509') {
-        matchedTopics.add(topicIdBlacklistMap.get(topicId));
+        matchedTopics.set(topicIdBlacklistMap.get(topicId), 1);
         hiddenTopicsIds++;
         return true;
     }
@@ -657,7 +699,7 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
         let title = titleTag.textContent;
         const subjectBlacklisted = isSubjectBlacklisted(title);
         if (subjectBlacklisted) {
-            matchedSubjects.addArray(subjectBlacklisted);
+            matchedSubjects.addArrayIncrement(subjectBlacklisted);
             hiddenSubjects++;
             return true;
         }
@@ -668,7 +710,7 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
         let author = authorTag.textContent.trim();
         const authorBlacklisted = isAuthorBlacklisted(author);
         if (authorBlacklisted) {
-            matchedAuthors.addArray(authorBlacklisted);
+            matchedAuthors.addArrayIncrement(authorBlacklisted);
             hiddenAuthors++;
             return true;
         }
