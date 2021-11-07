@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.21.0
+// @version     1.21.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.21.0'
+const deboucledVersion = '1.21.1'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -115,9 +115,9 @@ async function initStorage() {
 }
 
 async function loadStorage() {
-    subjectBlacklistArray = [...new Set(subjectBlacklistArray.concat(JSON.parse(GM_getValue(storage_blacklistedSubjects))))];
-    authorBlacklistArray = [...new Set(authorBlacklistArray.concat(JSON.parse(GM_getValue(storage_blacklistedAuthors))))];
-    topicIdBlacklistMap = new Map([...topicIdBlacklistMap, ...JSON.parse(GM_getValue(storage_blacklistedTopicIds))]);
+    subjectBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedSubjects)))];
+    authorBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedAuthors)))];
+    topicIdBlacklistMap = new Map([...JSON.parse(GM_getValue(storage_blacklistedTopicIds))]);
 
     subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
@@ -144,11 +144,16 @@ async function saveStorage() {
 }
 
 async function loadLocalStorage() {
+    let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, 0);
+    if (optionDetectPocMode === 0) return;
+
     const storagePocTopics = await localforage.getItem(localstorage_pocTopics);
-    if (storagePocTopics) pocTopicMap = new Map([...pocTopicMap, ...JSON.parse(storagePocTopics)]);
+    if (storagePocTopics) pocTopicMap = new Map([...JSON.parse(storagePocTopics)]);
 }
 
 async function saveLocalStorage() {
+    let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, 0);
+    if (optionDetectPocMode === 0) return;
     await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
 }
 
