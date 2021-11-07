@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.20.6
+// @version     1.21.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.20.6'
+const deboucledVersion = '1.21.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -586,7 +586,7 @@ function updateTopicHiddenAtDate() {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function getAllTopics(doc) {
-    let allTopics = doc.querySelectorAll('.topic-list.topic-list-admin > li:not(.dfp__atf)');
+    let allTopics = doc.querySelectorAll('.topic-list.topic-list-admin > li:not(.dfp__atf):not(.message)');
     return [...allTopics];
 }
 
@@ -666,7 +666,17 @@ function updateTopicsHeader() {
 }
 
 function removeTopic(element) {
+    removeSiblingMessages(element);
     element.remove();
+}
+
+function removeSiblingMessages(element) {
+    let sibling = element.nextElementSibling;
+    while (sibling && sibling.classList.contains('message')) {
+        const elemToRemove = sibling;
+        sibling = sibling.nextElementSibling;
+        elemToRemove.remove();
+    }
 }
 
 function addTopic(element, topics) {
@@ -1916,23 +1926,7 @@ function handleTopicMessages() {
 
 async function handleSearch() {
     let optionFilterResearch = addSearchFilterToggle();
-    if (optionFilterResearch) {
-        let searchType = getSearchType(window.location.search);
-        switch (searchType) {
-            /*
-            case 'titre_topic':
-                break;
-            case 'auteur_topic':
-                break;
-            */
-            case 'texte_message':
-                // Not implemented yet
-                break;
-            default:
-                await handleTopicList(false);
-                break;
-        }
-    }
+    if (optionFilterResearch) await handleTopicList(false);
 
     let topics = getAllTopics(document);
     if (topics.length === 0) return;
