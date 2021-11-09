@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.21.1
+// @version     1.21.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.21.1'
+const deboucledVersion = '1.21.5'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -423,11 +423,13 @@ function addRightBlocMatches() {
 
     function formatMatches(matches) {
         capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+        formatMatch = (str) => capitalize(str.replace(',', '').replace(/ +(?= )/g, '').trim());
         let matchesSorted = matches.sortByValueThenKey(true);
         let matchesHtml = '';
         let index = 0;
         matchesSorted.forEach((occ, match) => {
-            matchesHtml += `<span class="deboucled-match${index < matchesSorted.size - 1 ? '' : '-last'}" title="${occ} occurence${plural(occ)}">${capitalize(match)}</span>`;
+            const className = `deboucled-match${index < matchesSorted.size - 1 ? ' match-after' : ''}`;
+            matchesHtml += `<span class="${className}" deboucled-data-tooltip="${occ} fois">${formatMatch(match)}</span>`;
             index++;
         });
         return matchesHtml;
