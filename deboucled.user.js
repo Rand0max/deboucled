@@ -415,7 +415,7 @@ function addRightBlocMatches() {
 
     let html = '';
     html += '<div class="card card-jv-forum card-forum-margin">';
-    html += `<div class="card-header">CORRESPONDANCES<span class="deboucled-matched-total">${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)}</span></div>`;
+    html += `<div class="card-header">CORRESPONDANCES<span class="deboucled-card-header-right">${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)}</span></div>`;
     html += '<div class="card-body">';
     html += '<div class="scrollable">';
     html += '<div class="scrollable-wrapper">';
@@ -487,9 +487,12 @@ function addRightBlocStats() {
     let optionDisplayTopicCharts = GM_getValue(storage_optionDisplayTopicCharts, true);
     if (!optionDisplayTopicCharts || !deboucledTopicStatsMap.hasAny() || !deboucledTopicStatsMap.anyValue((v) => v > 0)) return;
 
+    const calcAverage = arr => arr.reduce((p, c) => p + c, 0) / arr.length;
+    const average = Math.round(calcAverage([...deboucledTopicStatsMap.values()]));
+
     let html = '';
     html += '<div class="card card-jv-forum card-forum-margin" style="max-height: 130px;">';
-    html += '<div class="card-header">TENDANCE DE FILTRAGE</div>';
+    html += `<div class="card-header">TENDANCE DE FILTRAGE<span class="deboucled-card-header-right">Moyenne : ${average}</span></div>`;
     html += '<div class="card-body" style="max-height: 130px;">';
     html += '<div class="scrollable">';
     html += '<div class="scrollable-wrapper">';
@@ -515,67 +518,87 @@ function buildStatsChart() {
         html += `<style>#deboucled-stats-chart {--color-1: linear-gradient(rgba(240, 50, 50, 0.8), rgba(240, 50, 50, 0.3));} .data {font: bold 16px/0px sans-serif;color: #999999;height: 100%;text-align: center;white-space: nowrap;} .data-datetime {font-size: 11px;font-weight: normal;font-family: monospace;} .charts-css.area tbody tr th {width: 47px;font: bold 10px/10px sans-serif;color: #999999;} .charts-css.area:not(.reverse):not(.reverse-data) tbody tr td {-webkit-box-pack: center;-ms-flex-pack: center;justify-content: center;-webkit-box-align: center;-ms-flex-align: center;align-items: center;} .charts-css.area:not(.reverse):not(.reverse-data) tbody tr td .data {-webkit-transform: initial;transform: initial;}</style>`;
         return html;
     }
-
     function formatDateToGroup(d) {
         var dateOptions = { day: '2-digit', month: '2-digit', year: '2-digit' };
-        return `${d.toLocaleDateString(undefined, dateOptions)}`;
+        return d.toLocaleDateString(undefined, dateOptions);
     }
-
     function formatDateToDisplay(d) {
-        //var dateOptions = { day: '2-digit', month: '2-digit', year: '2-digit' };
-        // ${d.toLocaleDateString(undefined, dateOptions)}
         var timeOptions = { hour12: false, hour: '2-digit', minute: '2-digit' };
-        return `${d.toLocaleTimeString(undefined, timeOptions)}`;
+        return d.toLocaleTimeString(undefined, timeOptions);
     }
+    function buildChartTableHtml() {
+        const maxValues = 73;
+        const selectedStats = [...deboucledTopicStatsMap].splice(Math.max(deboucledTopicStatsMap.size - maxValues, 0), maxValues);
 
-    const maxValues = 73;
-    const selectedStats = [...deboucledTopicStatsMap].splice(Math.max(deboucledTopicStatsMap.size - maxValues, 0), maxValues);
+        const statsWithDate = [...selectedStats].map(function (v) {
+            let d = new Date(v[0]);
+            return { key: formatDateToGroup(d), value: v[1], datetime: d };
+        });
+        const groupedByDate = groupBy(statsWithDate, 'key');
 
-    const statsWithDate = [...selectedStats].map(function (v) {
-        let d = new Date(v[0]);
-        return { key: formatDateToGroup(d), value: v[1], datetime: d };
-    });
-    const groupedByDate = groupBy(statsWithDate, 'key');
+        let chartTableHtml = '';
+        chartTableHtml += addChartStyles();
+        chartTableHtml += '<table class="charts-css area show-data-on-hover show-labels" id="deboucled-stats-chart" style="width: 340px; height: 75px;">';
 
-    let chartTableHtml = '';
-    chartTableHtml += addChartStyles();
-    chartTableHtml += '<table class="charts-css area show-data-on-hover show-labels" id="deboucled-stats-chart" style="width: 340px; height: 75px;">';
+        chartTableHtml += '<thead>';
+        for (const [rowKey, stats] of Object.entries(groupedByDate)) {
+            chartTableHtml += `<th scope="col">${rowKey}</th>`;
+        }
+        chartTableHtml += '</thead>';
 
-    chartTableHtml += '<thead>';
-    for (const [rowKey, stat] of Object.entries(groupedByDate)) {
-        chartTableHtml += `<th scope="col">${rowKey}</th>`;
+        const selectedValues = selectedStats.map((v) => v[1]);
+        const coefValue = Math.max(...selectedValues) + 2;
+        let previousValue = Math.max(selectedValues[0] - 1, 0);
+
+        chartTableHtml += '<tbody>'
+        for (const [rowKey, stats] of Object.entries(groupedByDate)) {
+            let firstEntry = true;
+            for (const [statKey, stat] of Object.entries(stats)) {
+                chartTableHtml += `<tr${firstEntry ? '' : ' class="hide-label"'}>`;
+                chartTableHtml += `<th scope="row">${rowKey}</th>`;
+                chartTableHtml += `<td style="--start: ${previousValue / coefValue}; --size: ${stat.value / coefValue}">`;
+                chartTableHtml += `<span class="data data-datetime">${formatDateToDisplay(stat.datetime)}</span>`;
+                chartTableHtml += `<span class="data">${stat.value}</span>`;
+                chartTableHtml += '</td>';
+                chartTableHtml += '</tr>';
+                previousValue = stat.value;
+                firstEntry = false;
+            }
+        }
+        chartTableHtml += '</tbody>';
+        chartTableHtml += '</table>';
+        return chartTableHtml;
     }
-    chartTableHtml += '</thead>';
-
-    const selectedValues = selectedStats.map((v) => v[1]);
-    const coefValue = Math.max(...selectedValues) + 2;
-    let previousValue = Math.max(selectedValues[0] - 1, 0);
-
-    chartTableHtml += '<tbody>'
-    for (const [rowKey, stats] of Object.entries(groupedByDate)) {
-        let firstEntry = true;
-        for (const [statKey, stat] of Object.entries(stats)) {
-            chartTableHtml += `<tr${firstEntry ? '' : ' class="hide-label"'}>`;
-            chartTableHtml += `<th scope="row">${rowKey}</th>`;
-            chartTableHtml += `<td style="--start: ${previousValue / coefValue}; --size: ${stat.value / coefValue}"><span class="data data-datetime">${formatDateToDisplay(stat.datetime)}</span><span class="data">${stat.value}</span></td>`;
-            chartTableHtml += '</tr>';
-            previousValue = stat.value;
-            firstEntry = false;
+    function iframeOnLoad() {
+        const iframeProcessed = document.querySelector('iframe#deboucled-iframe-chart').contentWindow.document.body;
+        if (!iframeProcessed) return;
+        const labels = iframeProcessed.querySelectorAll('tr:not(.hide-label) > th[scope="row"]');
+        if (labels.length <= 1) return;
+        for (let i = 0; i < labels.length - 1; i++) {
+            label = labels[i];
+            nextLabel = labels[i + 1];
+            // Hide overlapped headers
+            if (label.getBoundingClientRect().right > nextLabel.getBoundingClientRect().left) {
+                label.parentElement.classList.toggle('hide-label', true);
+            }
         }
     }
-    chartTableHtml += '</tbody>';
-    chartTableHtml += '</table>';
 
+    const iframe = buildChartIframe(buildChartTableHtml(), iframeOnLoad);
+    document.querySelector('#deboucled-chart-content').append(iframe);
+}
+
+function buildChartIframe(bodyHtml, onloadFunction) {
     let iframe = document.createElement('iframe');
+    iframe.onload = onloadFunction;
     iframe.id = 'deboucled-iframe-chart';
     iframe.style = 'width: 100%; height: 100%;';
     iframe.border = 'none';
     iframe.scrolling = 'no';
     iframe.overflowY = 'hidden';
     iframe.margin = '0';
-    iframe.srcdoc = chartTableHtml;
-
-    document.querySelector('#deboucled-chart-content').append(iframe);
+    iframe.srcdoc = bodyHtml;
+    return iframe;
 }
 
 function updateTopicHiddenAtDate() {
