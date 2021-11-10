@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.22.0
+// @version     1.22.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.22.0'
+const deboucledVersion = '1.22.1'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -1708,16 +1708,20 @@ function refreshCollapsibleContentHeight(entity) {
 }
 
 function addSettingButton(firstLaunch) {
-    let optionButton = document.createElement("button");
-    optionButton.setAttribute('id', 'deboucled-option-button');
-    optionButton.setAttribute('class', `btn deboucled-button deboucled-option-button${firstLaunch ? ' blinking' : ''}`);
-    optionButton.innerHTML = 'Déboucled';
-    document.querySelector('.bloc-pre-right').prepend(optionButton);
-    optionButton.onclick = function (e) {
+    function createDeboucledButton() {
+        let button = document.createElement('button');
+        button.setAttribute('id', 'deboucled-option-button');
+        button.setAttribute('class', `btn deboucled-button deboucled-option-button${firstLaunch ? ' blinking' : ''}`);
+        button.innerHTML = 'Déboucled';
+        return button;
+    }
+    document.querySelectorAll('.bloc-pre-right').forEach(e => e.prepend(createDeboucledButton()))
+    optionOnclick = function (e) {
         e.preventDefault();
         clearEntityInputs();
         showSettings();
     };
+    document.querySelectorAll('#deboucled-option-button').forEach(e => e.onclick = optionOnclick);
 
     window.onclick = function (e) {
         if (!document.querySelector('#deboucled-settings-bg-view').contains(e.target)) return;
