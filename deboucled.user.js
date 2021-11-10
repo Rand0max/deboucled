@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.21.5
+// @version     1.22.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.21.5'
+const deboucledVersion = '1.22.0'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -1258,24 +1258,52 @@ function buildSettingPage() {
         let html = "";
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">OPTIONS</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
-        html += '<div class="deboucled-setting-content" style="margin-bottom: 0;">';
+        html += '<div class="deboucled-setting-content">';
 
         let jvcLogo = '<span class="deboucled-jvc-logo"></span>';
         html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/forums/42-51-67697509-1-0-1-0-officiel-nouveau-script-deboucled-censure-les-topics-et-la-boucle-du-forum.htm" target="_blank" title="Topic officiel JVC">${jvcLogo}</a>`;
 
         let githubLogo = '<span class="deboucled-svg-github"><svg width="20px" viewBox="0 0 16 16" id="deboucled-github-logo"><use href="#githublogo"/></svg></span>';
         html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/deboucled" target="_blank" title="Github Officiel Déboucled">${githubLogo}</a>`;
+
         html += `<span class="deboucled-about-version">v${deboucledVersion}</span>`;
 
         html += '<table class="deboucled-option-table">';
-
-        let darkLogo = '<span class="deboucled-dark-logo"></span>'
-        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, false, 'Permet de basculer entre le thème normal et le thème sombre pour script Déboucled.');
 
         html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, true, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.');
 
         let spiralLogo = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
         html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiralLogo}`, storage_optionBoucledUseJvarchive, false, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
+
+        let pocLogo = '<span class="deboucled-poc-logo"></span>'
+        html += addDropdownOption(`Protection contre les <i>PoC</i> ${pocLogo} <span style="opacity: 0.3;font-style: italic;font-size: xx-small;">(beta)</span>`,
+            storage_optionDetectPocMode,
+            'Protection contre les topics &quot;post ou cancer&quot; et les dérivés.\n• Désactivé : aucune protection\n• Mode simple (rapide) : recherche dans le message uniquement si le titre contient un indice\n• Mode approfondi (plus lent) : recherche systématiquement dans le message et le titre',
+            0,
+            ['Désactivé', 'Mode simple', 'Mode approfondi ⚠']);
+
+        html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, false, 'Autoriser l\'affichage des topics même si le sujet est blacklist, à partir d\'un certain nombre de messages.');
+
+        let allowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
+        html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, 100, 10, 1000, allowDisplayThreshold, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.');
+
+        html += addImportExportButtons();
+
+        html += '</table>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
+    function addCustomisationSection(sectionIsActive) {
+        let html = "";
+        html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">PERSONNALISATION</div>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-customisation-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
+        html += '<div class="deboucled-setting-content">';
+
+        html += '<table class="deboucled-option-table">';
+
+        let darkLogo = '<span class="deboucled-dark-logo"></span>'
+        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, false, 'Permet de basculer entre le thème normal et le thème sombre pour script Déboucled.');
 
         let forbiddenLogo = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbiddenLogo}`, storage_optionDisplayBlacklistTopicButton, true, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics voulu.');
@@ -1298,20 +1326,6 @@ function buildSettingPage() {
 
         let statsLogo = '<span class="deboucled-chart-logo"></span>'
         html += addToggleOption(`Afficher la <i>tendance de filtrage</i> ${statsLogo} des topics`, storage_optionDisplayTopicCharts, true, 'Afficher ou non le graphique des tendances de filtrage de topics sur la droite de la page.');
-
-        let pocLogo = '<span class="deboucled-poc-logo"></span>'
-        html += addDropdownOption(`Protection contre les <i>PoC</i> ${pocLogo} <span style="opacity: 0.3;font-style: italic;font-size: xx-small;">(beta)</span>`,
-            storage_optionDetectPocMode,
-            'Protection contre les topics &quot;post ou cancer&quot; et les dérivés.\n• Désactivé : aucune protection\n• Mode simple (rapide) : recherche dans le message uniquement si le titre contient un indice\n• Mode approfondi (plus lent) : recherche systématiquement dans le message et le titre',
-            0,
-            ['Désactivé', 'Mode simple', 'Mode approfondi ⚠']);
-
-        html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, false, 'Autoriser l\'affichage des topics même si le sujet est blacklist, à partir d\'un certain nombre de messages.');
-
-        let allowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
-        html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, 100, 10, 1000, allowDisplayThreshold, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.');
-
-        html += addImportExportButtons();
 
         html += '</table>';
         html += '</div>';
@@ -1369,6 +1383,7 @@ function buildSettingPage() {
 
     let settingsHtml = "";
     settingsHtml += addOptionsSection(false);
+    settingsHtml += addCustomisationSection(false);
     settingsHtml += addEntitySettingSection(entitySubject, 'BLACKLIST SUJETS', 'Mot-clé', true);
     settingsHtml += addEntitySettingSection(entityAuthor, 'BLACKLIST AUTEURS', 'Pseudo', false);
     settingsHtml += addEntitySettingSection(entityTopicId, 'BLACKLIST TOPICS', 'TopicId', false);

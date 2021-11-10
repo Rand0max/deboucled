@@ -695,7 +695,7 @@ input[type="search"] {
 
 /* Div Table */
 .deboucled-setting-content {
-  margin: 15px;
+  margin: 15px 15px 10px 15px;
 }
 .deboucled-option-div-table {
   display: table;
