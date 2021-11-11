@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.22.7
+// @version     1.23.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,8 +56,8 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.22.7'
-const topicByPage = 25;
+const deboucledVersion = '1.23.0'
+const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
 const entityAuthor = 'author';
@@ -91,13 +91,14 @@ const storage_optionDisplayTopicCharts = 'deboucled_optionDisplayTopicCharts';
 const storage_optionDisplayTopicMatches = 'deboucled_optionDisplayTopicMatches';
 const storage_optionClickToShowTopicMatches = 'deboucled_optionClickToShowTopicMatches';
 const storage_optionRemoveUselessTags = 'deboucled_optionRemoveUselessTags';
+const storage_optionMaxTopicCount = 'deboucled_optionMaxTopicCount';
 const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
 const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
 const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 const storage_TopicStats = 'deboucled_TopicStats';
 
-const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
+const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
 
 const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors];
 
@@ -334,14 +335,16 @@ Map.prototype.sortByValue = function (desc = false) {
 }
 
 Map.prototype.sortByValueThenKey = function (descValue = false) {
-    if (descValue) return new Map([...this]
-        .sort((a, b) => {
-            if (a[1] > b[1]) return -1;
-            if (a[1] < b[1]) return 1;
-            if (a[0].toLowerCase() > b[0].toLowerCase()) return 1;
-            if (a[0].toLowerCase() < b[0].toLowerCase()) return -1;
-            return 0;
-        }));
+    if (descValue) {
+        return new Map([...this]
+            .sort((a, b) => {
+                if (a[1] > b[1]) return -1;
+                if (a[1] < b[1]) return 1;
+                if (a[0].toLowerCase() > b[0].toLowerCase()) return 1;
+                if (a[0].toLowerCase() < b[0].toLowerCase()) return -1;
+                return 0;
+            }));
+    }
 
     return new Map([...this]
         .sort((a, b) => {
@@ -633,7 +636,9 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
     let pageBrowse = 1;
     let filledTopics = [];
 
-    while (actualTopics < topicByPage && pageBrowse <= 10) {
+    const maxTopicCount = parseInt(GM_getValue(storage_optionMaxTopicCount, defaultTopicCount));
+
+    while (actualTopics < maxTopicCount && pageBrowse <= 10) {
         pageBrowse++;
         await getForumPageContent(pageBrowse).then((res) => {
             let nextDoc = domParser.parseFromString(res, 'text/html');
@@ -644,7 +649,7 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
                     hiddenTotalTopics++;
                     return;
                 }
-                if (actualTopics < topicByPage && !topicExists(topics, topic)) {
+                if (actualTopics < maxTopicCount && !topicExists(topics, topic)) {
                     addTopic(topic, topics);
                     actualTopics++;
                     filledTopics.push(topic);
@@ -1217,13 +1222,13 @@ function buildSettingsPage() {
         html += '</tr>';
         return html;
     }
-    function addRangeOption(title, optionId, defaultValue, minValue, maxValue, enabled, hint) {
+    function addRangeOption(title, optionId, defaultValue, minValue, maxValue, step, hint, enabled, isSubCell = false) {
         let html = "";
         html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
-        html += `<td class="deboucled-td-left deboucled-option-table-subcell" ${buildTooltip(hint)}>${title}</td>`;
+        html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}" ${buildTooltip(hint)}>${title}</td>`;
         html += '<td class="deboucled-td-right" style="padding-top: 7px;">';
-        let value = GM_getValue(optionId, defaultValue);
-        html += `<input type="range" id="${optionId}" min="${minValue}" max="${maxValue}" value="${value}" step="10" class="deboucled-range-slider">`;
+        let value = parseInt(GM_getValue(optionId, defaultValue));
+        html += `<input type="range" id="${optionId}" min="${minValue}" max="${maxValue}" value="${value}" step="${step}" class="deboucled-range-slider">`;
         html += `<span class="deboucled-range-title-value" id="${optionId}-value">${value}</span>`;
         html += '</tr>';
         return html;
@@ -1297,7 +1302,7 @@ function buildSettingsPage() {
         html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, false, 'Autoriser l\'affichage des topics même si le sujet est blacklist, à partir d\'un certain nombre de messages.');
 
         let allowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
-        html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, 100, 10, 1000, allowDisplayThreshold, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.');
+        html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, 100, 10, 1000, 10, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.', allowDisplayThreshold, true);
 
         let pocLogo = '<span class="deboucled-poc-logo"></span>'
         html += addDropdownOption(`Protection contre les <i>PoC</i> ${pocLogo} <span style="opacity: 0.3;font-style: italic;font-size: xx-small;">(beta)</span>`,
@@ -1307,6 +1312,8 @@ function buildSettingsPage() {
             ['Désactivé', 'Mode simple', 'Mode approfondi ⚠']);
 
         html += addToggleOption('Effacer les <i>balises abusives</i> du titre des topics', storage_optionRemoveUselessTags, false, 'Effacer du titre des topics les balises inutiles et répétitives comme [ALERTE], ou l\'usage abusif du &quot;AYA&quot; et ses dérivés.\n\nExemple : &quot;[ALERTE] cet exemple incroyable AYAAAA&quot; => &quot;Cet exemple incroyable&quot;');
+
+        html += addRangeOption('Nombre de topics à afficher sur la page', storage_optionMaxTopicCount, defaultTopicCount, defaultTopicCount, 50, 1, 'Nombre de topics à afficher sur la page (25 par défaut).', true, false);
 
         html += addImportExportButtons();
 
@@ -1461,6 +1468,7 @@ function buildSettingsPage() {
     });
     addToggleEvent(storage_optionRemoveUselessTags);
     addRangeEvent(storage_optionDisplayThreshold);
+    addRangeEvent(storage_optionMaxTopicCount);
     addSelectEvent(storage_optionDetectPocMode);
 
     addImportExportEvent();
@@ -1892,7 +1900,7 @@ async function getForumPageContent(page) {
     let matches = urlRegex.exec(currentPath);
     var currentPageId = parseInt(matches.groups.pageid);
 
-    let nextPageId = currentPageId + ((page - 1) * topicByPage);
+    let nextPageId = currentPageId + ((page - 1) * defaultTopicCount);
     let nextPageUrl = currentPath.replace(urlRegex, `$1${nextPageId}$3`);
 
     const response = await fetch(nextPageUrl);
