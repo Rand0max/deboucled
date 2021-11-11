@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.22.5
+// @version     1.22.6
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.22.5'
+const deboucledVersion = '1.22.6'
 const topicByPage = 25;
 
 const entitySubject = 'subject';
@@ -971,7 +971,7 @@ async function topicIsModerated(topicId) {
 }
 
 function removeUselessTags(topics) {
-    const regex = /(\[?a+y+a+\]?|(\{|\[)+.*alerte?.*(\}|\])+|alerte?)\s?:?/gi;
+    const regex = /(\[?a+y+a+\]?|(\{|\[|\()+.*alerte?.*(\}|\]|\))+|alerte?)\s?:?/gi;
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
         let newTitle = titleElem.textContent.replace(regex, '').removeDoubleSpaces().trim().capitalize();
