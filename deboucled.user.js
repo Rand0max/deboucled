@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.23.0
+// @version     1.23.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.23.0'
+const deboucledVersion = '1.23.1'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -72,26 +72,27 @@ const domParser = new DOMParser();
 
 const localstorage_pocTopics = 'deboucled_pocTopics';
 
-const storage_init = 'deboucled_init';
-const storage_blacklistedTopicIds = 'deboucled_blacklistedTopicIds';
-const storage_blacklistedSubjects = 'deboucled_blacklistedSubjects';
-const storage_blacklistedAuthors = 'deboucled_blacklistedAuthors';
-const storage_optionEnableDarkTheme = 'deboucled_optionEnableDarkTheme';
-const storage_optionBoucledUseJvarchive = 'deboucled_optionBoucledUseJvarchive';
-const storage_optionHideMessages = 'deboucled_optionHideMessages';
-const storage_optionAllowDisplayThreshold = 'deboucled_optionAllowDisplayThreshold';
-const storage_optionDisplayThreshold = 'deboucled_optionDisplayThreshold';
-const storage_optionDisplayBlacklistTopicButton = 'deboucled_optionDisplayBlacklistTopicButton';
-const storage_optionShowJvcBlacklistButton = 'deboucled_optionShowJvcBlacklistButton';
-const storage_optionFilterResearch = 'deboucled_optionFilterResearch';
-const storage_optionDetectPocMode = 'deboucled_optionDetectPocMode';
-const storage_optionPrevisualizeTopic = 'deboucled_optionPrevisualizeTopic';
-const storage_optionDisplayBlackTopic = 'deboucled_optionDisplayBlackTopic';
-const storage_optionDisplayTopicCharts = 'deboucled_optionDisplayTopicCharts';
-const storage_optionDisplayTopicMatches = 'deboucled_optionDisplayTopicMatches';
-const storage_optionClickToShowTopicMatches = 'deboucled_optionClickToShowTopicMatches';
-const storage_optionRemoveUselessTags = 'deboucled_optionRemoveUselessTags';
-const storage_optionMaxTopicCount = 'deboucled_optionMaxTopicCount';
+const storage_init = 'deboucled_init', storage_init_default = false;
+const storage_blacklistedTopicIds = 'deboucled_blacklistedTopicIds', storage_blacklistedTopicIds_default = new Map();
+const storage_blacklistedSubjects = 'deboucled_blacklistedSubjects', storage_blacklistedSubjects_default = [];
+const storage_blacklistedAuthors = 'deboucled_blacklistedAuthors', storage_blacklistedAuthors_default = [];
+const storage_optionEnableDarkTheme = 'deboucled_optionEnableDarkTheme', storage_optionEnableDarkTheme_default = false;
+const storage_optionBoucledUseJvarchive = 'deboucled_optionBoucledUseJvarchive', storage_optionBoucledUseJvarchive_default = false;
+const storage_optionHideMessages = 'deboucled_optionHideMessages', storage_optionHideMessages_default = true;
+const storage_optionAllowDisplayThreshold = 'deboucled_optionAllowDisplayThreshold', storage_optionAllowDisplayThreshold_default = false;
+const storage_optionDisplayThreshold = 'deboucled_optionDisplayThreshold', storage_optionDisplayThreshold_default = 100;
+const storage_optionDisplayBlacklistTopicButton = 'deboucled_optionDisplayBlacklistTopicButton', storage_optionDisplayBlacklistTopicButton_default = true;
+const storage_optionShowJvcBlacklistButton = 'deboucled_optionShowJvcBlacklistButton', storage_optionShowJvcBlacklistButton_default = false;
+const storage_optionFilterResearch = 'deboucled_optionFilterResearch', storage_optionFilterResearch_default = true;
+const storage_optionDetectPocMode = 'deboucled_optionDetectPocMode', storage_optionDetectPocMode_default = 0;
+const storage_optionPrevisualizeTopic = 'deboucled_optionPrevisualizeTopic', storage_optionPrevisualizeTopic_default = true;
+const storage_optionDisplayBlackTopic = 'deboucled_optionDisplayBlackTopic', storage_optionDisplayBlackTopic_default = true;
+const storage_optionDisplayTopicCharts = 'deboucled_optionDisplayTopicCharts', storage_optionDisplayTopicCharts_default = true;
+const storage_optionDisplayTopicMatches = 'deboucled_optionDisplayTopicMatches', storage_optionDisplayTopicMatches_default = true;
+const storage_optionClickToShowTopicMatches = 'deboucled_optionClickToShowTopicMatches', storage_optionClickToShowTopicMatches_default = false;
+const storage_optionRemoveUselessTags = 'deboucled_optionRemoveUselessTags', storage_optionRemoveUselessTags_default = false;
+const storage_optionMaxTopicCount = 'deboucled_optionMaxTopicCount', storage_optionMaxTopicCount_default = defaultTopicCount;
+
 const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
 const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
 const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
@@ -104,22 +105,22 @@ const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blackliste
 
 
 async function initStorage() {
-    let isInit = GM_getValue(storage_init, false);
+    let isInit = GM_getValue(storage_init, storage_init_default);
     if (isInit) {
         await loadStorage();
         return false;
     }
     else {
         saveStorage();
-        GM_setValue(storage_init, true);
+        GM_setValue(storage_init, storage_init_default);
         return true;
     }
 }
 
 async function loadStorage() {
-    subjectBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedSubjects)))];
-    authorBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedAuthors)))];
-    topicIdBlacklistMap = new Map([...JSON.parse(GM_getValue(storage_blacklistedTopicIds))]);
+    subjectBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedSubjects, storage_blacklistedSubjects_default)))];
+    authorBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedAuthors, storage_blacklistedAuthors_default)))];
+    topicIdBlacklistMap = new Map([...JSON.parse(GM_getValue(storage_blacklistedTopicIds, storage_blacklistedTopicIds_default))]);
 
     subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
@@ -146,7 +147,7 @@ async function saveStorage() {
 }
 
 async function loadLocalStorage() {
-    let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, 0);
+    let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     if (optionDetectPocMode === 0) return;
 
     const storagePocTopics = await localforage.getItem(localstorage_pocTopics);
@@ -154,7 +155,7 @@ async function loadLocalStorage() {
 }
 
 async function saveLocalStorage() {
-    let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, 0);
+    let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     if (optionDetectPocMode === 0) return;
     await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
 }
@@ -422,7 +423,7 @@ function groupBy(arr, criteria) {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function addRightBlocMatches() {
-    let optionDisplayTopicMatches = GM_getValue(storage_optionDisplayTopicMatches, true);
+    let optionDisplayTopicMatches = GM_getValue(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
     if (!optionDisplayTopicMatches || (!matchedTopics.hasAny() && !matchedSubjects.hasAny() && !matchedAuthors.hasAny())) return;
 
     let html = '';
@@ -446,7 +447,7 @@ function addRightBlocMatches() {
         return matchesHtml;
     }
 
-    let optionClickToShowTopicMatches = GM_getValue(storage_optionClickToShowTopicMatches, false);
+    let optionClickToShowTopicMatches = GM_getValue(storage_optionClickToShowTopicMatches, storage_optionClickToShowTopicMatches_default);
 
     function addMatches(matches, entity, title) {
         let matchesHtml = '';
@@ -495,7 +496,7 @@ function addRightBlocMatches() {
 }
 
 function addRightBlocStats() {
-    let optionDisplayTopicCharts = GM_getValue(storage_optionDisplayTopicCharts, true);
+    let optionDisplayTopicCharts = GM_getValue(storage_optionDisplayTopicCharts, storage_optionDisplayTopicCharts_default);
     if (!optionDisplayTopicCharts || !deboucledTopicStatsMap.hasAny() || !deboucledTopicStatsMap.anyValue((v) => v > 0)) return;
 
     const calcAverage = arr => arr.reduce((p, c) => p + c, 0) / arr.length;
@@ -636,7 +637,7 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
     let pageBrowse = 1;
     let filledTopics = [];
 
-    const maxTopicCount = parseInt(GM_getValue(storage_optionMaxTopicCount, defaultTopicCount));
+    const maxTopicCount = parseInt(GM_getValue(storage_optionMaxTopicCount, storage_optionMaxTopicCount_default));
 
     while (actualTopics < maxTopicCount && pageBrowse <= 10) {
         pageBrowse++;
@@ -701,6 +702,9 @@ function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
 }
 
 function updateTopicsHeader() {
+    //let optionDisplayTopicMatches = GM_getValue(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
+    //if (optionDisplayTopicMatches) return; // on n'affiche pas le nb de topics ignorés sur le header si le détail à droite est affiché.
+
     let subjectHeader = document.querySelector('.topic-head > span:nth-child(1)');
     subjectHeader.innerHTML = `SUJET<span class="deboucled-topic-subject">(${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)})</span>`;
 
@@ -984,6 +988,7 @@ function removeUselessTags(topics) {
     });
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////////////
 // MESSAGES
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -1124,7 +1129,7 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive)
             saveTotalHidden();
         }
         else if (upgradeMessage) {
-            let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, false);
+            let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
             upgradeJvcBlacklistButton(message, author, optionShowJvcBlacklistButton);
             addBoucledAuthorButton(message, author, optionBoucledUseJvarchive);
         }
@@ -1294,26 +1299,26 @@ function buildSettingsPage() {
 
         html += '<table class="deboucled-option-table">';
 
-        html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, true, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.', undefined, undefined, true);
+        html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, storage_optionHideMessages_default, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.', undefined, undefined, true);
 
         let spiralLogo = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
-        html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiralLogo}`, storage_optionBoucledUseJvarchive, false, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
+        html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiralLogo}`, storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
 
-        html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, false, 'Autoriser l\'affichage des topics même si le sujet est blacklist, à partir d\'un certain nombre de messages.');
+        html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default, 'Autoriser l\'affichage des topics même si le sujet est blacklist, à partir d\'un certain nombre de messages.');
 
-        let allowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
-        html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, 100, 10, 1000, 10, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.', allowDisplayThreshold, true);
+        let allowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
+        html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, storage_optionDisplayThreshold_default, 10, 1000, 10, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.', allowDisplayThreshold, true);
 
         let pocLogo = '<span class="deboucled-poc-logo"></span>'
         html += addDropdownOption(`Protection contre les <i>PoC</i> ${pocLogo} <span style="opacity: 0.3;font-style: italic;font-size: xx-small;">(beta)</span>`,
             storage_optionDetectPocMode,
             'Protection contre les topics &quot;post ou cancer&quot; et les dérivés.\n• Désactivé : aucune protection\n• Mode simple (rapide) : recherche dans le contenu uniquement si le titre contient un indice\n• Mode approfondi (plus lent) : recherche systématiquement dans le contenu et le titre',
-            0,
+            storage_optionDetectPocMode_default,
             ['Désactivé', 'Mode simple', 'Mode approfondi ⚠']);
 
-        html += addToggleOption('Effacer les <i>balises abusives</i> du titre des topics', storage_optionRemoveUselessTags, false, 'Effacer du titre des topics les balises inutiles et répétitives comme [ALERTE], ou l\'usage abusif du &quot;AYA&quot; et ses dérivés.\n\nExemple : &quot;[ALERTE] cet exemple incroyable AYAAAA&quot; => &quot;Cet exemple incroyable&quot;');
+        html += addToggleOption('Effacer les <i>balises abusives</i> du titre des topics', storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default, 'Effacer du titre des topics les balises inutiles et répétitives comme [ALERTE], ou l\'usage abusif du &quot;AYA&quot; et ses dérivés.\n\nExemple : &quot;[ALERTE] cet exemple incroyable AYAAAA&quot; => &quot;Cet exemple incroyable&quot;');
 
-        html += addRangeOption('Nombre de topics à afficher sur la page', storage_optionMaxTopicCount, defaultTopicCount, defaultTopicCount, 50, 1, 'Nombre de topics à afficher sur la page (25 par défaut).', true, false);
+        html += addRangeOption('Nombre de topics à afficher sur la page', storage_optionMaxTopicCount, storage_optionMaxTopicCount_default, defaultTopicCount, 50, 1, 'Nombre de topics à afficher sur la page (25 par défaut).', true, false);
 
         html += addImportExportButtons();
 
@@ -1331,29 +1336,29 @@ function buildSettingsPage() {
         html += '<table class="deboucled-option-table">';
 
         let darkLogo = '<span class="deboucled-dark-logo"></span>'
-        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, false, 'Permet de basculer entre le thème normal et le thème sombre pour script Déboucled.', undefined, undefined, true);
+        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default, 'Permet de basculer entre le thème normal et le thème sombre pour script Déboucled.', undefined, undefined, true);
 
         let forbiddenLogo = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
-        html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbiddenLogo}`, storage_optionDisplayBlacklistTopicButton, true, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics voulu.');
+        html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbiddenLogo}`, storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics voulu.');
 
         let blackTopicLogo = '<span class="topic-img deboucled-topic-black-logo" style="display: inline-block; vertical-align: middle;"></span>'
-        html += addToggleOption(`Afficher le pictogramme pour les <i>topics noirs</i> ${blackTopicLogo}`, storage_optionDisplayBlackTopic, true, 'Afficher les topics de plus de 100 messages avec le pictogramme noir (en plus du jaune, rouge, résolu, épinglé etc).');
+        html += addToggleOption(`Afficher le pictogramme pour les <i>topics noirs</i> ${blackTopicLogo}`, storage_optionDisplayBlackTopic, storage_optionDisplayBlackTopic_default, 'Afficher les topics de plus de 100 messages avec le pictogramme noir (en plus du jaune, rouge, résolu, épinglé etc).');
 
         let previewLogo = '<span><svg width="16px" viewBox="0 0 30 30" id="deboucled-preview-logo"><use href="#previewlogo"/></svg></span>';
-        html += addToggleOption(`Afficher les boutons pour avoir un <i>aperçu du topic</i> ${previewLogo}`, storage_optionPrevisualizeTopic, true, 'Afficher ou non l\'icone \'loupe\' à côté du sujet pour prévisualiser le topic.');
+        html += addToggleOption(`Afficher les boutons pour avoir un <i>aperçu du topic</i> ${previewLogo}`, storage_optionPrevisualizeTopic, storage_optionPrevisualizeTopic_default, 'Afficher ou non l\'icone \'loupe\' à côté du sujet pour prévisualiser le topic.');
 
         let blJvcLogo = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
-        html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvcLogo} de JVC`, storage_optionShowJvcBlacklistButton, false, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
+        html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvcLogo} de JVC`, storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
 
         let matchesLogo = '<span class="deboucled-list-logo"></span>'
-        html += addToggleOption(`Afficher les <i>détails du filtrage</i> ${matchesLogo} des topics`, storage_optionDisplayTopicMatches, true, 'Afficher ou non le tableau des détails de filtrage des topics sur la droite de la page.');
+        html += addToggleOption(`Afficher les <i>détails du filtrage</i> ${matchesLogo} des topics`, storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default, 'Afficher ou non le tableau des détails de filtrage des topics sur la droite de la page.');
 
-        let optionDisplayTopicMatches = GM_getValue(storage_optionDisplayTopicMatches, true);
+        let optionDisplayTopicMatches = GM_getValue(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
         let eyeLogo = '<span class="deboucled-eye-logo"></span>'
-        html += addToggleOption(`Cliquer sur l'oeil ${eyeLogo} pour <i>afficher les détails</i>`, storage_optionClickToShowTopicMatches, false, 'Cliquer sur l\'icone en oeil pour afficher le détail du filtrage par catégorie.', optionDisplayTopicMatches, true);
+        html += addToggleOption(`Cliquer sur l'oeil ${eyeLogo} pour <i>afficher les détails</i>`, storage_optionClickToShowTopicMatches, storage_optionClickToShowTopicMatches_default, 'Cliquer sur l\'icone en oeil pour afficher le détail du filtrage par catégorie.', optionDisplayTopicMatches, true);
 
         let statsLogo = '<span class="deboucled-chart-logo"></span>'
-        html += addToggleOption(`Afficher la <i>tendance de filtrage</i> ${statsLogo} des topics`, storage_optionDisplayTopicCharts, true, 'Afficher ou non le graphique des tendances de filtrage de topics sur la droite de la page.');
+        html += addToggleOption(`Afficher la <i>tendance de filtrage</i> ${statsLogo} des topics`, storage_optionDisplayTopicCharts, storage_optionDisplayTopicCharts_default, 'Afficher ou non le graphique des tendances de filtrage de topics sur la droite de la page.');
 
         html += '</table>';
         html += '</div>';
@@ -1764,7 +1769,7 @@ function addSettingButton(firstLaunch) {
 }
 
 function addSearchFilterToggle() {
-    let optionFilterResearch = GM_getValue(storage_optionFilterResearch, true);
+    let optionFilterResearch = GM_getValue(storage_optionFilterResearch, storage_optionFilterResearch_default);
 
     let toggleElem = document.createElement('label');
     toggleElem.className = 'deboucled-switch';
@@ -1911,8 +1916,8 @@ async function handleTopicList(canFillTopics) {
     let topics = getAllTopics(document);
     if (topics.length === 0) return;
 
-    let optionAllowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, false);
-    let optionDisplayThreshold = GM_getValue(storage_optionDisplayThreshold, 100);
+    let optionAllowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
+    let optionDisplayThreshold = GM_getValue(storage_optionDisplayThreshold, storage_optionDisplayThreshold_default);
 
     let topicsToRemove = [];
     let finalTopics = [];
@@ -1938,16 +1943,16 @@ async function handleTopicList(canFillTopics) {
 }
 
 async function handleTopicListOptions(topics) {
-    let optionDisplayBlacklistTopicButton = GM_getValue(storage_optionDisplayBlacklistTopicButton, true);
+    let optionDisplayBlacklistTopicButton = GM_getValue(storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default);
     if (optionDisplayBlacklistTopicButton) addIgnoreButtons(topics);
 
-    let optionPrevisualizeTopic = GM_getValue(storage_optionPrevisualizeTopic, true);
+    let optionPrevisualizeTopic = GM_getValue(storage_optionPrevisualizeTopic, storage_optionPrevisualizeTopic_default);
     if (optionPrevisualizeTopic) addPrevisualizeTopicEvent(topics);
 
-    let optionDisplayBlackTopic = GM_getValue(storage_optionDisplayBlackTopic, true);
+    let optionDisplayBlackTopic = GM_getValue(storage_optionDisplayBlackTopic, storage_optionDisplayBlackTopic_default);
     if (optionDisplayBlackTopic) addBlackTopicLogo(topics);
 
-    let optionRemoveUselessTags = GM_getValue(storage_optionRemoveUselessTags, false);
+    let optionRemoveUselessTags = GM_getValue(storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default);
     if (optionRemoveUselessTags) removeUselessTags(topics);
 
     await handlePoc(topics);
@@ -1955,7 +1960,7 @@ async function handleTopicListOptions(topics) {
 
 async function handlePoc(finalTopics) {
     // 0 = désactivé ; 1 = recherche simple ; 2 = recherche approfondie
-    let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, 0);
+    let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     if (optionDetectPocMode === 0) return;
 
     // On gère les PoC à la fin pour pas figer la page pendant le traitement
@@ -1984,15 +1989,15 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
         }
     }
     else {
-        let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, false);
+        let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
         upgradeJvcBlacklistButton(message, author, optionShowJvcBlacklistButton);
         addBoucledAuthorButton(message, author, optionBoucledUseJvarchive);
     }
 }
 
 function handleTopicMessages() {
-    let optionHideMessages = GM_getValue(storage_optionHideMessages, true);
-    let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, false);
+    let optionHideMessages = GM_getValue(storage_optionHideMessages, storage_optionHideMessages_default);
+    let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
 
     handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive);
 
@@ -2045,7 +2050,7 @@ async function init() {
     let firstLaunch = await initStorage();
     addCss();
     addSvgs();
-    const enableDarkTheme = GM_getValue(storage_optionEnableDarkTheme, false);
+    const enableDarkTheme = GM_getValue(storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default);
     toggleDarkTheme(enableDarkTheme);
     buildSettingsPage();
     addSettingButton(firstLaunch);
