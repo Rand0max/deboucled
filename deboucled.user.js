@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.23.1
+// @version     1.23.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.23.1'
+const deboucledVersion = '1.23.5'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -284,15 +284,15 @@ function importFromTotalBlacklist() {
 
 String.prototype.normalizeDiacritic = function () {
     return this.normalize("NFD").replace(/\p{Diacritic}/gu, "");
-};
+}
 
 String.prototype.escapeRegexPattern = function () {
     return this.replace(/[-[\]{}()+?.,\\^$|#\s]/g, '\\$&');
-};
+}
 
 String.prototype.handleGenericChar = function () {
     return this.replace('*', '.*');
-};
+}
 
 String.prototype.capitalize = function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
@@ -308,27 +308,27 @@ Array.prototype.sortNormalize = function () {
 
 Set.prototype.addArray = function (array) {
     array.forEach(this.add, this);
-};
+}
 
 Set.prototype.hasAny = function () {
     return this.size > 0;
-};
+}
 
 Map.prototype.hasAny = function () {
     return this.size > 0;
-};
+}
 
 Map.prototype.anyValue = function (callback) {
     return [...this.values()].some(callback);
-};
+}
 
 Map.prototype.addIncrement = function (key) {
     this.set(key.toLowerCase(), (this.get(key.toLowerCase()) ?? 0) + 1);
-};
+}
 
 Map.prototype.addArrayIncrement = function (array) {
     array.forEach(this.addIncrement, this);
-};
+}
 
 Map.prototype.sortByValue = function (desc = false) {
     if (desc) return new Map([...this].sort((a, b) => String(b[1]).localeCompare(a[1])));
@@ -360,7 +360,7 @@ Map.prototype.sortByValueThenKey = function (descValue = false) {
 
 function normalizeValue(value) {
     return value.toString().toUpperCase().normalizeDiacritic();
-};
+}
 
 function buildRegex(array, withBoundaries) {
     // \b ne fonctionne pas avec les caractères spéciaux
@@ -885,6 +885,49 @@ function addIgnoreButtons(topics) {
 }
 
 function addPrevisualizeTopicEvent(topics) {
+
+    function prepareMessagePreview(page) {
+        let messagePreview = page.querySelector('.bloc-message-forum');
+        messagePreview.querySelector('.bloc-options-msg').remove(); // remove buttons
+
+        // JvCare
+        const avatar = messagePreview.querySelector('.user-avatar-msg');
+        if (avatar && avatar.hasAttribute('data-srcset') && avatar.hasAttribute('src')) {
+            avatar.setAttribute('src', avatar.getAttribute('data-srcset'));
+            avatar.removeAttribute('data-srcset');
+        }
+        messagePreview.querySelectorAll('.JvCare').forEach(function (m) {
+            let anchor = document.createElement('a');
+            anchor.setAttribute('target', '_blank');
+            anchor.setAttribute('href', decryptJvCare(m.getAttribute('class')));
+            anchor.className = m.className.split(' ').splice(2).join(' ');
+            anchor.innerHTML = m.innerHTML;
+            m.outerHTML = anchor.outerHTML;
+        });
+        return messagePreview;
+    }
+
+    async function previewTopicCallback(topicUrl) {
+        return await fetch(topicUrl).then(function (response) {
+            if (!response.ok) throw Error(response.statusText);
+            return response.text();
+        }).then(function (r) {
+            const html = domParser.parseFromString(r, 'text/html');
+            return prepareMessagePreview(html);
+        }).catch(function (err) {
+            console.error(err);
+            return null;
+        });
+    }
+
+    async function onPreviewHover(topicUrl, previewDiv) {
+        if (previewDiv.querySelector('.bloc-message-forum')) return;
+        const topicContent = await previewTopicCallback(topicUrl);
+        if (!topicContent) return;
+        previewDiv.firstChild.remove();
+        previewDiv.appendChild(topicContent);
+    };
+
     topics.slice(1).forEach(function (topic) {
         let topicTitle = topic.querySelector('.topic-title');
         topicTitle.classList.add('deboucled-topic-title');
@@ -904,47 +947,8 @@ function addPrevisualizeTopicEvent(topics) {
         previewDiv.onclick = function (e) { e.preventDefault(); }
         anchor.appendChild(previewDiv);
 
-        function prepareMessagePreview(page) {
-            let messagePreview = page.querySelector('.bloc-message-forum');
-            messagePreview.querySelector('.bloc-options-msg').remove(); // remove buttons
-
-            // JvCare
-            const avatar = messagePreview.querySelector('.user-avatar-msg');
-            if (avatar && avatar.hasAttribute('data-srcset') && avatar.hasAttribute('src')) {
-                avatar.setAttribute('src', avatar.getAttribute('data-srcset'));
-                avatar.removeAttribute('data-srcset');
-            }
-            messagePreview.querySelectorAll('.JvCare').forEach(function (m) {
-                let anchor = document.createElement('a');
-                anchor.setAttribute('target', '_blank');
-                anchor.setAttribute('href', decryptJvCare(m.getAttribute('class')));
-                anchor.className = m.className.split(' ').splice(2).join(' ');
-                anchor.innerHTML = m.innerHTML;
-                m.outerHTML = anchor.outerHTML;
-            });
-            return messagePreview;
-        }
-
-        async function previewTopicCallback() {
-            return await fetch(topicUrl).then(function (response) {
-                if (!response.ok) throw Error(response.statusText);
-                return response.text();
-            }).then(function (r) {
-                const html = domParser.parseFromString(r, 'text/html');
-                return prepareMessagePreview(html);
-            }).catch(function (err) {
-                console.error(err);
-                return null;
-            });
-        }
-
-        anchor.onmouseenter = async function () {
-            if (previewDiv.querySelector('.bloc-message-forum')) return;
-            const topicContent = await previewTopicCallback();
-            if (!topicContent) return;
-            previewDiv.firstChild.remove();
-            previewDiv.appendChild(topicContent);
-        };
+        anchor.onclick = onPreviewHover(topicUrl, previewDiv);
+        anchor.onmouseenter = onPreviewHover(topicUrl, previewDiv);
     });
 }
 
@@ -1086,9 +1090,9 @@ function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklis
 }
 
 function highlightBlacklistedAuthor(messageElement, authorElement) {
-    let isSelf = messageElement.querySelector('span.picto-msg-croix') !== null;
+    let isSelf = messageElement.querySelector('span.picto-msg-croix');
     if (isSelf) return;
-    authorElement.style.color = 'rgb(230, 0, 0)';
+    authorElement.classList.toggle('deboucled-blacklisted', true);
 }
 
 function addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive) {
@@ -1336,16 +1340,16 @@ function buildSettingsPage() {
         html += '<table class="deboucled-option-table">';
 
         let darkLogo = '<span class="deboucled-dark-logo"></span>'
-        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default, 'Permet de basculer entre le thème normal et le thème sombre pour script Déboucled.', undefined, undefined, true);
+        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default, 'Permet de basculer entre le thème normal et le thème sombre pour le script Déboucled.', undefined, undefined, true);
 
         let forbiddenLogo = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
-        html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbiddenLogo}`, storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics voulu.');
+        html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbiddenLogo}`, storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics souhaités.');
 
         let blackTopicLogo = '<span class="topic-img deboucled-topic-black-logo" style="display: inline-block; vertical-align: middle;"></span>'
         html += addToggleOption(`Afficher le pictogramme pour les <i>topics noirs</i> ${blackTopicLogo}`, storage_optionDisplayBlackTopic, storage_optionDisplayBlackTopic_default, 'Afficher les topics de plus de 100 messages avec le pictogramme noir (en plus du jaune, rouge, résolu, épinglé etc).');
 
         let previewLogo = '<span><svg width="16px" viewBox="0 0 30 30" id="deboucled-preview-logo"><use href="#previewlogo"/></svg></span>';
-        html += addToggleOption(`Afficher les boutons pour avoir un <i>aperçu du topic</i> ${previewLogo}`, storage_optionPrevisualizeTopic, storage_optionPrevisualizeTopic_default, 'Afficher ou non l\'icone \'loupe\' à côté du sujet pour prévisualiser le topic.');
+        html += addToggleOption(`Afficher les boutons pour avoir un <i>aperçu du topic</i> ${previewLogo}`, storage_optionPrevisualizeTopic, storage_optionPrevisualizeTopic_default, 'Afficher ou non l\'icone \'loupe\' à côté du sujet pour prévisualiser le topic au survol.');
 
         let blJvcLogo = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
         html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvcLogo} de JVC`, storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
@@ -1355,7 +1359,7 @@ function buildSettingsPage() {
 
         let optionDisplayTopicMatches = GM_getValue(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
         let eyeLogo = '<span class="deboucled-eye-logo"></span>'
-        html += addToggleOption(`Cliquer sur l'oeil ${eyeLogo} pour <i>afficher les détails</i>`, storage_optionClickToShowTopicMatches, storage_optionClickToShowTopicMatches_default, 'Cliquer sur l\'icone en oeil pour afficher le détail du filtrage par catégorie.', optionDisplayTopicMatches, true);
+        html += addToggleOption(`Cliquer sur l'oeil ${eyeLogo} pour <i>afficher les détails</i>`, storage_optionClickToShowTopicMatches, storage_optionClickToShowTopicMatches_default, 'Affiche par défaut l\'icone en oeil, nécéssite de cliquer pour afficher le détail du filtrage par catégorie.', optionDisplayTopicMatches, true);
 
         let statsLogo = '<span class="deboucled-chart-logo"></span>'
         html += addToggleOption(`Afficher la <i>tendance de filtrage</i> ${statsLogo} des topics`, storage_optionDisplayTopicCharts, storage_optionDisplayTopicCharts_default, 'Afficher ou non le graphique des tendances de filtrage de topics sur la droite de la page.');
@@ -1995,9 +1999,27 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
     }
 }
 
+function handleTopicHeader() {
+    let titleElement = document.querySelector('#bloc-title-forum');
+    if (!titleElement) return;
+    const subjectMatches = isSubjectBlacklisted(titleElement.textContent);
+    if (!subjectMatches) return;
+    function highlightMatch(titleElem, match) {
+        let content = titleElem.innerHTML;
+        const m = match.trim();
+        const index = content.normalizeDiacritic().indexOf(m); // manip pour correctement remplacer les mots avec des accents
+        const realMatch = content.slice(index, index + m.length);
+        content = `${content.slice(0, index)}<span class="deboucled-blacklisted">${realMatch}</span>${content.slice(index + m.length, content.length)}`;
+        titleElem.innerHTML = content;
+    }
+    subjectMatches.forEach(m => highlightMatch(titleElement, m));
+}
+
 function handleTopicMessages() {
     let optionHideMessages = GM_getValue(storage_optionHideMessages, storage_optionHideMessages_default);
     let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
+
+    handleTopicHeader();
 
     handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive);
 
@@ -2090,4 +2112,4 @@ async function callMe() {
 
 callMe();
 
-addEventListener("instantclick:newpage", callMe);
+addEventListener('instantclick:newpage', callMe);

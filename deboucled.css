@@ -118,6 +118,9 @@ body.deboucled-dark-theme {
   }
 }
 
+.deboucled-blacklisted {
+  color: #e60000 !important;
+}
 .deboucled-ignored-messages {
   margin: 5px 0 5px 5px;
   padding-bottom: 0.5rem;
@@ -136,11 +139,11 @@ body.deboucled-dark-theme {
   height: 28px;
 }
 .blinking {
-  animation: blinker 1.5s linear 7s;
+  animation: blinker 1.5s linear 10s;
 }
 @keyframes blinker {
   50% {
-    opacity: 0;
+    opacity: 0.1;
   }
 }
 
@@ -228,6 +231,18 @@ body.deboucled-dark-theme {
   .deboucled-overlay {
     left: -12px;
     width: 108%;
+  }
+  .bloc-pre-right {
+    position: relative !important;
+    top: unset !important;
+    bottom: unset !important;
+    left: unset !important;
+    right: unset !important;
+  }
+}
+@media (max-width: 406px) {
+  .bloc-pre-right {
+    margin-top: 1rem !important;
   }
 }
 
