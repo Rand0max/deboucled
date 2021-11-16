@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.23.5
+// @version     1.24.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.23.5'
+const deboucledVersion = '1.24.0'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -64,7 +64,6 @@ const entityAuthor = 'author';
 const entityTopicId = 'topicid';
 
 const domParser = new DOMParser();
-
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // STORAGE
@@ -947,8 +946,8 @@ function addPrevisualizeTopicEvent(topics) {
         previewDiv.onclick = function (e) { e.preventDefault(); }
         anchor.appendChild(previewDiv);
 
-        anchor.onclick = onPreviewHover(topicUrl, previewDiv);
-        anchor.onmouseenter = onPreviewHover(topicUrl, previewDiv);
+        anchor.onclick = () => onPreviewHover(topicUrl, previewDiv);
+        anchor.onmouseenter = () => onPreviewHover(topicUrl, previewDiv);
     });
 }
 
@@ -1528,9 +1527,9 @@ function addSortEvent() {
 }
 
 function addImportExportEvent() {
-    document.querySelector('#deboucled-export-button').onclick = backupStorage;
-    document.querySelector('#deboucled-import-button').onchange = loadFile;
-    document.querySelector('#deboucled-import-tbl').onclick = importFromTotalBlacklist;
+    document.querySelector('#deboucled-export-button').onclick = () => backupStorage();
+    document.querySelector('#deboucled-import-button').onchange = (fe) => loadFile(fe);
+    document.querySelector('#deboucled-import-tbl').onclick = () => importFromTotalBlacklist();
 }
 
 function addCollapsibleEvents() {
