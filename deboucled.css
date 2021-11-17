@@ -181,7 +181,6 @@ body.deboucled-dark-theme {
   border-width: 1px !important;
   border-radius: 0 !important;
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25) !important;
-  color: var(--jv-text-color);
   cursor: default;
   text-decoration: none;
 }
@@ -195,6 +194,12 @@ body.deboucled-dark-theme {
   text-align: center;
   vertical-align: top;
   display: table-cell;
+}
+.deboucled-preview-content-text-light {
+  color: #ddd;
+}
+.deboucled-preview-content-text-dark {
+  color: #222;
 }
 
 @media (max-width: 807.98px) {

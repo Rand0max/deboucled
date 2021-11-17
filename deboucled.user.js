@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.24.1
+// @version     1.24.2
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.24.1'
+const deboucledVersion = '1.24.2'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -904,6 +904,20 @@ function addPrevisualizeTopicEvent(topics) {
             anchor.innerHTML = m.innerHTML;
             m.outerHTML = anchor.outerHTML;
         });
+
+        const text = messagePreview.querySelector('.txt-msg.text-enrichi-forum');
+        if (!text) return messagePreview;
+
+        // Adjust text contrast for Dark Reader
+        const preferDark = document.documentElement.getAttribute('data-darkreader-scheme'); 
+        //window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (preferDark === 'dark') {
+            text.classList.toggle('deboucled-preview-content-text-light', true);
+        }
+        else {
+            text.classList.toggle('deboucled-preview-content-text-dark', true);
+        }
+
         return messagePreview;
     }
 
