@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.24.0
+// @version     1.24.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.24.0'
+const deboucledVersion = '1.24.1'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -64,6 +64,7 @@ const entityAuthor = 'author';
 const entityTopicId = 'topicid';
 
 const domParser = new DOMParser();
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // STORAGE
@@ -110,7 +111,7 @@ async function initStorage() {
         return false;
     }
     else {
-        saveStorage();
+        await saveStorage();
         GM_setValue(storage_init, storage_init_default);
         return true;
     }
@@ -159,25 +160,25 @@ async function saveLocalStorage() {
     await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
 }
 
-function removeTopicIdBlacklist(topicId) {
+async function removeTopicIdBlacklist(topicId) {
     if (topicIdBlacklistMap.has(topicId)) {
         topicIdBlacklistMap.delete(topicId);
-        saveStorage();
+        await saveStorage();
     }
 }
 
-function addEntityBlacklist(array, key) {
+async function addEntityBlacklist(array, key) {
     if (array.indexOf(key) === -1) {
         array.push(key);
-        saveStorage();
+        await saveStorage();
     }
 }
 
-function removeEntityBlacklist(array, key) {
+async function removeEntityBlacklist(array, key) {
     let index = array.indexOf(key);
     if (index > -1) {
         array.splice(index, 1);
-        saveStorage();
+        await saveStorage();
     }
 }
 
@@ -262,7 +263,7 @@ function loadFile(fileEvent) {
     reader.readAsText(file);
 }
 
-function importFromTotalBlacklist() {
+async function importFromTotalBlacklist() {
     var blacklistFromTbl = localStorage.getItem('blacklisted');
     if (!blacklistFromTbl) {
         alert('Aucune blacklist détectée dans TotalBlacklist.');
@@ -270,7 +271,7 @@ function importFromTotalBlacklist() {
     }
     const blacklistFromTblArray = JSON.parse(blacklistFromTbl).filter(function (val) { return val !== 'forums' });
     authorBlacklistArray = [...new Set(authorBlacklistArray.concat(blacklistFromTblArray))];
-    saveStorage()
+    await saveStorage()
     refreshAuthorKeys();
     showRestoreCompleted();
     alert(`${blacklistFromTblArray.length} pseudos TotalBlacklist ont été importés dans Déboucled avec succès.`);
@@ -686,10 +687,10 @@ function toggleTopicOverlay(active) {
     document.querySelector('.topic-list.topic-list-admin').removeAttribute('style');
 }
 
-function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
+async function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
     if (!topicIdBlacklistMap.has(topicId)) {
         topicIdBlacklistMap.set(topicId, topicSubject);
-        saveStorage();
+        await saveStorage();
 
         if (!refreshTopicList) return;
         let topic = document.querySelector('[data-id="' + topicId + '"]');
@@ -876,7 +877,7 @@ function addIgnoreButtons(topics) {
         anchor.setAttribute('role', 'button');
         anchor.setAttribute('title', 'Blacklist le topic');
         anchor.setAttribute('class', 'deboucled-svg-forbidden-red');
-        anchor.onclick = function () { addTopicIdBlacklist(topicId, topicSubject, true); refreshTopicIdKeys(); };
+        anchor.onclick = async function () { await addTopicIdBlacklist(topicId, topicSubject, true); refreshTopicIdKeys(); };
         anchor.innerHTML = '<svg viewBox="0 0 160 160" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg>';
         span.appendChild(anchor)
         topic.appendChild(span);
@@ -1074,8 +1075,8 @@ function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklis
     let dbcBlacklistButton = document.createElement('span');
     dbcBlacklistButton.setAttribute('title', 'Blacklister avec Déboucled');
     dbcBlacklistButton.setAttribute('class', 'picto-msg-tronche deboucled-blacklist-author-button');
-    dbcBlacklistButton.onclick = function () {
-        addEntityBlacklist(authorBlacklistArray, author);
+    dbcBlacklistButton.onclick = async function () {
+        await addEntityBlacklist(authorBlacklistArray, author);
         refreshAuthorKeys()
         location.reload();
     };
@@ -1529,7 +1530,7 @@ function addSortEvent() {
 function addImportExportEvent() {
     document.querySelector('#deboucled-export-button').onclick = () => backupStorage();
     document.querySelector('#deboucled-import-button').onchange = (fe) => loadFile(fe);
-    document.querySelector('#deboucled-import-tbl').onclick = () => importFromTotalBlacklist();
+    document.querySelector('#deboucled-import-tbl').onclick = async () => await importFromTotalBlacklist();
 }
 
 function addCollapsibleEvents() {
@@ -1566,9 +1567,9 @@ function buildSettingEntities() {
     const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]\*]*$/iu;
     const regexAllowedTopicId = /^[0-9]+$/i;
 
-    createAddEntityEvent(entitySubject, regexAllowedSubject, function (key) { addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
-    createAddEntityEvent(entityAuthor, regexAllowedAuthor, function (key) { addEntityBlacklist(authorBlacklistArray, key); refreshAuthorKeys(); });
-    createAddEntityEvent(entityTopicId, regexAllowedTopicId, function (key) { addTopicIdBlacklist(key, key, false); refreshTopicIdKeys(); });
+    createAddEntityEvent(entitySubject, regexAllowedSubject, async function (key) { await addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
+    createAddEntityEvent(entityAuthor, regexAllowedAuthor, async function (key) { await addEntityBlacklist(authorBlacklistArray, key); refreshAuthorKeys(); });
+    createAddEntityEvent(entityTopicId, regexAllowedTopicId, async function (key) { await addTopicIdBlacklist(key, key, false); refreshTopicIdKeys(); });
 
     createSearchEntitiesEvent(entitySubject, regexAllowedSubject, refreshSubjectKeys);
     createSearchEntitiesEvent(entityAuthor, regexAllowedAuthor, refreshAuthorKeys);
@@ -1592,7 +1593,7 @@ function writeEntityKeys(entity, entries, filterCallback, removeCallback, entity
     document.querySelector(`#deboucled-${entity}List`).innerHTML = html;
 
     document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(function (input) {
-        input.onclick = function () { removeCallback(this.parentNode) };
+        input.onclick = async function () { await removeCallback(this.parentNode) };
     });
 }
 
@@ -1611,8 +1612,8 @@ function refreshSubjectKeys(filter = null) {
         entitySubject,
         [...subjectBlacklistArray],
         filter ? (array) => array.filter((value) => normalizeValue(value).includes(filter)) : null,
-        function (node) {
-            removeEntityBlacklist(subjectBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
+        async function (node) {
+            await removeEntityBlacklist(subjectBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
             refreshSubjectKeys();
             refreshCollapsibleContentHeight(entitySubject);
             clearSearchInputs();
@@ -1637,8 +1638,8 @@ function refreshAuthorKeys(filter = null) {
         entityAuthor,
         [...authorBlacklistArray],
         filter ? (array) => array.filter((value) => normalizeValue(value).includes(filter)) : null,
-        function (node) {
-            removeEntityBlacklist(authorBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
+        async function (node) {
+            await removeEntityBlacklist(authorBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
             refreshAuthorKeys();
             refreshCollapsibleContentHeight(entityAuthor);
             clearSearchInputs();
@@ -1663,8 +1664,8 @@ function refreshTopicIdKeys(filter = null) {
         entityTopicId,
         new Map(topicIdBlacklistMap),
         filter ? (map) => new Map([...map].filter((value, key) => normalizeValue(value).includes(filter) || normalizeValue(key).includes(filter))) : null,
-        function (node) {
-            removeTopicIdBlacklist(node.getAttribute('id').replace(/<[^>]*>/g, ''));
+        async function (node) {
+            await removeTopicIdBlacklist(node.getAttribute('id').replace(/<[^>]*>/g, ''));
             refreshTopicIdKeys();
             refreshCollapsibleContentHeight(entityTopicId);
             clearSearchInputs();
