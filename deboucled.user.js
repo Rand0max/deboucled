@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.24.2
+// @version     1.24.3
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.24.2'
+const deboucledVersion = '1.24.3'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -73,9 +73,9 @@ const domParser = new DOMParser();
 const localstorage_pocTopics = 'deboucled_pocTopics';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
-const storage_blacklistedTopicIds = 'deboucled_blacklistedTopicIds', storage_blacklistedTopicIds_default = new Map();
-const storage_blacklistedSubjects = 'deboucled_blacklistedSubjects', storage_blacklistedSubjects_default = [];
-const storage_blacklistedAuthors = 'deboucled_blacklistedAuthors', storage_blacklistedAuthors_default = [];
+const storage_blacklistedTopicIds = 'deboucled_blacklistedTopicIds', storage_blacklistedTopicIds_default = '[]';
+const storage_blacklistedSubjects = 'deboucled_blacklistedSubjects', storage_blacklistedSubjects_default = '[]';
+const storage_blacklistedAuthors = 'deboucled_blacklistedAuthors', storage_blacklistedAuthors_default = '[]';
 const storage_optionEnableDarkTheme = 'deboucled_optionEnableDarkTheme', storage_optionEnableDarkTheme_default = false;
 const storage_optionBoucledUseJvarchive = 'deboucled_optionBoucledUseJvarchive', storage_optionBoucledUseJvarchive_default = false;
 const storage_optionHideMessages = 'deboucled_optionHideMessages', storage_optionHideMessages_default = true;
@@ -112,7 +112,7 @@ async function initStorage() {
     }
     else {
         await saveStorage();
-        GM_setValue(storage_init, storage_init_default);
+        GM_setValue(storage_init, true);
         return true;
     }
 }
@@ -877,7 +877,7 @@ function addIgnoreButtons(topics) {
         anchor.setAttribute('role', 'button');
         anchor.setAttribute('title', 'Blacklist le topic');
         anchor.setAttribute('class', 'deboucled-svg-forbidden-red');
-        anchor.onclick = async function () { await addTopicIdBlacklist(topicId, topicSubject, true); refreshTopicIdKeys(); };
+        anchor.onclick = function () { addTopicIdBlacklist(topicId, topicSubject, true); refreshTopicIdKeys(); };
         anchor.innerHTML = '<svg viewBox="0 0 160 160" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg>';
         span.appendChild(anchor)
         topic.appendChild(span);
@@ -909,7 +909,7 @@ function addPrevisualizeTopicEvent(topics) {
         if (!text) return messagePreview;
 
         // Adjust text contrast for Dark Reader
-        const preferDark = document.documentElement.getAttribute('data-darkreader-scheme'); 
+        const preferDark = document.documentElement.getAttribute('data-darkreader-scheme');
         //window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (preferDark === 'dark') {
             text.classList.toggle('deboucled-preview-content-text-light', true);
@@ -1089,8 +1089,8 @@ function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklis
     let dbcBlacklistButton = document.createElement('span');
     dbcBlacklistButton.setAttribute('title', 'Blacklister avec Déboucled');
     dbcBlacklistButton.setAttribute('class', 'picto-msg-tronche deboucled-blacklist-author-button');
-    dbcBlacklistButton.onclick = async function () {
-        await addEntityBlacklist(authorBlacklistArray, author);
+    dbcBlacklistButton.onclick = function () {
+        addEntityBlacklist(authorBlacklistArray, author);
         refreshAuthorKeys()
         location.reload();
     };
@@ -1544,7 +1544,7 @@ function addSortEvent() {
 function addImportExportEvent() {
     document.querySelector('#deboucled-export-button').onclick = () => backupStorage();
     document.querySelector('#deboucled-import-button').onchange = (fe) => loadFile(fe);
-    document.querySelector('#deboucled-import-tbl').onclick = async () => await importFromTotalBlacklist();
+    document.querySelector('#deboucled-import-tbl').onclick = () => importFromTotalBlacklist();
 }
 
 function addCollapsibleEvents() {
@@ -1581,9 +1581,9 @@ function buildSettingEntities() {
     const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]\*]*$/iu;
     const regexAllowedTopicId = /^[0-9]+$/i;
 
-    createAddEntityEvent(entitySubject, regexAllowedSubject, async function (key) { await addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
-    createAddEntityEvent(entityAuthor, regexAllowedAuthor, async function (key) { await addEntityBlacklist(authorBlacklistArray, key); refreshAuthorKeys(); });
-    createAddEntityEvent(entityTopicId, regexAllowedTopicId, async function (key) { await addTopicIdBlacklist(key, key, false); refreshTopicIdKeys(); });
+    createAddEntityEvent(entitySubject, regexAllowedSubject, function (key) { addEntityBlacklist(subjectBlacklistArray, key); refreshSubjectKeys(); });
+    createAddEntityEvent(entityAuthor, regexAllowedAuthor, function (key) { addEntityBlacklist(authorBlacklistArray, key); refreshAuthorKeys(); });
+    createAddEntityEvent(entityTopicId, regexAllowedTopicId, function (key) { addTopicIdBlacklist(key, key, false); refreshTopicIdKeys(); });
 
     createSearchEntitiesEvent(entitySubject, regexAllowedSubject, refreshSubjectKeys);
     createSearchEntitiesEvent(entityAuthor, regexAllowedAuthor, refreshAuthorKeys);
@@ -1607,7 +1607,7 @@ function writeEntityKeys(entity, entries, filterCallback, removeCallback, entity
     document.querySelector(`#deboucled-${entity}List`).innerHTML = html;
 
     document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(function (input) {
-        input.onclick = async function () { await removeCallback(this.parentNode) };
+        input.onclick = function () { removeCallback(this.parentNode) };
     });
 }
 
@@ -1838,14 +1838,14 @@ function addHighlightModeratedButton() {
     anchor.className = 'titre-bloc deboucled-entity-moderated-button';
     anchor.setAttribute('role', 'button');
     anchor.innerHTML = buttonText;
-    anchor.onclick = async function () {
+    anchor.onclick = function () {
         if (this.textContent === buttonStopText) {
             stopHighlightModeratedTopics = true;
             this.innerHTML = buttonText;
         }
         else {
             this.innerHTML = `<b>${buttonStopText}</b>`;
-            await highlightModeratedTopics();
+            highlightModeratedTopics();
             stopHighlightModeratedTopics = false;
             this.innerHTML = buttonText;
         }
