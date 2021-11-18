@@ -238,7 +238,18 @@ body.deboucled-dark-theme {
     width: 108%;
   }
 }
-@media (max-width: 807.98px) {
+@media (min-width: 1000px) and (max-width: 1480px), (max-width: 807.98px) {
+  .bloc-pre-pagi-forum {
+    position: relative;
+  }
+  .bloc-pre-pagi-forum .bloc-pre-right {
+    position: absolute;
+    right: 0;
+    bottom: 1rem;
+  }
+  .bloc-pre-pagi-forum.bloc-outils-bottom .bloc-pre-right {
+    top: 1rem;
+  }
   .bloc-pre-pagi-forum .group-one {
     margin-bottom: 0.3125rem;
   }
@@ -247,7 +258,23 @@ body.deboucled-dark-theme {
     float: none;
     text-align: left;
   }
+  .bloc-rech-forum {
+    display: block;
+    text-align: center;
+    clear: both;
+    margin-top: 2.5rem;
+    background: #d5d5d5;
+    padding: 0.5rem;
+  }
+  .bloc-rech-forum .txt-search {
+    width: 9.25rem;
+  }
+  .bloc-rech-forum ~ .bloc-pre-right {
+    top: 0;
+    bottom: inherit;
+  }
 }
+
 .deboucled-setting-impexp-message {
   font: bold 11px/100% arial, sans-serif;
   color: rgba(180, 0, 0, 0.9);

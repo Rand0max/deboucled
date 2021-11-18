@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.24.4
+// @version     1.24.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.24.4'
+const deboucledVersion = '1.24.5'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -1760,7 +1760,7 @@ function refreshCollapsibleContentHeight(entity) {
     if (content) content.style.maxHeight = content.scrollHeight + 'px';
 }
 
-function addSettingButton(firstLaunch) {
+function addSettingButton(firstLaunch, isTopicMessages) {
     function createDeboucledButton() {
         let button = document.createElement('button');
         button.setAttribute('id', 'deboucled-option-button');
@@ -1770,14 +1770,19 @@ function addSettingButton(firstLaunch) {
     }
     const blocsPreRight = document.querySelectorAll('.bloc-pre-right');
     blocsPreRight.forEach(e => {
-        const refreshButton = e.querySelector('.btn-actualiser-forum');
-        const groupOne = document.createElement('div');
-        const groupTwo = document.createElement('div');
-        groupOne.className = 'group-one';
-        groupTwo.className = 'group-two';
-        e.append(groupOne, groupTwo);
-        groupOne.append(createDeboucledButton());
-        groupTwo.append(refreshButton);
+        if (isTopicMessages) {
+            const refreshButton = e.querySelector('.btn-actualiser-forum');
+            const groupOne = document.createElement('div');
+            const groupTwo = document.createElement('div');
+            groupOne.className = 'group-one';
+            groupTwo.className = 'group-two';
+            e.append(groupOne, groupTwo);
+            groupOne.append(createDeboucledButton());
+            groupTwo.append(refreshButton);
+        }
+        else {
+            e.prepend(createDeboucledButton());
+        }
     });
 
     let optionOnclick = function (e) {
@@ -2093,14 +2098,14 @@ function handleError() {
     insertAfter(jvArchiveButton, homepageButton);
 }
 
-async function init() {
+async function init(isTopicMessages = false) {
     let firstLaunch = await initStorage();
     addCss();
     addSvgs();
     const enableDarkTheme = GM_getValue(storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default);
     toggleDarkTheme(enableDarkTheme);
     buildSettingsPage();
-    addSettingButton(firstLaunch);
+    addSettingButton(firstLaunch, isTopicMessages);
 }
 
 async function callMe() {
@@ -2117,7 +2122,7 @@ async function callMe() {
             break;
         }
         case 'topicmessages': {
-            await init();
+            await init(true);
             handleTopicMessages();
             break;
         }
