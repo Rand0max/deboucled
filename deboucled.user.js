@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.24.5
+// @version     1.24.6
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.24.5'
+const deboucledVersion = '1.24.6'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -1383,7 +1383,7 @@ function buildSettingsPage() {
         html += '</div>';
         return html;
     }
-    function addEntitySettingSection(entity, header, hint, sectionIsActive) {
+    function addEntitySettingSection(entity, header, hint, messageHint, sectionIsActive) {
         let html = "";
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">${header}</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-${entity}-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
@@ -1393,6 +1393,7 @@ function buildSettingsPage() {
         html += '<td>';
         html += `<input type="text" id="deboucled-${entity}-input-key" class="deboucled-input-key" placeholder="${hint}" >`;
         html += `<span id="deboucled-${entity}-input-button" class="btn deboucled-button deboucled-add-button">Ajouter</span>`;
+        if (messageHint) html += `<span class="deboucled-entity-message-hint">${messageHint}</span>`;
         html += `<input type="search" id="deboucled-${entity}-search-key" class="deboucled-input-search" style="float: right;" placeholder="Rechercher..." >`;
         html += '</td>';
         html += '</tr>';
@@ -1435,9 +1436,9 @@ function buildSettingsPage() {
     let settingsHtml = "";
     settingsHtml += addOptionsSection(false);
     settingsHtml += addCustomisationSection(false);
-    settingsHtml += addEntitySettingSection(entitySubject, 'BLACKLIST SUJETS', 'Mot-clé', true);
-    settingsHtml += addEntitySettingSection(entityAuthor, 'BLACKLIST AUTEURS', 'Pseudo', false);
-    settingsHtml += addEntitySettingSection(entityTopicId, 'BLACKLIST TOPICS', 'TopicId', false);
+    settingsHtml += addEntitySettingSection(entitySubject, 'BLACKLIST SUJETS', 'Mot-clé', 'Utilisez le caractère étoile * pour remplacer n\'importe quelle expression.', true);
+    settingsHtml += addEntitySettingSection(entityAuthor, 'BLACKLIST AUTEURS', 'Pseudo', undefined, false);
+    settingsHtml += addEntitySettingSection(entityTopicId, 'BLACKLIST TOPICS', 'TopicId', undefined, false);
     settingsHtml += addStatsSection(false);
 
     let settingsView = document.createElement('div');
