@@ -237,20 +237,17 @@ body.deboucled-dark-theme {
     left: -12px;
     width: 108%;
   }
-  .bloc-pre-right {
-    position: relative !important;
-    top: unset !important;
-    bottom: unset !important;
-    left: unset !important;
-    right: unset !important;
+}
+@media (max-width: 807.98px) {
+  .bloc-pre-pagi-forum .group-one {
+    margin-bottom: 0.3125rem;
+  }
+  .bloc-pre-pagi-forum .group-one,
+  .bloc-pre-pagi-forum .group-two {
+    float: none;
+    text-align: left;
   }
 }
-@media (max-width: 406px) {
-  .bloc-pre-right {
-    margin-top: 1rem !important;
-  }
-}
-
 .deboucled-setting-impexp-message {
   font: bold 11px/100% arial, sans-serif;
   color: rgba(180, 0, 0, 0.9);
@@ -269,7 +266,6 @@ body.deboucled-dark-theme {
 .deboucled-button {
   background-color: #0050a6e1;
   height: 28px;
-
   color: #eee;
   text-transform: uppercase;
   text-shadow: none;
@@ -289,7 +285,7 @@ body.deboucled-dark-theme {
 }
 .deboucled-option-button {
   margin-right: 5px;
-  min-width: 80px;
+  min-width: 5.25rem;
 }
 .deboucled-setting-button {
   margin: 15px 10px 0px 0;

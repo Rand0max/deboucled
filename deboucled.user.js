@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.24.3
+// @version     1.24.4
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.24.3'
+const deboucledVersion = '1.24.4'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -1577,7 +1577,7 @@ function addCollapsibleEvents() {
 
 function buildSettingEntities() {
     //const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u00A1-\u02AF]*$/i;
-    const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u00A1-\u02AF\u{1F300}-\u{1FAD6}]*$/iu;
+    const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u2018-\u201F\u00A1-\u02AF\u{1F300}-\u{1FAD6}]*$/iu;
     const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]\*]*$/iu;
     const regexAllowedTopicId = /^[0-9]+$/i;
 
@@ -1768,7 +1768,18 @@ function addSettingButton(firstLaunch) {
         button.innerHTML = 'Déboucled';
         return button;
     }
-    document.querySelectorAll('.bloc-pre-right').forEach(e => e.prepend(createDeboucledButton()))
+    const blocsPreRight = document.querySelectorAll('.bloc-pre-right');
+    blocsPreRight.forEach(e => {
+        const refreshButton = e.querySelector('.btn-actualiser-forum');
+        const groupOne = document.createElement('div');
+        const groupTwo = document.createElement('div');
+        groupOne.className = 'group-one';
+        groupTwo.className = 'group-two';
+        e.append(groupOne, groupTwo);
+        groupOne.append(createDeboucledButton());
+        groupTwo.append(refreshButton);
+    });
+
     let optionOnclick = function (e) {
         e.preventDefault();
         clearEntityInputs();
