@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.24.9
+// @version     2.0.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -30,6 +30,13 @@
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
+const deboucledVersion = '2.0.0'
+const defaultTopicCount = 25;
+
+const entitySubject = 'subject';
+const entityAuthor = 'author';
+const entityTopicId = 'topicid';
+
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
 let topicIdBlacklistMap = new Map();
@@ -46,6 +53,8 @@ let hiddenAuthors = 0;
 let hiddenAuthorArray = new Set();
 let deboucledTopicStatsMap = new Map();
 
+let preBoucleArray = [];
+
 let matchedSubjects = new Map();
 let matchedAuthors = new Map();
 let matchedTopics = new Map();
@@ -55,13 +64,6 @@ let moderatedTopics = new Map();
 let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
-
-const deboucledVersion = '1.24.9'
-const defaultTopicCount = 25;
-
-const entitySubject = 'subject';
-const entityAuthor = 'author';
-const entityTopicId = 'topicid';
 
 const domParser = new DOMParser();
 
@@ -121,6 +123,8 @@ async function loadStorage() {
     subjectBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedSubjects, storage_blacklistedSubjects_default)))];
     authorBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedAuthors, storage_blacklistedAuthors_default)))];
     topicIdBlacklistMap = new Map([...JSON.parse(GM_getValue(storage_blacklistedTopicIds, storage_blacklistedTopicIds_default))]);
+
+    //initPreBoucles();
 
     subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
@@ -276,6 +280,94 @@ async function importFromTotalBlacklist() {
     showRestoreCompleted();
     alert(`${blacklistFromTblArray.length} pseudos TotalBlacklist ont été importés dans Déboucled avec succès.`);
 }
+
+///////////////////////////////////////////////////////////////////////////////////////
+// ANTI-BOUCLES
+///////////////////////////////////////////////////////////////////////////////////////
+
+function initPreBoucles() {
+    const popularBoucles =
+    {
+        id: 'popularboucles',
+        title: 'Boucles connues',
+        enable: false,
+        type: entitySubject,
+        entities: ['ces photos putain', 'yannick*tour eiffel', 'midsommar', 'eau*pastèque', 'l\'échéance est tombée', 'ai-je l\'air sympathique', 'pour avoir une copine en']
+    };
+    const covid19 =
+    {
+        id: 'covid19',
+        title: 'Covid19',
+        enable: false,
+        type: entitySubject,
+        entities: ['covid*', 'corona*', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*', '*pass', 'vizio', 'schwab', 'veran']
+    };
+    const politic =
+    {
+        id: 'politic',
+        title: 'Politique',
+        enable: false,
+        type: entitySubject,
+        entities: ['*zemmour*', 'le z', 'knafo', 'z0zz', 'philippot', 'le pen', 'macron', 'cnews', 'asselineau', 'fillon', 'veran']
+    };
+    const deviant =
+    {
+        id: 'deviant',
+        title: 'Déviances',
+        enable: false,
+        type: entitySubject,
+        entities: ['feet*', 'trap*', 'kj', 'adf', 'papa du forum', 'blacked', 'cuck', 'reine fatima', 'shemale*', 'domina', 'fetichiste', 'fetichisme']
+    };
+    const socials =
+    {
+        id: 'socials',
+        title: 'Réseaux sociaux',
+        enable: false,
+        type: entitySubject,
+        entities: ['tinder', 'twitter', 'facebook', 'tik*tok', 'adopte un mec', 'meetic', 'badoo', 'okcupid', 'bumble', 'happn', 'insta', 'instagram', 'snapchat']
+    };
+    const boucledAuthors =
+    {
+        id: 'boucledauthors',
+        title: 'Pseudos boucled',
+        enable: false,
+        type: entityAuthor,
+        entities: ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki']
+    };
+
+    preBoucleArray.push(popularBoucles);
+    preBoucleArray.push(covid19);
+    preBoucleArray.push(politic);
+    preBoucleArray.push(deviant);
+    preBoucleArray.push(socials);
+    preBoucleArray.push(boucledAuthors);
+
+    console.log(preBoucleArray);
+
+    mergeBlacklistsWithPreBoucles();
+}
+
+function mergeBlacklistsWithPreBoucles() {
+    let preBoucleSubjects = [];
+    let preBoucleAuthors = [];
+    preBoucleArray.filter(pb => !pb.enable && pb.type === entitySubject)
+        .forEach(pb => { preBoucleSubjects = preBoucleSubjects.concat(pb.entities); });
+    preBoucleArray.filter(pb => !pb.enable && pb.type === entityAuthor)
+        .forEach(pb => { preBoucleAuthors = preBoucleAuthors.concat(pb.entities); });
+
+    console.log(preBoucleSubjects);
+    console.log(preBoucleAuthors);
+
+    console.log(subjectBlacklistArray);
+    console.log(authorBlacklistArray);
+
+    subjectBlacklistArray = [...new Set([...subjectBlacklistArray, ...preBoucleSubjects])];
+    authorBlacklistArray = [...new Set([...authorBlacklistArray, ...preBoucleAuthors])];
+
+    console.log(subjectBlacklistArray);
+    console.log(authorBlacklistArray);
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
