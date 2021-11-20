@@ -300,6 +300,7 @@ async function importFromTotalBlacklist() {
     alert(`${blacklistFromTblArray.length} pseudos TotalBlacklist ont été importés dans Déboucled avec succès.`);
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////////////
 // ANTI-BOUCLES
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -327,7 +328,7 @@ function initPreBoucles() {
         title: 'Politique',
         enabled: false,
         type: entitySubject,
-        entities: ['*zemmour*', 'le z', 'knafo', 'z0zz', 'philippot', 'le pen', 'macron', 'cnews', 'asselineau', 'fillon', 'veran']
+        entities: ['*zemmour*', 'le z', 'knafo', 'z0zz', 'philippot', 'le pen', 'macron', 'cnews', 'asselineau', 'fillon', 'veran', 'lrem']
     };
     const deviant =
     {
@@ -343,8 +344,17 @@ function initPreBoucles() {
         title: 'Réseaux sociaux',
         enabled: false,
         type: entitySubject,
-        entities: ['tinder', 'twitter', 'facebook', 'tik*tok', 'adopte un mec', 'meetic', 'badoo', 'okcupid', 'bumble', 'happn', 'insta', 'instagram', 'snapchat']
+        entities: ['tinder', 'youtube', 'twitter', 'facebook', 'tik*tok', 'adopte un mec', 'meetic', 'badoo', 'okcupid', 'bumble', 'happn', 'insta', 'instagram', 'snapchat', 'feldup', 'norman', 'cyprien', 'natoo', 'kemar', 'jdg', 'joueur du grenier', 'amixem', 'squeezie']
     };
+    const kiddy =
+    {
+        id: 'kiddy',
+        title: 'Immature',
+        enabled: false,
+        type: entitySubject,
+        entities: ['reacprout', 'prout', 'caca', 'pipi']
+    };
+
     const boucledAuthors =
     {
         id: 'boucledauthors',
@@ -359,6 +369,7 @@ function initPreBoucles() {
     preBoucleArray.push(politic);
     preBoucleArray.push(deviant);
     preBoucleArray.push(socials);
+    preBoucleArray.push(kiddy);
     preBoucleArray.push(boucledAuthors);
 
     console.log(preBoucleArray);
@@ -386,7 +397,6 @@ function mergeBlacklistsWithPreBoucles() {
     console.log(subjectBlacklistArray);
     console.log(authorBlacklistArray);
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -1327,13 +1337,14 @@ function buildSettingsPage() {
     document.body.prepend(bgView);
     document.querySelector('#deboucled-settings-bg-view').style.display = 'none';
 
-    function buildTooltip(hint, firstElem = false) {
-        return `deboucled-data-tooltip="${hint}"${firstElem ? ' data-tooltip-location="bottom"' : ''}`;
+    function buildTooltip(hint, location = 'top') {
+        const tooltipLocation = location === 'top' ? '' : ` data-tooltip-location="${location}"`;
+        return `deboucled-data-tooltip="${hint}"${tooltipLocation}`;
     }
-    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false, firstElem = false) {
+    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false, hintLocation = 'top') {
         let html = '';
         html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
-        html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}" ${buildTooltip(hint, firstElem)}>${title}</td>`;
+        html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}" ${buildTooltip(hint, hintLocation)}>${title}</td>`;
         html += '<td class="deboucled-td-right">';
         html += '<label class="deboucled-switch">';
         let checked = GM_getValue(optionId, defaultValue) ? 'checked' : '';
@@ -1416,7 +1427,7 @@ function buildSettingsPage() {
 
         html += '<table class="deboucled-option-table">';
 
-        html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, storage_optionHideMessages_default, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.', undefined, undefined, true);
+        html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, storage_optionHideMessages_default, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.', undefined, undefined, 'bottom');
 
         let spiralLogo = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
         html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiralLogo}`, storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
@@ -1453,7 +1464,7 @@ function buildSettingsPage() {
         html += '<table class="deboucled-option-table">';
 
         let darkLogo = '<span class="deboucled-dark-logo"></span>'
-        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default, 'Permet de basculer entre le thème normal et le thème sombre pour le script Déboucled.', undefined, undefined, true);
+        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default, 'Permet de basculer entre le thème normal et le thème sombre pour le script Déboucled.', undefined, undefined, 'bottom');
 
         let forbiddenLogo = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbiddenLogo}`, storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics souhaités.');
@@ -1492,7 +1503,8 @@ function buildSettingsPage() {
 
         preBoucleArray.filter(b => b.type === entitySubject)
             .forEach(b => {
-                html += addToggleOption(b.title, b.id, b.enabled, b.title);
+                const hint = b.entities.join(', ');
+                html += addToggleOption(b.title, b.id, b.enabled, hint, undefined, undefined, 'right');
             })
 
         html += '</table>';
