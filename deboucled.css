@@ -238,56 +238,6 @@ body.deboucled-dark-theme {
     width: 108%;
   }
 }
-@media (min-width: 1000px) and (max-width: 1480px), (max-width: 807.98px) {
-  .bloc-pre-pagi-forum {
-    position: relative;
-  }
-  .bloc-pre-pagi-forum .bloc-pre-right {
-    position: absolute;
-    right: 0;
-    bottom: 1rem;
-  }
-  .bloc-pre-pagi-forum.bloc-outils-bottom .bloc-pre-right {
-    top: 1rem;
-  }
-  .bloc-pre-pagi-forum .group-one {
-    margin-bottom: 0.3125rem;
-  }
-  .bloc-pre-pagi-forum .group-one,
-  .bloc-pre-pagi-forum .group-two {
-    float: none;
-    text-align: left;
-  }
-  .bloc-rech-forum {
-    display: block;
-    text-align: center;
-    clear: both;
-    margin-top: 2.5rem;
-    background: #d5d5d5;
-    padding: 0.5rem;
-  }
-  .bloc-rech-forum .txt-search {
-    width: 9.25rem;
-  }
-  .bloc-rech-forum ~ .bloc-pre-right {
-    top: 0;
-    bottom: inherit;
-  }
-}
-
-.deboucled-setting-impexp-message {
-  font: bold 11px/100% arial, sans-serif;
-  color: rgba(180, 0, 0, 0.9);
-  pointer-events: none;
-  user-select: none;
-  visibility: hidden;
-  opacity: 1;
-  transition: opacity 1s ease-out 4s;
-}
-.deboucled-setting-impexp-message.active {
-  visibility: visible;
-  opacity: 0;
-}
 
 /* Button */
 .deboucled-button {
@@ -311,11 +261,23 @@ body.deboucled-dark-theme {
   box-shadow: var(--deboucled-button-shadow);
 }
 .deboucled-option-button {
-  margin-right: 5px;
   min-width: 5.25rem;
 }
 .deboucled-setting-button {
   margin: 15px 10px 0px 0;
+}
+.deboucled-setting-impexp-message {
+  font: bold 11px/100% arial, sans-serif;
+  color: rgba(180, 0, 0, 0.9);
+  pointer-events: none;
+  user-select: none;
+  visibility: hidden;
+  opacity: 1;
+  transition: opacity 1s ease-out 4s;
+}
+.deboucled-setting-impexp-message.active {
+  visibility: visible;
+  opacity: 0;
 }
 .deboucled-add-button {
   margin-left: 5px;
@@ -358,6 +320,55 @@ body.deboucled-dark-theme {
 .deboucled-entity-message-hint:active,
 .deboucled-entity-message-hint:hover {
   opacity: 0.6;
+}
+
+#forum-main-col .bloc-pre-pagi-forum .bloc-rech-forum {
+  display: inline-block;
+  text-align: center;
+  clear: both;
+  margin-top: 0;
+  background: unset;
+  padding: 0;
+}
+#forum-main-col .bloc-pre-pagi-forum {
+  display: flex;
+  align-items: flex-end;
+}
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-left {
+  justify-content: flex-start;
+}
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-right {
+  justify-content: flex-end;
+}
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-left,
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-right {
+  display: flex;
+  row-gap: 0.3125rem;
+  flex-wrap: wrap;
+  margin-top: auto;
+  flex: 1;
+  align-items: end;
+  position: relative;
+  right: unset;
+  left: unset;
+  top: unset;
+  bottom: unset;
+  overflow: visible;
+}
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-right button {
+  float: right;
+  min-width: 5.25rem;
+  margin-left: 0.3125rem;
+}
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-right .group-one,
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-right .group-two {
+  margin-bottom: 0;
+}
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-left .group-two {
+  display: flex;
+  row-gap: 0.3125rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 /* Logo */
