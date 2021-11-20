@@ -75,6 +75,7 @@ const domParser = new DOMParser();
 const localstorage_pocTopics = 'deboucled_pocTopics';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
+const storage_preBoucles = 'deboucled_preBoucles', storage_preBoucles_default = '[]';
 const storage_blacklistedTopicIds = 'deboucled_blacklistedTopicIds', storage_blacklistedTopicIds_default = '[]';
 const storage_blacklistedSubjects = 'deboucled_blacklistedSubjects', storage_blacklistedSubjects_default = '[]';
 const storage_blacklistedAuthors = 'deboucled_blacklistedAuthors', storage_blacklistedAuthors_default = '[]';
@@ -101,7 +102,7 @@ const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 const storage_TopicStats = 'deboucled_TopicStats';
 
-const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
+const storage_Keys = [storage_init, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
 
 const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors];
 
@@ -124,7 +125,8 @@ async function loadStorage() {
     authorBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedAuthors, storage_blacklistedAuthors_default)))];
     topicIdBlacklistMap = new Map([...JSON.parse(GM_getValue(storage_blacklistedTopicIds, storage_blacklistedTopicIds_default))]);
 
-    //initPreBoucles();
+    initPreBoucles();
+    loadPreBouclesStatus();
 
     subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
@@ -141,6 +143,8 @@ async function saveStorage() {
     GM_setValue(storage_blacklistedSubjects, JSON.stringify([...new Set(subjectBlacklistArray)]));
     GM_setValue(storage_blacklistedAuthors, JSON.stringify([...new Set(authorBlacklistArray)]));
     GM_setValue(storage_blacklistedTopicIds, JSON.stringify([...topicIdBlacklistMap]));
+
+    savePreBouclesStatus();
 
     subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
@@ -169,6 +173,21 @@ async function removeTopicIdBlacklist(topicId) {
         topicIdBlacklistMap.delete(topicId);
         await saveStorage();
     }
+}
+
+function loadPreBouclesStatus() {
+    const preBouclesStatuses = [...JSON.parse(GM_getValue(storage_preBoucles, storage_preBoucles_default))];
+    if (!preBouclesStatuses) return;
+    preBouclesStatuses.forEach(pbs => {
+        const preBoucle = preBoucleArray.find(pb => pb.id === pbs[0]);
+        if (!preBoucle) return;
+        preBoucle.enabled = pbs[1];
+    });
+}
+
+function savePreBouclesStatus() {
+    const preBouclesStatuses = preBoucleArray.map(pb => [pb.id, pb.enabled]);
+    GM_setValue(storage_preBoucles, JSON.stringify(preBouclesStatuses));
 }
 
 async function addEntityBlacklist(array, key) {
@@ -290,7 +309,7 @@ function initPreBoucles() {
     {
         id: 'popularboucles',
         title: 'Boucles connues',
-        enable: false,
+        enabled: false,
         type: entitySubject,
         entities: ['ces photos putain', 'yannick*tour eiffel', 'midsommar', 'eau*pastèque', 'l\'échéance est tombée', 'ai-je l\'air sympathique', 'pour avoir une copine en']
     };
@@ -298,7 +317,7 @@ function initPreBoucles() {
     {
         id: 'covid19',
         title: 'Covid19',
-        enable: false,
+        enabled: false,
         type: entitySubject,
         entities: ['covid*', 'corona*', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*', '*pass', 'vizio', 'schwab', 'veran']
     };
@@ -306,7 +325,7 @@ function initPreBoucles() {
     {
         id: 'politic',
         title: 'Politique',
-        enable: false,
+        enabled: false,
         type: entitySubject,
         entities: ['*zemmour*', 'le z', 'knafo', 'z0zz', 'philippot', 'le pen', 'macron', 'cnews', 'asselineau', 'fillon', 'veran']
     };
@@ -314,7 +333,7 @@ function initPreBoucles() {
     {
         id: 'deviant',
         title: 'Déviances',
-        enable: false,
+        enabled: false,
         type: entitySubject,
         entities: ['feet*', 'trap*', 'kj', 'adf', 'papa du forum', 'blacked', 'cuck', 'reine fatima', 'shemale*', 'domina', 'fetichiste', 'fetichisme']
     };
@@ -322,7 +341,7 @@ function initPreBoucles() {
     {
         id: 'socials',
         title: 'Réseaux sociaux',
-        enable: false,
+        enabled: false,
         type: entitySubject,
         entities: ['tinder', 'twitter', 'facebook', 'tik*tok', 'adopte un mec', 'meetic', 'badoo', 'okcupid', 'bumble', 'happn', 'insta', 'instagram', 'snapchat']
     };
@@ -330,7 +349,7 @@ function initPreBoucles() {
     {
         id: 'boucledauthors',
         title: 'Pseudos boucled',
-        enable: false,
+        enabled: false,
         type: entityAuthor,
         entities: ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki']
     };
@@ -350,9 +369,9 @@ function initPreBoucles() {
 function mergeBlacklistsWithPreBoucles() {
     let preBoucleSubjects = [];
     let preBoucleAuthors = [];
-    preBoucleArray.filter(pb => !pb.enable && pb.type === entitySubject)
+    preBoucleArray.filter(pb => !pb.enabled && pb.type === entitySubject)
         .forEach(pb => { preBoucleSubjects = preBoucleSubjects.concat(pb.entities); });
-    preBoucleArray.filter(pb => !pb.enable && pb.type === entityAuthor)
+    preBoucleArray.filter(pb => !pb.enabled && pb.type === entityAuthor)
         .forEach(pb => { preBoucleAuthors = preBoucleAuthors.concat(pb.entities); });
 
     console.log(preBoucleSubjects);
@@ -1311,20 +1330,8 @@ function buildSettingsPage() {
     function buildTooltip(hint, firstElem = false) {
         return `deboucled-data-tooltip="${hint}"${firstElem ? ' data-tooltip-location="bottom"' : ''}`;
     }
-    function addStat(title, content) {
-        let html = "";
-        html += '<tr>';
-        html += '<td style="text-align: right;">';
-        html += `<span class="deboucled-stat-title">${title}</span>`;
-        html += '</td>';
-        html += '<td>';
-        html += `<span class="deboucled-stat-value">${content}</span>`;
-        html += '</td>';
-        html += '</tr>';
-        return html;
-    }
     function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false, firstElem = false) {
-        let html = "";
+        let html = '';
         html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
         html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}" ${buildTooltip(hint, firstElem)}>${title}</td>`;
         html += '<td class="deboucled-td-right">';
@@ -1338,7 +1345,7 @@ function buildSettingsPage() {
         return html;
     }
     function addRangeOption(title, optionId, defaultValue, minValue, maxValue, step, hint, enabled, isSubCell = false) {
-        let html = "";
+        let html = '';
         html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
         html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}" ${buildTooltip(hint)}>${title}</td>`;
         html += '<td class="deboucled-td-right" style="padding-top: 7px;">';
@@ -1349,7 +1356,7 @@ function buildSettingsPage() {
         return html;
     }
     function addDropdownOption(title, optionId, hint, defaultValue, values) {
-        let html = "";
+        let html = '';
         html += '<tr>';
         html += `<td class="deboucled-td-left" ${buildTooltip(hint)} style="vertical-align: top;">${title}</td>`;
         html += '<td class="deboucled-td-right">';
@@ -1367,18 +1374,18 @@ function buildSettingsPage() {
         return html;
     }
     function addImportExportButtons() {
-        let html = "";
+        let html = '';
         html += '<tr>';
         html += '<td class="deboucled-td-left" rowspan="2">Restaurer/sauvegarder les préférences</td>';
         html += '<td class="deboucled-td-left">';
-        html += `<label for="deboucled-import-button" class="btn deboucled-button deboucled-setting-button">Restaurer</label>`;
-        html += `<input type="file" accept="application/JSON" id="deboucled-import-button" style="display: none;"></input>`;
-        html += `<span id="deboucled-export-button" class="btn deboucled-button deboucled-setting-button">Sauvegarder</span>`;
-        html += `<span id="deboucled-import-tbl" class="btn deboucled-button deboucled-setting-button" style="min-width: 10rem;">Importer TotalBlacklist</span>`;
+        html += '<label for="deboucled-import-button" class="btn deboucled-button deboucled-setting-button">Restaurer</label>';
+        html += '<input type="file" accept="application/JSON" id="deboucled-import-button" style="display: none;"></input>';
+        html += '<span id="deboucled-export-button" class="btn deboucled-button deboucled-setting-button">Sauvegarder</span>';
+        html += '<span id="deboucled-import-tbl" class="btn deboucled-button deboucled-setting-button" style="min-width: 10rem;">Importer TotalBlacklist</span>';
         html += '</td>';
         html += '<td class="deboucled-td-right" style="white-space: nowrap;">';
-        html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message" style="display: block; text-align: center;">Restauration terminée</span>`;
-        html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message">⚠ Veuillez rafraichir la page ⚠</span>`;
+        html += '<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message" style="display: block; text-align: center;">Restauration terminée</span>';
+        html += '<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message">⚠ Veuillez rafraichir la page ⚠</span>';
         html += '</td>';
         html += '</tr>';
         html += '<tr>';
@@ -1387,14 +1394,14 @@ function buildSettingsPage() {
         html += '<input type="checkbox" id="deboucled-impexp-blonly"></input>';
         html += '<span class="deboucled-toggle-slider little round"></span>';
         html += '</label>';
-        html += `<span class="deboucled-toggle-title-right">Uniquement les blacklists</span>`;
+        html += '<span class="deboucled-toggle-title-right">Uniquement les blacklists</span>';
         html += '</td>';
         html += '</tr>';
         return html;
     }
 
     function addOptionsSection(sectionIsActive) {
-        let html = "";
+        let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">OPTIONS</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
         html += '<div class="deboucled-setting-content">';
@@ -1438,7 +1445,7 @@ function buildSettingsPage() {
         return html;
     }
     function addCustomisationSection(sectionIsActive) {
-        let html = "";
+        let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">PERSONNALISATION</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-customisation-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
         html += '<div class="deboucled-setting-content">';
@@ -1475,8 +1482,26 @@ function buildSettingsPage() {
         html += '</div>';
         return html;
     }
+    function addPreBouclesSection(sectionIsActive) {
+        let html = '';
+        html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">ANTI-BOUCLES</div>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
+        html += '<div class="deboucled-setting-content">';
+
+        html += '<table class="deboucled-option-table">';
+
+        preBoucleArray.filter(b => b.type === entitySubject)
+            .forEach(b => {
+                html += addToggleOption(b.title, b.id, b.enabled, b.title);
+            })
+
+        html += '</table>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
     function addEntitySettingSection(entity, header, hint, messageHint, sectionIsActive) {
-        let html = "";
+        let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">${header}</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-${entity}-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
         html += '<div class="deboucled-setting-content">';
@@ -1504,7 +1529,19 @@ function buildSettingsPage() {
         return html;
     }
     function addStatsSection(sectionIsActive) {
-        let html = "";
+        function addStat(title, content) {
+            let html = '';
+            html += '<tr>';
+            html += '<td style="text-align: right;">';
+            html += `<span class="deboucled-stat-title">${title}</span>`;
+            html += '</td>';
+            html += '<td>';
+            html += `<span class="deboucled-stat-value">${content}</span>`;
+            html += '</td>';
+            html += '</tr>';
+            return html;
+        }
+        let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">STATISTIQUES</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
         html += '<div class="deboucled-setting-content">';
@@ -1525,9 +1562,10 @@ function buildSettingsPage() {
         return html;
     }
 
-    let settingsHtml = "";
+    let settingsHtml = '';
     settingsHtml += addOptionsSection(false);
     settingsHtml += addCustomisationSection(false);
+    settingsHtml += addPreBouclesSection(false);
     settingsHtml += addEntitySettingSection(entitySubject, 'BLACKLIST SUJETS', 'Mot-clé', 'Utilisez le caractère étoile * pour remplacer n\'importe quelle expression.', true);
     settingsHtml += addEntitySettingSection(entityAuthor, 'BLACKLIST AUTEURS', 'Pseudo', undefined, false);
     settingsHtml += addEntitySettingSection(entityTopicId, 'BLACKLIST TOPICS', 'TopicId', undefined, false);
@@ -1539,8 +1577,22 @@ function buildSettingsPage() {
     settingsView.innerHTML = settingsHtml;
     document.body.prepend(settingsView);
 
-    document.querySelector('.deboucled-about-version').onclick = () => alert('Paix sur la boucle nonobstant.');
+    addSettingEvents();
 
+    addImportExportEvent();
+
+    addCollapsibleEvents();
+
+    buildSettingEntities();
+
+    refreshEntityCounts();
+
+    addHighlightModeratedButton();
+
+    addSortEvent();
+}
+
+function addSettingEvents() {
     function addToggleEvent(id, callback = undefined) {
         const toggleSlider = document.querySelector('#' + id);
         toggleSlider.onchange = (e) => {
@@ -1562,6 +1614,9 @@ function buildSettingsPage() {
             GM_setValue(id, parseInt(e.currentTarget.value));
         };
     }
+
+    const pave2022 = 'Juste pour rappel en 2000V2 :\n\n· Fin de la boucle temporelle.\n· Débug du script mathématique.\n· Conscience des oldfags.\n· Avènement des proto-boucleurs.\n\nVous êtes fin prêts.';
+    document.querySelector('.deboucled-about-version').onclick = () => alert(pave2022);
 
     addToggleEvent(storage_optionEnableDarkTheme, toggleDarkTheme);
     addToggleEvent(storage_optionHideMessages);
@@ -1586,18 +1641,6 @@ function buildSettingsPage() {
     addRangeEvent(storage_optionDisplayThreshold);
     addRangeEvent(storage_optionMaxTopicCount);
     addSelectEvent(storage_optionDetectPocMode);
-
-    addImportExportEvent();
-
-    addCollapsibleEvents();
-
-    buildSettingEntities();
-
-    refreshEntityCounts();
-
-    addHighlightModeratedButton();
-
-    addSortEvent();
 }
 
 function addSortEvent() {

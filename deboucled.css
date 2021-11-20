@@ -373,7 +373,7 @@ body.deboucled-dark-theme {
 }
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-right button {
   float: right;
-  min-width: 6.375rem;
+  min-width: 6.375rem !important;
   margin-left: 0.3125rem;
 }
 
