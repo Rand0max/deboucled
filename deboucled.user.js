@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.24.7
+// @version     1.24.8
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -56,7 +56,7 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.24.7'
+const deboucledVersion = '1.24.8'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -1761,7 +1761,7 @@ function refreshCollapsibleContentHeight(entity) {
     if (content) content.style.maxHeight = content.scrollHeight + 'px';
 }
 
-function addSettingButton(firstLaunch, isTopicMessages) {
+function addSettingButton(firstLaunch) {
     function createDeboucledButton() {
         let button = document.createElement('button');
         button.setAttribute('id', 'deboucled-option-button');
@@ -1770,21 +1770,7 @@ function addSettingButton(firstLaunch, isTopicMessages) {
         return button;
     }
     const blocsPreRight = document.querySelectorAll('.bloc-pre-right');
-    blocsPreRight.forEach(e => {
-        if (isTopicMessages) {
-            const refreshButton = e.querySelector('.btn-actualiser-forum');
-            const groupOne = document.createElement('div');
-            const groupTwo = document.createElement('div');
-            groupOne.className = 'group-one';
-            groupTwo.className = 'group-two';
-            e.append(groupOne, groupTwo);
-            groupOne.append(createDeboucledButton());
-            groupTwo.append(refreshButton);
-        }
-        else {
-            e.prepend(createDeboucledButton());
-        }
-    });
+    blocsPreRight.forEach(e => { e.prepend(createDeboucledButton()); });
 
     let optionOnclick = function (e) {
         e.preventDefault();
@@ -2106,7 +2092,7 @@ async function init(isTopicMessages = false) {
     const enableDarkTheme = GM_getValue(storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default);
     toggleDarkTheme(enableDarkTheme);
     buildSettingsPage();
-    addSettingButton(firstLaunch, isTopicMessages);
+    addSettingButton(firstLaunch);
 }
 
 async function callMe() {

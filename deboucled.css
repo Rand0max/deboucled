@@ -322,6 +322,7 @@ body.deboucled-dark-theme {
   opacity: 0.6;
 }
 
+/* Bloc tool bar */
 #forum-main-col .bloc-pre-pagi-forum .bloc-rech-forum {
   display: inline-block;
   text-align: center;
@@ -333,21 +334,16 @@ body.deboucled-dark-theme {
 #forum-main-col .bloc-pre-pagi-forum {
   display: flex;
   align-items: flex-end;
-}
-#forum-main-col .bloc-pre-pagi-forum .bloc-pre-left {
-  justify-content: flex-start;
-}
-#forum-main-col .bloc-pre-pagi-forum .bloc-pre-right {
-  justify-content: flex-end;
+  flex: auto;
 }
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-left,
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-right {
   display: flex;
+  align-items: flex-end;
+  flex: auto;
   row-gap: 0.3125rem;
   flex-wrap: wrap;
   margin-top: auto;
-  flex: 1;
-  align-items: end;
   position: relative;
   right: unset;
   left: unset;
@@ -355,20 +351,30 @@ body.deboucled-dark-theme {
   bottom: unset;
   overflow: visible;
 }
-#forum-main-col .bloc-pre-pagi-forum .bloc-pre-right button {
-  float: right;
-  min-width: 5.25rem;
-  margin-left: 0.3125rem;
-}
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-left .group-one,
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-left .group-two,
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-right .group-one,
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-right .group-two {
-  margin-bottom: 0;
-}
-#forum-main-col .bloc-pre-pagi-forum .bloc-pre-left .group-two {
   display: flex;
   row-gap: 0.3125rem;
   justify-content: space-between;
   flex-wrap: wrap;
+  margin-bottom: 0;
+}
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-left .group-one,
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-left .group-two,
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-left {
+  justify-content: flex-start;
+}
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-right .group-one,
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-right .group-two,
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-right {
+  justify-content: flex-end;
+}
+#forum-main-col .bloc-pre-pagi-forum .bloc-pre-right button {
+  float: right;
+  min-width: 6.375rem;
+  margin-left: 0.3125rem;
 }
 
 /* Logo */
