@@ -40,8 +40,8 @@ const entityTopicId = 'topicid';
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
 let topicIdBlacklistMap = new Map();
-let subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
-let authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
+let subjectsBlacklistReg = new RegExp();
+let authorsBlacklistReg = new RegExp();
 
 let pocTopicMap = new Map();
 
@@ -54,6 +54,8 @@ let hiddenAuthorArray = new Set();
 let deboucledTopicStatsMap = new Map();
 
 let preBoucleArray = [];
+let preBoucleSubjectsBlacklistReg = new RegExp();
+let preBoucleAuthorsBlacklistReg = new RegExp();
 
 let matchedSubjects = new Map();
 let matchedAuthors = new Map();
@@ -126,7 +128,6 @@ async function loadStorage() {
     topicIdBlacklistMap = new Map([...JSON.parse(GM_getValue(storage_blacklistedTopicIds, storage_blacklistedTopicIds_default))]);
 
     initPreBoucles();
-    loadPreBouclesStatus();
 
     subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
@@ -144,7 +145,7 @@ async function saveStorage() {
     GM_setValue(storage_blacklistedAuthors, JSON.stringify([...new Set(authorBlacklistArray)]));
     GM_setValue(storage_blacklistedTopicIds, JSON.stringify([...topicIdBlacklistMap]));
 
-    savePreBouclesStatus();
+    savePreBouclesStatuses();
 
     subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
@@ -175,18 +176,27 @@ async function removeTopicIdBlacklist(topicId) {
     }
 }
 
-function loadPreBouclesStatus() {
-    const preBouclesStatuses = [...JSON.parse(GM_getValue(storage_preBoucles, storage_preBoucles_default))];
+function loadPreBouclesStatuses() {
+    let preBouclesStatuses = [...JSON.parse(GM_getValue(storage_preBoucles, storage_preBoucles_default))];
+    console.log(preBouclesStatuses);
     if (!preBouclesStatuses) return;
     preBouclesStatuses.forEach(pbs => {
-        const preBoucle = preBoucleArray.find(pb => pb.id === pbs[0]);
-        if (!preBoucle) return;
-        preBoucle.enabled = pbs[1];
+        togglePreBoucleStatus(pbs[0], pbs[1]);
     });
 }
 
-function savePreBouclesStatus() {
-    const preBouclesStatuses = preBoucleArray.map(pb => [pb.id, pb.enabled]);
+function togglePreBoucleStatus(id, enabled) {
+    let preBoucle = preBoucleArray.find(pb => pb.id === id);
+    console.log(preBoucle);
+    console.log(id + ' : ' + enabled);
+    if (!preBoucle) return;
+    preBoucle.enabled = enabled;
+}
+
+function savePreBouclesStatuses() {
+    let preBouclesStatuses = preBoucleArray.map(pb => [pb.id, pb.enabled]);
+    console.log('savePreBouclesStatuses');
+    console.log(preBouclesStatuses);
     GM_setValue(storage_preBoucles, JSON.stringify(preBouclesStatuses));
 }
 
@@ -320,7 +330,7 @@ function initPreBoucles() {
         title: 'Covid19',
         enabled: false,
         type: entitySubject,
-        entities: ['covid*', 'corona*', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*', '*pass', 'vizio', 'schwab', 'veran']
+        entities: ['covid*', 'corona*', 'virus', 'gestes barriere', 'geste barriere', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*', '*pass', 'vizio', 'schwab', 'veran', 'pcr', 'antigenique', 'thrombose*']
     };
     const politic =
     {
@@ -336,7 +346,7 @@ function initPreBoucles() {
         title: 'Déviances',
         enabled: false,
         type: entitySubject,
-        entities: ['feet*', 'trap*', 'kj', 'adf', 'papa du forum', 'blacked', 'cuck', 'reine fatima', 'shemale*', 'domina', 'fetichiste', 'fetichisme']
+        entities: ['feet*', 'trap*', 'kj', 'adf', 'papa du forum', 'blacked', 'cuck', 'reine fatima', 'shemale*', 'domina', 'fetichiste', 'fetichisme', 'mym', 'onlyfan', 'onlyfans', 'sissy', 'trans', 'transexuel', 'transexuelle', 'lgbt*', 'm2f', 'f2m', 'asmr', 'trav', 'travelo']
     };
     const socials =
     {
@@ -344,7 +354,7 @@ function initPreBoucles() {
         title: 'Réseaux sociaux',
         enabled: false,
         type: entitySubject,
-        entities: ['tinder', 'youtube', 'twitter', 'facebook', 'tik*tok', 'adopte un mec', 'meetic', 'badoo', 'okcupid', 'bumble', 'happn', 'insta', 'instagram', 'snapchat', 'feldup', 'norman', 'cyprien', 'natoo', 'kemar', 'jdg', 'joueur du grenier', 'amixem', 'squeezie']
+        entities: ['tinder', 'youtube', 'twitter', 'facebook', 'tik*tok', 'adopte un mec', 'meetic', 'badoo', 'okcupid', 'bumble', 'happn', 'insta', 'instagram', 'snapchat', 'feldup', 'norman', 'cyprien', 'natoo', 'kemar', 'jdg', 'joueur du grenier', 'amixem', 'squeezie', 'mym', 'onlyfan', 'onlyfans']
     };
     const kiddy =
     {
@@ -354,6 +364,14 @@ function initPreBoucles() {
         type: entitySubject,
         entities: ['reacprout', 'prout', 'caca', 'pipi']
     };
+    const hatred =
+    {
+        id: 'hatred',
+        title: 'Haineux',
+        enabled: false,
+        type: entitySubject,
+        entities: ['facho*', 'chofa*', 'qlf', 'paz', 's2s', 'gwer*', 'raciste*']
+    };
 
     const boucledAuthors =
     {
@@ -361,7 +379,7 @@ function initPreBoucles() {
         title: 'Pseudos boucled',
         enabled: false,
         type: entityAuthor,
-        entities: ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki']
+        entities: ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki']
     };
 
     preBoucleArray.push(popularBoucles);
@@ -370,32 +388,36 @@ function initPreBoucles() {
     preBoucleArray.push(deviant);
     preBoucleArray.push(socials);
     preBoucleArray.push(kiddy);
+    preBoucleArray.push(hatred);
     preBoucleArray.push(boucledAuthors);
 
     console.log(preBoucleArray);
 
-    mergeBlacklistsWithPreBoucles();
+    loadPreBouclesStatuses();
+    buildPreBouclesBlacklists();
 }
 
-function mergeBlacklistsWithPreBoucles() {
+function buildPreBouclesBlacklists() {
     let preBoucleSubjects = [];
     let preBoucleAuthors = [];
-    preBoucleArray.filter(pb => !pb.enabled && pb.type === entitySubject)
+    preBoucleArray.filter(pb => pb.enabled && pb.type === entitySubject)
         .forEach(pb => { preBoucleSubjects = preBoucleSubjects.concat(pb.entities); });
-    preBoucleArray.filter(pb => !pb.enabled && pb.type === entityAuthor)
+    preBoucleArray.filter(pb => pb.enabled && pb.type === entityAuthor)
         .forEach(pb => { preBoucleAuthors = preBoucleAuthors.concat(pb.entities); });
 
     console.log(preBoucleSubjects);
     console.log(preBoucleAuthors);
 
-    console.log(subjectBlacklistArray);
-    console.log(authorBlacklistArray);
+    const preBoucleSubjectBlacklistArray = [...new Set([...preBoucleSubjects])];
+    const preBoucleAuthorBlacklistArray = [...new Set([...preBoucleAuthors])];
 
-    subjectBlacklistArray = [...new Set([...subjectBlacklistArray, ...preBoucleSubjects])];
-    authorBlacklistArray = [...new Set([...authorBlacklistArray, ...preBoucleAuthors])];
+    preBoucleSubjectsBlacklistReg = buildRegex(preBoucleSubjectBlacklistArray, true);
+    preBoucleAuthorsBlacklistReg = buildRegex(preBoucleAuthorBlacklistArray, false);
 
-    console.log(subjectBlacklistArray);
-    console.log(authorBlacklistArray);
+    console.log(preBoucleSubjectBlacklistArray);
+    console.log(preBoucleAuthorBlacklistArray);
+    console.log(preBoucleSubjectsBlacklistReg);
+    console.log(preBoucleAuthorsBlacklistReg);
 }
 
 
@@ -917,14 +939,17 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
 }
 
 function isSubjectBlacklisted(subject) {
-    if (subjectBlacklistArray.length === 0) return false;
-    return subject.normalizeDiacritic().match(subjectsBlacklistReg);
+    console.log('isSubjectBlacklisted haspreboucle : ' + preBoucleArray.some(b => b.enabled && b.type === entitySubject));
+    if (subjectBlacklistArray.length === 0 || !preBoucleArray.some(b => b.enabled && b.type === entitySubject)) return false;
+    let normSubject = subject.normalizeDiacritic();
+    return normSubject.match(subjectsBlacklistReg) || normSubject.match(preBoucleSubjectsBlacklistReg);
 }
 
 function isAuthorBlacklisted(author) {
-    if (authorBlacklistArray.length === 0) return false;
-    const authorL = author.toLowerCase();
-    return authorL !== 'rand0max' && authorL.normalizeDiacritic().match(authorsBlacklistReg);
+    console.log('isAuthorBlacklisted haspreboucle : ' + preBoucleArray.some(b => b.enabled && b.type === entityAuthor));
+    if (authorBlacklistArray.length === 0 || !preBoucleArray.some(b => b.enabled && b.type === entityAuthor)) return false;
+    const normAuthor = author.toLowerCase().normalizeDiacritic();
+    return normAuthor !== 'rand0max' && (normAuthor.match(authorsBlacklistReg) || normAuthor.match(preBoucleAuthorsBlacklistReg));
 }
 
 async function isTopicPoC(element, optionDetectPocMode) {
@@ -939,7 +964,7 @@ async function isTopicPoC(element, optionDetectPocMode) {
     if (!titleElem) return false;
 
     const title = titleElem.textContent.trim().normalizeDiacritic();
-    const isTitlePocRegex = /(pos(t|te|tez|to|too|tou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan|pose.*toucan/i;
+    const isTitlePocRegex = /(pos(t|te|tez|to|too|tou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan|postouk|postook|pose.*toucan/i;
     let isTitlePoc = isTitlePocRegex.test(title);
 
     if (optionDetectPocMode === 1 && !isTitlePoc) {
@@ -948,13 +973,13 @@ async function isTopicPoC(element, optionDetectPocMode) {
     }
 
     function topicCallback(r) {
-        const doc = domParser.parseFromString(r, "text/html");
+        const doc = domParser.parseFromString(r, 'text/html');
 
         const firstMessageElem = doc.querySelector('.txt-msg');
         const firstMessage = firstMessageElem.textContent.trim().toLowerCase().normalizeDiacritic();
 
         const isMessagePocRegex = /pos(t|te|tez) ou/i;
-        const maladies = ['cancer', 'torsion', 'testiculaire', 'tumeur', 'cholera', 'sida', 'corona', 'coronavirus', 'covid', 'covid19', 'cerf', 'serf', 'phimosis', 'trisomie', 'diarrhee', 'charcot', 'lyme', 'avc', 'cirrhose', 'diabete', 'parkinson', 'alzheimer', 'mucoviscidose', 'lepre', 'tuberculose'];
+        const maladies = ['cancer', 'ancer', 'cer', 'en serre', 'necrose', 'torsion', 'testiculaire', 'tumeur', 'cholera', 'sida', 'corona', 'coronavirus', 'covid', 'covid19', 'cerf', 'serf', 'phimosis', 'trisomie', 'diarrhee', 'charcot', 'lyme', 'avc', 'cirrhose', 'diabete', 'parkinson', 'alzheimer', 'mucoviscidose', 'lepre', 'tuberculose'];
         const isMessagePoc = isMessagePocRegex.test(firstMessage) || (isTitlePoc && maladies.some(s => firstMessage.includes(s)));
 
         pocTopicMap.set(topicId, isMessagePoc);
@@ -1501,11 +1526,10 @@ function buildSettingsPage() {
 
         html += '<table class="deboucled-option-table">';
 
-        preBoucleArray.filter(b => b.type === entitySubject)
-            .forEach(b => {
-                const hint = b.entities.join(', ');
-                html += addToggleOption(b.title, b.id, b.enabled, hint, undefined, undefined, 'right');
-            })
+        preBoucleArray.forEach(b => {
+            const hint = b.entities.sort().join(', ');
+            html += addToggleOption(b.title, `deboucled-preboucle-${b.id}`, b.enabled, hint, undefined, undefined, 'right');
+        });
 
         html += '</table>';
         html += '</div>';
@@ -1605,11 +1629,11 @@ function buildSettingsPage() {
 }
 
 function addSettingEvents() {
-    function addToggleEvent(id, callback = undefined) {
+    function addToggleEvent(id, setValue = true, callback = undefined) {
         const toggleSlider = document.querySelector('#' + id);
         toggleSlider.onchange = (e) => {
             const checked = e.currentTarget.checked;
-            GM_setValue(id, checked);
+            if (setValue) GM_setValue(id, checked);
             if (callback) callback(checked);
         };
     }
@@ -1630,7 +1654,7 @@ function addSettingEvents() {
     const pave2022 = 'Juste pour rappel en 2000V2 :\n\n· Fin de la boucle temporelle.\n· Débug du script mathématique.\n· Conscience des oldfags.\n· Avènement des proto-boucleurs.\n\nVous êtes fin prêts.';
     document.querySelector('.deboucled-about-version').onclick = () => alert(pave2022);
 
-    addToggleEvent(storage_optionEnableDarkTheme, toggleDarkTheme);
+    addToggleEvent(storage_optionEnableDarkTheme, undefined, toggleDarkTheme);
     addToggleEvent(storage_optionHideMessages);
     addToggleEvent(storage_optionBoucledUseJvarchive);
     addToggleEvent(storage_optionDisplayBlacklistTopicButton);
@@ -1638,21 +1662,28 @@ function addSettingEvents() {
     addToggleEvent(storage_optionPrevisualizeTopic);
     addToggleEvent(storage_optionShowJvcBlacklistButton);
     addToggleEvent(storage_optionDisplayTopicCharts);
-    addToggleEvent(storage_optionDisplayTopicMatches, function () {
+    addToggleEvent(storage_optionDisplayTopicMatches, undefined, function () {
         document.querySelectorAll(`[id = ${storage_optionClickToShowTopicMatches}-container]`).forEach(function (el) {
-            el.classList.toggle("deboucled-disabled");
+            el.classList.toggle('deboucled-disabled');
         })
     });
     addToggleEvent(storage_optionClickToShowTopicMatches);
-    addToggleEvent(storage_optionAllowDisplayThreshold, function () {
+    addToggleEvent(storage_optionAllowDisplayThreshold, undefined, function () {
         document.querySelectorAll(`[id = ${storage_optionDisplayThreshold}-container]`).forEach(function (el) {
-            el.classList.toggle("deboucled-disabled");
+            el.classList.toggle('deboucled-disabled');
         })
     });
     addToggleEvent(storage_optionRemoveUselessTags);
     addRangeEvent(storage_optionDisplayThreshold);
     addRangeEvent(storage_optionMaxTopicCount);
     addSelectEvent(storage_optionDetectPocMode);
+
+    preBoucleArray.forEach(b => {
+        addToggleEvent(`deboucled-preboucle-${b.id}`, false, function (checked) {
+            togglePreBoucleStatus(b.id, checked);
+            savePreBouclesStatuses();
+        });
+    });
 }
 
 function addSortEvent() {

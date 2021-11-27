@@ -990,6 +990,7 @@ input:checked + .deboucled-toggle-slider.little:before {
 /* Panel Collapsible */
 .deboucled-collapsible {
   cursor: pointer;
+  user-select: none;
 }
 .deboucled-collapsible-active,
 .deboucled-collapsible:hover {
