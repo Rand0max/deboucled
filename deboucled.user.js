@@ -1155,7 +1155,7 @@ async function topicIsModerated(topicId) {
 }
 
 function removeUselessTags(topics) {
-    const regex = /(\[?a+y+a+\]?|(\{|\[|\()+\w*alerte?\w*(\}|\]|\))+|alerte?)\s?:?/gi;
+    const regex = /(\[?a+y+a+\]?|^((\{|\[|\(|🛑)*\s*\w*alerte?(\srouge|\snoir|\snoire|\snucleaire)?\w*\s*(\}|\]|\)|🛑)*))\s?:?-?/gi;
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
         let newTitle = titleElem.textContent.replace(regex, '').removeDoubleSpaces().trim().capitalize();
