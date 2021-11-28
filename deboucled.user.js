@@ -939,17 +939,28 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
 }
 
 function isSubjectBlacklisted(subject) {
-    console.log('isSubjectBlacklisted haspreboucle : ' + preBoucleArray.some(b => b.enabled && b.type === entitySubject));
-    if (subjectBlacklistArray.length === 0 || !preBoucleArray.some(b => b.enabled && b.type === entitySubject)) return false;
+    const hasSubjectBlacklist = subjectBlacklistArray.length > 0;
+    const hasPreBoucle = preBoucleArray.some(b => b.enabled && b.type === entitySubject);
+    console.log('isSubjectBlacklisted hasSubjectBlacklist : ' + hasSubjectBlacklist);
+    console.log('isSubjectBlacklisted hasPreBoucle : ' + hasPreBoucle);
+    if (!hasSubjectBlacklist && !hasPreBoucle) return false;
+
     let normSubject = subject.normalizeDiacritic();
-    return normSubject.match(subjectsBlacklistReg) || normSubject.match(preBoucleSubjectsBlacklistReg);
+    return (hasSubjectBlacklist && normSubject.match(subjectsBlacklistReg))
+        || (hasPreBoucle && normSubject.match(preBoucleSubjectsBlacklistReg));
 }
 
 function isAuthorBlacklisted(author) {
-    console.log('isAuthorBlacklisted haspreboucle : ' + preBoucleArray.some(b => b.enabled && b.type === entityAuthor));
-    if (authorBlacklistArray.length === 0 || !preBoucleArray.some(b => b.enabled && b.type === entityAuthor)) return false;
+    const hasAuthorBlacklist = authorBlacklistArray.length > 0;
+    const hasPreBoucle = preBoucleArray.some(b => b.enabled && b.type === entityAuthor);
+    console.log('isAuthorBlacklisted hasAuthorBlacklist : ' + hasAuthorBlacklist);
+    console.log('isAuthorBlacklisted hasPreBoucle : ' + hasPreBoucle);
+    if (!hasAuthorBlacklist && !hasPreBoucle) return false;
+
     const normAuthor = author.toLowerCase().normalizeDiacritic();
-    return normAuthor !== 'rand0max' && (normAuthor.match(authorsBlacklistReg) || normAuthor.match(preBoucleAuthorsBlacklistReg));
+    return normAuthor !== 'rand0max' &&
+        ((hasAuthorBlacklist && normAuthor.match(authorsBlacklistReg))
+            || (hasPreBoucle && normAuthor.match(preBoucleAuthorsBlacklistReg)));
 }
 
 async function isTopicPoC(element, optionDetectPocMode) {
@@ -2195,10 +2206,14 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
 }
 
 function handleTopicHeader() {
+    console.log('handleTopicHeader');
     let titleElement = document.querySelector('#bloc-title-forum');
     if (!titleElement) return;
+    console.log(titleElement);
     const subjectMatches = isSubjectBlacklisted(titleElement.textContent);
     if (!subjectMatches) return;
+    console.log(subjectMatches);
+
     function highlightMatch(titleElem, match) {
         let content = titleElem.innerHTML;
         const m = match.trim();
