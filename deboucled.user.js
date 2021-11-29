@@ -330,7 +330,7 @@ function initPreBoucles() {
         title: 'Covid19',
         enabled: false,
         type: entitySubject,
-        entities: ['covid*', 'corona*', 'virus', 'gestes barriere', 'geste barriere', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*', '*pass', 'vizio', 'schwab', 'veran', 'pcr', 'antigenique', 'thrombose*']
+        entities: ['covid*', 'corona*', 'virus', 'gestes barriere', 'geste barriere', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*', '*pass', 'vizio', 'schwab', 'veran', 'pcr', 'antigenique', 'thrombose*', 'oracle', 'omicron']
     };
     const politic =
     {
@@ -379,7 +379,7 @@ function initPreBoucles() {
         title: 'Pseudos boucled',
         enabled: false,
         type: entityAuthor,
-        entities: ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki']
+        entities: ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki', 'leao']
     };
 
     preBoucleArray.push(popularBoucles);
@@ -1020,7 +1020,7 @@ function markTopicPoc(element) {
 
 function addIgnoreButtons(topics) {
     let header = topics[0];
-    let spanHead = document.createElement("span");
+    let spanHead = document.createElement('span');
     spanHead.setAttribute('class', 'deboucled-topic-blacklist');
     spanHead.setAttribute('style', 'width: 1.75rem');
     header.appendChild(spanHead);
@@ -1155,11 +1155,11 @@ async function topicIsModerated(topicId) {
 }
 
 function removeUselessTags(topics) {
-    const regex = /(\[?a+y+a+\]?|^((\{|\[|\(|🛑)*\s*\w*alerte?(\srouge|\snoir|\snoire|\snucleaire)?\w*\s*(\}|\]|\)|🛑)*))\s?:?-?/gi;
+    const regex = /(\[?a+y+a+o*\]?|^((\{|\[|\(|🛑)*\s*\w*alerte?(\srouge|\snoir|\snoire|\secarlate|\satomique|\snucleaire)?\w*\s*(\}|\]|\)|🛑)*))\s?:?-?,?/gi;
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
         let newTitle = titleElem.textContent.replace(regex, '').removeDoubleSpaces().trim().capitalize();
-        titleElem.textContent = newTitle;
+        if (newTitle.length > 0) titleElem.textContent = newTitle;
     });
 }
 
