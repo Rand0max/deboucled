@@ -158,7 +158,7 @@ async function saveStorage() {
 async function loadLocalStorage() {
     let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     if (optionDetectPocMode === 0) return;
-
+    // eslint-disable-next-line no-undef
     const storagePocTopics = await localforage.getItem(localstorage_pocTopics);
     if (storagePocTopics) pocTopicMap = new Map([...JSON.parse(storagePocTopics)]);
 }
@@ -166,6 +166,7 @@ async function loadLocalStorage() {
 async function saveLocalStorage() {
     let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     if (optionDetectPocMode === 0) return;
+    // eslint-disable-next-line no-undef
     await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
 }
 
@@ -1097,7 +1098,7 @@ function addPrevisualizeTopicEvent(topics) {
         if (!topicContent) return;
         previewDiv.firstChild.remove();
         previewDiv.appendChild(topicContent);
-    };
+    }
 
     topics.slice(1).forEach(function (topic) {
         let topicTitle = topic.querySelector('.topic-title');
@@ -1766,7 +1767,6 @@ function addCollapsibleEvents() {
 }
 
 function buildSettingEntities() {
-    //const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u00A1-\u02AF]*$/i;
     const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u2018-\u201F\u00A1-\u02AF\u{1F300}-\u{1FAD6}]*$/iu;
     const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]\*]*$/iu;
     const regexAllowedTopicId = /^[0-9]+$/i;
@@ -2278,7 +2278,7 @@ function handleError() {
     insertAfter(jvArchiveButton, homepageButton);
 }
 
-async function init(isTopicMessages = false) {
+async function init() {
     let firstLaunch = await initStorage();
     addCss();
     addSvgs();
