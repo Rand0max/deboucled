@@ -323,7 +323,7 @@ function initPreBoucles() {
         title: 'Boucles connues',
         enabled: false,
         type: entitySubject,
-        entities: ['ces photos putain', 'yannick*tour eiffel', 'midsommar', 'eau*pastèque', 'l\'échéance est tombée', 'ai-je l\'air sympathique', 'pour avoir une copine en']
+        entities: ['ces photos putain', 'yannick*tour eiffel', 'midsommar', 'eau*pastèque', 'l\'échéance est tombée', 'ai-je l\'air sympathique', 'pour avoir une copine en', 'no jump']
     };
     const covid19 =
     {
@@ -339,7 +339,7 @@ function initPreBoucles() {
         title: 'Politique',
         enabled: false,
         type: entitySubject,
-        entities: ['*zemmour*', 'le z', 'knafo', 'z0zz', 'philippot', 'le pen', 'macron', 'cnews', 'asselineau', 'fillon', 'veran', 'lrem']
+        entities: ['*zemmour*', 'le z', 'du z', 'pro z', 'pro-z', 'z0zz', 'zozz', 'knafo', 'philippot', 'le pen', 'macron', 'cnews', 'asselineau', 'fillon', 'veran', 'lrem']
     };
     const deviant =
     {
@@ -1311,27 +1311,28 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive)
         }
     }
 
-    if (optionHideMessages) { // pour JvChat on ne changera pas le message de toute façon
+    if (optionHideMessages) { // pour le moment : JvChat on ne changera pas le message (bouton blacklist à implem)
+        // JvChat
         addEventListener('jvchat:newmessage', function (event) {
             let message = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
-            let authorElem = message.querySelector('h5.jvchat-author');
-            if (!authorElem) return;
-            handleLiveMessage(message, authorElem, false);
+            let authorElement = message.querySelector('h5.jvchat-author');
+            if (!authorElement) return;
+            handleLiveMessage(message, authorElement, false);
         });
-        addEventListener('jvchat:activation', function (event) {
+        addEventListener('jvchat:activation', function () {
             hiddenMessages = 0;
             hiddenAuthorArray.clear();
             updateMessagesHeader();
         });
     }
 
+    // TopicLive
     addEventListener('topiclive:newmessage', function (event) {
         let message = document.querySelector(`.bloc-message-forum[data-id="${event.detail.id}"]`);
         if (!message) return;
         let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
         if (!authorElement) return;
-        let author = authorElement.textContent.trim();
-        handleLiveMessage(message, author, true);
+        handleLiveMessage(message, authorElement, true);
     });
 }
 
@@ -1347,7 +1348,7 @@ function addMessageQuoteEvent() {
     const textArea = document.querySelector('#message_topic');
 
     document.querySelectorAll('.picto-msg-quote').forEach(function (btn) {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', () => {
             const parentHeader = btn.parentElement.parentElement;
             if (!parentHeader) return;
             setTimeout(() => {
@@ -1768,6 +1769,7 @@ function addCollapsibleEvents() {
 
 function buildSettingEntities() {
     const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u2018-\u201F\u00A1-\u02AF\u{1F300}-\u{1FAD6}]*$/iu;
+    // eslint-disable-next-line no-useless-escape
     const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]\*]*$/iu;
     const regexAllowedTopicId = /^[0-9]+$/i;
 
