@@ -721,7 +721,7 @@ input[type="search"] {
   content: attr(deboucled-data-tooltip);
   padding: 5px 12px;
   min-width: 50px;
-  max-width: 300px;
+  max-width: 20vw;
   width: max-content;
   width: -moz-max-content;
   border-radius: 6px;
@@ -780,6 +780,9 @@ input[type="search"] {
 }
 [data-tooltip-location="right"]:hover:before {
   transform: translate(5px, 50%) scale(1);
+}
+.data-tooltip-large:before {
+  max-width: 45vw;
 }
 
 /* SVG */

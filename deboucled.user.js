@@ -384,13 +384,13 @@ function initPreBoucles() {
     };
 
     preBoucleArray.push(popularBoucles);
+    preBoucleArray.push(boucledAuthors);
     preBoucleArray.push(covid19);
     preBoucleArray.push(politic);
     preBoucleArray.push(deviant);
     preBoucleArray.push(socials);
     preBoucleArray.push(kiddy);
     preBoucleArray.push(hatred);
-    preBoucleArray.push(boucledAuthors);
 
     //console.log(preBoucleArray);
 
@@ -1411,10 +1411,12 @@ function buildSettingsPage() {
         const tooltipLocation = location === 'top' ? '' : ` data-tooltip-location="${location}"`;
         return `deboucled-data-tooltip="${hint}"${tooltipLocation}`;
     }
-    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false, hintLocation = 'top') {
+    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false, hintLocation = 'top', hintLarge = false) {
         let html = '';
         html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
-        html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}" ${buildTooltip(hint, hintLocation)}>${title}</td>`;
+        const subCell = isSubCell ? ' deboucled-option-table-subcell' : '';
+        const largeHint = hintLarge ? ' data-tooltip-large' : '';
+        html += `<td class="deboucled-td-left${subCell}${largeHint}" ${buildTooltip(hint, hintLocation)}>${title}</td>`;
         html += '<td class="deboucled-td-right">';
         html += '<label class="deboucled-switch">';
         let checked = GM_getValue(optionId, defaultValue) ? 'checked' : '';
@@ -1573,7 +1575,7 @@ function buildSettingsPage() {
 
         preBoucleArray.forEach(b => {
             const hint = b.entities.sort().join(', ');
-            html += addToggleOption(b.title, `deboucled-preboucle-${b.id}`, b.enabled, hint, undefined, undefined, 'right');
+            html += addToggleOption(b.title, `deboucled-preboucle-${b.id}`, b.enabled, hint, undefined, undefined, 'right', '50vw');
         });
 
         html += '</table>';
