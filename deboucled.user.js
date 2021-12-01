@@ -179,7 +179,7 @@ async function removeTopicIdBlacklist(topicId) {
 
 function loadPreBouclesStatuses() {
     let preBouclesStatuses = [...JSON.parse(GM_getValue(storage_preBoucles, storage_preBoucles_default))];
-    console.log(preBouclesStatuses);
+    //console.log(preBouclesStatuses);
     if (!preBouclesStatuses) return;
     preBouclesStatuses.forEach(pbs => {
         togglePreBoucleStatus(pbs[0], pbs[1]);
@@ -188,16 +188,16 @@ function loadPreBouclesStatuses() {
 
 function togglePreBoucleStatus(id, enabled) {
     let preBoucle = preBoucleArray.find(pb => pb.id === id);
-    console.log(preBoucle);
-    console.log(id + ' : ' + enabled);
+    //console.log(preBoucle);
+    //console.log(id + ' : ' + enabled);
     if (!preBoucle) return;
     preBoucle.enabled = enabled;
 }
 
 function savePreBouclesStatuses() {
     let preBouclesStatuses = preBoucleArray.map(pb => [pb.id, pb.enabled]);
-    console.log('savePreBouclesStatuses');
-    console.log(preBouclesStatuses);
+    //console.log('savePreBouclesStatuses');
+    //console.log(preBouclesStatuses);
     GM_setValue(storage_preBoucles, JSON.stringify(preBouclesStatuses));
 }
 
@@ -339,7 +339,7 @@ function initPreBoucles() {
         title: 'Politique',
         enabled: false,
         type: entitySubject,
-        entities: ['*zemmour*', 'le z', 'du z', 'pro z', 'pro-z', 'z0zz', 'zozz', 'knafo', 'philippot', 'le pen', 'macron', 'cnews', 'asselineau', 'fillon', 'veran', 'lrem']
+        entities: ['*zemmour*', 'le z', 'du z', 'pro z', 'pro-z', 'z0zz', 'zozz', 'knafo', 'philippot', 'le pen', 'lepen', 'macron', 'cnews', 'asselineau', 'melenchon', 'lfi', 'rn', 'fn', 'fillon', 'veran', 'lrem']
     };
     const deviant =
     {
@@ -380,7 +380,7 @@ function initPreBoucles() {
         title: 'Pseudos boucled',
         enabled: false,
         type: entityAuthor,
-        entities: ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki', 'leao']
+        entities: ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki', 'leao', 'oael']
     };
 
     preBoucleArray.push(popularBoucles);
@@ -392,7 +392,7 @@ function initPreBoucles() {
     preBoucleArray.push(hatred);
     preBoucleArray.push(boucledAuthors);
 
-    console.log(preBoucleArray);
+    //console.log(preBoucleArray);
 
     loadPreBouclesStatuses();
     buildPreBouclesBlacklists();
@@ -406,8 +406,8 @@ function buildPreBouclesBlacklists() {
     preBoucleArray.filter(pb => pb.enabled && pb.type === entityAuthor)
         .forEach(pb => { preBoucleAuthors = preBoucleAuthors.concat(pb.entities); });
 
-    console.log(preBoucleSubjects);
-    console.log(preBoucleAuthors);
+    //console.log(preBoucleSubjects);
+    //console.log(preBoucleAuthors);
 
     const preBoucleSubjectBlacklistArray = [...new Set([...preBoucleSubjects])];
     const preBoucleAuthorBlacklistArray = [...new Set([...preBoucleAuthors])];
@@ -415,10 +415,10 @@ function buildPreBouclesBlacklists() {
     preBoucleSubjectsBlacklistReg = buildRegex(preBoucleSubjectBlacklistArray, true);
     preBoucleAuthorsBlacklistReg = buildRegex(preBoucleAuthorBlacklistArray, false);
 
-    console.log(preBoucleSubjectBlacklistArray);
-    console.log(preBoucleAuthorBlacklistArray);
-    console.log(preBoucleSubjectsBlacklistReg);
-    console.log(preBoucleAuthorsBlacklistReg);
+    //console.log(preBoucleSubjectBlacklistArray);
+    //console.log(preBoucleAuthorBlacklistArray);
+    //console.log(preBoucleSubjectsBlacklistReg);
+    //console.log(preBoucleAuthorsBlacklistReg);
 }
 
 
@@ -942,8 +942,8 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
 function isSubjectBlacklisted(subject) {
     const hasSubjectBlacklist = subjectBlacklistArray.length > 0;
     const hasPreBoucle = preBoucleArray.some(b => b.enabled && b.type === entitySubject);
-    console.log('isSubjectBlacklisted hasSubjectBlacklist : ' + hasSubjectBlacklist);
-    console.log('isSubjectBlacklisted hasPreBoucle : ' + hasPreBoucle);
+    //console.log('isSubjectBlacklisted hasSubjectBlacklist : ' + hasSubjectBlacklist);
+    //console.log('isSubjectBlacklisted hasPreBoucle : ' + hasPreBoucle);
     if (!hasSubjectBlacklist && !hasPreBoucle) return false;
 
     let normSubject = subject.normalizeDiacritic();
@@ -954,8 +954,8 @@ function isSubjectBlacklisted(subject) {
 function isAuthorBlacklisted(author) {
     const hasAuthorBlacklist = authorBlacklistArray.length > 0;
     const hasPreBoucle = preBoucleArray.some(b => b.enabled && b.type === entityAuthor);
-    console.log('isAuthorBlacklisted hasAuthorBlacklist : ' + hasAuthorBlacklist);
-    console.log('isAuthorBlacklisted hasPreBoucle : ' + hasPreBoucle);
+    //console.log('isAuthorBlacklisted hasAuthorBlacklist : ' + hasAuthorBlacklist);
+    //console.log('isAuthorBlacklisted hasPreBoucle : ' + hasPreBoucle);
     if (!hasAuthorBlacklist && !hasPreBoucle) return false;
 
     const normAuthor = author.toLowerCase().normalizeDiacritic();
@@ -1240,18 +1240,23 @@ function removeMessage(element) {
     element.remove();
 }
 
-function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton) {
-    let isSelf = messageElement.querySelector('span.picto-msg-croix') !== null;
-    if (isSelf) return;
-
+function buildDeboucledBlacklistButton(author, callbackAfter) {
     let dbcBlacklistButton = document.createElement('span');
     dbcBlacklistButton.setAttribute('title', 'Blacklister avec Déboucled');
     dbcBlacklistButton.setAttribute('class', 'picto-msg-tronche deboucled-blacklist-author-button');
     dbcBlacklistButton.onclick = function () {
         addEntityBlacklist(authorBlacklistArray, author);
         refreshAuthorKeys()
-        location.reload();
+        if (callbackAfter) callbackAfter();
     };
+    return dbcBlacklistButton;
+}
+
+function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton) {
+    let isSelf = messageElement.querySelector('span.picto-msg-croix') !== null;
+    if (isSelf) return;
+
+    let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload() });
 
     let jvcBlacklistButton = messageElement.querySelector('span.picto-msg-tronche');
     let logged = (jvcBlacklistButton !== null);
@@ -1289,50 +1294,77 @@ function addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchiv
 }
 
 function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive) {
-    function handleLiveMessage(message, authorElement, upgradeMessage) {
+    function removeLiveMessage(messageElement, author) {
+        removeMessage(messageElement);
+        hiddenMessages++;
+        hiddenAuthorArray.add(author);
+        updateMessagesHeader();
+        saveTotalHidden();
+    }
+
+    function createJvChatBlacklistButton(messageElement, authorElement, author) {
+        let isSelf = messageElement.querySelector('span.picto-msg-croix') !== null;
+        console.log('createJvChatBlacklistButton isSelf : ' + isSelf);
+        if (isSelf) return;
+
+        let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => {
+            if (optionHideMessages) {
+                removeLiveMessage(messageElement, author);
+            }
+            else {
+                highlightBlacklistedAuthor(messageElement, authorElement, author);
+                addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive);
+            }
+        });
+        dbcBlacklistButton.classList.toggle('jvchat-picto', true);
+
+        let jvchatTooltip = messageElement.querySelector('.jvchat-tooltip');
+        jvchatTooltip.prepend(dbcBlacklistButton);
+    }
+
+    function handleLiveMessage(messageElement, authorElement, jvchat) {
         let author = authorElement.textContent.trim();
         if (isAuthorBlacklisted(author)) {
             if (optionHideMessages) {
-                removeMessage(message);
-                hiddenMessages++;
-                hiddenAuthorArray.add(author);
+                removeLiveMessage(messageElement, author);
             }
             else {
-                highlightBlacklistedAuthor(message, authorElement);
-                addBoucledAuthorButton(message, author, optionBoucledUseJvarchive);
+                highlightBlacklistedAuthor(messageElement, authorElement);
+                addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive);
             }
-            updateMessagesHeader();
-            saveTotalHidden();
         }
-        else if (upgradeMessage) {
-            let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
-            upgradeJvcBlacklistButton(message, author, optionShowJvcBlacklistButton);
-            addBoucledAuthorButton(message, author, optionBoucledUseJvarchive);
+        else {
+            if (jvchat) {
+                createJvChatBlacklistButton(messageElement, authorElement, author);
+            }
+            else {
+                let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
+                upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton);
+                addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive);
+            }
         }
     }
 
-    if (optionHideMessages) { // pour le moment : JvChat on ne changera pas le message (bouton blacklist à implem)
-        // JvChat
-        addEventListener('jvchat:newmessage', function (event) {
-            let message = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
-            let authorElement = message.querySelector('h5.jvchat-author');
-            if (!authorElement) return;
-            handleLiveMessage(message, authorElement, false);
-        });
-        addEventListener('jvchat:activation', function () {
-            hiddenMessages = 0;
-            hiddenAuthorArray.clear();
-            updateMessagesHeader();
-        });
-    }
+    // JvChat
+    addEventListener('jvchat:newmessage', function (event) {
+        let messageElement = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
+        let authorElement = messageElement.querySelector('h5.jvchat-author');
+        if (!authorElement) return;
+        handleLiveMessage(messageElement, authorElement, true);
+    });
+    addEventListener('jvchat:activation', function () {
+        hiddenMessages = 0;
+        hiddenAuthorArray.clear();
+        updateMessagesHeader();
+    });
 
     // TopicLive
     addEventListener('topiclive:newmessage', function (event) {
-        let message = document.querySelector(`.bloc-message-forum[data-id="${event.detail.id}"]`);
-        if (!message) return;
-        let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+        let messageElement = document.querySelector(`.bloc-message-forum[data-id="${event.detail.id}"]`);
+        if (!messageElement) return;
+        let authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
         if (!authorElement) return;
-        handleLiveMessage(message, authorElement, true);
+        handleLiveMessage(messageElement, authorElement, false);
     });
 }
 
@@ -2208,13 +2240,13 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
 }
 
 function handleTopicHeader() {
-    console.log('handleTopicHeader');
+    //console.log('handleTopicHeader');
     let titleElement = document.querySelector('#bloc-title-forum');
     if (!titleElement) return;
-    console.log(titleElement);
+    //console.log(titleElement);
     const subjectMatches = isSubjectBlacklisted(titleElement.textContent);
     if (!subjectMatches) return;
-    console.log(subjectMatches);
+    //console.log(subjectMatches);
 
     function highlightMatch(titleElem, match) {
         let content = titleElem.innerHTML;
