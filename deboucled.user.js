@@ -22,6 +22,8 @@
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
 // @resource    CHARTS_CSS https://unpkg.com/charts.css/dist/charts.min.css
 // @require     https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js
+// @require     https://unpkg.com/@chocolateboy/uncommonjs
+// @require     https://unpkg.com/fastest-levenshtein
 // @run-at      document-end
 // ==/UserScript==
 
@@ -323,7 +325,7 @@ function initPreBoucles() {
         title: 'Boucles connues',
         enabled: false,
         type: entitySubject,
-        entities: ['ces photos putain', 'yannick*tour eiffel', 'midsommar', 'eau*pastèque', 'l\'échéance est tombée', 'ai-je l\'air sympathique', 'pour avoir une copine en', 'no jump']
+        entities: ['ces photos putain', 'yannick*tour eiffel', 'metisseur22cm', 'midsommar', 'eau*pastèque', 'l\'échéance est tombée', 'ai-je l\'air sympathique', 'pour avoir une copine en', 'no jump']
     };
     const covid19 =
     {
@@ -561,6 +563,62 @@ function groupBy(arr, criteria) {
     return newObj;
 }
 
+function removeRepeatingCharacters(str) {
+    /*
+    return str.split('').filter(function (char, index, strArray) {
+        //console.log(`${char} ${index} ${strArray}`);
+        return index >= 1 && strArray[index - 1] === char;
+    }).join('');
+    */
+    //const vowels = ['A', 'E', 'I', 'O', 'U', 'Y'];
+    let res = '';
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        //if ((vowels.includes(char) || !isNaN(char)) && i >= 1 && char === str[i - 1]) continue;
+        //else if (!vowels.includes(char) && i >= 2 && char === str[i - 1] && char === str[i - 2]) continue;
+        if (i >= 1 && str[i] === str[i - 1]) continue;
+        res += char;
+    }
+    return res;
+}
+
+function replaceNumbersSimilarToCharacters(str) {
+    let res = str;
+    res = res.replaceAll('0', 'O');
+    res = res.replaceAll('1', 'I');
+    res = res.replaceAll('3', 'E');
+    res = res.replaceAll('4', 'A');
+    res = res.replaceAll('5', 'S');
+    res = res.replaceAll('7', 'T');
+    return res;
+}
+
+function calculateStringDistance(str1, str2) {
+    console.log('BEFORE : ' + str1);
+    console.log('BEFORE : ' + str2);
+
+    str1 = normalizeValue(str1).trim();
+    str2 = normalizeValue(str2).trim();
+
+    console.log('AFTER : ' + str1);
+    console.log('AFTER : ' + str2);
+
+    str1 = replaceNumbersSimilarToCharacters(str1);
+    str2 = replaceNumbersSimilarToCharacters(str2);
+
+    console.log('AFTER2 : ' + str1);
+    console.log('AFTER2 : ' + str2);
+
+    str1 = removeRepeatingCharacters(str1);
+    str2 = removeRepeatingCharacters(str2);
+
+    console.log('AFTER3 : ' + str1);
+    console.log('AFTER3 : ' + str2);
+
+    // eslint-disable-next-line no-undef
+    let result = 100 - 100 * distance(str1, str2) / Math.max(str1.length, str2.length);
+    return Math.round(result);
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // RIGHT COLUMN - STATS/CHARTS
@@ -2066,14 +2124,14 @@ function addHighlightModeratedButton() {
     anchor.className = 'titre-bloc deboucled-entity-moderated-button';
     anchor.setAttribute('role', 'button');
     anchor.innerHTML = buttonText;
-    anchor.onclick = function () {
+    anchor.onclick = async function () {
         if (this.textContent === buttonStopText) {
             stopHighlightModeratedTopics = true;
             this.innerHTML = buttonText;
         }
         else {
             this.innerHTML = `<b>${buttonStopText}</b>`;
-            highlightModeratedTopics();
+            await highlightModeratedTopics();
             stopHighlightModeratedTopics = false;
             this.innerHTML = buttonText;
         }
@@ -2092,7 +2150,7 @@ async function highlightModeratedTopics() {
         if (!moderatedTopics.has(key)) {
             entity.style.backgroundColor = '#69ceff70';
             let isModerated = await topicIsModerated(key);
-            await sleep(500);
+            await sleep(700);
             entity.removeAttribute('style');
             moderatedTopics.set(key, isModerated);
         }
@@ -2359,3 +2417,37 @@ async function callMe() {
 callMe();
 
 addEventListener('instantclick:newpage', callMe);
+
+/*
+// de 75% à 100%
+
+console.log(calculateStringDistance('ces photos putain', 'CEE333EEE3S PHHHHO0OOTOSS55 puuuutttaaaiiiillnniinnnnnnnn...'));
+console.log(calculateStringDistance('ces photos putain', 'CEEEE333EEE3S PHHHHO0OOTOSS55 puuuutttaaaiiiillnniinnnnnnnn...'));
+console.log(calculateStringDistance('ces photos putain', 'CEE333EEE3S PHHHO0OOTOSS55 puuuutttaaaiiiillnniinnnnnnnn...'));
+console.log(calculateStringDistance('"Célestin tu-" "Ferme-là"', '"Céleessestin tu-" "FFFFererme-là" '));
+console.log(calculateStringDistance('Yannick, 19 ans, se jette du haut de la Tour Eiffel', 'Yannniicccccllkk, 19999199999 aaaanssss5, seee jettteeee du hauttttt de la Tooiiuurrr Eifffeeiel'));
+console.log(calculateStringDistance('"J\'appelle Metisseur22cm a la barre"', '"J\'aaaappeelllle Meeelttissseeurr222ccmm a la bbbarreee" '));
+console.log(calculateStringDistance('Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', 'SSSi on RAAAAA4JOUTE 10% d’EAU à une PAA44SSS5STÈQUE qui en CONTIENT 90%...'));
+console.log(calculateStringDistance('[DILEMME] 100 000 000 000 000€ mais...', '[DDDIIILEMME] 100 000 000 000 000 000000000 000 000€ maaaaiiiis....'));
+console.log(calculateStringDistance('Il est bien Midsommar ?', 'Illllli esssttt biennnnn MIDDSS5SSS0OOOMMARR ?? '));
+
+console.log(calculateStringDistance('ces photos putain', 'Ceeeesss5ss PHHOOOOTTO00S puttaaiaain'));
+console.log(calculateStringDistance('Yannick, 19 ans, se jette du haut de la Tour Eiffel', 'Y4nnlck, 1981291 an5sss, se j3ee3tte du haut de la Too0uor Eiff3elll'));
+console.log(calculateStringDistance('"J\'appelle Metisseur22cm a la barre"', '"J\'aap3ellle Me3ttiss5eurr22cmm a la bbaaree3"'));
+console.log(calculateStringDistance('Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', 'Si on RAAA4JJJOUTE 10% d’EAUU à une PAA4ASTÈQUE qui en CONTIENT 90%...'));
+
+console.log(calculateStringDistance('ces photos putain', 'Ceeeesss5ss5ss PHHOOO0OOTTO00S puttaaiaain...'));
+console.log(calculateStringDistance('Yannick, 19 ans, se jette du haut de la Tour Eiffel', 'Yannnlliickk, 1991829 ansss, se jett3ee du haut de la Tooo0ur Eillifel'));
+console.log(calculateStringDistance('Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', 'Si on RAAA4JJJOUTE 10% d’EAU à une PAAA44ASTÈQUE qui en CONTIENT 90%...'));
+
+console.log(calculateStringDistance('ces photos putain', 'Ceeeeesss5ss PHHOOOOOTTO00S puttaaiaain...'));
+console.log(calculateStringDistance('Yannick, 19 ans, se jette du haut de la Tour Eiffel', 'Yaaaannnliickk, 119191910 aanss5s, sejetette ddu. hautlt de la Tounrr Eillffel'));
+console.log(calculateStringDistance('Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', 'Si on RAAA4JJJOUTE 10% d’EAU à une PAA4ASTÈQUE qui en CONTIENT 90%...'));
+
+console.log(calculateStringDistance('ces photos putain', 'Ceee3esss5ss PHOT0O0O0SS5S putttaaaa4aaiiaain...'));
+console.log(calculateStringDistance('Yannick, 19 ans, se jette du haut de la Tour Eiffel', 'YaaaYaannnick, 19 aanssans, se jetteeete du hahhaaut de la Touurr EiffelEifflle'));
+console.log(calculateStringDistance('Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', 'Si on RAAAA44JOUTE 10% d’EAU à une PPAA44ASTÈQUE qui en CONTIENT 90%...'));
+
+console.log(calculateStringDistance('ces photos putain', 'Ces PHOO0O0OTOS5SS ppttutaaainnn...'));
+console.log(calculateStringDistance('Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', 'Si on RAAAJOUTE 10% d’EAU à une PASTÈÈÈÈQUE qui en CONTIENT 90%...'));
+*/
