@@ -349,7 +349,7 @@ function initPreBoucles() {
         title: 'Déviances',
         enabled: false,
         type: entitySubject,
-        entities: ['feet*', 'trap*', 'kj', 'adf', 'papa du forum', 'blacked', 'cuck', 'reine fatima', 'shemale*', 'domina', 'fetichiste', 'fetichisme', 'mym', 'onlyfan', 'onlyfans', 'sissy', 'trans', 'transexuel', 'transexuelle', 'lgbt*', 'm2f', 'f2m', 'asmr', 'trav', 'travelo']
+        entities: ['feet*', 'trap*', 'kj', 'adf', 'papa du forum', 'blacked', 'cuck', 'reine fatima', 'shemale*', 'domina', 'fetichiste', 'fetichisme', 'mym', 'onlyfan', 'onlyfans', 'sissy', 'trans', 'transexuel', 'transexuelle', 'lgbt*', 'm2f', 'f2m', 'asmr', 'trav', 'travelo', 'femdom']
     };
     const socials =
     {
@@ -636,14 +636,15 @@ function addRightBlocMatches() {
     html += '<div class="scrollable-wrapper">';
     html += '<div id="deboucled-matches-content" class="scrollable-content bloc-info-forum">';
 
-    function formatMatches(matches) {
+    function formatMatches(matches, withHint) {
         let formatMatch = (str) => str.replace(',', '').removeDoubleSpaces().trim().capitalize();
         let matchesSorted = matches.sortByValueThenKey(true);
         let matchesHtml = '';
         let index = 0;
         matchesSorted.forEach((occ, match) => {
             const className = `deboucled-match${index < matchesSorted.size - 1 ? ' match-after' : ''}`;
-            matchesHtml += `<span class="${className}" deboucled-data-tooltip="${occ} fois">${formatMatch(match)}</span>`;
+            const hint = withHint ? ` deboucled-data-tooltip="${occ} fois"` : '';
+            matchesHtml += `<span class="${className}"${hint}>${formatMatch(match)}</span>`;
             index++;
         });
         return matchesHtml;
@@ -651,25 +652,25 @@ function addRightBlocMatches() {
 
     let optionClickToShowTopicMatches = GM_getValue(storage_optionClickToShowTopicMatches, storage_optionClickToShowTopicMatches_default);
 
-    function addMatches(matches, entity, title) {
+    function addMatches(matches, entity, title, withHint) {
         let matchesHtml = '';
         matchesHtml += `<h4 class="titre-info-fofo">${title}</h4>`;
         if (optionClickToShowTopicMatches) {
             matchesHtml += `<div id="deboucled-matches-${entity}-wrapper" class="deboucled-matches-wrapper">`;
             matchesHtml += `<span class="deboucled-eye-logo deboucled-display-matches"></span>`;
-            matchesHtml += `<div id="deboucled-matched-${entity}" style="display:none;">${formatMatches(matches)}</div>`;
+            matchesHtml += `<div id="deboucled-matched-${entity}" style="display:none;">${formatMatches(matches, withHint)}</div>`;
         }
         else {
             matchesHtml += `<div id="deboucled-matches-${entity}-wrapper">`;
-            matchesHtml += `<div id="deboucled-matched-${entity}">${formatMatches(matches)}</div>`;
+            matchesHtml += `<div id="deboucled-matched-${entity}">${formatMatches(matches, withHint)}</div>`;
         }
         matchesHtml += '</div>';
         return matchesHtml;
     }
 
-    if (matchedSubjects.hasAny()) html += addMatches(matchedSubjects, entitySubject, 'Sujets');
-    if (matchedAuthors.hasAny()) html += addMatches(matchedAuthors, entityAuthor, 'Auteurs');
-    if (matchedTopics.hasAny()) html += addMatches(matchedTopics, entityTopicId, 'Topics');
+    if (matchedSubjects.hasAny()) html += addMatches(matchedSubjects, entitySubject, 'Sujets', true);
+    if (matchedAuthors.hasAny()) html += addMatches(matchedAuthors, entityAuthor, 'Auteurs', true);
+    if (matchedTopics.hasAny()) html += addMatches(matchedTopics, entityTopicId, 'Topics', false);
 
     html += '</div>';
     html += '</div>';
@@ -1214,7 +1215,7 @@ async function topicIsModerated(topicId) {
 }
 
 function removeUselessTags(topics) {
-    const regex = /(\[?a+y+a+o*\]?|^((\{|\[|\(|🛑)*\s*\w*alerte?(\srouge|\snoir|\snoire|\secarlate|\satomique|\snucleaire)?\w*\s*(\}|\]|\)|🛑)*))\s?:?-?,?/gi;
+    const regex = /(\[?a+y+a+o*\]?|^((\{|\[|\(|🛑|🔴)*\s*\w*alerte?(\srouge|\snoir|\snoire|\secarlate|\satomique|\sgenerale|\scosmique|\snucleaire)?\w*\s*(\}|\]|\)|🛑|🔴)*))\s?:?-?,?/gi;
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
         let newTitle = titleElem.textContent.replace(regex, '').removeDoubleSpaces().trim().capitalize();
