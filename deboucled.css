@@ -376,6 +376,11 @@ body.deboucled-dark-theme {
   min-width: 6.375rem !important;
   margin-left: 0.3125rem;
 }
+.form-rech-forum {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 0.3125rem;
+}
 
 /* Logo */
 .deboucled-logo-forbidden {

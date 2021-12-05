@@ -58,6 +58,7 @@ let deboucledTopicStatsMap = new Map();
 let preBoucleArray = [];
 let preBoucleSubjectsBlacklistReg = new RegExp();
 let preBoucleAuthorsBlacklistReg = new RegExp();
+let vinzBoucleArray = [];
 
 let matchedSubjects = new Map();
 let matchedAuthors = new Map();
@@ -99,6 +100,8 @@ const storage_optionDisplayTopicMatches = 'deboucled_optionDisplayTopicMatches',
 const storage_optionClickToShowTopicMatches = 'deboucled_optionClickToShowTopicMatches', storage_optionClickToShowTopicMatches_default = false;
 const storage_optionRemoveUselessTags = 'deboucled_optionRemoveUselessTags', storage_optionRemoveUselessTags_default = false;
 const storage_optionMaxTopicCount = 'deboucled_optionMaxTopicCount', storage_optionMaxTopicCount_default = defaultTopicCount;
+const storage_optionAntiVinz = 'deboucled_optionAntiVinz', storage_optionAntiVinz_default = false;
+const storage_optionBlAuthorIgnoreMp = 'deboucled_optionBlAuthorIgnoreMp', storage_optionBlAuthorIgnoreMp_default = false;
 
 const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
 const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
@@ -106,12 +109,15 @@ const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 const storage_TopicStats = 'deboucled_TopicStats';
 
-const storage_Keys = [storage_init, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
+const storage_Keys = [storage_init, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
 
 const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors];
 
 
 async function initStorage() {
+    initPreBoucles();
+    initVinzBoucles();
+
     let isInit = GM_getValue(storage_init, storage_init_default);
     if (isInit) {
         await loadStorage();
@@ -128,8 +134,6 @@ async function loadStorage() {
     subjectBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedSubjects, storage_blacklistedSubjects_default)))];
     authorBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedAuthors, storage_blacklistedAuthors_default)))];
     topicIdBlacklistMap = new Map([...JSON.parse(GM_getValue(storage_blacklistedTopicIds, storage_blacklistedTopicIds_default))]);
-
-    initPreBoucles();
 
     subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
@@ -349,7 +353,7 @@ function initPreBoucles() {
         title: 'Déviances',
         enabled: false,
         type: entitySubject,
-        entities: ['feet*', 'trap*', 'kj', 'adf', 'papa du forum', 'blacked', 'cuck', 'reine fatima', 'shemale*', 'domina', 'fetichiste', 'fetichisme', 'mym', 'onlyfan', 'onlyfans', 'sissy', 'trans', 'transexuel', 'transexuelle', 'lgbt*', 'm2f', 'f2m', 'asmr', 'trav', 'travelo', 'femdom']
+        entities: ['feet*', 'trap*', 'kj', 'adf', 'papa du forum', 'blacked', 'cuck', 'reine fatima', 'shemale*', 'domina', 'fetichiste', 'fetichisme', 'mym', 'onlyfan', 'onlyfans', 'sissy', 'trans', 'transexuel', 'transexuelle', 'lgbt*', 'm2f', 'f2m', 'asmr', 'trav', 'travelo', 'femdom', 'cage de chastete']
     };
     const socials =
     {
@@ -421,6 +425,22 @@ function buildPreBouclesBlacklists() {
     //console.log(preBoucleAuthorBlacklistArray);
     //console.log(preBoucleSubjectsBlacklistReg);
     //console.log(preBoucleAuthorsBlacklistReg);
+}
+
+function makeVinzSubjectPure(str) {
+    // normalize boucles string and make them as "pure" as possible (also improve performances)
+    str = normalizeValue(str).trim();
+    str = replaceNumbersSimilarToCharacters(str);
+    str = removeRepeatingCharacters(str);
+    return str;
+}
+
+function initVinzBoucles() {
+    vinzBoucleArray = ['ces photos putain', '"Célestin tu-" "Ferme-là"', 'Yannick, 19 ans, se jette du haut de la Tour Eiffel', '"J\'appelle Metisseur22cm a la barre"', 'Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', '[DILEMME] 100 000 000 000 000€ mais...', 'Il est bien Midsommar ?'];
+
+    vinzBoucleArray.forEach((val, index) => {
+        vinzBoucleArray[index] = makeVinzSubjectPure(val);
+    });
 }
 
 
@@ -594,27 +614,6 @@ function replaceNumbersSimilarToCharacters(str) {
 }
 
 function calculateStringDistance(str1, str2) {
-    console.log('BEFORE : ' + str1);
-    console.log('BEFORE : ' + str2);
-
-    str1 = normalizeValue(str1).trim();
-    str2 = normalizeValue(str2).trim();
-
-    console.log('AFTER : ' + str1);
-    console.log('AFTER : ' + str2);
-
-    str1 = replaceNumbersSimilarToCharacters(str1);
-    str2 = replaceNumbersSimilarToCharacters(str2);
-
-    console.log('AFTER2 : ' + str1);
-    console.log('AFTER2 : ' + str2);
-
-    str1 = removeRepeatingCharacters(str1);
-    str2 = removeRepeatingCharacters(str2);
-
-    console.log('AFTER3 : ' + str1);
-    console.log('AFTER3 : ' + str2);
-
     // eslint-disable-next-line no-undef
     let result = 100 - 100 * distance(str1, str2) / Math.max(str1.length, str2.length);
     return Math.round(result);
@@ -756,6 +755,7 @@ function buildStatsChart() {
         chartTableHtml += '<table class="charts-css area show-data-on-hover show-labels" id="deboucled-stats-chart" style="width: 340px; height: 75px;">';
 
         chartTableHtml += '<thead>';
+        // eslint-disable-next-line no-unused-vars
         for (const [rowKey, stats] of Object.entries(groupedByDate)) {
             chartTableHtml += `<th scope="col">${rowKey}</th>`;
         }
@@ -768,6 +768,7 @@ function buildStatsChart() {
         chartTableHtml += '<tbody>'
         for (const [rowKey, stats] of Object.entries(groupedByDate)) {
             let firstEntry = true;
+            // eslint-disable-next-line no-unused-vars
             for (const [statKey, stat] of Object.entries(stats)) {
                 chartTableHtml += `<tr${firstEntry ? '' : ' class="hide-label"'}>`;
                 chartTableHtml += `<th scope="row">${rowKey}</th>`;
@@ -835,7 +836,7 @@ function getAllTopics(doc) {
     return [...allTopics];
 }
 
-async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold) {
+async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz) {
     let actualTopics = topics.length - hiddenTotalTopics - 1;
     let pageBrowse = 1;
     let filledTopics = [];
@@ -849,7 +850,7 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
             let nextPageTopics = getAllTopics(nextDoc);
 
             nextPageTopics.slice(1).forEach(function (topic) {
-                if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold)) {
+                if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz)) {
                     hiddenTotalTopics++;
                     return;
                 }
@@ -960,7 +961,7 @@ function getTopicMessageCount(element) {
     return parseInt(messageCountElement?.textContent.trim() ?? "0");
 }
 
-function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayThreshold) {
+function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz) {
     if (!element.hasAttribute('data-id')) return true;
 
     let topicId = element.getAttribute('data-id');
@@ -975,7 +976,7 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
 
     let titleTag = element.querySelector('.lien-jv.topic-title');
     if (titleTag) {
-        let title = titleTag.textContent;
+        const title = titleTag.textContent;
         const subjectBlacklisted = isSubjectBlacklisted(title);
         if (subjectBlacklisted) {
             matchedSubjects.addArrayIncrement(subjectBlacklisted);
@@ -986,13 +987,19 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
 
     let authorTag = element.querySelector('.topic-author');
     if (authorTag) {
-        let author = authorTag.textContent.trim();
+        const author = authorTag.textContent.trim();
         const authorBlacklisted = isAuthorBlacklisted(author);
         if (authorBlacklisted) {
             matchedAuthors.addArrayIncrement(authorBlacklisted);
             hiddenAuthors++;
             return true;
         }
+    }
+
+    if (optionAntiVinz) {
+        const title = titleTag.textContent;
+        const author = authorTag.textContent.toLowerCase().trim();
+        if (isVinzTopic(title, author)) return true;
     }
 
     return false;
@@ -1021,6 +1028,18 @@ function isAuthorBlacklisted(author) {
     return normAuthor !== 'rand0max' &&
         ((hasAuthorBlacklist && normAuthor.match(authorsBlacklistReg))
             || (hasPreBoucle && normAuthor.match(preBoucleAuthorsBlacklistReg)));
+}
+
+function isVinzTopic(subject, author) {
+    const authorMayBeVinz = author.startsWith('vinz') || (author.length === 5 && author.charAt(0) === 'v');
+    const pureSubject = makeVinzSubjectPure(subject);
+    for (const boucle of vinzBoucleArray) {
+        let score = calculateStringDistance(boucle, pureSubject);
+        //console.log('score : ' + score + ' - ' + authorMayBeVinz);
+        if (authorMayBeVinz) score += 10; // on rajoute 10% au score si l'on soupçonne l'auteur d'être Vinz
+        if (score >= 80) return true;
+    }
+    return false;
 }
 
 async function isTopicPoC(element, optionDetectPocMode) {
@@ -1363,7 +1382,7 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive)
 
     function createJvChatBlacklistButton(messageElement, authorElement, author) {
         let isSelf = messageElement.querySelector('span.picto-msg-croix') !== null;
-        console.log('createJvChatBlacklistButton isSelf : ' + isSelf);
+        //console.log('createJvChatBlacklistButton isSelf : ' + isSelf);
         if (isSelf) return;
 
         let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => {
@@ -1629,13 +1648,14 @@ function buildSettingsPage() {
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">ANTI-BOUCLES</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
         html += '<div class="deboucled-setting-content">';
-
         html += '<table class="deboucled-option-table">';
 
         preBoucleArray.forEach(b => {
             const hint = b.entities.sort().join(', ');
             html += addToggleOption(b.title, `deboucled-preboucle-${b.id}`, b.enabled, hint, undefined, undefined, 'right', '50vw');
         });
+
+        html += addToggleOption('Algorithme anti-Vinz', storage_optionAntiVinz, storage_optionAntiVinz_default, 'Algorithme intelligent pour éradiquer totalement Vinz et sa boucle infernale, en dépit de ses tentatives d\'évitement.', undefined, undefined, 'right');
 
         html += '</table>';
         html += '</div>';
@@ -1790,6 +1810,7 @@ function addSettingEvents() {
             savePreBouclesStatuses();
         });
     });
+    addToggleEvent(storage_optionAntiVinz);
 }
 
 function addSortEvent() {
@@ -2197,12 +2218,6 @@ function getCurrentPageType(url) {
     return 'unknown';
 }
 
-function getSearchType(urlSearch) {
-    let searchRegex = /(\?search_in_forum=)(?<searchvalue>.*)(&type_search_in_forum=)(?<searchtype>.*)/i;
-    let matches = searchRegex.exec(urlSearch);
-    return matches.groups.searchtype.trim().toLowerCase();
-}
-
 async function getForumPageContent(page) {
     let urlRegex = /(\/forums\/0-[0-9]+-0-1-0-)(?<pageid>[0-9]+)(-0-.*)/i;
 
@@ -2223,19 +2238,20 @@ async function handleTopicList(canFillTopics) {
 
     let optionAllowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
     let optionDisplayThreshold = GM_getValue(storage_optionDisplayThreshold, storage_optionDisplayThreshold_default);
+    let optionAntiVinz = GM_getValue(storage_optionAntiVinz, storage_optionAntiVinz_default);
 
     let topicsToRemove = [];
     let finalTopics = [];
     finalTopics.push(topics[0]); // header
     topics.slice(1).forEach(function (topic) {
-        if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold)) {
+        if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz)) {
             topicsToRemove.push(topic);
             hiddenTotalTopics++;
         }
         else finalTopics.push(topic);
     });
     if (canFillTopics) {
-        const filledTopics = await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold);
+        const filledTopics = await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz);
         finalTopics = finalTopics.concat(filledTopics);
     }
     topicsToRemove.forEach(removeTopic);
@@ -2418,37 +2434,3 @@ async function callMe() {
 callMe();
 
 addEventListener('instantclick:newpage', callMe);
-
-/*
-// de 75% à 100%
-
-console.log(calculateStringDistance('ces photos putain', 'CEE333EEE3S PHHHHO0OOTOSS55 puuuutttaaaiiiillnniinnnnnnnn...'));
-console.log(calculateStringDistance('ces photos putain', 'CEEEE333EEE3S PHHHHO0OOTOSS55 puuuutttaaaiiiillnniinnnnnnnn...'));
-console.log(calculateStringDistance('ces photos putain', 'CEE333EEE3S PHHHO0OOTOSS55 puuuutttaaaiiiillnniinnnnnnnn...'));
-console.log(calculateStringDistance('"Célestin tu-" "Ferme-là"', '"Céleessestin tu-" "FFFFererme-là" '));
-console.log(calculateStringDistance('Yannick, 19 ans, se jette du haut de la Tour Eiffel', 'Yannniicccccllkk, 19999199999 aaaanssss5, seee jettteeee du hauttttt de la Tooiiuurrr Eifffeeiel'));
-console.log(calculateStringDistance('"J\'appelle Metisseur22cm a la barre"', '"J\'aaaappeelllle Meeelttissseeurr222ccmm a la bbbarreee" '));
-console.log(calculateStringDistance('Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', 'SSSi on RAAAAA4JOUTE 10% d’EAU à une PAA44SSS5STÈQUE qui en CONTIENT 90%...'));
-console.log(calculateStringDistance('[DILEMME] 100 000 000 000 000€ mais...', '[DDDIIILEMME] 100 000 000 000 000 000000000 000 000€ maaaaiiiis....'));
-console.log(calculateStringDistance('Il est bien Midsommar ?', 'Illllli esssttt biennnnn MIDDSS5SSS0OOOMMARR ?? '));
-
-console.log(calculateStringDistance('ces photos putain', 'Ceeeesss5ss PHHOOOOTTO00S puttaaiaain'));
-console.log(calculateStringDistance('Yannick, 19 ans, se jette du haut de la Tour Eiffel', 'Y4nnlck, 1981291 an5sss, se j3ee3tte du haut de la Too0uor Eiff3elll'));
-console.log(calculateStringDistance('"J\'appelle Metisseur22cm a la barre"', '"J\'aap3ellle Me3ttiss5eurr22cmm a la bbaaree3"'));
-console.log(calculateStringDistance('Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', 'Si on RAAA4JJJOUTE 10% d’EAUU à une PAA4ASTÈQUE qui en CONTIENT 90%...'));
-
-console.log(calculateStringDistance('ces photos putain', 'Ceeeesss5ss5ss PHHOOO0OOTTO00S puttaaiaain...'));
-console.log(calculateStringDistance('Yannick, 19 ans, se jette du haut de la Tour Eiffel', 'Yannnlliickk, 1991829 ansss, se jett3ee du haut de la Tooo0ur Eillifel'));
-console.log(calculateStringDistance('Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', 'Si on RAAA4JJJOUTE 10% d’EAU à une PAAA44ASTÈQUE qui en CONTIENT 90%...'));
-
-console.log(calculateStringDistance('ces photos putain', 'Ceeeeesss5ss PHHOOOOOTTO00S puttaaiaain...'));
-console.log(calculateStringDistance('Yannick, 19 ans, se jette du haut de la Tour Eiffel', 'Yaaaannnliickk, 119191910 aanss5s, sejetette ddu. hautlt de la Tounrr Eillffel'));
-console.log(calculateStringDistance('Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', 'Si on RAAA4JJJOUTE 10% d’EAU à une PAA4ASTÈQUE qui en CONTIENT 90%...'));
-
-console.log(calculateStringDistance('ces photos putain', 'Ceee3esss5ss PHOT0O0O0SS5S putttaaaa4aaiiaain...'));
-console.log(calculateStringDistance('Yannick, 19 ans, se jette du haut de la Tour Eiffel', 'YaaaYaannnick, 19 aanssans, se jetteeete du hahhaaut de la Touurr EiffelEifflle'));
-console.log(calculateStringDistance('Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', 'Si on RAAAA44JOUTE 10% d’EAU à une PPAA44ASTÈQUE qui en CONTIENT 90%...'));
-
-console.log(calculateStringDistance('ces photos putain', 'Ces PHOO0O0OTOS5SS ppttutaaainnn...'));
-console.log(calculateStringDistance('Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', 'Si on RAAAJOUTE 10% d’EAU à une PASTÈÈÈÈQUE qui en CONTIENT 90%...'));
-*/
