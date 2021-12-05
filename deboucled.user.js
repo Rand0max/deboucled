@@ -1652,10 +1652,10 @@ function buildSettingsPage() {
 
         preBoucleArray.forEach(b => {
             const hint = b.entities.sort().join(', ');
-            html += addToggleOption(b.title, `deboucled-preboucle-${b.id}`, b.enabled, hint, undefined, undefined, 'right', '50vw');
+            html += addToggleOption(b.title, `deboucled-preboucle-${b.id}`, b.enabled, hint, undefined, undefined, 'right', true);
         });
 
-        html += addToggleOption('Algorithme anti-Vinz', storage_optionAntiVinz, storage_optionAntiVinz_default, 'Algorithme intelligent pour éradiquer totalement Vinz et sa boucle infernale, en dépit de ses tentatives d\'évitement.', undefined, undefined, 'right');
+        html += addToggleOption('Algorithme anti-Vinz', storage_optionAntiVinz, storage_optionAntiVinz_default, 'Algorithme intelligent pour éradiquer totalement Vinz et sa boucle infernale, en dépit de ses tentatives d\'évitement.', undefined, undefined, 'right', true);
 
         html += '</table>';
         html += '</div>';

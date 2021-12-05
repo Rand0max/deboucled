@@ -631,6 +631,12 @@ input[type="search"] {
 .deboucled-settings-view.active {
   opacity: 1;
 }
+@media (max-width: 1479.98px) {
+  .deboucled-settings-view {
+    width: 80%;
+    margin-left: 10%;
+  }
+}
 @media (max-width: 999px) {
   .deboucled-settings-view {
     width: 96%;
@@ -787,7 +793,17 @@ input[type="search"] {
   transform: translate(5px, 50%) scale(1);
 }
 .data-tooltip-large:before {
-  max-width: 45vw;
+  max-width: 50vw;
+}
+@media (max-width: 1479.98px) {
+  .data-tooltip-large:before {
+    max-width: 60vw;
+  }
+}
+@media (max-width: 999px) {
+  .data-tooltip-large:before {
+    max-width: 65vw;
+  }
 }
 
 /* SVG */
