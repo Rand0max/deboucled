@@ -39,6 +39,9 @@ body.deboucled-dark-theme {
 .deboucled-td-right {
   width: 99%;
 }
+.deboucled-td-right-padding {
+  padding-left: 10px;
+}
 @media (max-width: 500px) {
   .deboucled-td-left {
     white-space: break-spaces;
@@ -803,16 +806,16 @@ input[type="search"] {
   transform: translate(5px, 50%) scale(1);
 }
 .data-tooltip-large:before {
-  max-width: 50vw;
+  max-width: 48vw;
 }
 @media (max-width: 1479.98px) {
   .data-tooltip-large:before {
-    max-width: 60vw;
+    max-width: 58vw;
   }
 }
 @media (max-width: 999px) {
   .data-tooltip-large:before {
-    max-width: 65vw;
+    max-width: 63vw;
   }
 }
 

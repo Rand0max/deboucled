@@ -1489,16 +1489,17 @@ function buildSettingsPage() {
         const tooltipLocation = location === 'top' ? '' : ` data-tooltip-location="${location}"`;
         return `deboucled-data-tooltip="${hint}"${tooltipLocation}`;
     }
-    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false, hintLocation = 'top', hintLarge = false) {
+    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false, hintLocation = 'top', hintLarge = false, rightColPad = true) {
         let html = '';
         html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
-        const subCell = isSubCell ? ' deboucled-option-table-subcell' : '';
-        const largeHint = hintLarge ? ' data-tooltip-large' : '';
-        html += `<td class="deboucled-td-left${subCell}${largeHint}" ${buildTooltip(hint, hintLocation)}>${title}</td>`;
-        html += '<td class="deboucled-td-right">';
+        const subCellStr = isSubCell ? ' deboucled-option-table-subcell' : '';
+        const hintLargeStr = hintLarge ? ' data-tooltip-large' : '';
+        const rightColPadStr = rightColPad ? ' deboucled-td-right-padding' : '';
+        html += `<td class="deboucled-td-left${subCellStr}${hintLargeStr}" ${buildTooltip(hint, hintLocation)}>${title}</td>`;
+        html += `<td class="deboucled-td-right${rightColPadStr}">`;
         html += '<label class="deboucled-switch">';
-        let checked = GM_getValue(optionId, defaultValue) ? 'checked' : '';
-        html += `<input type="checkbox" id="${optionId}" ${checked}></input>`;
+        let checkedStr = GM_getValue(optionId, defaultValue) ? 'checked' : '';
+        html += `<input type="checkbox" id="${optionId}" ${checkedStr}></input>`;
         html += '<span class="deboucled-toggle-slider round"></span>';
         html += '</label>';
         html += '</td>';
@@ -1652,10 +1653,10 @@ function buildSettingsPage() {
 
         preBoucleArray.forEach(b => {
             const hint = b.entities.sort().join(', ');
-            html += addToggleOption(b.title, `deboucled-preboucle-${b.id}`, b.enabled, hint, undefined, undefined, 'right', true);
+            html += addToggleOption(b.title, `deboucled-preboucle-${b.id}`, b.enabled, hint, undefined, undefined, 'right', true, true);
         });
 
-        html += addToggleOption('Algorithme anti-Vinz', storage_optionAntiVinz, storage_optionAntiVinz_default, 'Algorithme intelligent pour éradiquer totalement Vinz et sa boucle infernale, en dépit de ses tentatives d\'évitement.', undefined, undefined, 'right', true);
+        html += addToggleOption('Algorithme anti-Vinz', storage_optionAntiVinz, storage_optionAntiVinz_default, 'Algorithme intelligent pour éradiquer totalement Vinz et sa boucle infernale, en dépit de ses tentatives d\'évitement.', undefined, undefined, 'right', true, true);
 
         html += '</table>';
         html += '</div>';
@@ -2398,7 +2399,7 @@ async function init() {
     addSettingButton(firstLaunch);
 }
 
-async function callMe() {
+async function entryPoint() {
     let currentPageType = getCurrentPageType(window.location.pathname);
     switch (currentPageType) {
         case 'topiclist': {
@@ -2430,6 +2431,6 @@ async function callMe() {
     }
 }
 
-callMe();
+entryPoint();
 
-addEventListener('instantclick:newpage', callMe);
+addEventListener('instantclick:newpage', entryPoint);
