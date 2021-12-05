@@ -1077,9 +1077,9 @@ function updateMessagesHeader() {
 }
 
 function removeMessage(element) {
-    if (element.previousElementSibling) element.previousElementSibling.remove();
-    else if (element.nextElementSibling) element.nextElementSibling.remove();
-    element.remove();
+    if (element.previousElementSibling) element.previousElementSibling.hidden = true;
+    else if (element.nextElementSibling) element.nextElementSibling.hidden = true;
+    element.hidden = true;
 }
 
 function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton) {
