@@ -2099,7 +2099,6 @@ function addSearchFilterToggle() {
 
     let toggleElem = document.createElement('label');
     toggleElem.className = 'deboucled-switch';
-    toggleElem.style.marginBottom = '2px';
     toggleElem.title = 'Filter les résultats avec Déboucled';
     toggleElem.innerHTML = `<input type="checkbox" id="deboucled-search-filter-toggle" ${optionFilterResearch ? 'checked' : ''}><span class="deboucled-toggle-slider round red"></span>`;
     document.querySelector('.form-rech-forum').appendChild(toggleElem);
