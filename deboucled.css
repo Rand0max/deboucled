@@ -249,7 +249,7 @@ body.deboucled-dark-theme {
   font-weight: 700;
   font-size: 0.625rem;
   padding: 0;
-  min-width: 6.375rem;
+  min-width: 5.25rem;
   line-height: 1.6875rem;
   border-radius: 0.25rem;
   border: none !important;
@@ -336,11 +336,13 @@ body.deboucled-dark-theme {
   align-items: flex-end;
   flex: auto;
 }
+#forum-main-col .bloc-pre-pagi-forum .bloc-rech-forum {
+  flex: 1;
+}
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-left,
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-right {
   display: flex;
   align-items: flex-end;
-  flex: auto !important;
   row-gap: 0.3125rem;
   flex-wrap: wrap;
   margin-top: auto;
@@ -373,13 +375,13 @@ body.deboucled-dark-theme {
 }
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-right button {
   float: right;
-  min-width: 6.375rem !important;
+  min-width: 5.25rem;
   margin-left: 0.3125rem;
 }
-.form-rech-forum {
-  display: flex;
-  flex-wrap: wrap;
-  row-gap: 0.3125rem;
+@media (min-width: 612px) and (max-width: 807px) {
+  .bloc-rech-forum .txt-search {
+    width: 8.25rem;
+  }
 }
 
 /* Logo */
