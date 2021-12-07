@@ -1490,18 +1490,33 @@ function buildSettingsPage() {
     document.body.prepend(bgView);
     document.querySelector('#deboucled-settings-bg-view').style.display = 'none';
 
-    function buildTooltip(hint, location = 'top') {
+    function buildTooltip(hint, location = 'right') {
         const tooltipLocation = location === 'top' ? '' : ` data-tooltip-location="${location}"`;
         return `deboucled-data-tooltip="${hint}"${tooltipLocation}`;
     }
-    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false, hintLocation = 'top', hintLarge = false, rightColPad = false) {
+    function addToggleOption(title, optionId, defaultValue, hint) {
         let html = '';
-        html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
-        const subCellStr = isSubCell ? ' deboucled-option-table-subcell' : '';
-        const hintLargeStr = hintLarge ? ' data-tooltip-large' : '';
-        const rightColPadStr = rightColPad ? ' deboucled-td-right-padding' : '';
-        html += `<td class="deboucled-td-left${subCellStr}${hintLargeStr}" ${buildTooltip(hint, hintLocation)}>${title}</td>`;
-        html += `<td class="deboucled-td-right${rightColPadStr}">`;
+        html += `<tr id="${optionId}-container">`;
+        html += `<td class="deboucled-td-left">`;
+        html += `<span ${buildTooltip(hint)}>${title}</span>`;
+        html += '</td>';
+        html += `<td class="deboucled-td-right">`;
+        html += '<label class="deboucled-switch">';
+        let checkedStr = GM_getValue(optionId, defaultValue) ? 'checked' : '';
+        html += `<input type="checkbox" id="${optionId}" ${checkedStr}></input>`;
+        html += '<span class="deboucled-toggle-slider round"></span>';
+        html += '</label>';
+        html += '</td>';
+        html += '</tr>';
+        return html;
+    }
+    function addToggleAltOption(title, optionId, defaultValue, hint) {
+        let html = '';
+        html += `<tr id="${optionId}-container">`;
+        html += `<td class="deboucled-td-left full-width">`;
+        html += `<span class="data-tooltip-large" ${buildTooltip(hint)}>${title}</span>`;
+        html += '</td>';
+        html += `<td class="deboucled-td-right deboucled-td-right-padding">`;
         html += '<label class="deboucled-switch">';
         let checkedStr = GM_getValue(optionId, defaultValue) ? 'checked' : '';
         html += `<input type="checkbox" id="${optionId}" ${checkedStr}></input>`;
@@ -1514,7 +1529,9 @@ function buildSettingsPage() {
     function addRangeOption(title, optionId, defaultValue, minValue, maxValue, step, hint, enabled, isSubCell = false) {
         let html = '';
         html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
-        html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}" ${buildTooltip(hint)}>${title}</td>`;
+        html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}">`;
+        html += `<span ${buildTooltip(hint)}>${title}</span>`;
+        html += '</td>';
         html += '<td class="deboucled-td-right" style="padding-top: 7px;">';
         let value = parseInt(GM_getValue(optionId, defaultValue));
         html += `<input type="range" id="${optionId}" min="${minValue}" max="${maxValue}" value="${value}" step="${step}" class="deboucled-range-slider">`;
@@ -1525,7 +1542,9 @@ function buildSettingsPage() {
     function addDropdownOption(title, optionId, hint, defaultValue, values) {
         let html = '';
         html += '<tr>';
-        html += `<td class="deboucled-td-left" ${buildTooltip(hint)} style="vertical-align: top;">${title}</td>`;
+        html += '<td class="deboucled-td-left" style="vertical-align: top;">';
+        html += `<span ${buildTooltip(hint)}>${title}</span>`;
+        html += '</td>';
         html += '<td class="deboucled-td-right">';
         html += '<span class="deboucled-dropdown select">';
         html += `<select class="deboucled-dropdown" id="${optionId}">`;
@@ -1543,7 +1562,9 @@ function buildSettingsPage() {
     function addImportExportButtons() {
         let html = '';
         html += '<tr>';
-        html += '<td class="deboucled-td-left" rowspan="2">Restaurer/sauvegarder les préférences</td>';
+        html += `<td class="deboucled-td-left" rowspan="2">`;
+        html += `<span ${buildTooltip('Exportez ou importer vos préférences et/ou vos blacklists.')}>Restaurer/sauvegarder les préférences</span>`;
+        html += '</td>';
         html += '<td class="deboucled-td-left">';
         html += '<label for="deboucled-import-button" class="btn deboucled-button deboucled-setting-button">Restaurer</label>';
         html += '<input type="file" accept="application/JSON" id="deboucled-import-button" style="display: none;"></input>';
@@ -1583,7 +1604,7 @@ function buildSettingsPage() {
 
         html += '<table class="deboucled-option-table">';
 
-        html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, storage_optionHideMessages_default, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.', undefined, undefined, 'bottom');
+        html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, storage_optionHideMessages_default, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.');
 
         let mpLogo = '<span class="deboucled-mp-logo nav-icon-pm"></span>'
         html += addToggleOption(`Filtrer les <i>Messages Privés</i> ${mpLogo} des <i>auteurs blacklist</i>`, storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default, 'Ignorer les MPs des pseudos présents dans votre blacklist et les déplacer automatiquement dans le dossier &quot;Spam&quot;.');
@@ -1623,7 +1644,7 @@ function buildSettingsPage() {
         html += '<table class="deboucled-option-table">';
 
         let darkLogo = '<span class="deboucled-dark-logo"></span>'
-        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default, 'Permet de basculer entre le thème normal et le thème sombre pour le script Déboucled.', undefined, undefined, 'bottom');
+        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default, 'Permet de basculer entre le thème normal et le thème sombre pour le script Déboucled.');
 
         let forbiddenLogo = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbiddenLogo}`, storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics souhaités.');
@@ -1657,14 +1678,15 @@ function buildSettingsPage() {
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">ANTI-BOUCLES</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
         html += '<div class="deboucled-setting-content">';
+        html += '<div class="deboucled-preboucle-title">Listes anti-boucle pré-enregistrées</div>';
         html += '<table class="deboucled-option-table">';
 
         preBoucleArray.forEach(b => {
             const hint = b.entities.sort().join(', ');
-            html += addToggleOption(b.title, `deboucled-preboucle-${b.id}`, b.enabled, hint, undefined, undefined, 'right', true, true);
+            html += addToggleAltOption(b.title, `deboucled-preboucle-${b.id}`, b.enabled, hint);
         });
 
-        html += addToggleOption('Algorithme anti-Vinz', storage_optionAntiVinz, storage_optionAntiVinz_default, 'Algorithme intelligent pour éradiquer totalement Vinz et sa boucle infernale, en dépit de ses tentatives d\'évitement.', undefined, undefined, 'right', true, true);
+        html += addToggleAltOption('Algorithme anti-Vinz', storage_optionAntiVinz, storage_optionAntiVinz_default, 'Algorithme intelligent pour éradiquer totalement Vinz et sa boucle infernale, en dépit de ses tentatives d\'évitement.');
 
         html += '</table>';
         html += '</div>';
@@ -1788,7 +1810,7 @@ function addSettingEvents() {
         };
     }
 
-    const pave2022 = 'Juste pour rappel en 2000V2 :\n\n· Fin de la boucle temporelle.\n· Débug du script mathématique.\n· Conscience des oldfags.\n· Avènement des proto-boucleurs.\n\nVous êtes fin prêts.';
+    const pave2022 = 'Juste pour rappel en 2022 :\n\n· Fin de la boucle temporelle.\n· Débug du script mathématique.\n· Révélation projet DéboucledV2.\n· Conscience des oldfags.\n· Avènement des proto-boucleurs.\n· Résonnance de Vinzmann.\n\nVous n\'êtes pas prêts.';
     document.querySelector('.deboucled-about-version').onclick = () => alert(pave2022);
 
     addToggleEvent(storage_optionEnableDarkTheme, undefined, toggleDarkTheme);
@@ -2484,6 +2506,7 @@ async function handlePrivateMessageNotifs() {
     if (!optionBlAuthorIgnoreMp) return;
 
     const mpElem = document.querySelector('.jv-nav-account-mp > div > .jv-nav-dropdown-container-content');
+    if (!mpElem) return; // not connected
     let privateMessageElements = await awaitElements(mpElem, '.jv-nav-dropdown-item');
 
     let hiddenPrivateMessageArray = [];
