@@ -528,7 +528,7 @@ function buildRegex(array, withBoundaries) {
     let bStart = withBoundaries ? '(?<=\\W|^)' : '';
     let bEnd = withBoundaries ? '(?=\\W|$)' : '';
     let map = array.map((e) => {
-        let word = e.escapeRegexPattern().handleGenericChar().normalizeDiacritic();
+        let word = e.escapeRegexPattern().normalizeDiacritic().handleGenericChar();
         return `${bStart}${word}${bEnd}`;
     })
     let regex = map.join('|');
@@ -1617,7 +1617,7 @@ function buildSettingsPage() {
         html += addToggleOption(`Filtrer les <i>Messages Privés</i> ${mpLogo} des <i>auteurs blacklist</i>`, storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default, 'Ignorer les MPs des pseudos présents dans votre blacklist et les déplacer automatiquement dans le dossier &quot;Spam&quot;.');
 
         let messageLogo = '<span class="deboucled-msg-logo"></span>'
-        html += addToggleOption(`Masquer les <i>messages</i> ${messageLogo} avec les <i>sujets blacklist</i>`, storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default, 'Masquer les messages contenant les mots-clés présents dans la &quot;Blacklist Sujets&quot;.');
+        html += addToggleOption(`Masquer les <i>messages</i> ${messageLogo} avec les <i>sujets blacklist</i>`, storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default, 'Masque les messages contenant les mots-clés présents dans la &quot;Blacklist Sujets&quot;.\nCliquez sur l\'oeil pour afficher le message, et les expressions blacklist apparaitront en rouge.');
 
         let spiralLogo = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
         html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiralLogo}`, storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
@@ -2421,66 +2421,41 @@ async function handlePoc(finalTopics) {
 
 function highlightBlacklistMatches(element, matches) {
     let content = element.textContent;
-    console.log('content begin : ' + content);
-
     let index = -1;
     matches.forEach(match => {
-        console.log('match : ' + match);
         const matchNorm = match.normalizeDiacritic();
-        console.log('matchNorm : ' + matchNorm);
-
         index = content.normalizeDiacritic().indexOf(matchNorm, index + 1);
-        console.log('index begin : ' + index);
-
         const realMatchContent = content.slice(index, index + matchNorm.length);
-        console.log('realMatch : ' + realMatchContent);
-
         const newContent = `<span class="deboucled-blacklisted">${realMatchContent}</span>`;
         content = `${content.slice(0, index)}${newContent}${content.slice(index + match.length, content.length)}`;
-        console.log('content end : ' + content);
-
         index += newContent.length;
-        console.log('index end : ' + index);
     });
+
     if (element.nodeType == Node.TEXT_NODE) {
         let newNode = document.createElement('span');
         element.parentElement.appendChild(newNode);
         newNode.outerHTML = content;
         element.remove();
-    } 
+    }
     else {
         element.innerHTML = content;
     }
 }
 
-function HighlightMessageMatches(messageElement) {
-    function getParagraphChildren(contentElement) {
-        return [...contentElement.children].filter(c =>
-            c.tagName === 'P'
-            // c.tagName !== 'BLOCKQUOTE'
-            // && c.tagName !== 'IMG'
-            // && c.tagName !== 'A'
-            && c.textContent.trim() !== '');
-    }
-    function getTextChildren(contentElement) {
-        return [...contentElement.childNodes].filter(c =>
-            c.nodeType === Node.TEXT_NODE
-            && c.textContent.trim() !== '');
-    }
+function handleMessageBlacklistMatches(messageElement) {
+    const getParagraphChildren = (contentElement) => [...contentElement.children].filter(c => c.tagName === 'P' && c.textContent.trim() !== '');
+    const getTextChildren = (contentElement) => [...contentElement.childNodes].filter(c => c.nodeType === Node.TEXT_NODE && c.textContent.trim() !== '');
     function highlightMatches(textChild) {
         const matches = isSubjectBlacklisted(textChild.textContent);
-        console.log('matches : ' + matches);
         if (!matches) return false;
         highlightBlacklistMatches(textChild, matches);
         return true;
     }
 
-    let hasMatch = false;
-    let paragraphChildren = getParagraphChildren(messageElement);
-    console.log(paragraphChildren);
     // Un message contient une balise p pour chaque ligne
     // Un p peut contenir du texte ou du html (img, a, etc)
-
+    let paragraphChildren = getParagraphChildren(messageElement);
+    let hasMatch = false;
     paragraphChildren.forEach(paragraph => {
         const textChildren = getTextChildren(paragraph); // on ne s'intéresse qu'au texte
         textChildren.forEach(textChild => { hasMatch = highlightMatches(textChild) ? true : hasMatch });
@@ -2489,14 +2464,10 @@ function HighlightMessageMatches(messageElement) {
 }
 
 function handleBlSubjectIgnoreMessages(messageElement) {
-    //if (messageElement.getAttribute('data-id') !== '1133488167') return;
-
     let contentElement = messageElement.querySelector('.txt-msg.text-enrichi-forum');
     if (!contentElement) return;
 
-    console.log(contentElement);
-
-    let hasAnyMatch = HighlightMessageMatches(contentElement);
+    let hasAnyMatch = handleMessageBlacklistMatches(contentElement);
     if (!hasAnyMatch) return;
 
     const blocContenu = contentElement.parentElement;
@@ -2725,4 +2696,3 @@ async function entryPoint() {
 entryPoint();
 
 addEventListener('instantclick:newpage', entryPoint);
-
