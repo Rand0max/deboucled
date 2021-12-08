@@ -1393,19 +1393,23 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
         saveTotalHidden();
     }
 
+    function handleBlacklistedAuthor(messageElement, authorElement, author) {
+        if (optionHideMessages) {
+            removeLiveMessage(messageElement, author);
+            return true;
+        }
+        else {
+            highlightBlacklistedAuthor(messageElement, authorElement);
+            addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive);
+        }
+        return false;
+    }
+
     function createJvChatBlacklistButton(messageElement, authorElement, author) {
-        let isSelf = messageElement.querySelector('span.picto-msg-croix') !== null;
+        let isSelf = messageElement.querySelector('span.picto-msg-croix');
         if (isSelf) return;
 
-        let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => {
-            if (optionHideMessages) {
-                removeLiveMessage(messageElement, author);
-            }
-            else {
-                highlightBlacklistedAuthor(messageElement, authorElement, author);
-                addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive);
-            }
-        });
+        let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => handleBlacklistedAuthor(messageElement, authorElement, author));
         dbcBlacklistButton.classList.toggle('jvchat-picto', true);
 
         let jvchatTooltip = messageElement.querySelector('.jvchat-tooltip');
@@ -1415,13 +1419,8 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
     function handleLiveMessage(messageElement, authorElement, jvchat) {
         let author = authorElement.textContent.trim();
         if (isAuthorBlacklisted(author)) {
-            if (optionHideMessages) {
-                removeLiveMessage(messageElement, author);
-            }
-            else {
-                highlightBlacklistedAuthor(messageElement, authorElement);
-                addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive);
-            }
+            if (handleBlacklistedAuthor(messageElement, authorElement, author))
+                return; // si on a supprimé le message on se casse, plus rien à faire
         }
         else {
             if (jvchat) {
@@ -1433,6 +1432,9 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
                 addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive);
             }
         }
+
+        if (!optionBlSubjectIgnoreMessages) return;
+        handleBlSubjectIgnoreMessages(messageElement);
     }
 
     // JvChat
@@ -2433,7 +2435,7 @@ function highlightBlacklistMatches(element, matches) {
 
     if (element.nodeType == Node.TEXT_NODE) {
         let newNode = document.createElement('span');
-        element.parentElement.appendChild(newNode);
+        element.parentElement.insertBefore(newNode, element);
         newNode.outerHTML = content;
         element.remove();
     }
@@ -2499,7 +2501,7 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages, o
             removeMessage(message);
             hiddenMessages++;
             hiddenAuthorArray.add(author);
-            return;
+            return; // si on a supprimé le message on se casse, plus rien à faire
         }
         else {
             highlightBlacklistedAuthor(message, authorElement);
