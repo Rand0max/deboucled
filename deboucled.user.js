@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.0.0
+// @version     2.0.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -33,12 +33,11 @@
 // @run-at      document-end
 // ==/UserScript==
 
-
 ///////////////////////////////////////////////////////////////////////////////////////
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
-const deboucledVersion = '2.0.0'
+const deboucledVersion = '2.0.1'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -977,7 +976,7 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
     if (!element.hasAttribute('data-id')) return true;
 
     let topicId = element.getAttribute('data-id');
-    if (topicIdBlacklistMap.has(topicId) && topicId !== '67697509') {
+    if (topicIdBlacklistMap.has(topicId) && topicId !== '67697509' && topicId !== '68410257') {
         matchedTopics.set(topicIdBlacklistMap.get(topicId), 1);
         hiddenTopicsIds++;
         return true;
@@ -1039,7 +1038,7 @@ function isAuthorBlacklisted(author) {
     if (!hasAuthorBlacklist && !hasPreBoucle) return false;
 
     const normAuthor = author.toLowerCase().normalizeDiacritic();
-    return normAuthor !== 'rand0max' &&
+    return normAuthor !== 'rand0max' && normAuthor !== 'deboucled' &&
         ((hasAuthorBlacklist && normAuthor.match(authorsBlacklistReg))
             || (hasPreBoucle && normAuthor.match(preBoucleAuthorsBlacklistReg)));
 }
@@ -2423,14 +2422,24 @@ async function handlePoc(finalTopics) {
 
 function highlightBlacklistMatches(element, matches) {
     let content = element.textContent;
+
+    // Supprime les surrogate pairs car c'est ingérable
+    // Surrogate pairs = grosse merde = JS = calvitie foudroyante
+    // eslint-disable-next-line no-useless-escape
+    const regex = /[^\p{L}\p{N}\p{P}\p{Z}{\^\$}]/gu;
+    const pureMatches = matches.map(m => m.replace(regex, '').trim()).filter(m => m !== '');
+
     let index = -1;
-    matches.forEach(match => {
-        const matchNorm = match.normalizeDiacritic();
-        index = content.normalizeDiacritic().indexOf(matchNorm, index + 1);
-        const realMatchContent = content.slice(index, index + matchNorm.length);
+    pureMatches.every(match => {
+        const normMatch = match.normalizeDiacritic();
+        const normContent = content.normalizeDiacritic();
+        index = normContent.indexOf(normMatch, index + 1);
+        if (index <= -1) return false;
+        const realMatchContent = content.slice(index, index + normMatch.length);
         const newContent = `<span class="deboucled-blacklisted">${realMatchContent}</span>`;
         content = `${content.slice(0, index)}${newContent}${content.slice(index + match.length, content.length)}`;
         index += newContent.length;
+        return true;
     });
 
     if (element.nodeType == Node.TEXT_NODE) {
@@ -2523,8 +2532,6 @@ function handleTopicHeader() {
     if (!titleElement) return;
     const subjectMatches = isSubjectBlacklisted(titleElement.textContent);
     if (!subjectMatches) return;
-    //const uniqueMatches = [...new Set(subjectMatches)];
-    //uniqueMatches.forEach(match => highlightBlacklistMatch(titleElement, match));
     highlightBlacklistMatches(titleElement, subjectMatches);
 }
 
