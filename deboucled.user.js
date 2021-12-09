@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     1.24.9
+// @version     2.0.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -9,10 +9,16 @@
 // @icon        https://image.noelshack.com/fichiers/2021/38/6/1632606701-deboucled.png
 // @match       http://www.jeuxvideo.com/forums/*
 // @match       https://www.jeuxvideo.com/forums/*
-// @match       http://m.jeuxvideo.com/forums/*
-// @match       https://m.jeuxvideo.com/forums/*
 // @match       http://www.jeuxvideo.com/recherche/forums/*
 // @match       https://www.jeuxvideo.com/recherche/forums/*
+// @match       http://www.jeuxvideo.com/messages-prives/*
+// @match       https://www.jeuxvideo.com/messages-prives/*
+// @match       http://m.jeuxvideo.com/forums/*
+// @match       https://m.jeuxvideo.com/forums/*
+// @match       http://m.jeuxvideo.com/recherche/forums/*
+// @match       https://m.jeuxvideo.com/recherche/forums/*
+// @match       http://m.jeuxvideo.com/messages-prives/*
+// @match       https://m.jeuxvideo.com/messages-prives/*
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
@@ -22,6 +28,8 @@
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
 // @resource    CHARTS_CSS https://unpkg.com/charts.css/dist/charts.min.css
 // @require     https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js
+// @require     https://unpkg.com/@chocolateboy/uncommonjs
+// @require     https://unpkg.com/fastest-levenshtein
 // @run-at      document-end
 // ==/UserScript==
 
@@ -30,11 +38,18 @@
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
+const deboucledVersion = '2.0.0'
+const defaultTopicCount = 25;
+
+const entitySubject = 'subject';
+const entityAuthor = 'author';
+const entityTopicId = 'topicid';
+
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
 let topicIdBlacklistMap = new Map();
-let subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
-let authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
+let subjectsBlacklistReg = new RegExp();
+let authorsBlacklistReg = new RegExp();
 
 let pocTopicMap = new Map();
 
@@ -43,8 +58,14 @@ let hiddenSubjects = 0;
 let hiddenTopicsIds = 0;
 let hiddenMessages = 0;
 let hiddenAuthors = 0;
+let hiddenPrivateMessages = 0;
 let hiddenAuthorArray = new Set();
 let deboucledTopicStatsMap = new Map();
+
+let preBoucleArray = [];
+let preBoucleSubjectsBlacklistReg = new RegExp();
+let preBoucleAuthorsBlacklistReg = new RegExp();
+let vinzBoucleArray = [];
 
 let matchedSubjects = new Map();
 let matchedAuthors = new Map();
@@ -56,13 +77,6 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
-const deboucledVersion = '1.24.9'
-const defaultTopicCount = 25;
-
-const entitySubject = 'subject';
-const entityAuthor = 'author';
-const entityTopicId = 'topicid';
-
 const domParser = new DOMParser();
 
 
@@ -73,6 +87,7 @@ const domParser = new DOMParser();
 const localstorage_pocTopics = 'deboucled_pocTopics';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
+const storage_preBoucles = 'deboucled_preBoucles', storage_preBoucles_default = '[]';
 const storage_blacklistedTopicIds = 'deboucled_blacklistedTopicIds', storage_blacklistedTopicIds_default = '[]';
 const storage_blacklistedSubjects = 'deboucled_blacklistedSubjects', storage_blacklistedSubjects_default = '[]';
 const storage_blacklistedAuthors = 'deboucled_blacklistedAuthors', storage_blacklistedAuthors_default = '[]';
@@ -92,19 +107,26 @@ const storage_optionDisplayTopicMatches = 'deboucled_optionDisplayTopicMatches',
 const storage_optionClickToShowTopicMatches = 'deboucled_optionClickToShowTopicMatches', storage_optionClickToShowTopicMatches_default = false;
 const storage_optionRemoveUselessTags = 'deboucled_optionRemoveUselessTags', storage_optionRemoveUselessTags_default = false;
 const storage_optionMaxTopicCount = 'deboucled_optionMaxTopicCount', storage_optionMaxTopicCount_default = defaultTopicCount;
+const storage_optionAntiVinz = 'deboucled_optionAntiVinz', storage_optionAntiVinz_default = false;
+const storage_optionBlAuthorIgnoreMp = 'deboucled_optionBlAuthorIgnoreMp', storage_optionBlAuthorIgnoreMp_default = false;
+const storage_optionBlSubjectIgnoreMessages = 'deboucled_optionBlSubjectIgnoreMessages', storage_optionBlSubjectIgnoreMessages_default = false;
 
 const storage_totalHiddenTopicIds = 'deboucled_totalHiddenTopicIds';
 const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
 const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
+const storage_totalHiddenPrivateMessages = 'deboucled_totalHiddenPrivateMessages';
 const storage_TopicStats = 'deboucled_TopicStats';
 
-const storage_Keys = [storage_init, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_TopicStats];
+const storage_Keys = [storage_init, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_TopicStats];
 
 const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors];
 
 
 async function initStorage() {
+    initPreBoucles();
+    initVinzBoucles();
+
     let isInit = GM_getValue(storage_init, storage_init_default);
     if (isInit) {
         await loadStorage();
@@ -138,6 +160,8 @@ async function saveStorage() {
     GM_setValue(storage_blacklistedAuthors, JSON.stringify([...new Set(authorBlacklistArray)]));
     GM_setValue(storage_blacklistedTopicIds, JSON.stringify([...topicIdBlacklistMap]));
 
+    savePreBouclesStatuses();
+
     subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
     authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
 
@@ -149,7 +173,7 @@ async function saveStorage() {
 async function loadLocalStorage() {
     let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     if (optionDetectPocMode === 0) return;
-
+    // eslint-disable-next-line no-undef
     const storagePocTopics = await localforage.getItem(localstorage_pocTopics);
     if (storagePocTopics) pocTopicMap = new Map([...JSON.parse(storagePocTopics)]);
 }
@@ -157,6 +181,7 @@ async function loadLocalStorage() {
 async function saveLocalStorage() {
     let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     if (optionDetectPocMode === 0) return;
+    // eslint-disable-next-line no-undef
     await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
 }
 
@@ -165,6 +190,25 @@ async function removeTopicIdBlacklist(topicId) {
         topicIdBlacklistMap.delete(topicId);
         await saveStorage();
     }
+}
+
+function loadPreBouclesStatuses() {
+    let preBouclesStatuses = [...JSON.parse(GM_getValue(storage_preBoucles, storage_preBoucles_default))];
+    if (!preBouclesStatuses) return;
+    preBouclesStatuses.forEach(pbs => {
+        togglePreBoucleStatus(pbs[0], pbs[1]);
+    });
+}
+
+function togglePreBoucleStatus(id, enabled) {
+    let preBoucle = preBoucleArray.find(pb => pb.id === id);
+    if (!preBoucle) return;
+    preBoucle.enabled = enabled;
+}
+
+function savePreBouclesStatuses() {
+    let preBouclesStatuses = preBoucleArray.map(pb => [pb.id, pb.enabled]);
+    GM_setValue(storage_preBoucles, JSON.stringify(preBouclesStatuses));
 }
 
 async function addEntityBlacklist(array, key) {
@@ -192,6 +236,7 @@ function saveTotalHidden() {
     incrementTotalHidden(storage_totalHiddenSubjects, hiddenSubjects);
     incrementTotalHidden(storage_totalHiddenAuthors, hiddenAuthors);
     incrementTotalHidden(storage_totalHiddenMessages, hiddenMessages);
+    incrementTotalHidden(storage_totalHiddenPrivateMessages, hiddenPrivateMessages);
 }
 
 function backupStorage() {
@@ -279,6 +324,122 @@ async function importFromTotalBlacklist() {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
+// ANTI-BOUCLES
+///////////////////////////////////////////////////////////////////////////////////////
+
+function initPreBoucles() {
+    const popularBoucles =
+    {
+        id: 'popularboucles',
+        title: 'Boucles connues',
+        enabled: false,
+        type: entitySubject,
+        entities: ['ces photos putain', 'yannick*tour eiffel', 'metisseur22cm', 'midsommar', 'eau*pastèque', 'l\'échéance est tombée', 'ai-je l\'air sympathique', 'pour avoir une copine en', 'no jump']
+    };
+    const covid19 =
+    {
+        id: 'covid19',
+        title: 'Covid19',
+        enabled: false,
+        type: entitySubject,
+        entities: ['covid*', 'corona*', 'virus', 'gestes barriere', 'geste barriere', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*', '*pass', 'vizio', 'schwab', 'veran', 'pcr', 'antigenique', 'thrombose*', 'oracle', 'omicron']
+    };
+    const politic =
+    {
+        id: 'politic',
+        title: 'Politique',
+        enabled: false,
+        type: entitySubject,
+        entities: ['*zemmour*', 'le z', 'du z', 'pro z', 'pro-z', 'z0zz', 'zozz', 'knafo', 'philippot', 'le pen', 'lepen', 'macron', 'cnews', 'asselineau', 'melenchon', 'lfi', 'rn', 'fn', 'fillon', 'veran', 'lrem']
+    };
+    const deviant =
+    {
+        id: 'deviant',
+        title: 'Déviances',
+        enabled: false,
+        type: entitySubject,
+        entities: ['feet*', 'trap*', 'kj', 'adf', 'papa du forum', 'blacked', 'cuck', 'reine fatima', 'shemale*', 'domina', 'fetichiste', 'fetichisme', 'mym', 'onlyfan', 'onlyfans', 'sissy', 'trans', 'transexuel', 'transexuelle', 'lgbt*', 'm2f', 'f2m', 'asmr', 'trav', 'travelo', 'femdom', 'cage de chastete']
+    };
+    const socials =
+    {
+        id: 'socials',
+        title: 'Réseaux sociaux',
+        enabled: false,
+        type: entitySubject,
+        entities: ['tinder', 'youtube', 'twitter', 'facebook', 'tik*tok', 'adopte un mec', 'meetic', 'badoo', 'okcupid', 'bumble', 'happn', 'insta', 'instagram', 'snapchat', 'feldup', 'norman', 'cyprien', 'natoo', 'kemar', 'jdg', 'joueur du grenier', 'amixem', 'squeezie', 'mym', 'onlyfan', 'onlyfans']
+    };
+    const kiddy =
+    {
+        id: 'kiddy',
+        title: 'Immature',
+        enabled: false,
+        type: entitySubject,
+        entities: ['reacprout', 'prout', 'caca', 'pipi']
+    };
+    const hatred =
+    {
+        id: 'hatred',
+        title: 'Haineux',
+        enabled: false,
+        type: entitySubject,
+        entities: ['facho*', 'chofa*', 'qlf', 'paz', 's2s', 'gwer*', 'raciste*']
+    };
+
+    const boucledAuthors =
+    {
+        id: 'boucledauthors',
+        title: 'Pseudos boucled',
+        enabled: false,
+        type: entityAuthor,
+        entities: ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki', 'leao', 'oael']
+    };
+
+    preBoucleArray.push(popularBoucles);
+    preBoucleArray.push(boucledAuthors);
+    preBoucleArray.push(covid19);
+    preBoucleArray.push(politic);
+    preBoucleArray.push(deviant);
+    preBoucleArray.push(socials);
+    preBoucleArray.push(kiddy);
+    preBoucleArray.push(hatred);
+
+    loadPreBouclesStatuses();
+    buildPreBouclesBlacklists();
+}
+
+function buildPreBouclesBlacklists() {
+    let preBoucleSubjects = [];
+    let preBoucleAuthors = [];
+    preBoucleArray.filter(pb => pb.enabled && pb.type === entitySubject)
+        .forEach(pb => { preBoucleSubjects = preBoucleSubjects.concat(pb.entities); });
+    preBoucleArray.filter(pb => pb.enabled && pb.type === entityAuthor)
+        .forEach(pb => { preBoucleAuthors = preBoucleAuthors.concat(pb.entities); });
+
+    const preBoucleSubjectBlacklistArray = [...new Set([...preBoucleSubjects])];
+    const preBoucleAuthorBlacklistArray = [...new Set([...preBoucleAuthors])];
+
+    preBoucleSubjectsBlacklistReg = buildRegex(preBoucleSubjectBlacklistArray, true);
+    preBoucleAuthorsBlacklistReg = buildRegex(preBoucleAuthorBlacklistArray, false);
+}
+
+function makeVinzSubjectPure(str) {
+    // normalize boucles string and make them as "pure" as possible (also improve performances)
+    str = normalizeValue(str).trim();
+    str = replaceNumbersSimilarToCharacters(str);
+    str = removeRepeatingCharacters(str);
+    return str;
+}
+
+function initVinzBoucles() {
+    vinzBoucleArray = ['ces photos putain', '"Célestin tu-" "Ferme-là"', 'Yannick, 19 ans, se jette du haut de la Tour Eiffel', '"J\'appelle Metisseur22cm a la barre"', 'Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', '[DILEMME] 100 000 000 000 000€ mais...', 'Il est bien Midsommar ?', 'AYA CETTE HALLUCINATION AUDITIVE bordel'];
+
+    vinzBoucleArray.forEach((val, index) => {
+        vinzBoucleArray[index] = makeVinzSubjectPure(val);
+    });
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
 // EXTENSIONS
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -291,7 +452,7 @@ String.prototype.escapeRegexPattern = function () {
 }
 
 String.prototype.handleGenericChar = function () {
-    return this.replace('*', '.*');
+    return this.replace('*', '.*?');
 }
 
 String.prototype.capitalize = function () {
@@ -367,7 +528,7 @@ function buildRegex(array, withBoundaries) {
     let bStart = withBoundaries ? '(?<=\\W|^)' : '';
     let bEnd = withBoundaries ? '(?=\\W|$)' : '';
     let map = array.map((e) => {
-        let word = e.escapeRegexPattern().handleGenericChar().normalizeDiacritic();
+        let word = e.escapeRegexPattern().normalizeDiacritic().handleGenericChar();
         return `${bStart}${word}${bEnd}`;
     })
     let regex = map.join('|');
@@ -417,6 +578,58 @@ function groupBy(arr, criteria) {
     return newObj;
 }
 
+function removeRepeatingCharacters(str) {
+    /*
+    return str.split('').filter(function (char, index, strArray) {
+        return index >= 1 && strArray[index - 1] === char;
+    }).join('');
+    */
+    //const vowels = ['A', 'E', 'I', 'O', 'U', 'Y'];
+    let res = '';
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        //if ((vowels.includes(char) || !isNaN(char)) && i >= 1 && char === str[i - 1]) continue;
+        //else if (!vowels.includes(char) && i >= 2 && char === str[i - 1] && char === str[i - 2]) continue;
+        if (i >= 1 && str[i] === str[i - 1]) continue;
+        res += char;
+    }
+    return res;
+}
+
+function replaceNumbersSimilarToCharacters(str) {
+    let res = str;
+    res = res.replaceAll('0', 'O');
+    res = res.replaceAll('1', 'I');
+    res = res.replaceAll('3', 'E');
+    res = res.replaceAll('4', 'A');
+    res = res.replaceAll('5', 'S');
+    res = res.replaceAll('7', 'T');
+    return res;
+}
+
+function calculateStringDistance(str1, str2) {
+    // eslint-disable-next-line no-undef
+    let result = 100 - 100 * distance(str1, str2) / Math.max(str1.length, str2.length);
+    return Math.round(result);
+}
+
+async function awaitElements(target, selector) {
+    return new Promise(resolve => {
+        if (target.querySelectorAll(selector).length !== 0) {
+            return resolve(target.querySelectorAll(selector));
+        }
+        const observer = new MutationObserver(() => {
+            if (target.querySelectorAll(selector).length !== 0) {
+                resolve(target.querySelectorAll(selector));
+                observer.disconnect();
+            }
+        });
+        observer.observe(target, {
+            childList: true,
+            subtree: true,
+        });
+    });
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // RIGHT COLUMN - STATS/CHARTS
@@ -434,14 +647,15 @@ function addRightBlocMatches() {
     html += '<div class="scrollable-wrapper">';
     html += '<div id="deboucled-matches-content" class="scrollable-content bloc-info-forum">';
 
-    function formatMatches(matches) {
+    function formatMatches(matches, withHint) {
         let formatMatch = (str) => str.replace(',', '').removeDoubleSpaces().trim().capitalize();
         let matchesSorted = matches.sortByValueThenKey(true);
         let matchesHtml = '';
         let index = 0;
         matchesSorted.forEach((occ, match) => {
             const className = `deboucled-match${index < matchesSorted.size - 1 ? ' match-after' : ''}`;
-            matchesHtml += `<span class="${className}" deboucled-data-tooltip="${occ} fois">${formatMatch(match)}</span>`;
+            const hint = withHint ? ` deboucled-data-tooltip="${occ} fois"` : '';
+            matchesHtml += `<span class="${className}"${hint}>${formatMatch(match)}</span>`;
             index++;
         });
         return matchesHtml;
@@ -449,25 +663,25 @@ function addRightBlocMatches() {
 
     let optionClickToShowTopicMatches = GM_getValue(storage_optionClickToShowTopicMatches, storage_optionClickToShowTopicMatches_default);
 
-    function addMatches(matches, entity, title) {
+    function addMatches(matches, entity, title, withHint) {
         let matchesHtml = '';
         matchesHtml += `<h4 class="titre-info-fofo">${title}</h4>`;
         if (optionClickToShowTopicMatches) {
-            matchesHtml += `<div id="deboucled-matches-${entity}-wrapper" class="deboucled-matches-wrapper">`;
+            matchesHtml += `<div id="deboucled-matches-${entity}-wrapper" class="deboucled-hide-wrapper">`;
             matchesHtml += `<span class="deboucled-eye-logo deboucled-display-matches"></span>`;
-            matchesHtml += `<div id="deboucled-matched-${entity}" style="display:none;">${formatMatches(matches)}</div>`;
+            matchesHtml += `<div id="deboucled-matched-${entity}" style="display:none;">${formatMatches(matches, withHint)}</div>`;
         }
         else {
             matchesHtml += `<div id="deboucled-matches-${entity}-wrapper">`;
-            matchesHtml += `<div id="deboucled-matched-${entity}">${formatMatches(matches)}</div>`;
+            matchesHtml += `<div id="deboucled-matched-${entity}">${formatMatches(matches, withHint)}</div>`;
         }
         matchesHtml += '</div>';
         return matchesHtml;
     }
 
-    if (matchedSubjects.hasAny()) html += addMatches(matchedSubjects, entitySubject, 'Sujets');
-    if (matchedAuthors.hasAny()) html += addMatches(matchedAuthors, entityAuthor, 'Auteurs');
-    if (matchedTopics.hasAny()) html += addMatches(matchedTopics, entityTopicId, 'Topics');
+    if (matchedSubjects.hasAny()) html += addMatches(matchedSubjects, entitySubject, 'Sujets', true);
+    if (matchedAuthors.hasAny()) html += addMatches(matchedAuthors, entityAuthor, 'Auteurs', true);
+    if (matchedTopics.hasAny()) html += addMatches(matchedTopics, entityTopicId, 'Topics', false);
 
     html += '</div>';
     html += '</div>';
@@ -527,7 +741,7 @@ function buildStatsChart() {
         const css = GM_getResourceText('CHARTS_CSS');
         let html = '';
         html += `<style>${css}</style>`;
-        html += `<style>#deboucled-stats-chart {--color-1: linear-gradient(rgba(240, 50, 50, 0.8), rgba(240, 50, 50, 0.3));} .data {font: bold 16px/0px sans-serif;color: #999999;height: 100%;text-align: center;white-space: nowrap;} .data-datetime {font-size: 11px;font-weight: normal;font-family: monospace;} .charts-css.area tbody tr th {width: 47px;font: bold 10px/10px sans-serif;color: #999999;} .charts-css.area:not(.reverse):not(.reverse-data) tbody tr td {-webkit-box-pack: center;-ms-flex-pack: center;justify-content: center;-webkit-box-align: center;-ms-flex-align: center;align-items: center;} .charts-css.area:not(.reverse):not(.reverse-data) tbody tr td .data {-webkit-transform: initial;transform: initial;}</style>`;
+        html += `<style>#deboucled-stats-chart {--color-1: linear-gradient(rgba(240, 50, 50, 0.8), rgba(240, 50, 50, 0.3));} .data {font: bold 16px/0px sans-serif;color: #999999;height: 100%;text-align: center;white-space: nowrap;} .data-datetime {font-size: 11px;font-weight: normal;font-family: monospace;} .charts-css.area tbody tr th {width: 50px;font: bold 10px/10px sans-serif;color: #999999;} .charts-css.area:not(.reverse):not(.reverse-data) tbody tr td {-webkit-box-pack: center;-ms-flex-pack: center;justify-content: center;-webkit-box-align: center;-ms-flex-align: center;align-items: center;} .charts-css.area:not(.reverse):not(.reverse-data) tbody tr td .data {-webkit-transform: initial;transform: initial;}</style>`;
         return html;
     }
     function formatDateToGroup(d) {
@@ -553,6 +767,7 @@ function buildStatsChart() {
         chartTableHtml += '<table class="charts-css area show-data-on-hover show-labels" id="deboucled-stats-chart" style="width: 340px; height: 75px;">';
 
         chartTableHtml += '<thead>';
+        // eslint-disable-next-line no-unused-vars
         for (const [rowKey, stats] of Object.entries(groupedByDate)) {
             chartTableHtml += `<th scope="col">${rowKey}</th>`;
         }
@@ -565,6 +780,7 @@ function buildStatsChart() {
         chartTableHtml += '<tbody>'
         for (const [rowKey, stats] of Object.entries(groupedByDate)) {
             let firstEntry = true;
+            // eslint-disable-next-line no-unused-vars
             for (const [statKey, stat] of Object.entries(stats)) {
                 chartTableHtml += `<tr${firstEntry ? '' : ' class="hide-label"'}>`;
                 chartTableHtml += `<th scope="row">${rowKey}</th>`;
@@ -632,7 +848,7 @@ function getAllTopics(doc) {
     return [...allTopics];
 }
 
-async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold) {
+async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz) {
     let actualTopics = topics.length - hiddenTotalTopics - 1;
     let pageBrowse = 1;
     let filledTopics = [];
@@ -646,7 +862,7 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
             let nextPageTopics = getAllTopics(nextDoc);
 
             nextPageTopics.slice(1).forEach(function (topic) {
-                if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold)) {
+                if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz)) {
                     hiddenTotalTopics++;
                     return;
                 }
@@ -748,7 +964,7 @@ function topicExists(topics, element) {
     * Cela peut provoquer des doublons à l'affichage.
     */
     let topicId = element.getAttribute('data-id');
-    if (topicId === null) return false;
+    if (!topicId) return false;
     return topics.some((elem) => elem.getAttribute('data-id') === topicId);
 }
 
@@ -757,7 +973,7 @@ function getTopicMessageCount(element) {
     return parseInt(messageCountElement?.textContent.trim() ?? "0");
 }
 
-function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayThreshold) {
+function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz) {
     if (!element.hasAttribute('data-id')) return true;
 
     let topicId = element.getAttribute('data-id');
@@ -772,7 +988,7 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
 
     let titleTag = element.querySelector('.lien-jv.topic-title');
     if (titleTag) {
-        let title = titleTag.textContent;
+        const title = titleTag.textContent;
         const subjectBlacklisted = isSubjectBlacklisted(title);
         if (subjectBlacklisted) {
             matchedSubjects.addArrayIncrement(subjectBlacklisted);
@@ -783,10 +999,22 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
 
     let authorTag = element.querySelector('.topic-author');
     if (authorTag) {
-        let author = authorTag.textContent.trim();
+        const author = authorTag.textContent.trim();
         const authorBlacklisted = isAuthorBlacklisted(author);
         if (authorBlacklisted) {
             matchedAuthors.addArrayIncrement(authorBlacklisted);
+            hiddenAuthors++;
+            return true;
+        }
+    }
+
+    if (optionAntiVinz) {
+        const title = titleTag.textContent;
+        const author = authorTag.textContent.toLowerCase().trim();
+        if (isVinzTopic(title, author)) {
+            matchedSubjects.addArrayIncrement([title.trim()]);
+            matchedAuthors.addArrayIncrement(['Vinz']);
+            hiddenSubjects++;
             hiddenAuthors++;
             return true;
         }
@@ -796,14 +1024,35 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
 }
 
 function isSubjectBlacklisted(subject) {
-    if (subjectBlacklistArray.length === 0) return false;
-    return subject.normalizeDiacritic().match(subjectsBlacklistReg);
+    const hasSubjectBlacklist = subjectBlacklistArray.length > 0;
+    const hasPreBoucle = preBoucleArray.some(b => b.enabled && b.type === entitySubject);
+    if (!hasSubjectBlacklist && !hasPreBoucle) return false;
+
+    let normSubject = subject.normalizeDiacritic();
+    return (hasSubjectBlacklist && normSubject.match(subjectsBlacklistReg))
+        || (hasPreBoucle && normSubject.match(preBoucleSubjectsBlacklistReg));
 }
 
 function isAuthorBlacklisted(author) {
-    if (authorBlacklistArray.length === 0) return false;
-    const authorL = author.toLowerCase();
-    return authorL !== 'rand0max' && authorL.normalizeDiacritic().match(authorsBlacklistReg);
+    const hasAuthorBlacklist = authorBlacklistArray.length > 0;
+    const hasPreBoucle = preBoucleArray.some(b => b.enabled && b.type === entityAuthor);
+    if (!hasAuthorBlacklist && !hasPreBoucle) return false;
+
+    const normAuthor = author.toLowerCase().normalizeDiacritic();
+    return normAuthor !== 'rand0max' &&
+        ((hasAuthorBlacklist && normAuthor.match(authorsBlacklistReg))
+            || (hasPreBoucle && normAuthor.match(preBoucleAuthorsBlacklistReg)));
+}
+
+function isVinzTopic(subject, author) {
+    const authorMayBeVinz = author.startsWith('vinz') || (author.length === 5 && author.charAt(0) === 'v');
+    const pureSubject = makeVinzSubjectPure(subject);
+    for (const boucle of vinzBoucleArray) {
+        let score = calculateStringDistance(boucle, pureSubject);
+        if (authorMayBeVinz) score += 10; // on rajoute 10% au score si l'on soupçonne l'auteur d'être Vinz
+        if (score >= 80) return true;
+    }
+    return false;
 }
 
 async function isTopicPoC(element, optionDetectPocMode) {
@@ -818,7 +1067,7 @@ async function isTopicPoC(element, optionDetectPocMode) {
     if (!titleElem) return false;
 
     const title = titleElem.textContent.trim().normalizeDiacritic();
-    const isTitlePocRegex = /(pos(t|te|tez|to|too|tou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan|pose.*toucan/i;
+    const isTitlePocRegex = /(pos(t|te|tez|to|too|tou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan|postouk|postook|pose.*toucan/i;
     let isTitlePoc = isTitlePocRegex.test(title);
 
     if (optionDetectPocMode === 1 && !isTitlePoc) {
@@ -827,13 +1076,13 @@ async function isTopicPoC(element, optionDetectPocMode) {
     }
 
     function topicCallback(r) {
-        const doc = domParser.parseFromString(r, "text/html");
+        const doc = domParser.parseFromString(r, 'text/html');
 
         const firstMessageElem = doc.querySelector('.txt-msg');
         const firstMessage = firstMessageElem.textContent.trim().toLowerCase().normalizeDiacritic();
 
         const isMessagePocRegex = /pos(t|te|tez) ou/i;
-        const maladies = ['cancer', 'torsion', 'testiculaire', 'tumeur', 'cholera', 'sida', 'corona', 'coronavirus', 'covid', 'covid19', 'cerf', 'serf', 'phimosis', 'trisomie', 'diarrhee', 'charcot', 'lyme', 'avc', 'cirrhose', 'diabete', 'parkinson', 'alzheimer', 'mucoviscidose', 'lepre', 'tuberculose'];
+        const maladies = ['cancer', 'ancer', 'cer', 'en serre', 'necrose', 'torsion', 'testiculaire', 'tumeur', 'cholera', 'sida', 'corona', 'coronavirus', 'covid', 'covid19', 'cerf', 'serf', 'phimosis', 'trisomie', 'diarrhee', 'charcot', 'lyme', 'avc', 'cirrhose', 'diabete', 'parkinson', 'alzheimer', 'mucoviscidose', 'lepre', 'tuberculose'];
         const isMessagePoc = isMessagePocRegex.test(firstMessage) || (isTitlePoc && maladies.some(s => firstMessage.includes(s)));
 
         pocTopicMap.set(topicId, isMessagePoc);
@@ -863,7 +1112,7 @@ function markTopicPoc(element) {
 
 function addIgnoreButtons(topics) {
     let header = topics[0];
-    let spanHead = document.createElement("span");
+    let spanHead = document.createElement('span');
     spanHead.setAttribute('class', 'deboucled-topic-blacklist');
     spanHead.setAttribute('style', 'width: 1.75rem');
     header.appendChild(spanHead);
@@ -940,7 +1189,7 @@ function addPrevisualizeTopicEvent(topics) {
         if (!topicContent) return;
         previewDiv.firstChild.remove();
         previewDiv.appendChild(topicContent);
-    };
+    }
 
     topics.slice(1).forEach(function (topic) {
         let topicTitle = topic.querySelector('.topic-title');
@@ -998,11 +1247,11 @@ async function topicIsModerated(topicId) {
 }
 
 function removeUselessTags(topics) {
-    const regex = /(\[?a+y+a+\]?|(\{|\[|\()+\w*alerte?\w*(\}|\]|\))+|alerte?)\s?:?/gi;
+    const regex = /(\[?a+y+a+o*\]?|^((\{|\[|\(|🛑|🔴)*\s*\w*alerte?(\srouge|\snoir|\snoire|\secarlate|\satomique|\sgenerale|\scosmique|\snucleaire)?\w*\s*(\}|\]|\)|🛑|🔴)*))\s?:?-?,?/gi;
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
         let newTitle = titleElem.textContent.replace(regex, '').removeDoubleSpaces().trim().capitalize();
-        titleElem.textContent = newTitle;
+        if (newTitle.length > 0) titleElem.textContent = newTitle;
     });
 }
 
@@ -1082,18 +1331,23 @@ function removeMessage(element) {
     element.remove();
 }
 
-function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton) {
-    let isSelf = messageElement.querySelector('span.picto-msg-croix') !== null;
-    if (isSelf) return;
-
+function buildDeboucledBlacklistButton(author, callbackAfter) {
     let dbcBlacklistButton = document.createElement('span');
     dbcBlacklistButton.setAttribute('title', 'Blacklister avec Déboucled');
     dbcBlacklistButton.setAttribute('class', 'picto-msg-tronche deboucled-blacklist-author-button');
     dbcBlacklistButton.onclick = function () {
         addEntityBlacklist(authorBlacklistArray, author);
         refreshAuthorKeys()
-        location.reload();
+        if (callbackAfter) callbackAfter();
     };
+    return dbcBlacklistButton;
+}
+
+function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton) {
+    let isSelf = messageElement.querySelector('span.picto-msg-croix');
+    if (isSelf) return;
+
+    let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload() });
 
     let jvcBlacklistButton = messageElement.querySelector('span.picto-msg-tronche');
     let logged = (jvcBlacklistButton !== null);
@@ -1111,10 +1365,10 @@ function highlightBlacklistedAuthor(messageElement, authorElement) {
 
 function addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive) {
     let backToForumElement = document.querySelector('div.group-two > a:nth-child(2)');
-    if (backToForumElement === null) return;
+    if (!backToForumElement) return;
 
     let mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
-    if (mpBloc === null) return;
+    if (!mpBloc) return;
 
     let forumUrl = backToForumElement.getAttribute('href');
     let redirectUrl = `/recherche${forumUrl}?search_in_forum=${author}&type_search_in_forum=auteur_topic`;
@@ -1130,50 +1384,79 @@ function addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchiv
     insertAfter(boucledAuthorAnchor, mpBloc);
 }
 
-function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive) {
-    function handleLiveMessage(message, authorElement, upgradeMessage) {
+function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages) {
+    function removeLiveMessage(messageElement, author) {
+        removeMessage(messageElement);
+        hiddenMessages++;
+        hiddenAuthorArray.add(author);
+        updateMessagesHeader();
+        saveTotalHidden();
+    }
+
+    function handleBlacklistedAuthor(messageElement, authorElement, author) {
+        if (optionHideMessages) {
+            removeLiveMessage(messageElement, author);
+            return true;
+        }
+        else {
+            highlightBlacklistedAuthor(messageElement, authorElement);
+            addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive);
+        }
+        return false;
+    }
+
+    function createJvChatBlacklistButton(messageElement, authorElement, author) {
+        let isSelf = messageElement.querySelector('span.picto-msg-croix');
+        if (isSelf) return;
+
+        let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => handleBlacklistedAuthor(messageElement, authorElement, author));
+        dbcBlacklistButton.classList.toggle('jvchat-picto', true);
+
+        let jvchatTooltip = messageElement.querySelector('.jvchat-tooltip');
+        jvchatTooltip.prepend(dbcBlacklistButton);
+    }
+
+    function handleLiveMessage(messageElement, authorElement, jvchat) {
         let author = authorElement.textContent.trim();
         if (isAuthorBlacklisted(author)) {
-            if (optionHideMessages) {
-                removeMessage(message);
-                hiddenMessages++;
-                hiddenAuthorArray.add(author);
+            if (handleBlacklistedAuthor(messageElement, authorElement, author))
+                return; // si on a supprimé le message on se casse, plus rien à faire
+        }
+        else {
+            if (jvchat) {
+                createJvChatBlacklistButton(messageElement, authorElement, author);
             }
             else {
-                highlightBlacklistedAuthor(message, authorElement);
-                addBoucledAuthorButton(message, author, optionBoucledUseJvarchive);
+                let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
+                upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton);
+                addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive);
             }
-            updateMessagesHeader();
-            saveTotalHidden();
         }
-        else if (upgradeMessage) {
-            let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
-            upgradeJvcBlacklistButton(message, author, optionShowJvcBlacklistButton);
-            addBoucledAuthorButton(message, author, optionBoucledUseJvarchive);
-        }
+
+        if (!optionBlSubjectIgnoreMessages) return;
+        handleBlSubjectIgnoreMessages(messageElement);
     }
 
-    if (optionHideMessages) { // pour JvChat on ne changera pas le message de toute façon
-        addEventListener('jvchat:newmessage', function (event) {
-            let message = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
-            let authorElem = message.querySelector('h5.jvchat-author');
-            if (!authorElem) return;
-            handleLiveMessage(message, authorElem, false);
-        });
-        addEventListener('jvchat:activation', function (event) {
-            hiddenMessages = 0;
-            hiddenAuthorArray.clear();
-            updateMessagesHeader();
-        });
-    }
-
-    addEventListener('topiclive:newmessage', function (event) {
-        let message = document.querySelector(`.bloc-message-forum[data-id="${event.detail.id}"]`);
-        if (!message) return;
-        let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+    // JvChat
+    addEventListener('jvchat:newmessage', function (event) {
+        let messageElement = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
+        let authorElement = messageElement.querySelector('h5.jvchat-author');
         if (!authorElement) return;
-        let author = authorElement.textContent.trim();
-        handleLiveMessage(message, author, true);
+        handleLiveMessage(messageElement, authorElement, true);
+    });
+    addEventListener('jvchat:activation', function () {
+        hiddenMessages = 0;
+        hiddenAuthorArray.clear();
+        updateMessagesHeader();
+    });
+
+    // TopicLive
+    addEventListener('topiclive:newmessage', function (event) {
+        let messageElement = document.querySelector(`.bloc-message-forum[data-id="${event.detail.id}"]`);
+        if (!messageElement) return;
+        let authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+        if (!authorElement) return;
+        handleLiveMessage(messageElement, authorElement, false);
     });
 }
 
@@ -1189,7 +1472,7 @@ function addMessageQuoteEvent() {
     const textArea = document.querySelector('#message_topic');
 
     document.querySelectorAll('.picto-msg-quote').forEach(function (btn) {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', () => {
             const parentHeader = btn.parentElement.parentElement;
             if (!parentHeader) return;
             setTimeout(() => {
@@ -1216,29 +1499,36 @@ function buildSettingsPage() {
     document.body.prepend(bgView);
     document.querySelector('#deboucled-settings-bg-view').style.display = 'none';
 
-    function buildTooltip(hint, firstElem = false) {
-        return `deboucled-data-tooltip="${hint}"${firstElem ? ' data-tooltip-location="bottom"' : ''}`;
+    function buildTooltip(hint, location = 'right') {
+        const tooltipLocation = location === 'top' ? '' : ` data-tooltip-location="${location}"`;
+        return `deboucled-data-tooltip="${hint}"${tooltipLocation}`;
     }
-    function addStat(title, content) {
-        let html = "";
-        html += '<tr>';
-        html += '<td style="text-align: right;">';
-        html += `<span class="deboucled-stat-title">${title}</span>`;
+    function addToggleOption(title, optionId, defaultValue, hint) {
+        let html = '';
+        html += `<tr id="${optionId}-container">`;
+        html += `<td class="deboucled-td-left">`;
+        html += `<span ${buildTooltip(hint)}>${title}</span>`;
         html += '</td>';
-        html += '<td>';
-        html += `<span class="deboucled-stat-value">${content}</span>`;
+        html += `<td class="deboucled-td-right">`;
+        html += '<label class="deboucled-switch">';
+        let checkedStr = GM_getValue(optionId, defaultValue) ? 'checked' : '';
+        html += `<input type="checkbox" id="${optionId}" ${checkedStr}></input>`;
+        html += '<span class="deboucled-toggle-slider round"></span>';
+        html += '</label>';
         html += '</td>';
         html += '</tr>';
         return html;
     }
-    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false, firstElem = false) {
-        let html = "";
-        html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
-        html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}" ${buildTooltip(hint, firstElem)}>${title}</td>`;
-        html += '<td class="deboucled-td-right">';
+    function addToggleAltOption(title, optionId, defaultValue, hint) {
+        let html = '';
+        html += `<tr id="${optionId}-container">`;
+        html += `<td class="deboucled-td-left full-width">`;
+        html += `<span class="data-tooltip-large" ${buildTooltip(hint)}>${title}</span>`;
+        html += '</td>';
+        html += `<td class="deboucled-td-right deboucled-td-right-padding">`;
         html += '<label class="deboucled-switch">';
-        let checked = GM_getValue(optionId, defaultValue) ? 'checked' : '';
-        html += `<input type="checkbox" id="${optionId}" ${checked}></input>`;
+        let checkedStr = GM_getValue(optionId, defaultValue) ? 'checked' : '';
+        html += `<input type="checkbox" id="${optionId}" ${checkedStr}></input>`;
         html += '<span class="deboucled-toggle-slider round"></span>';
         html += '</label>';
         html += '</td>';
@@ -1246,9 +1536,11 @@ function buildSettingsPage() {
         return html;
     }
     function addRangeOption(title, optionId, defaultValue, minValue, maxValue, step, hint, enabled, isSubCell = false) {
-        let html = "";
+        let html = '';
         html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
-        html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}" ${buildTooltip(hint)}>${title}</td>`;
+        html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}">`;
+        html += `<span ${buildTooltip(hint)}>${title}</span>`;
+        html += '</td>';
         html += '<td class="deboucled-td-right" style="padding-top: 7px;">';
         let value = parseInt(GM_getValue(optionId, defaultValue));
         html += `<input type="range" id="${optionId}" min="${minValue}" max="${maxValue}" value="${value}" step="${step}" class="deboucled-range-slider">`;
@@ -1257,9 +1549,11 @@ function buildSettingsPage() {
         return html;
     }
     function addDropdownOption(title, optionId, hint, defaultValue, values) {
-        let html = "";
+        let html = '';
         html += '<tr>';
-        html += `<td class="deboucled-td-left" ${buildTooltip(hint)} style="vertical-align: top;">${title}</td>`;
+        html += '<td class="deboucled-td-left" style="vertical-align: top;">';
+        html += `<span ${buildTooltip(hint)}>${title}</span>`;
+        html += '</td>';
         html += '<td class="deboucled-td-right">';
         html += '<span class="deboucled-dropdown select">';
         html += `<select class="deboucled-dropdown" id="${optionId}">`;
@@ -1275,18 +1569,20 @@ function buildSettingsPage() {
         return html;
     }
     function addImportExportButtons() {
-        let html = "";
+        let html = '';
         html += '<tr>';
-        html += '<td class="deboucled-td-left" rowspan="2">Restaurer/sauvegarder les préférences</td>';
+        html += `<td class="deboucled-td-left" rowspan="2">`;
+        html += `<span ${buildTooltip('Exportez ou importer vos préférences et/ou vos blacklists.')}>Restaurer/sauvegarder les préférences</span>`;
+        html += '</td>';
         html += '<td class="deboucled-td-left">';
-        html += `<label for="deboucled-import-button" class="btn deboucled-button deboucled-setting-button">Restaurer</label>`;
-        html += `<input type="file" accept="application/JSON" id="deboucled-import-button" style="display: none;"></input>`;
-        html += `<span id="deboucled-export-button" class="btn deboucled-button deboucled-setting-button">Sauvegarder</span>`;
-        html += `<span id="deboucled-import-tbl" class="btn deboucled-button deboucled-setting-button" style="min-width: 10rem;">Importer TotalBlacklist</span>`;
+        html += '<label for="deboucled-import-button" class="btn deboucled-button deboucled-setting-button">Restaurer</label>';
+        html += '<input type="file" accept="application/JSON" id="deboucled-import-button" style="display: none;"></input>';
+        html += '<span id="deboucled-export-button" class="btn deboucled-button deboucled-setting-button">Sauvegarder</span>';
+        html += '<span id="deboucled-import-tbl" class="btn deboucled-button deboucled-setting-button" style="min-width: 10rem;">Importer TotalBlacklist</span>';
         html += '</td>';
         html += '<td class="deboucled-td-right" style="white-space: nowrap;">';
-        html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message" style="display: block; text-align: center;">Restauration terminée</span>`;
-        html += `<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message">⚠ Veuillez rafraichir la page ⚠</span>`;
+        html += '<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message" style="display: block; text-align: center;">Restauration terminée</span>';
+        html += '<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message">⚠ Veuillez rafraichir la page ⚠</span>';
         html += '</td>';
         html += '</tr>';
         html += '<tr>';
@@ -1295,14 +1591,14 @@ function buildSettingsPage() {
         html += '<input type="checkbox" id="deboucled-impexp-blonly"></input>';
         html += '<span class="deboucled-toggle-slider little round"></span>';
         html += '</label>';
-        html += `<span class="deboucled-toggle-title-right">Uniquement les blacklists</span>`;
+        html += '<span class="deboucled-toggle-title-right">Uniquement les blacklists</span>';
         html += '</td>';
         html += '</tr>';
         return html;
     }
 
     function addOptionsSection(sectionIsActive) {
-        let html = "";
+        let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">OPTIONS</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
         html += '<div class="deboucled-setting-content">';
@@ -1317,7 +1613,13 @@ function buildSettingsPage() {
 
         html += '<table class="deboucled-option-table">';
 
-        html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, storage_optionHideMessages_default, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.', undefined, undefined, true);
+        html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, storage_optionHideMessages_default, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.');
+
+        let mpLogo = '<span class="deboucled-mp-logo nav-icon-pm"></span>'
+        html += addToggleOption(`Filtrer les <i>Messages Privés</i> ${mpLogo} des <i>auteurs blacklist</i>`, storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default, 'Ignorer les MPs des pseudos présents dans votre blacklist et les déplacer automatiquement dans le dossier &quot;Spam&quot;.');
+
+        let messageLogo = '<span class="deboucled-msg-logo"></span>'
+        html += addToggleOption(`Masquer les <i>messages</i> ${messageLogo} avec les <i>sujets blacklist</i>`, storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default, 'Masque les messages contenant les mots-clés présents dans la &quot;Blacklist Sujets&quot;.\nCliquez sur l\'oeil pour afficher le message, et les expressions blacklist apparaitront en rouge.');
 
         let spiralLogo = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
         html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiralLogo}`, storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
@@ -1346,7 +1648,7 @@ function buildSettingsPage() {
         return html;
     }
     function addCustomisationSection(sectionIsActive) {
-        let html = "";
+        let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">PERSONNALISATION</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-customisation-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
         html += '<div class="deboucled-setting-content">';
@@ -1354,7 +1656,7 @@ function buildSettingsPage() {
         html += '<table class="deboucled-option-table">';
 
         let darkLogo = '<span class="deboucled-dark-logo"></span>'
-        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default, 'Permet de basculer entre le thème normal et le thème sombre pour le script Déboucled.', undefined, undefined, true);
+        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default, 'Permet de basculer entre le thème normal et le thème sombre pour le script Déboucled.');
 
         let forbiddenLogo = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbiddenLogo}`, storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics souhaités.');
@@ -1383,8 +1685,28 @@ function buildSettingsPage() {
         html += '</div>';
         return html;
     }
+    function addPreBouclesSection(sectionIsActive) {
+        let html = '';
+        html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">ANTI-BOUCLES</div>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
+        html += '<div class="deboucled-setting-content">';
+        html += '<div class="deboucled-preboucle-title">Listes anti-boucle pré-enregistrées</div>';
+        html += '<table class="deboucled-option-table">';
+
+        preBoucleArray.forEach(b => {
+            const hint = `${getEntityTitle(b.type)} : ${b.entities.sort().join(', ')}`;
+            html += addToggleAltOption(b.title, `deboucled-preboucle-${b.id}`, b.enabled, hint);
+        });
+
+        html += addToggleAltOption('Algorithme anti-Vinz', storage_optionAntiVinz, storage_optionAntiVinz_default, 'Algorithme intelligent pour éradiquer totalement Vinz et sa boucle infernale, en dépit de ses tentatives d\'évitement.');
+
+        html += '</table>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
     function addEntitySettingSection(entity, header, hint, messageHint, sectionIsActive) {
-        let html = "";
+        let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">${header}</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-${entity}-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
         html += '<div class="deboucled-setting-content">';
@@ -1412,7 +1734,19 @@ function buildSettingsPage() {
         return html;
     }
     function addStatsSection(sectionIsActive) {
-        let html = "";
+        function addStat(title, content) {
+            let html = '';
+            html += '<tr>';
+            html += '<td style="text-align: right;">';
+            html += `<span class="deboucled-stat-title">${title}</span>`;
+            html += '</td>';
+            html += '<td>';
+            html += `<span class="deboucled-stat-value">${content}</span>`;
+            html += '</td>';
+            html += '</tr>';
+            return html;
+        }
+        let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">STATISTIQUES</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
         html += '<div class="deboucled-setting-content">';
@@ -1421,11 +1755,13 @@ function buildSettingsPage() {
         let totalHiddenAuthors = GM_getValue(storage_totalHiddenAuthors, '0');
         let totalHiddenTopicIds = GM_getValue(storage_totalHiddenTopicIds, '0');
         let totalHiddenMessages = GM_getValue(storage_totalHiddenMessages, '0');
-        let totalHidden = parseInt(totalHiddenSubjects + totalHiddenAuthors + totalHiddenTopicIds + totalHiddenMessages);
+        let totalHiddenPrivateMessages = GM_getValue(storage_totalHiddenPrivateMessages, '0');
+        let totalHidden = parseInt(totalHiddenSubjects + totalHiddenAuthors + totalHiddenTopicIds + totalHiddenMessages + totalHiddenPrivateMessages);
         html += addStat('Sujets ignorés', totalHiddenSubjects);
         html += addStat('Pseudos ignorés', totalHiddenAuthors);
         html += addStat('Topics ignorés', totalHiddenTopicIds);
         html += addStat('Messages ignorés', totalHiddenMessages);
+        html += addStat('Messages privés ignorés', totalHiddenPrivateMessages);
         html += addStat('Total ignorés', totalHidden);
         html += '</table>';
         html += '</div>';
@@ -1433,9 +1769,10 @@ function buildSettingsPage() {
         return html;
     }
 
-    let settingsHtml = "";
+    let settingsHtml = '';
     settingsHtml += addOptionsSection(false);
     settingsHtml += addCustomisationSection(false);
+    settingsHtml += addPreBouclesSection(false);
     settingsHtml += addEntitySettingSection(entitySubject, 'BLACKLIST SUJETS', 'Mot-clé', 'Utilisez le caractère étoile * pour remplacer n\'importe quelle expression.', true);
     settingsHtml += addEntitySettingSection(entityAuthor, 'BLACKLIST AUTEURS', 'Pseudo', undefined, false);
     settingsHtml += addEntitySettingSection(entityTopicId, 'BLACKLIST TOPICS', 'TopicId', undefined, false);
@@ -1447,13 +1784,27 @@ function buildSettingsPage() {
     settingsView.innerHTML = settingsHtml;
     document.body.prepend(settingsView);
 
-    document.querySelector('.deboucled-about-version').onclick = () => alert('Paix sur la boucle nonobstant.');
+    addSettingEvents();
 
-    function addToggleEvent(id, callback = undefined) {
+    addImportExportEvent();
+
+    addCollapsibleEvents();
+
+    buildSettingEntities();
+
+    refreshEntityCounts();
+
+    addHighlightModeratedButton();
+
+    addSortEvent();
+}
+
+function addSettingEvents() {
+    function addToggleEvent(id, setValue = true, callback = undefined) {
         const toggleSlider = document.querySelector('#' + id);
         toggleSlider.onchange = (e) => {
             const checked = e.currentTarget.checked;
-            GM_setValue(id, checked);
+            if (setValue) GM_setValue(id, checked);
             if (callback) callback(checked);
         };
     }
@@ -1471,23 +1822,28 @@ function buildSettingsPage() {
         };
     }
 
-    addToggleEvent(storage_optionEnableDarkTheme, toggleDarkTheme);
+    const pave2022 = 'Juste pour rappel en 2022 :\n\n· Fin de la boucle temporelle.\n· Débug du script mathématique.\n· Révélation projet DéboucledV2.\n· Conscience des oldfags.\n· Avènement des proto-boucleurs.\n· Résonnance de Vinzmann.\n\nVous n\'êtes pas prêts.';
+    document.querySelector('.deboucled-about-version').onclick = () => alert(pave2022);
+
+    addToggleEvent(storage_optionEnableDarkTheme, undefined, toggleDarkTheme);
     addToggleEvent(storage_optionHideMessages);
+    addToggleEvent(storage_optionBlAuthorIgnoreMp);
+    addToggleEvent(storage_optionBlSubjectIgnoreMessages);
     addToggleEvent(storage_optionBoucledUseJvarchive);
     addToggleEvent(storage_optionDisplayBlacklistTopicButton);
     addToggleEvent(storage_optionDisplayBlackTopic);
     addToggleEvent(storage_optionPrevisualizeTopic);
     addToggleEvent(storage_optionShowJvcBlacklistButton);
     addToggleEvent(storage_optionDisplayTopicCharts);
-    addToggleEvent(storage_optionDisplayTopicMatches, function () {
+    addToggleEvent(storage_optionDisplayTopicMatches, undefined, function () {
         document.querySelectorAll(`[id = ${storage_optionClickToShowTopicMatches}-container]`).forEach(function (el) {
-            el.classList.toggle("deboucled-disabled");
+            el.classList.toggle('deboucled-disabled');
         })
     });
     addToggleEvent(storage_optionClickToShowTopicMatches);
-    addToggleEvent(storage_optionAllowDisplayThreshold, function () {
+    addToggleEvent(storage_optionAllowDisplayThreshold, undefined, function () {
         document.querySelectorAll(`[id = ${storage_optionDisplayThreshold}-container]`).forEach(function (el) {
-            el.classList.toggle("deboucled-disabled");
+            el.classList.toggle('deboucled-disabled');
         })
     });
     addToggleEvent(storage_optionRemoveUselessTags);
@@ -1495,17 +1851,13 @@ function buildSettingsPage() {
     addRangeEvent(storage_optionMaxTopicCount);
     addSelectEvent(storage_optionDetectPocMode);
 
-    addImportExportEvent();
-
-    addCollapsibleEvents();
-
-    buildSettingEntities();
-
-    refreshEntityCounts();
-
-    addHighlightModeratedButton();
-
-    addSortEvent();
+    preBoucleArray.forEach(b => {
+        addToggleEvent(`deboucled-preboucle-${b.id}`, false, function (checked) {
+            togglePreBoucleStatus(b.id, checked);
+            savePreBouclesStatuses();
+        });
+    });
+    addToggleEvent(storage_optionAntiVinz);
 }
 
 function addSortEvent() {
@@ -1577,8 +1929,8 @@ function addCollapsibleEvents() {
 }
 
 function buildSettingEntities() {
-    //const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u00A1-\u02AF]*$/i;
     const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u2018-\u201F\u00A1-\u02AF\u{1F300}-\u{1FAD6}]*$/iu;
+    // eslint-disable-next-line no-useless-escape
     const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]\*]*$/iu;
     const regexAllowedTopicId = /^[0-9]+$/i;
 
@@ -1769,8 +2121,10 @@ function addSettingButton(firstLaunch) {
         button.innerHTML = 'Déboucled';
         return button;
     }
-    const blocsPreRight = document.querySelectorAll('.bloc-pre-right');
-    blocsPreRight.forEach(e => { e.prepend(createDeboucledButton()); });
+
+    let blocMenu = document.querySelectorAll('.bloc-pre-right');
+    if (blocMenu.length === 0) blocMenu = document.querySelectorAll('.action-left');
+    blocMenu.forEach(e => { e.prepend(createDeboucledButton()); });
 
     let optionOnclick = function (e) {
         e.preventDefault();
@@ -1794,7 +2148,6 @@ function addSearchFilterToggle() {
 
     let toggleElem = document.createElement('label');
     toggleElem.className = 'deboucled-switch';
-    toggleElem.style.marginBottom = '2px';
     toggleElem.title = 'Filter les résultats avec Déboucled';
     toggleElem.innerHTML = `<input type="checkbox" id="deboucled-search-filter-toggle" ${optionFilterResearch ? 'checked' : ''}><span class="deboucled-toggle-slider round red"></span>`;
     document.querySelector('.form-rech-forum').appendChild(toggleElem);
@@ -1841,14 +2194,14 @@ function addHighlightModeratedButton() {
     anchor.className = 'titre-bloc deboucled-entity-moderated-button';
     anchor.setAttribute('role', 'button');
     anchor.innerHTML = buttonText;
-    anchor.onclick = function () {
+    anchor.onclick = async function () {
         if (this.textContent === buttonStopText) {
             stopHighlightModeratedTopics = true;
             this.innerHTML = buttonText;
         }
         else {
             this.innerHTML = `<b>${buttonStopText}</b>`;
-            highlightModeratedTopics();
+            await highlightModeratedTopics();
             stopHighlightModeratedTopics = false;
             this.innerHTML = buttonText;
         }
@@ -1867,7 +2220,7 @@ async function highlightModeratedTopics() {
         if (!moderatedTopics.has(key)) {
             entity.style.backgroundColor = '#69ceff70';
             let isModerated = await topicIsModerated(key);
-            await sleep(500);
+            await sleep(700);
             entity.removeAttribute('style');
             moderatedTopics.set(key, isModerated);
         }
@@ -1877,8 +2230,85 @@ async function highlightModeratedTopics() {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
+// PRIVATE MESSAGES PAGE
+///////////////////////////////////////////////////////////////////////////////////////
+
+function findPrivateMessageDefaultParams(doc) {
+    if (!doc) return null;
+    return [...doc.querySelectorAll('#b-reception > form > input[type=hidden]')]
+        .map(fs => ({ name: fs.getAttribute('name'), value: fs.getAttribute('value') }));
+}
+
+async function getPrivateMessageDocument(url) {
+    return await fetch(url).then(function (response) {
+        if (!response.ok) throw Error(response.statusText);
+        return response.text();
+    }).then(function (r) {
+        return domParser.parseFromString(r, 'text/html');
+    }).catch(function (err) {
+        console.warn(err);
+        return null;
+    });
+}
+
+async function sendPrivateMessagesToSpam(messageIds, onMpPage) {
+    const url = 'https://www.jeuxvideo.com/messages-prives/boite-reception.php';
+    let mpDoc = onMpPage ? document : await getPrivateMessageDocument(url);
+    let mpFsElements = findPrivateMessageDefaultParams(mpDoc);
+    if (!mpFsElements) return;
+
+    var params = new URLSearchParams();
+    mpFsElements.forEach(fs => { params.append(fs.name, fs.value); });
+    params.append('conv_move', '666');
+    messageIds.forEach(m => { params.append('conv_select[]', m) });
+
+    await fetch(url, { method: 'POST', body: params })
+        .then(function (response) {
+            if (!response.ok) throw Error(response.statusText);
+        }).catch(function (err) {
+            console.error(err);
+        });
+}
+
+async function getPrivateMessageAuthor(messageId, hash) {
+    const url = 'https://www.jeuxvideo.com/messages-prives/ajax/ajax_mp_get_participants.php';
+
+    var params = new URLSearchParams();
+    params.append('idc', messageId);
+    params.append('h', hash);
+
+    const resDoc = await fetch(url, { method: 'POST', body: params })
+        .then(function (response) {
+            if (!response.ok) throw Error(response.statusText);
+            return response.text();
+        }).then(function (r) {
+            const resObj = JSON.parse(r);
+            return domParser.parseFromString(resObj.html, 'text/html');
+        }).catch(function (err) {
+            console.error(err);
+        });
+    if (!resDoc) return null;
+    const authorElem = resDoc.body.querySelector('ul > li > span');
+    if (!authorElem) return null;
+    return authorElem.textContent.trim();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
 // MAIN PAGE
 ///////////////////////////////////////////////////////////////////////////////////////
+
+function getEntityTitle(entity) {
+    switch (entity) {
+        case entitySubject:
+            return 'Sujets';
+        case entityAuthor:
+            return 'Auteurs';
+        case entityTopicId:
+            return 'Topics';
+    }
+    return '';
+}
 
 function toggleDarkTheme(enabled) {
     document.body.classList.toggle('deboucled-dark-theme', enabled);
@@ -1910,13 +2340,10 @@ function getCurrentPageType(url) {
     let searchRegex = /^\/recherche\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*/i;
     if (url.match(searchRegex)) return 'search';
 
-    return 'unknown';
-}
+    let privateMessagesRegex = /^(\/messages-prives\/boite-reception\.php(\?folder=0)?)$/i;
+    if (url.match(privateMessagesRegex)) return 'privatemessages';
 
-function getSearchType(urlSearch) {
-    let searchRegex = /(\?search_in_forum=)(?<searchvalue>.*)(&type_search_in_forum=)(?<searchtype>.*)/i;
-    let matches = searchRegex.exec(urlSearch);
-    return matches.groups.searchtype.trim().toLowerCase();
+    return 'unknown';
 }
 
 async function getForumPageContent(page) {
@@ -1939,19 +2366,20 @@ async function handleTopicList(canFillTopics) {
 
     let optionAllowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
     let optionDisplayThreshold = GM_getValue(storage_optionDisplayThreshold, storage_optionDisplayThreshold_default);
+    let optionAntiVinz = GM_getValue(storage_optionAntiVinz, storage_optionAntiVinz_default);
 
     let topicsToRemove = [];
     let finalTopics = [];
     finalTopics.push(topics[0]); // header
     topics.slice(1).forEach(function (topic) {
-        if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold)) {
+        if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz)) {
             topicsToRemove.push(topic);
             hiddenTotalTopics++;
         }
         else finalTopics.push(topic);
     });
     if (canFillTopics) {
-        const filledTopics = await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold);
+        const filledTopics = await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz);
         finalTopics = finalTopics.concat(filledTopics);
     }
     topicsToRemove.forEach(removeTopic);
@@ -1993,9 +2421,79 @@ async function handlePoc(finalTopics) {
     await saveLocalStorage();
 }
 
-function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
+function highlightBlacklistMatches(element, matches) {
+    let content = element.textContent;
+    let index = -1;
+    matches.forEach(match => {
+        const matchNorm = match.normalizeDiacritic();
+        index = content.normalizeDiacritic().indexOf(matchNorm, index + 1);
+        const realMatchContent = content.slice(index, index + matchNorm.length);
+        const newContent = `<span class="deboucled-blacklisted">${realMatchContent}</span>`;
+        content = `${content.slice(0, index)}${newContent}${content.slice(index + match.length, content.length)}`;
+        index += newContent.length;
+    });
+
+    if (element.nodeType == Node.TEXT_NODE) {
+        let newNode = document.createElement('span');
+        element.parentElement.insertBefore(newNode, element);
+        newNode.outerHTML = content;
+        element.remove();
+    }
+    else {
+        element.innerHTML = content;
+    }
+}
+
+function handleMessageBlacklistMatches(messageElement) {
+    const getParagraphChildren = (contentElement) => [...contentElement.children].filter(c => c.tagName === 'P' && c.textContent.trim() !== '');
+    const getTextChildren = (contentElement) => [...contentElement.childNodes].filter(c => c.nodeType === Node.TEXT_NODE && c.textContent.trim() !== '');
+    function highlightMatches(textChild) {
+        const matches = isSubjectBlacklisted(textChild.textContent);
+        if (!matches) return false;
+        highlightBlacklistMatches(textChild, matches);
+        return true;
+    }
+
+    // Un message contient une balise p pour chaque ligne
+    // Un p peut contenir du texte ou du html (img, a, etc)
+    let paragraphChildren = getParagraphChildren(messageElement);
+    let hasMatch = false;
+    paragraphChildren.forEach(paragraph => {
+        const textChildren = getTextChildren(paragraph); // on ne s'intéresse qu'au texte
+        textChildren.forEach(textChild => { hasMatch = highlightMatches(textChild) ? true : hasMatch });
+    })
+    return hasMatch;
+}
+
+function handleBlSubjectIgnoreMessages(messageElement) {
+    let contentElement = messageElement.querySelector('.txt-msg.text-enrichi-forum');
+    if (!contentElement) return;
+
+    let hasAnyMatch = handleMessageBlacklistMatches(contentElement);
+    if (!hasAnyMatch) return;
+
+    const blocContenu = contentElement.parentElement;
+    blocContenu.style.display = 'none';
+
+    let divWrapper = document.createElement('div');
+    divWrapper.className = 'deboucled-matches-wrapper deboucled-message-wrapper';
+    blocContenu.parentElement.appendChild(divWrapper);
+    let spanEye = document.createElement('span');
+    spanEye.className = 'deboucled-eye-logo deboucled-display-matches';
+    divWrapper.appendChild(spanEye);
+    divWrapper.appendChild(blocContenu);
+
+    divWrapper.onclick = function () {
+        this.firstChild.remove();
+        this.removeAttribute('class');
+        blocContenu.removeAttribute('style');
+        divWrapper.onclick = null;
+    }
+}
+
+function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages, optionBlSubjectIgnoreMessages) {
     let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
-    if (authorElement === null) return;
+    if (!authorElement) return;
     let author = authorElement.textContent.trim();
 
     if (isAuthorBlacklisted(author)) {
@@ -2003,6 +2501,7 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
             removeMessage(message);
             hiddenMessages++;
             hiddenAuthorArray.add(author);
+            return; // si on a supprimé le message on se casse, plus rien à faire
         }
         else {
             highlightBlacklistedAuthor(message, authorElement);
@@ -2014,6 +2513,9 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages) {
         upgradeJvcBlacklistButton(message, author, optionShowJvcBlacklistButton);
         addBoucledAuthorButton(message, author, optionBoucledUseJvarchive);
     }
+
+    if (!optionBlSubjectIgnoreMessages) return;
+    handleBlSubjectIgnoreMessages(message);
 }
 
 function handleTopicHeader() {
@@ -2021,28 +2523,23 @@ function handleTopicHeader() {
     if (!titleElement) return;
     const subjectMatches = isSubjectBlacklisted(titleElement.textContent);
     if (!subjectMatches) return;
-    function highlightMatch(titleElem, match) {
-        let content = titleElem.innerHTML;
-        const m = match.trim();
-        const index = content.normalizeDiacritic().indexOf(m); // manip pour correctement remplacer les mots avec des accents
-        const realMatch = content.slice(index, index + m.length);
-        content = `${content.slice(0, index)}<span class="deboucled-blacklisted">${realMatch}</span>${content.slice(index + m.length, content.length)}`;
-        titleElem.innerHTML = content;
-    }
-    subjectMatches.forEach(m => highlightMatch(titleElement, m));
+    //const uniqueMatches = [...new Set(subjectMatches)];
+    //uniqueMatches.forEach(match => highlightBlacklistMatch(titleElement, match));
+    highlightBlacklistMatches(titleElement, subjectMatches);
 }
 
 function handleTopicMessages() {
     let optionHideMessages = GM_getValue(storage_optionHideMessages, storage_optionHideMessages_default);
     let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
+    let optionBlSubjectIgnoreMessages = GM_getValue(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default);
 
     handleTopicHeader();
 
-    handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive);
+    handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages);
 
     let allMessages = getAllMessages(document);
     allMessages.forEach(function (message) {
-        handleMessage(message, optionBoucledUseJvarchive, optionHideMessages);
+        handleMessage(message, optionBoucledUseJvarchive, optionHideMessages, optionBlSubjectIgnoreMessages);
     });
 
     buildMessagesHeader();
@@ -2057,6 +2554,71 @@ async function handleSearch() {
     let topics = getAllTopics(document);
     if (topics.length === 0) return;
     await handleTopicListOptions(topics);
+}
+
+function handlePrivateMessage(privateMessageElement, author) {
+    if (isAuthorBlacklisted(author)) {
+        privateMessageElement.remove(); //style.display = 'none';
+        hiddenPrivateMessages++;
+        return privateMessageElement;
+    }
+    return null;
+}
+
+async function handlePrivateMessages() {
+    let optionBlAuthorIgnoreMp = GM_getValue(storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default);
+    if (!optionBlAuthorIgnoreMp) return;
+
+    const privateMessageElements = document.querySelectorAll('.list-msg > .row-mp:not(.row-head)');
+
+    let hiddenPrivateMessageArray = [];
+    for (const privateMessageElem of privateMessageElements) {
+        const mpId = privateMessageElem.querySelector('.conv_select').getAttribute('value');
+        let author = '';
+        const participants = privateMessageElem.querySelector('.pm-list-participants');
+        if (participants) {
+            const mpHash = participants.getAttribute('data-hash');
+            author = await getPrivateMessageAuthor(mpId, mpHash);
+        }
+        else {
+            author = privateMessageElem.querySelector('.exp-msg > div > span').textContent.trim();
+        }
+        if (!author) continue;
+
+        const hiddenMp = handlePrivateMessage(privateMessageElem, author);
+        if (hiddenMp) hiddenPrivateMessageArray.push(mpId);
+    }
+    if (hiddenPrivateMessageArray.length > 0) {
+        saveTotalHidden();
+        await sendPrivateMessagesToSpam(hiddenPrivateMessageArray, true);
+    }
+}
+
+async function handlePrivateMessageNotifs() {
+    let optionBlAuthorIgnoreMp = GM_getValue(storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default);
+    if (!optionBlAuthorIgnoreMp) return;
+
+    const mpElem = document.querySelector('.jv-nav-account-mp > div > .jv-nav-dropdown-container-content');
+    if (!mpElem) return; // not connected
+    let privateMessageElements = await awaitElements(mpElem, '.jv-nav-dropdown-item');
+
+    let hiddenPrivateMessageArray = [];
+    for (const privateMessageElem of privateMessageElements) {
+        const mpId = privateMessageElem.getAttribute('data-id')
+        const author = privateMessageElem.querySelector('.jv-nav-dropdown-author').textContent.trim();
+        const hiddenMp = handlePrivateMessage(privateMessageElem, author);
+        if (hiddenMp) hiddenPrivateMessageArray.push(mpId);
+    }
+
+    if (hiddenPrivateMessageArray.length > 0) {
+        /*
+        // Gérer la bulle de notif ?
+        const hasNotifElement = document.querySelector('.jv-account-number-mp.js-menu-dropdown.has-notif');
+        if (!hasNotifElement) return;
+        */
+        saveTotalHidden();
+        await sendPrivateMessagesToSpam(hiddenPrivateMessageArray, false);
+    }
 }
 
 function handleError() {
@@ -2085,7 +2647,7 @@ function handleError() {
     insertAfter(jvArchiveButton, homepageButton);
 }
 
-async function init(isTopicMessages = false) {
+async function init() {
     let firstLaunch = await initStorage();
     addCss();
     addSvgs();
@@ -2095,8 +2657,8 @@ async function init(isTopicMessages = false) {
     addSettingButton(firstLaunch);
 }
 
-async function callMe() {
-    let currentPageType = getCurrentPageType(window.location.pathname);
+async function entryPoint() {
+    let currentPageType = getCurrentPageType(`${window.location.pathname}${window.location.search}`);
     switch (currentPageType) {
         case 'topiclist': {
             await init();
@@ -2106,16 +2668,22 @@ async function callMe() {
             addRightBlocMatches();
             addRightBlocStats();
             toggleTopicOverlay(false);
+            handlePrivateMessageNotifs();
             break;
         }
         case 'topicmessages': {
-            await init(true);
+            await init();
             handleTopicMessages();
             break;
         }
         case 'search': {
             await init();
             await handleSearch();
+            break;
+        }
+        case 'privatemessages': {
+            await init();
+            await handlePrivateMessages();
             break;
         }
         case 'error': {
@@ -2127,6 +2695,6 @@ async function callMe() {
     }
 }
 
-callMe();
+entryPoint();
 
-addEventListener('instantclick:newpage', callMe);
+addEventListener('instantclick:newpage', entryPoint);
