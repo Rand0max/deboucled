@@ -37,7 +37,7 @@
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
-const deboucledVersion = '2.0.1'
+const deboucledVersion = '2.0.2'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -1312,10 +1312,8 @@ function updateMessagesHeader() {
     }
     else {
         ignoredMessageHeader.removeAttribute('style');
-        if (ignoredMessageHeader) {
-            let pr = plural(hiddenMessages);
-            ignoredMessageHeader.firstChild.textContent = `${hiddenMessages} message${pr} ignoré${pr}`;
-        }
+        let pr = plural(hiddenMessages);
+        ignoredMessageHeader.firstChild.textContent = `${hiddenMessages} message${pr} ignoré${pr}`;
 
         let ignoredAuthors = document.querySelector('#deboucled-ignored-messages-authors-header');
         if (ignoredAuthors) {
@@ -1603,7 +1601,7 @@ function buildSettingsPage() {
         html += '<div class="deboucled-setting-content">';
 
         let jvcLogo = '<span class="deboucled-jvc-logo"></span>';
-        html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/forums/42-51-67697509-1-0-1-0-officiel-nouveau-script-deboucled-censure-les-topics-et-la-boucle-du-forum.htm" target="_blank" title="Topic officiel JVC">${jvcLogo}</a>`;
+        html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm" target="_blank" title="Topic officiel JVC">${jvcLogo}</a>`;
 
         let githubLogo = '<span class="deboucled-svg-github"><svg width="20px" viewBox="0 0 16 16" id="deboucled-github-logo"><use href="#githublogo"/></svg></span>';
         html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/deboucled" target="_blank" title="Github Officiel Déboucled">${githubLogo}</a>`;
