@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.0.4
+// @version     2.1.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -26,6 +26,7 @@
 // @grant       GM_listValues
 // @grant       GM_getResourceText
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
+// @resource    PEEPODARKJVC_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/peepodarkjvc.css
 // @resource    CHARTS_CSS https://unpkg.com/charts.css/dist/charts.min.css
 // @require     https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js
 // @require     https://unpkg.com/@chocolateboy/uncommonjs
@@ -37,7 +38,7 @@
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
-const deboucledVersion = '2.0.4'
+const deboucledVersion = '2.1.0'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -92,7 +93,8 @@ const storage_preBoucles = 'deboucled_preBoucles', storage_preBoucles_default = 
 const storage_blacklistedTopicIds = 'deboucled_blacklistedTopicIds', storage_blacklistedTopicIds_default = '[]';
 const storage_blacklistedSubjects = 'deboucled_blacklistedSubjects', storage_blacklistedSubjects_default = '[]';
 const storage_blacklistedAuthors = 'deboucled_blacklistedAuthors', storage_blacklistedAuthors_default = '[]';
-const storage_optionEnableDarkTheme = 'deboucled_optionEnableDarkTheme', storage_optionEnableDarkTheme_default = false;
+const storage_optionEnableJvcDarkTheme = 'deboucled_optionEnableJvcDarkTheme', storage_optionEnableJvcDarkTheme_default = false;
+const storage_optionEnableDeboucledDarkTheme = 'deboucled_optionEnableDeboucledDarkTheme', storage_optionEnableDeboucledDarkTheme_default = false;
 const storage_optionBoucledUseJvarchive = 'deboucled_optionBoucledUseJvarchive', storage_optionBoucledUseJvarchive_default = false;
 const storage_optionHideMessages = 'deboucled_optionHideMessages', storage_optionHideMessages_default = true;
 const storage_optionAllowDisplayThreshold = 'deboucled_optionAllowDisplayThreshold', storage_optionAllowDisplayThreshold_default = false;
@@ -119,7 +121,7 @@ const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 const storage_totalHiddenPrivateMessages = 'deboucled_totalHiddenPrivateMessages';
 const storage_TopicStats = 'deboucled_TopicStats';
 
-const storage_Keys = [storage_init, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_TopicStats];
+const storage_Keys = [storage_init, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_optionEnableJvcDarkTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_TopicStats];
 
 const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors];
 
@@ -546,9 +548,14 @@ function plural(nb) {
     return nb > 1 ? 's' : '';
 }
 
-function addCss() {
+function addStyles(enableJvcDarkTheme) {
     const deboucledCss = GM_getResourceText('DEBOUCLED_CSS');
     GM_addStyle(deboucledCss);
+
+    if (enableJvcDarkTheme) {
+        const peepodarkjvcCss = GM_getResourceText('PEEPODARKJVC_CSS');
+        GM_addStyle(peepodarkjvcCss);
+    }
 }
 
 function addSvg(svgHtml, selector) {
@@ -1657,7 +1664,9 @@ function buildSettingsPage() {
         html += '<table class="deboucled-option-table">';
 
         let darkLogo = '<span class="deboucled-dark-logo"></span>'
-        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour Déboucled`, storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default, 'Permet de basculer entre le thème normal et le thème sombre pour le script Déboucled.');
+        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour <b>JVC</b> (par Peepo)`, storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default, 'Basculer entre le thème JVC normal, et le thème sombre créé par Peepo (pensez à rafraichir la page pour voir les changements).');
+
+        html += addToggleOption(`Utiliser le <i>thème sombre</i> pour <b>Déboucled</b>`, storage_optionEnableDeboucledDarkTheme, storage_optionEnableDeboucledDarkTheme_default, 'Permet de basculer entre le thème normal et le thème sombre pour le script Déboucled.', undefined, true);
 
         let forbiddenLogo = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbiddenLogo}`, storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics souhaités.');
@@ -1826,7 +1835,8 @@ function addSettingEvents() {
     const pave2022 = 'Juste pour rappel en 2022 :\n\n· Fin de la boucle temporelle.\n· Débug du script mathématique.\n· Révélation projet DéboucledV2.\n· Conscience des oldfags.\n· Avènement des proto-boucleurs.\n· Résonnance de Vinzmann.\n\nVous n\'êtes pas prêts.';
     document.querySelector('.deboucled-about-version').onclick = () => alert(pave2022);
 
-    addToggleEvent(storage_optionEnableDarkTheme, undefined, toggleDarkTheme);
+    addToggleEvent(storage_optionEnableDeboucledDarkTheme, undefined, toggleDeboucledDarkTheme);
+    addToggleEvent(storage_optionEnableJvcDarkTheme);
     addToggleEvent(storage_optionHideMessages);
     addToggleEvent(storage_optionBlAuthorIgnoreMp);
     addToggleEvent(storage_optionBlSubjectIgnoreMessages);
@@ -2311,7 +2321,7 @@ function getEntityTitle(entity) {
     return '';
 }
 
-function toggleDarkTheme(enabled) {
+function toggleDeboucledDarkTheme(enabled) {
     document.body.classList.toggle('deboucled-dark-theme', enabled);
 }
 
@@ -2658,10 +2668,11 @@ function handleError() {
 
 async function init() {
     let firstLaunch = await initStorage();
-    addCss();
+    const enableJvcDarkTheme = GM_getValue(storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default);
+    addStyles(enableJvcDarkTheme);
     addSvgs();
-    const enableDarkTheme = GM_getValue(storage_optionEnableDarkTheme, storage_optionEnableDarkTheme_default);
-    toggleDarkTheme(enableDarkTheme);
+    const enableDeboucledDarkTheme = GM_getValue(storage_optionEnableDeboucledDarkTheme, storage_optionEnableDeboucledDarkTheme_default);
+    toggleDeboucledDarkTheme(enableDeboucledDarkTheme);
     buildSettingsPage();
     addSettingButton(firstLaunch);
 }
