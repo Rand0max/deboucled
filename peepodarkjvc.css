@@ -1,6 +1,6 @@
 /* 
 ---------------------------------------------------------
-- Thème créé par Peepo, merci à lui.
+- Thanks to Peepo, creator of this theme.
 - https://userstyles.org/styles/206703/peepojv
 - https://www.jeuxvideo.com/forums/message/1144955144
 ---------------------------------------------------------
@@ -325,7 +325,7 @@ body {
 
 /*"PeepoJV avant "Fil d'ariane" */
 .fil-ariane-crumb:before {
-  content: "PeepoJV";
+  content: "jeuxvideo.com";
   color: #dedede;
 }
 
