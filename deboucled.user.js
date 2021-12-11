@@ -44,6 +44,8 @@ const entitySubject = 'subject';
 const entityAuthor = 'author';
 const entityTopicId = 'topicid';
 
+const jvarchiveUrl = 'https://jvarchive.com';
+
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
 let topicIdBlacklistMap = new Map();
@@ -192,8 +194,10 @@ async function removeTopicIdBlacklist(topicId) {
 }
 
 function loadPreBouclesStatuses() {
+    const gmPreBouclesStatus = GM_getValue(storage_preBoucles, storage_preBoucles_default);
+    if (!gmPreBouclesStatus) return;
     let preBouclesStatuses = [...JSON.parse(GM_getValue(storage_preBoucles, storage_preBoucles_default))];
-    if (!preBouclesStatuses) return;
+    if (preBouclesStatuses.length === 0) return;
     preBouclesStatuses.forEach(pbs => {
         togglePreBoucleStatus(pbs[0], pbs[1]);
     });
@@ -1369,7 +1373,7 @@ function addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchiv
 
     let forumUrl = backToForumElement.getAttribute('href');
     let redirectUrl = `/recherche${forumUrl}?search_in_forum=${author}&type_search_in_forum=auteur_topic`;
-    if (optionBoucledUseJvarchive) redirectUrl = `https://jvarchive.com/topic/recherche?search=${author}&searchType=auteur_topic_exact`;
+    if (optionBoucledUseJvarchive) redirectUrl = `${jvarchiveUrl}/topic/recherche?search=${author}&searchType=auteur_topic_exact`;
 
     let boucledAuthorAnchor = document.createElement('a');
     boucledAuthorAnchor.setAttribute('class', 'xXx lien-jv deboucled-author-boucled-button deboucled-svg-spiral-gray');
@@ -1500,10 +1504,10 @@ function buildSettingsPage() {
         const tooltipLocation = location === 'top' ? '' : ` data-tooltip-location="${location}"`;
         return `deboucled-data-tooltip="${hint}"${tooltipLocation}`;
     }
-    function addToggleOption(title, optionId, defaultValue, hint) {
+    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false) {
         let html = '';
-        html += `<tr id="${optionId}-container">`;
-        html += `<td class="deboucled-td-left">`;
+        html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
+        html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}">`;
         html += `<span ${buildTooltip(hint)}>${title}</span>`;
         html += '</td>';
         html += `<td class="deboucled-td-right">`;
@@ -2643,7 +2647,7 @@ function handleError() {
 
     let jvArchiveButton = document.createElement('a');
     jvArchiveButton.className = 'btn btn-primary';
-    jvArchiveButton.href = `https://jvarchive.com${window.location.pathname.slice(0, -4)}`;
+    jvArchiveButton.href = `${jvarchiveUrl}${window.location.pathname.slice(0, -4)}`;
     jvArchiveButton.alt = 'JvArchive';
     jvArchiveButton.target = '_blank';
     jvArchiveButton.style.marginLeft = '15px';
