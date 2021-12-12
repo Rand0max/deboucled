@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.1.0
+// @version     2.2.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -38,7 +38,7 @@
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
-const deboucledVersion = '2.1.0'
+const deboucledVersion = '2.2.0'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -50,8 +50,8 @@ const jvarchiveUrl = 'https://jvarchive.com';
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
 let topicIdBlacklistMap = new Map();
-let subjectsBlacklistReg = new RegExp();
-let authorsBlacklistReg = new RegExp();
+let subjectsBlacklistReg;
+let authorsBlacklistReg;
 
 let pocTopicMap = new Map();
 
@@ -65,8 +65,6 @@ let hiddenAuthorArray = new Set();
 let deboucledTopicStatsMap = new Map();
 
 let preBoucleArray = [];
-let preBoucleSubjectsBlacklistReg = new RegExp();
-let preBoucleAuthorsBlacklistReg = new RegExp();
 let vinzBoucleArray = [];
 
 let matchedSubjects = new Map();
@@ -147,15 +145,12 @@ async function loadStorage() {
     authorBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedAuthors, storage_blacklistedAuthors_default)))];
     topicIdBlacklistMap = new Map([...JSON.parse(GM_getValue(storage_blacklistedTopicIds, storage_blacklistedTopicIds_default))]);
 
-    subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
-    authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
+    buildBlacklistsRegex();
 
     let topicStats = GM_getValue(storage_TopicStats);
     if (topicStats) deboucledTopicStatsMap = new Map([...JSON.parse(topicStats)]);
 
     await loadLocalStorage();
-
-    await saveStorage();
 }
 
 async function saveStorage() {
@@ -164,9 +159,6 @@ async function saveStorage() {
     GM_setValue(storage_blacklistedTopicIds, JSON.stringify([...topicIdBlacklistMap]));
 
     savePreBouclesStatuses();
-
-    subjectsBlacklistReg = buildRegex(subjectBlacklistArray, true);
-    authorsBlacklistReg = buildRegex(authorBlacklistArray, false);
 
     await saveLocalStorage();
 
@@ -322,9 +314,25 @@ async function importFromTotalBlacklist() {
     const blacklistFromTblArray = JSON.parse(blacklistFromTbl).filter(function (val) { return val !== 'forums' });
     authorBlacklistArray = [...new Set(authorBlacklistArray.concat(blacklistFromTblArray))];
     await saveStorage()
+    buildBlacklistsRegex();
     refreshAuthorKeys();
     showRestoreCompleted();
     alert(`${blacklistFromTblArray.length} pseudos TotalBlacklist ont été importés dans Déboucled avec succès.`);
+}
+
+function buildBlacklistsRegex() {
+    let preBoucleSubjects = [];
+    let preBoucleAuthors = [];
+    preBoucleArray.filter(pb => pb.enabled && pb.type === entitySubject)
+        .forEach(pb => { preBoucleSubjects = preBoucleSubjects.concat(pb.entities); });
+    preBoucleArray.filter(pb => pb.enabled && pb.type === entityAuthor)
+        .forEach(pb => { preBoucleAuthors = preBoucleAuthors.concat(pb.entities); });
+
+    const mergedSubjectBlacklistArray = [...new Set([...preBoucleSubjects, ...subjectBlacklistArray])];
+    const mergedAuthorBlacklistArray = [...new Set([...preBoucleAuthors, ...authorBlacklistArray])];
+
+    subjectsBlacklistReg = buildRegex(mergedSubjectBlacklistArray, true);
+    authorsBlacklistReg = buildRegex(mergedAuthorBlacklistArray, false);
 }
 
 
@@ -409,22 +417,6 @@ function initPreBoucles() {
     preBoucleArray.push(hatred);
 
     loadPreBouclesStatuses();
-    buildPreBouclesBlacklists();
-}
-
-function buildPreBouclesBlacklists() {
-    let preBoucleSubjects = [];
-    let preBoucleAuthors = [];
-    preBoucleArray.filter(pb => pb.enabled && pb.type === entitySubject)
-        .forEach(pb => { preBoucleSubjects = preBoucleSubjects.concat(pb.entities); });
-    preBoucleArray.filter(pb => pb.enabled && pb.type === entityAuthor)
-        .forEach(pb => { preBoucleAuthors = preBoucleAuthors.concat(pb.entities); });
-
-    const preBoucleSubjectBlacklistArray = [...new Set([...preBoucleSubjects])];
-    const preBoucleAuthorBlacklistArray = [...new Set([...preBoucleAuthors])];
-
-    preBoucleSubjectsBlacklistReg = buildRegex(preBoucleSubjectBlacklistArray, true);
-    preBoucleAuthorsBlacklistReg = buildRegex(preBoucleAuthorBlacklistArray, false);
 }
 
 function makeVinzSubjectPure(str) {
@@ -457,7 +449,7 @@ String.prototype.escapeRegexPattern = function () {
 }
 
 String.prototype.handleGenericChar = function () {
-    return this.replace('*', '.*?');
+    return this.replaceAll('*', '.*?');
 }
 
 String.prototype.capitalize = function () {
@@ -465,7 +457,7 @@ String.prototype.capitalize = function () {
 }
 
 String.prototype.removeDoubleSpaces = function () {
-    return this.replace(/ +(?= )/g, '');
+    return this.replaceAll(/ +(?= )/g, '');
 }
 
 Array.prototype.sortNormalize = function () {
@@ -529,14 +521,29 @@ function normalizeValue(value) {
 }
 
 function buildRegex(array, withBoundaries) {
+    if (!array?.length) return null;
+
+    function transformGenericChars(str) {
+        const genCharsRegex = /^(?<leadingGeneric>\*?)(?<expression>.*?)(?<trailingGeneric>\*?)$/gi;
+        const matches = genCharsRegex.exec(str);
+        if (!matches.groups.expression) return null;
+        const leadingGeneric = matches.groups.leadingGeneric ? `(?:${matches.groups.leadingGeneric.handleGenericChar()})` : '';
+        const trailingGeneric = matches.groups.trailingGeneric ? `(?:${matches.groups.trailingGeneric.handleGenericChar()})` : '';
+        const expression = matches.groups.expression.handleGenericChar();
+        return `${leadingGeneric}(${expression})${trailingGeneric}`;
+    }
+
     // \b ne fonctionne pas avec les caractères spéciaux
     let bStart = withBoundaries ? '(?<=\\W|^)' : '';
     let bEnd = withBoundaries ? '(?=\\W|$)' : '';
-    let map = array.map((e) => {
-        let word = e.escapeRegexPattern().normalizeDiacritic().handleGenericChar();
+
+    let regexMap = array.map((e) => {
+        let word = e.escapeRegexPattern().normalizeDiacritic();
+        word = transformGenericChars(word);
         return `${bStart}${word}${bEnd}`;
-    })
-    let regex = map.join('|');
+    });
+
+    let regex = regexMap.join('|');
     return new RegExp(regex, 'gi');
 }
 
@@ -641,6 +648,7 @@ async function awaitElements(target, selector) {
     });
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////////////
 // RIGHT COLUMN - STATS/CHARTS
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -658,7 +666,7 @@ function addRightBlocMatches() {
     html += '<div id="deboucled-matches-content" class="scrollable-content bloc-info-forum">';
 
     function formatMatches(matches, withHint) {
-        let formatMatch = (str) => str.replace(',', '').removeDoubleSpaces().trim().capitalize();
+        let formatMatch = (str) => str.replaceAll(',', '').removeDoubleSpaces().trim().capitalize();
         let matchesSorted = matches.sortByValueThenKey(true);
         let matchesHtml = '';
         let index = 0;
@@ -862,10 +870,11 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
     let actualTopics = topics.length - hiddenTotalTopics - 1;
     let pageBrowse = 1;
     let filledTopics = [];
+    const maxPages = 10;
 
     const maxTopicCount = parseInt(GM_getValue(storage_optionMaxTopicCount, storage_optionMaxTopicCount_default));
 
-    while (actualTopics < maxTopicCount && pageBrowse <= 10) {
+    while (actualTopics < maxTopicCount && pageBrowse <= maxPages) {
         pageBrowse++;
         await getForumPageContent(pageBrowse).then((res) => {
             let nextDoc = domParser.parseFromString(res, 'text/html');
@@ -998,9 +1007,9 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
 
     let titleTag = element.querySelector('.lien-jv.topic-title');
     if (titleTag) {
-        const title = titleTag.textContent;
-        const subjectBlacklisted = isSubjectBlacklisted(title);
-        if (subjectBlacklisted) {
+        const title = titleTag.textContent.trim();
+        const subjectBlacklisted = getSubjectBlacklistMatches(title);
+        if (subjectBlacklisted?.length) {
             matchedSubjects.addArrayIncrement(subjectBlacklisted);
             hiddenSubjects++;
             return true;
@@ -1010,8 +1019,8 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
     let authorTag = element.querySelector('.topic-author');
     if (authorTag) {
         const author = authorTag.textContent.trim();
-        const authorBlacklisted = isAuthorBlacklisted(author);
-        if (authorBlacklisted) {
+        const authorBlacklisted = getAuthorBlacklistMatches(author);
+        if (authorBlacklisted?.length) {
             matchedAuthors.addArrayIncrement(authorBlacklisted);
             hiddenAuthors++;
             return true;
@@ -1033,25 +1042,32 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
     return false;
 }
 
-function isSubjectBlacklisted(subject) {
-    const hasSubjectBlacklist = subjectBlacklistArray.length > 0;
-    const hasPreBoucle = preBoucleArray.some(b => b.enabled && b.type === entitySubject);
-    if (!hasSubjectBlacklist && !hasPreBoucle) return false;
-
-    let normSubject = subject.normalizeDiacritic();
-    return (hasSubjectBlacklist && normSubject.match(subjectsBlacklistReg))
-        || (hasPreBoucle && normSubject.match(preBoucleSubjectsBlacklistReg));
+function filterMatchResults(matches) {
+    /* Imbitable en dépit : 
+        - on récupère toutes les correspondances sous forme de tableau avec matchAll
+        - on vire le premier élément de chaque tableau qui correspond à la correspondance complète
+        - on applati les tableaux dans un seul pour faciliter le filtrage
+        - on filtre en ne gardant que les correspondances exactes (non-nulle) du groupe "expression" du regex
+    */
+    return matches.map(r => r.slice(1)).flat().filter(r => r);
 }
 
-function isAuthorBlacklisted(author) {
-    const hasAuthorBlacklist = authorBlacklistArray.length > 0;
-    const hasPreBoucle = preBoucleArray.some(b => b.enabled && b.type === entityAuthor);
-    if (!hasAuthorBlacklist && !hasPreBoucle) return false;
+function getSubjectBlacklistMatches(subject) {
+    if (!subjectsBlacklistReg) return false;
+    const normSubject = subject.normalizeDiacritic();
+    // let matches = normSubject.match(subjectsBlacklistReg);
+    let matches = [...normSubject.matchAll(subjectsBlacklistReg)];
+    let groupedMatches = filterMatchResults(matches);
+    return groupedMatches;
+}
 
+function getAuthorBlacklistMatches(author) {
+    if (!authorsBlacklistReg) return false;
     const normAuthor = author.toLowerCase().normalizeDiacritic();
-    return normAuthor !== 'rand0max' && normAuthor !== 'deboucled' &&
-        ((hasAuthorBlacklist && normAuthor.match(authorsBlacklistReg))
-            || (hasPreBoucle && normAuthor.match(preBoucleAuthorsBlacklistReg)));
+    // let matches = normAuthor.match(authorsBlacklistReg);
+    let matches = [...normAuthor.matchAll(authorsBlacklistReg)];
+    let groupedMatches = filterMatchResults(matches);
+    return groupedMatches;
 }
 
 function isVinzTopic(subject, author) {
@@ -1426,7 +1442,7 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
 
     function handleLiveMessage(messageElement, authorElement, jvchat) {
         let author = authorElement.textContent.trim();
-        if (isAuthorBlacklisted(author)) {
+        if (getAuthorBlacklistMatches(author)?.length) {
             if (handleBlacklistedAuthor(messageElement, authorElement, author))
                 return; // si on a supprimé le message on se casse, plus rien à faire
         }
@@ -2469,8 +2485,8 @@ function handleMessageBlacklistMatches(messageElement) {
     const getParagraphChildren = (contentElement) => [...contentElement.children].filter(c => c.tagName === 'P' && c.textContent.trim() !== '');
     const getTextChildren = (contentElement) => [...contentElement.childNodes].filter(c => c.nodeType === Node.TEXT_NODE && c.textContent.trim() !== '');
     function highlightMatches(textChild) {
-        const matches = isSubjectBlacklisted(textChild.textContent);
-        if (!matches) return false;
+        const matches = getSubjectBlacklistMatches(textChild.textContent);
+        if (!matches?.length) return false;
         highlightBlacklistMatches(textChild, matches);
         return true;
     }
@@ -2517,7 +2533,7 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages, o
     if (!authorElement) return;
     let author = authorElement.textContent.trim();
 
-    if (isAuthorBlacklisted(author)) {
+    if (getAuthorBlacklistMatches(author)?.length) {
         if (optionHideMessages) {
             removeMessage(message);
             hiddenMessages++;
@@ -2542,8 +2558,8 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages, o
 function handleTopicHeader() {
     let titleElement = document.querySelector('#bloc-title-forum');
     if (!titleElement) return;
-    const subjectMatches = isSubjectBlacklisted(titleElement.textContent);
-    if (!subjectMatches) return;
+    const subjectMatches = getSubjectBlacklistMatches(titleElement.textContent);
+    if (!subjectMatches?.length) return;
     highlightBlacklistMatches(titleElement, subjectMatches);
 }
 
@@ -2576,7 +2592,7 @@ async function handleSearch() {
 }
 
 function handlePrivateMessage(privateMessageElement, author) {
-    if (isAuthorBlacklisted(author)) {
+    if (getAuthorBlacklistMatches(author)?.length) {
         privateMessageElement.remove(); //style.display = 'none';
         hiddenPrivateMessages++;
         return privateMessageElement;
@@ -2678,6 +2694,7 @@ async function init() {
 }
 
 async function entryPoint() {
+    //let start = performance.now();
     let currentPageType = getCurrentPageType(`${window.location.pathname}${window.location.search}`);
     switch (currentPageType) {
         case 'topiclist': {
@@ -2713,7 +2730,10 @@ async function entryPoint() {
         default:
             break;
     }
+    //let end = performance.now();
+    //console.log(`total time = ${end - start} ms`);
 }
+
 
 entryPoint();
 
