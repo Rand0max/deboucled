@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.2.0
+// @version     2.2.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -38,7 +38,7 @@
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
-const deboucledVersion = '2.2.0'
+const deboucledVersion = '2.2.1'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -347,7 +347,7 @@ function initPreBoucles() {
         title: 'Boucles connues',
         enabled: false,
         type: entitySubject,
-        entities: ['ces photos putain', 'yannick*tour eiffel', 'metisseur22cm', 'midsommar', 'eau*pastèque', 'l\'échéance est tombée', 'ai-je l\'air sympathique', 'pour avoir une copine en', 'no jump']
+        entities: ['ces photos putain', 'yannick*tour eiffel', 'metisseur22cm', 'midsommar', 'eau*pasteque', 'celestin tu', 'l\'échéance est tombée', 'ai-je l\'air sympathique', 'pour avoir une copine en', 'no jump', 'john cena est mort', 'par le corps masculin', 'dicaprio au lidl', '2 sauces interdites', 'allemand fou detruit son clavier', 'ma caissiere', 'traduisez en anglais', 'sauce sonic', 'seth gueko', 'gros gamos allemand', 'eau blanche', '*ssache que', 'genre de mec plait']
     };
     const covid19 =
     {
@@ -379,7 +379,15 @@ function initPreBoucles() {
         title: 'Réseaux sociaux',
         enabled: false,
         type: entitySubject,
-        entities: ['tinder', 'youtube', 'twitter', 'facebook', 'tik*tok', 'adopte un mec', 'meetic', 'badoo', 'okcupid', 'bumble', 'happn', 'insta', 'instagram', 'snapchat', 'feldup', 'norman', 'cyprien', 'natoo', 'kemar', 'jdg', 'joueur du grenier', 'amixem', 'squeezie', 'mym', 'onlyfan', 'onlyfans']
+        entities: ['tinder', 'twitter', 'facebook', 'tik*tok', 'adopte un mec', 'meetic', 'badoo', 'okcupid', 'bumble', 'happn', 'insta', 'instagram', 'snapchat', 'mym', 'onlyfan', 'onlyfans']
+    };
+    const youtube =
+    {
+        id: 'youtube',
+        title: 'Youtube',
+        enabled: false,
+        type: entitySubject,
+        entities: ['youtube', 'feldup', 'norman', 'cyprien', 'natoo', 'kemar', 'jdg', 'joueur du grenier', 'amixem', 'squeezie', 'rire jaune', 'kevin tran', 'michou', 'mcfly', 'carlito', 'inoxtag', 'seblafrite', 'joyca', 'julien chieze', 'kyan khojandi']
     };
     const kiddy =
     {
@@ -387,7 +395,7 @@ function initPreBoucles() {
         title: 'Immature',
         enabled: false,
         type: entitySubject,
-        entities: ['reacprout', 'prout', 'caca', 'pipi']
+        entities: ['reacprout*', 'prout', 'caca', 'cacaprout', 'pipi']
     };
     const hatred =
     {
@@ -395,7 +403,7 @@ function initPreBoucles() {
         title: 'Haineux',
         enabled: false,
         type: entitySubject,
-        entities: ['facho*', 'chofa*', 'qlf', 'paz', 's2s', 'gwer*', 'raciste*']
+        entities: ['facho*', 'chofs', 'chofa*', 'qlf', 'paz', 'pazification', 'pazifie', 's2s', 'gwer*', 'raciste*', 'hagar', 'hagra']
     };
 
     const boucledAuthors =
@@ -404,7 +412,7 @@ function initPreBoucles() {
         title: 'Pseudos boucled',
         enabled: false,
         type: entityAuthor,
-        entities: ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki', 'leao', 'oael']
+        entities: ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki', 'leao', 'oael', 'surk', 'zemmourfinito']
     };
 
     preBoucleArray.push(popularBoucles);
@@ -413,6 +421,7 @@ function initPreBoucles() {
     preBoucleArray.push(politic);
     preBoucleArray.push(deviant);
     preBoucleArray.push(socials);
+    preBoucleArray.push(youtube);
     preBoucleArray.push(kiddy);
     preBoucleArray.push(hatred);
 
