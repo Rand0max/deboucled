@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name        Déboucled-Split
+// @name        Déboucled
 // @namespace   deboucledjvcom
 // @version     2.3.0
-// @downloadURL https://github.com/Rand0max/deboucled/raw/split-files/deboucled.user.js
-// @updateURL   https://github.com/Rand0max/deboucled/raw/split-files/deboucled.meta.js
+// @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
+// @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
 // @description Censure les topics et les auteurs éclatax et vous sort de la boucle
 // @icon        https://image.noelshack.com/fichiers/2021/38/6/1632606701-deboucled.png
@@ -25,8 +25,8 @@
 // @grant       GM_deleteValue
 // @grant       GM_listValues
 // @grant       GM_getResourceText
-// @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/split-files/deboucled.css
-// @resource    PEEPODARKJVC_CSS https://raw.githubusercontent.com/Rand0max/deboucled/split-files/peepodarkjvc.css
+// @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
+// @resource    PEEPODARKJVC_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/peepodarkjvc.css
 // @resource    CHARTS_CSS https://unpkg.com/charts.css/dist/charts.min.css
 // @require     https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js
 // @require     https://unpkg.com/@chocolateboy/uncommonjs
