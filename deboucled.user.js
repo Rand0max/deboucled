@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.2.3
+// @version     2.2.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -38,7 +38,7 @@
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
-const deboucledVersion = '2.2.3'
+const deboucledVersion = '2.2.5'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -123,6 +123,18 @@ const storage_Keys = [storage_init, storage_preBoucles, storage_blacklistedTopic
 
 const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors];
 
+
+function getBlacklistWithKey(key) {
+    switch (key) {
+        case storage_blacklistedTopicIds:
+            return topicIdBlacklistMap;
+        case storage_blacklistedSubjects:
+            return subjectBlacklistArray;
+        case storage_blacklistedAuthors:
+            return authorBlacklistArray;
+    }
+    return null;
+}
 
 async function initStorage() {
     initPreBoucles();
@@ -262,6 +274,7 @@ function backupStorage() {
 
 function restoreStorage(fileContent) {
     const onlyBlacklists = document.querySelector('#deboucled-impexp-blonly').checked;
+    const mergeBlacklists = document.querySelector('#deboucled-impexp-mergebl').checked;
 
     // On parse le JSON du fichier pour en faire un objet
     let settingsObj = JSON.parse(fileContent);
@@ -276,7 +289,13 @@ function restoreStorage(fileContent) {
 
         // Type object = array/map donc il faut déserialiser
         if (typeof (value) === 'object') {
-            GM_setValue(key, JSON.stringify(value));
+            let newValue = value;
+            // On merge les blacklists si besoin
+            if (storage_Keys_Blacklists.includes(key) && mergeBlacklists) {
+                let currentList = getBlacklistWithKey(key);
+                newValue = [...mergeArrays(currentList, value)];
+            }
+            GM_setValue(key, JSON.stringify(newValue));
         }
         else {
             // Valeur normale (boolean/string/int/etc)
@@ -419,7 +438,7 @@ function initPreBoucles() {
         title: 'Religion',
         enabled: false,
         type: entitySubject,
-        entities: ['allah', 'jesus', 'christ', 'juif*', 'chretien*', 'musulman*', 'islam*', 'judaisme', 'muslim*', 'burka', 'burqa']
+        entities: ['allah', 'jesus', 'christ*', 'juif*', 'chretien*', 'musulman*', 'islam*', 'judaisme', 'muslim*', 'burka', 'burqa', 'priere']
     };
 
     const boucledAuthors =
@@ -428,7 +447,7 @@ function initPreBoucles() {
         title: 'Pseudos boucled',
         enabled: false,
         type: entityAuthor,
-        entities: ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki', 'leao', 'oael', 'surk', 'zemmourfinito', 'labelconfort', 'xinoz', 'zinzinabbath']
+        entities: ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki', 'leao', 'oael', 'surk', 'zemmourfinito', 'labelconfort', 'xinoz', 'zinzinabbath', 'rifson']
     };
 
     preBoucleArray.push(popularBoucles);
@@ -542,6 +561,18 @@ Map.prototype.sortByValueThenKey = function (descValue = false) {
         }));
 }
 
+
+function mergeArrays(array1, array2) {
+    if (array1 instanceof Map || array2 instanceof Map) {
+        return new Map([...new Set([...array1, ...array2])]);
+    }
+    else if (array1 instanceof Set || array2 instanceof Set) {
+        return new Set([...array1, ...array2]);
+    }
+    else {
+        return [...new Set([...array1, ...array2])];
+    }
+}
 
 function normalizeValue(value) {
     return value.toString().toUpperCase().normalizeDiacritic();
@@ -1639,11 +1670,19 @@ function buildSettingsPage() {
         html += '</tr>';
         html += '<tr>';
         html += '<td class="deboucled-td-left">';
+
         html += '<label class="deboucled-switch little">';
         html += '<input type="checkbox" id="deboucled-impexp-blonly"></input>';
         html += '<span class="deboucled-toggle-slider little round"></span>';
         html += '</label>';
         html += '<span class="deboucled-toggle-title-right">Uniquement les blacklists</span>';
+
+        html += '<label class="deboucled-switch little">';
+        html += '<input type="checkbox" id="deboucled-impexp-mergebl"></input>';
+        html += '<span class="deboucled-toggle-slider little round"></span>';
+        html += '</label>';
+        html += '<span class="deboucled-toggle-title-right">Fusionner les blacklists</span>';
+
         html += '</td>';
         html += '</tr>';
         return html;
