@@ -6,7 +6,6 @@ resources/**
 tampermonkey-module.d.ts
 tampermonkey-reference.d.ts
 tsconfig.json
-/.eslintrc.js
 /package-lock.json
 /package.json
 *.debug.js
