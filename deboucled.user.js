@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        Déboucled
+// @name        Déboucled-Split
 // @namespace   deboucledjvcom
 // @version     2.3.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/split-files/deboucled.user.js
