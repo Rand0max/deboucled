@@ -84,6 +84,22 @@ function initPreBoucles() {
         type: entitySubject,
         entities: ['allah', 'jesus', 'christ*', 'juif*', 'chretien*', 'musulman*', 'islam*', 'judaisme', 'muslim*', 'burka', 'burqa', 'priere']
     };
+    const rap =
+    {
+        id: 'rap',
+        title: 'Rap',
+        enabled: false,
+        type: entitySubject,
+        entities: ['rap', 'maes', 'lacrim', 'orelsan', 'ninho', 'ziak', 'gambi', 'gazo', 'kalash', 'niska', 'rohff', 'booba', 'b2o', 'kaaris', 'pnl', 'qlf', 'larse', 'vald', 'mister you', 'eminem', 'wiz khalifa', 'drake', 'xxxtentacion', 'nba youngboy', 'rick ross', 'future', 'travis scott', 'tyga', 'kid cudi', 'pop smoke', 'run the jewels', 'nas', 'tupac', '2pac', 'cardi b', 'kendrick lamar', 'lil wayne', 'nicki minaj', 'jul', 'freeze corleone', 'damso', 'the weekend', 'lil uzi']
+    };
+    const crypto =
+    {
+        id: 'crypto',
+        title: 'Cryptomonnaies',
+        enabled: false,
+        type: entitySubject,
+        entities: ['*crypto*', 'blockchain', 'mineur', 'mining', 'minage', 'nft', 'wallet', 'satoshi', 'bitcoin', 'btc', 'cardano', 'shitcoin', 'ethereum', 'monero', 'libra', 'coinbase', 'eth', 'ripple', 'litecoin', 'tether', 'eos', 'binance', 'tezos', 'to the moon', 'to ze moon', 'bat', 'dogecoin', 'zynecoin', 'kcs', 'fee', 'fees', 'all in', 'kucoin', 'refill', 'bullrun', 'shiba inu']
+    };
 
     const boucledAuthors =
     {
@@ -105,6 +121,8 @@ function initPreBoucles() {
     preBoucleArray.push(hatred);
     preBoucleArray.push(girls);
     preBoucleArray.push(religion);
+    preBoucleArray.push(rap);
+    preBoucleArray.push(crypto);
 
     loadPreBouclesStatuses();
 }
