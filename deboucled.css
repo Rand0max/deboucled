@@ -329,6 +329,9 @@ body.deboucled-dark-theme {
 #forum-main-col .bloc-pre-pagi-forum .bloc-rech-forum {
   flex: 1 1 26%;
 }
+#page-messages-forum #forum-main-col .bloc-pre-pagi-forum .bloc-pre-left {
+  flex: 1 1 18%;
+}
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-left,
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-right {
   display: flex;
@@ -343,7 +346,6 @@ body.deboucled-dark-theme {
   bottom: unset;
   overflow: visible;
   flex: 1;
-  /* flex: 1 1 18%; */
 }
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-left .group-one,
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-left .group-two,
