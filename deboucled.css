@@ -432,6 +432,16 @@ body.deboucled-dark-theme {
   width: 16px;
   height: 16px;
 }
+.deboucled-topic-resolved-logo {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAN1wAADdcBQiibeAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEwSURBVDiNrZPBTsJAEIa/abn4IlygkQSfgnBXqSF9A+TqBbx4Vd9gJVK9S3wKSUjAiy/SU/090AKVlpDonDY7+83/78yuSWI3Liatuv+d9jDaQDvbniPmqefHr/3F1+55ywsYZqFrDGR2B5xQHolJN9Po81GsQZOEYdabNGeITgVYDOM97q+6QvIAQtcYHA0DiE7oGgMAO386rftKFwds74K3mYMRkKTmt2pZw46Cp9FyvHYcgDHySS+9rNtbhVylAv61f1YjH1WJQhkcumC8yUG7VuZ2Gi3HoQs26woYAOu55hvQPWi1AgZmHmK+LccodMFegQoYjA8v9fwYSKqKVMKQpPgvJokr17yW2X0hXZz5vrg0fI5WD//zlIUU91ddk4aF65TYNmmYw5mTv33nH7ISrdUqRp/sAAAAAElFTkSuQmCC)
+    0 no-repeat;
+  margin: 0 2px;
+  width: 14px;
+  height: 14px;
+  background-size: 14px;
+  display: inline-block;
+  vertical-align: sub;
+}
 .deboucled-blacklist-jvc-button {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAF0SURBVDhPnVM5jsJAECwfwsaJP4BEisA/IAM+QegcEvgKCdGGJHyEDAd+AAGIEBCyLc6d6rW9Y5YAbUnlmanurp5DNubzuQdgpjhUdBU/Qaa4UByZ6sPiUPHTYoK5rJnRgJ3/iyENys6PxwNZluF8PsvI9TtNg0uDEpfLBb1eD5PJBP1+X9a6NhgMZK2jYnC/3xEEgcw7nY5007V2u/26g6qBbduIokjmcRzDNE3R1ut1RdPBZ3zmc3G/Xq/SlYm1Wk30V003qdgx4DgOPM+D67qyfqfpqK4UbrcbkiTB6XTC8XgUcp6m6Z/zE3Y+CrhVJoVhCN/3c/UHm80Gy+US9Xpd7qVAuQMW8nzj8ViKD4cDttstdrud7KLZbGI6nUre81le2+8lcuvdbldeYb/fw7Ks8rws4iU2Gg20Wi2sViuJEzRI1ejStbhpwzCEOhgnacbiPJ6xBf8qEXi2wuAV1BhjjhZf0GCk+KXIX/RTMFfVYPQNhK3ILLQDrO8AAAAASUVORK5CYII=)
     0 no-repeat;

@@ -8,11 +8,11 @@ function getAllTopics(doc) {
     return [...allTopics];
 }
 
-async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz) {
+async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz) {
     let actualTopics = topics.length - hiddenTotalTopics - 1;
     let pageBrowse = 1;
     let filledTopics = [];
-    const maxPages = 10;
+    const maxPages = 15;
 
     const maxTopicCount = parseInt(GM_getValue(storage_optionMaxTopicCount, storage_optionMaxTopicCount_default));
 
@@ -23,7 +23,7 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
             let nextPageTopics = getAllTopics(nextDoc);
 
             nextPageTopics.slice(1).forEach(function (topic) {
-                if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz)) {
+                if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz)) {
                     hiddenTotalTopics++;
                     return;
                 }
@@ -134,7 +134,7 @@ function getTopicMessageCount(element) {
     return parseInt(messageCountElement?.textContent.trim() ?? "0");
 }
 
-function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz) {
+function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz) {
     if (!element.hasAttribute('data-id')) return true;
 
     let topicId = element.getAttribute('data-id');
@@ -146,6 +146,8 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
 
     // Seuil d'affichage valable uniquement pour les BL sujets et auteurs
     if (optionAllowDisplayThreshold && getTopicMessageCount(element) >= optionDisplayThreshold) return false;
+
+    if (optionEnableTopicMsgCountThreshold && getTopicMessageCount(element) < optionTopicMsgCountThreshold) return true;
 
     let titleTag = element.querySelector('.lien-jv.topic-title');
     if (titleTag) {
@@ -384,18 +386,44 @@ function addPrevisualizeTopicEvent(topics) {
     });
 }
 
-function addBlackTopicLogo(topics) {
-    topics.slice(1).forEach(function (topic) {
-        const topicImg = topic.querySelector('.topic-img');
-        const topicCount = topic.querySelector('.topic-count');
-        if (!topicImg || !topicCount) return;
-        if (topicImg.title.toLowerCase() !== 'topic hot') return;
-        const nbMessage = parseInt(topicCount.textContent);
-        if (nbMessage < 100) return;
+function handleTopicPictos(topics, optionDisplayBlackTopic, optionReplaceResolvedPicto) {
+    const ignoredTopics = ['topic fermé', 'topic épinglé'];
+
+    function buildBlackPicto(topicImg) {
         let span = document.createElement('span');
         span.className = 'topic-img deboucled-topic-black-logo';
         insertAfter(span, topicImg);
         topicImg.remove();
+    }
+
+    topics.slice(1).forEach(function (topic) {
+        const topicImg = topic.querySelector('.topic-img');
+        if (!topicImg) return;
+        const currentPictoName = topicImg.title.trim().toLowerCase();
+        if (ignoredTopics.includes(currentPictoName)) return;
+
+        const messageCount = topic.querySelector('.topic-count');
+        if (!messageCount) return;
+        const nbMessage = parseInt(messageCount.textContent.trim());
+
+        if (currentPictoName === 'topic résolu' && optionReplaceResolvedPicto) {
+            if (nbMessage >= 100 && optionDisplayBlackTopic) {
+                buildBlackPicto(topicImg);
+            }
+            else if (nbMessage >= 25) {
+                topicImg.src = '/img/forums/topic-dossier2.png';
+                topicImg.alt = 'Topic hot';
+                topicImg.title = 'Topic hot';
+            }
+            else {
+                topicImg.src = '/img/forums/topic-dossier1.png';
+                topicImg.alt = 'Topic';
+                topicImg.title = 'Topic';
+            }
+        }
+        else if (nbMessage >= 100 && optionDisplayBlackTopic) {
+            buildBlackPicto(topicImg);
+        }
     });
 }
 
@@ -416,7 +444,7 @@ async function topicIsModerated(topicId) {
 }
 
 function removeUselessTags(topics) {
-    const regex = /(\[?a+y+a+o*\]?|^((\{|\[|\(|🛑|🔴)*\s*\w*alerte?(\srouge|\snoir|\snoire|\secarlate|\satomique|\sgenerale|\scosmique|\snucleaire)?\w*\s*(\}|\]|\)|🛑|🔴)*))\s?:?-?,?/gi;
+    const regex = /(\[?a+y+a+o*\]?|(\{|\[|\(|🛑|🔴|🚨)(alerte.*?)(\}|\]|\)|🛑|🔴|🚨)|^alerte)\s?:?-?,?/gi;
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
         let newTitle = titleElem.textContent.replace(regex, '').removeDoubleSpaces().trim().capitalize();

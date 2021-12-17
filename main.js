@@ -71,20 +71,24 @@ async function handleTopicList(canFillTopics) {
 
     let optionAllowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
     let optionDisplayThreshold = GM_getValue(storage_optionDisplayThreshold, storage_optionDisplayThreshold_default);
+
+    let optionEnableTopicMsgCountThreshold = GM_getValue(storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default);
+    let optionTopicMsgCountThreshold = GM_getValue(storage_optionTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold_default);
+
     let optionAntiVinz = GM_getValue(storage_optionAntiVinz, storage_optionAntiVinz_default);
 
     let topicsToRemove = [];
     let finalTopics = [];
     finalTopics.push(topics[0]); // header
     topics.slice(1).forEach(function (topic) {
-        if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz)) {
+        if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz)) {
             topicsToRemove.push(topic);
             hiddenTotalTopics++;
         }
         else finalTopics.push(topic);
     });
     if (canFillTopics) {
-        const filledTopics = await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold, optionAntiVinz);
+        const filledTopics = await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz);
         finalTopics = finalTopics.concat(filledTopics);
     }
     topicsToRemove.forEach(removeTopic);
@@ -104,7 +108,8 @@ async function handleTopicListOptions(topics) {
     if (optionPrevisualizeTopic) addPrevisualizeTopicEvent(topics);
 
     let optionDisplayBlackTopic = GM_getValue(storage_optionDisplayBlackTopic, storage_optionDisplayBlackTopic_default);
-    if (optionDisplayBlackTopic) addBlackTopicLogo(topics);
+    let optionReplaceResolvedPicto = GM_getValue(storage_optionReplaceResolvedPicto, storage_optionReplaceResolvedPicto_default);
+    if (optionDisplayBlackTopic || optionReplaceResolvedPicto) handleTopicPictos(topics, optionDisplayBlackTopic, optionReplaceResolvedPicto);
 
     let optionRemoveUselessTags = GM_getValue(storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default);
     if (optionRemoveUselessTags) removeUselessTags(topics);

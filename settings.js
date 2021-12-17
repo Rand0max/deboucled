@@ -214,14 +214,10 @@ function buildSettingsPage() {
         html += '<div class="deboucled-setting-content">';
         html += `<div class="deboucled-preboucle-title" ${buildTooltip('Cochez les catégories que vous souhaitez filtrer sur le forum.\nPassez la souris ou cliquez sur les intitulés de catégorie pour voir les mots-clés qui seront utilisés.', 'bottom')}>Listes anti-boucle pré-enregistrées</div>`;
         html += '<table class="deboucled-option-table">';
-
         preBoucleArray.forEach(b => {
             const hint = `${getEntityTitle(b.type)} : ${b.entities.sort().join(', ')}`;
             html += addToggleAltOption(b.title, `deboucled-preboucle-${b.id}`, b.enabled, hint);
         });
-
-        html += addToggleAltOption('Algorithme anti-Vinz', storage_optionAntiVinz, storage_optionAntiVinz_default, 'Algorithme intelligent pour éradiquer totalement Vinz et sa boucle infernale, en dépit de ses tentatives d\'évitement.');
-
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -250,6 +246,28 @@ function buildSettingsPage() {
         html += `<div id="deboucled-${entity}List" style="margin-top:10px;"></div>`;
         html += '</td>';
         html += '</tr>';
+        html += '</table>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
+    function addAdvancedOptionsSection(sectionIsActive) {
+        let html = '';
+        html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">OPTIONS AVANCÉES</div>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
+        html += '<div class="deboucled-setting-content">';
+        html += '<table class="deboucled-option-table">';
+
+        html += addToggleOption('Algorithme de filtrage <i>anti-Vinz</i>', storage_optionAntiVinz, storage_optionAntiVinz_default, 'Algorithme intelligent pour éradiquer totalement Vinz et sa boucle infernale, en dépit de ses tentatives d\'évitement.');
+
+        let resolvedLogo = '<span class="deboucled-topic-resolved-logo"></span>'
+        html += addToggleOption(`Remplacer le pictogramme ${resolvedLogo} <i>résolu</i> des topics`, storage_optionReplaceResolvedPicto, storage_optionReplaceResolvedPicto_default, 'Remplacer le pictogramme résolu sur la gauche des topics par le picto normal (jaune, rouge, vérouillé, etc).');
+
+        html += addToggleOption('Filter les topics en dessous d\'un nombre de messages', storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default, 'Filtrer automatiquement les topics qui n\'ont pas le nombre minimum de messages voulu.');
+
+        let enableTopicMsgCountThreshold = GM_getValue(storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default);
+        html += addRangeOption('Nombre de messages minimum', storage_optionTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold_default, 1, 30, 1, 'Nombre de messages minimum dans le topic pour autoriser l\'affichage.', enableTopicMsgCountThreshold, true);
+
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -298,6 +316,7 @@ function buildSettingsPage() {
     settingsHtml += addEntitySettingSection(entitySubject, 'BLACKLIST SUJETS', 'Mot-clé', 'Utilisez le caractère étoile * pour remplacer n\'importe quelle expression.', true);
     settingsHtml += addEntitySettingSection(entityAuthor, 'BLACKLIST AUTEURS', 'Pseudo', undefined, false);
     settingsHtml += addEntitySettingSection(entityTopicId, 'BLACKLIST TOPICS', 'TopicId', undefined, false);
+    settingsHtml += addAdvancedOptionsSection(false);
     settingsHtml += addStatsSection(false);
 
     let settingsView = document.createElement('div');
@@ -380,7 +399,15 @@ function addSettingEvents() {
             savePreBouclesStatuses();
         });
     });
+
     addToggleEvent(storage_optionAntiVinz);
+    addToggleEvent(storage_optionReplaceResolvedPicto);
+    addToggleEvent(storage_optionEnableTopicMsgCountThreshold, undefined, function () {
+        document.querySelectorAll(`[id = ${storage_optionTopicMsgCountThreshold}-container]`).forEach(function (el) {
+            el.classList.toggle('deboucled-disabled');
+        })
+    });
+    addRangeEvent(storage_optionTopicMsgCountThreshold);
 }
 
 function addSortEvent() {
