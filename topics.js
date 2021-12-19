@@ -222,6 +222,8 @@ function getAuthorBlacklistMatches(author) {
 }
 
 async function isVinzTopic(subject, author, topicUrl) {
+    // TODO : implémenter du cache comme pour les poc
+
     let topicContent = undefined;
 
     async function isVinzMessage(url) {
@@ -238,8 +240,9 @@ async function isVinzTopic(subject, author, topicUrl) {
                 return getTopicMessageCallback(r);
             }).catch(function (err) {
                 console.warn(err);
-                return false;
+                return undefined;
             });
+            if (!topicContent) return false; // Probablement 410
         }
 
         for (const boucleMessage of vinzBoucleMessageArray) {
