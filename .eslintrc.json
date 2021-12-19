@@ -8,6 +8,7 @@
   "parserOptions": {
     "ecmaVersion": "latest"
   },
+  "ignorePatterns": ["variables.js", "storage.js", "extensions.js", "preboucles.js", "stats.js", "topics.js", "messages.js", "settings.js", "privatemessages.js", "main.js"],
   "rules": {
     "no-unused-vars": "warn"
   }

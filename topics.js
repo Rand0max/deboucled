@@ -18,22 +18,25 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
 
     while (actualTopics < maxTopicCount && pageBrowse <= maxPages) {
         pageBrowse++;
-        await getForumPageContent(pageBrowse).then((res) => {
-            let nextDoc = domParser.parseFromString(res, 'text/html');
-            let nextPageTopics = getAllTopics(nextDoc);
-
-            nextPageTopics.slice(1).forEach(function (topic) {
-                if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz)) {
-                    hiddenTotalTopics++;
-                    return;
-                }
-                if (actualTopics < maxTopicCount && !topicExists(topics, topic)) {
-                    addTopic(topic, topics);
-                    actualTopics++;
-                    filledTopics.push(topic);
-                }
+        const nextPageTopics = await getForumPageContent(pageBrowse)
+            .then((res) => {
+                let nextPageDoc = domParser.parseFromString(res, 'text/html');
+                return getAllTopics(nextPageDoc);
             });
-        });
+
+        for (let topic of nextPageTopics.slice(1)) {
+            const topicBlacklisted = await isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz);
+            if (topicBlacklisted) {
+                hiddenTotalTopics++;
+                continue;
+            }
+
+            if (actualTopics < maxTopicCount && !topicExists(topics, topic)) {
+                addTopic(topic, topics);
+                actualTopics++;
+                filledTopics.push(topic);
+            }
+        }
     }
     return filledTopics;
 }
@@ -43,6 +46,7 @@ function createTopicListOverlay() {
     if (!topicTable) return;
 
     topicTable.style.opacity = '0.3';
+    topicTable.style.filter = 'blur(2px)';
 
     const wrapperDiv = document.createElement('div');
     wrapperDiv.id = 'deboucled-topic-list-wrapper';
@@ -134,7 +138,7 @@ function getTopicMessageCount(element) {
     return parseInt(messageCountElement?.textContent.trim() ?? "0");
 }
 
-function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz) {
+async function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz) {
     if (!element.hasAttribute('data-id')) return true;
 
     let topicId = element.getAttribute('data-id');
@@ -172,10 +176,12 @@ function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayT
     }
 
     if (optionAntiVinz) {
-        const title = titleTag.textContent;
+        const title = titleTag.textContent.trim();
         const author = authorTag.textContent.toLowerCase().trim();
-        if (isVinzTopic(title, author)) {
-            matchedSubjects.addArrayIncrement([title.trim()]);
+        const url = titleTag.getAttribute('href');
+        const vinzTopic = await isVinzTopic(title, author, url);
+        if (vinzTopic) {
+            matchedSubjects.addArrayIncrement([title]);
             matchedAuthors.addArrayIncrement(['Vinz']);
             hiddenSubjects++;
             hiddenAuthors++;
@@ -215,14 +221,51 @@ function getAuthorBlacklistMatches(author) {
     return groupedMatches;
 }
 
-function isVinzTopic(subject, author) {
+async function isVinzTopic(subject, author, topicUrl) {
+    let topicContent = undefined;
+
+    async function isVinzMessage(url) {
+        function getTopicMessageCallback(r) {
+            const doc = domParser.parseFromString(r, 'text/html');
+            const firstMessageElem = doc.querySelector('.txt-msg');
+            return normalizeValue(firstMessageElem.textContent.trim());
+        }
+        if (!topicContent) {
+            topicContent = await fetch(url).then(function (response) {
+                if (!response.ok) throw Error(response.statusText);
+                return response.text();
+            }).then(function (r) {
+                return getTopicMessageCallback(r);
+            }).catch(function (err) {
+                console.warn(err);
+                return false;
+            });
+        }
+
+        for (const boucleMessage of vinzBoucleMessageArray) {
+            if (topicContent.includes(boucleMessage)) return true;
+        }
+        return false;
+    }
+
     const authorMayBeVinz = author.startsWith('vinz') || (author.length === 5 && author.charAt(0) === 'v');
     const pureSubject = makeVinzSubjectPure(subject);
+    let possibleBoucle = false;
     for (const boucle of vinzBoucleArray) {
         let score = calculateStringDistance(boucle, pureSubject);
         if (authorMayBeVinz) score += 10; // on rajoute 10% au score si l'on soupçonne l'auteur d'être Vinz
+
+        // +80% c'est certifié Vinz le zinzin
         if (score >= 80) return true;
+
+        /* 
+            +50% on a encore un doute, on ira vérifier le contenu de son topic éclatax 
+            après avoir vérifié toutes les boucles, si aucune ne dépasse 80%.
+            P.S : je sais que tu lis ça Vinz, je t'invite à disposax.
+        */
+        if (score >= 50) possibleBoucle = true;
     }
+    if (possibleBoucle) return await isVinzMessage(topicUrl);
     return false;
 }
 

@@ -3,7 +3,7 @@
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
-const deboucledVersion = '2.4.0'
+const deboucledVersion = '2.5.0'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -31,6 +31,7 @@ let deboucledTopicStatsMap = new Map();
 
 let preBoucleArray = [];
 let vinzBoucleArray = [];
+let vinzBoucleMessageArray = [];
 
 let matchedSubjects = new Map();
 let matchedAuthors = new Map();

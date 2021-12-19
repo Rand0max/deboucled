@@ -263,7 +263,7 @@ function buildSettingsPage() {
         let resolvedLogo = '<span class="deboucled-topic-resolved-logo"></span>'
         html += addToggleOption(`Remplacer le pictogramme ${resolvedLogo} <i>résolu</i> des topics`, storage_optionReplaceResolvedPicto, storage_optionReplaceResolvedPicto_default, 'Remplacer le pictogramme résolu sur la gauche des topics par le picto normal (jaune, rouge, vérouillé, etc).');
 
-        html += addToggleOption('Filter les topics en dessous d\'un nombre de messages', storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default, 'Filtrer automatiquement les topics qui n\'ont pas le nombre minimum de messages voulu.');
+        html += addToggleOption('Filtrer les topics en dessous d\'un nombre de messages', storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default, 'Filtrer automatiquement les topics qui n\'ont pas le nombre minimum de messages voulu.');
 
         let enableTopicMsgCountThreshold = GM_getValue(storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default);
         html += addRangeOption('Nombre de messages minimum', storage_optionTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold_default, 1, 30, 1, 'Nombre de messages minimum dans le topic pour autoriser l\'affichage.', enableTopicMsgCountThreshold, true);
@@ -490,7 +490,7 @@ function buildSettingEntities() {
 
     createSearchEntitiesEvent(entitySubject, regexAllowedSubject, refreshSubjectKeys);
     createSearchEntitiesEvent(entityAuthor, regexAllowedAuthor, refreshAuthorKeys);
-    createSearchEntitiesEvent(entityTopicId, regexAllowedSubject, refreshTopicIdKeys); // On peut filter sur le titre du topic
+    createSearchEntitiesEvent(entityTopicId, regexAllowedSubject, refreshTopicIdKeys); // On peut filtrer sur le titre du topic
 
     refreshSubjectKeys();
     refreshAuthorKeys();
@@ -698,7 +698,7 @@ function addSearchFilterToggle() {
 
     let toggleElem = document.createElement('label');
     toggleElem.className = 'deboucled-switch';
-    toggleElem.title = 'Filter les résultats avec Déboucled';
+    toggleElem.title = 'Filtrer les résultats avec Déboucled';
     toggleElem.innerHTML = `<input type="checkbox" id="deboucled-search-filter-toggle" ${optionFilterResearch ? 'checked' : ''}><span class="deboucled-toggle-slider round red"></span>`;
     document.querySelector('.form-rech-forum').appendChild(toggleElem);
 

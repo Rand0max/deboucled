@@ -61,8 +61,13 @@ async function getForumPageContent(page) {
     let nextPageId = currentPageId + ((page - 1) * defaultTopicCount);
     let nextPageUrl = currentPath.replace(urlRegex, `$1${nextPageId}$3`);
 
-    const response = await fetch(nextPageUrl);
-    return await response.text();
+    return fetch(nextPageUrl).then(function (response) {
+        if (!response.ok) throw Error(response.statusText);
+        return response.text();
+    }).catch(function (err) {
+        console.warn(err);
+        return undefined;
+    });
 }
 
 async function handleTopicList(canFillTopics) {
@@ -80,13 +85,15 @@ async function handleTopicList(canFillTopics) {
     let topicsToRemove = [];
     let finalTopics = [];
     finalTopics.push(topics[0]); // header
-    topics.slice(1).forEach(function (topic) {
-        if (isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz)) {
+
+    for (let topic of topics.slice(1)) {
+        const topicBlacklisted = await isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz);
+        if (topicBlacklisted) {
             topicsToRemove.push(topic);
             hiddenTotalTopics++;
         }
         else finalTopics.push(topic);
-    });
+    }
     if (canFillTopics) {
         const filledTopics = await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz);
         finalTopics = finalTopics.concat(filledTopics);
@@ -421,3 +428,4 @@ async function entryPoint() {
 entryPoint();
 
 addEventListener('instantclick:newpage', entryPoint);
+
