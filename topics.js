@@ -46,7 +46,7 @@ function createTopicListOverlay() {
     if (!topicTable) return;
 
     topicTable.style.opacity = '0.3';
-    topicTable.style.filter = 'blur(2px)';
+    topicTable.style.filter = 'blur(1px)';
 
     const wrapperDiv = document.createElement('div');
     wrapperDiv.id = 'deboucled-topic-list-wrapper';
