@@ -3,6 +3,14 @@
 // MAIN PAGE
 ///////////////////////////////////////////////////////////////////////////////////////
 
+function getUserPseudo() {
+    const pseudoElem = document.querySelector('.account-pseudo');
+    if (!pseudoElem || pseudoElem.textContent.trim().toLowerCase() === 'mon compte') return undefined;
+    const linkAccountElem = document.querySelector('.nav-link-account')
+    if (!linkAccountElem || !linkAccountElem.hasAttribute('data-account-id')) return undefined;
+    return pseudoElem.textContent.trim();
+}
+
 function getEntityTitle(entity) {
     switch (entity) {
         case entitySubject:
@@ -172,8 +180,11 @@ function highlightBlacklistMatches(element, matches) {
 }
 
 function handleMessageBlacklistMatches(messageElement) {
-    const getParagraphChildren = (contentElement) => [...contentElement.children].filter(c => c.tagName === 'P' && c.textContent.trim() !== '');
+    const allowedTags = ['P', 'STRONG', 'U', 'I', 'EM', 'B'];
+    const getParagraphChildren = (contentElement) => [...contentElement.children].filter(c => allowedTags.includes(c.tagName) && c.textContent.trim() !== '');
+
     const getTextChildren = (contentElement) => [...contentElement.childNodes].filter(c => c.nodeType === Node.TEXT_NODE && c.textContent.trim() !== '');
+
     function highlightMatches(textChild) {
         const matches = getSubjectBlacklistMatches(textChild.textContent);
         if (!matches?.length) return false;
@@ -181,15 +192,20 @@ function handleMessageBlacklistMatches(messageElement) {
         return true;
     }
 
-    // Un message contient une balise p pour chaque ligne
-    // Un p peut contenir du texte ou du html (img, a, etc)
-    let paragraphChildren = getParagraphChildren(messageElement);
-    let hasMatch = false;
-    paragraphChildren.forEach(paragraph => {
-        const textChildren = getTextChildren(paragraph); // on ne s'intéresse qu'au texte
-        textChildren.forEach(textChild => { hasMatch = highlightMatches(textChild) ? true : hasMatch });
-    })
-    return hasMatch;
+    function highlightChildren(element) {
+        let hasMatch = false;
+        // Un message contient une balise p pour chaque ligne
+        // Un p peut contenir du texte ou du html (img, a, etc ET strong, b, u, etc)
+        let paragraphChildren = getParagraphChildren(element);
+        paragraphChildren.forEach(paragraph => {
+            const textChildren = getTextChildren(paragraph); // on ne s'intéresse qu'au texte
+            textChildren.forEach(textChild => { hasMatch = highlightMatches(textChild) ? true : hasMatch });
+            hasMatch = highlightChildren(paragraph) ? true : hasMatch;
+        })
+        return hasMatch;
+    }
+
+    return highlightChildren(messageElement);
 }
 
 function handleBlSubjectIgnoreMessages(messageElement) {
@@ -241,7 +257,7 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages, o
         addBoucledAuthorButton(message, author, optionBoucledUseJvarchive);
     }
 
-    if (!optionBlSubjectIgnoreMessages) return;
+    if (!optionBlSubjectIgnoreMessages || (userPseudo && author.toLowerCase() === userPseudo.toLowerCase())) return;
     handleBlSubjectIgnoreMessages(message);
 }
 
@@ -381,6 +397,7 @@ async function init() {
     toggleDeboucledDarkTheme(enableDeboucledDarkTheme);
     buildSettingsPage();
     addSettingButton(firstLaunch);
+    userPseudo = getUserPseudo();
 }
 
 async function entryPoint() {

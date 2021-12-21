@@ -3,7 +3,7 @@
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
-const deboucledVersion = '2.5.3'
+const deboucledVersion = '2.5.4'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -42,6 +42,8 @@ let moderatedTopics = new Map();
 let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
+
+let userPseudo = undefined;
 
 const domParser = new DOMParser();
 
