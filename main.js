@@ -348,9 +348,10 @@ async function handlePrivateMessages() {
     const privateMessageElements = document.querySelectorAll('.list-msg > .row-mp:not(.row-head)');
 
     let hiddenPrivateMessageArray = [];
-    for (const privateMessageElem of privateMessageElements) {
+
+    async function handlePrivateMessageElem(privateMessageElem) {
         const mpId = privateMessageElem.querySelector('.conv_select').getAttribute('value');
-        let author = '';
+        let author = undefined;
         const participants = privateMessageElem.querySelector('.pm-list-participants');
         if (participants) {
             const mpHash = participants.getAttribute('data-hash');
@@ -359,11 +360,14 @@ async function handlePrivateMessages() {
         else {
             author = privateMessageElem.querySelector('.exp-msg > div > span').textContent.trim();
         }
-        if (!author) continue;
-
+        if (!author) return;
         const hiddenMp = handlePrivateMessage(privateMessageElem, author);
         if (hiddenMp) hiddenPrivateMessageArray.push(mpId);
     }
+
+    let tasks = [...privateMessageElements].map(handlePrivateMessageElem);
+    await Promise.all(tasks);
+
     if (hiddenPrivateMessageArray.length > 0) {
         saveTotalHidden();
         await sendPrivateMessagesToSpam(hiddenPrivateMessageArray, true);

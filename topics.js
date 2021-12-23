@@ -214,8 +214,7 @@ function getSubjectBlacklistMatches(subject) {
 function getAuthorBlacklistMatches(author) {
     if (!authorsBlacklistReg) return null;
     const normAuthor = author.toLowerCase().normalizeDiacritic();
-    if (normAuthor === 'rand0max' || normAuthor === 'deboucled') return null;
-    // let matches = normAuthor.match(authorsBlacklistReg);
+    if (normAuthor === 'rand0max') return null;
     let matches = [...normAuthor.matchAll(authorsBlacklistReg)];
     let groupedMatches = filterMatchResults(matches);
     return groupedMatches;
