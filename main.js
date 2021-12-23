@@ -264,7 +264,7 @@ function handleMessage(message, optionHideMessages, optionBoucledUseJvarchive, o
 function getTopicId() {
     const urlRegex = /^\/forums\/(42|1)-[0-9]+-(?<topicid>[0-9]+)-[0-9]+-0-1-0-.*\.htm$/gi;
     const matches = urlRegex.exec(window.location.pathname);
-    if (!matches && !matches?.groups?.topicid) return;
+    if (!matches && !matches.groups?.topicid) return;
     return parseInt(matches.groups.topicid);
 }
 
