@@ -64,6 +64,7 @@ function initPreBoucles() {
 function makeVinzSubjectPure(str) {
     // normalize boucles string and make them as "pure" as possible (also improve performances)
     str = normalizeValue(str).trim();
+    str = str.normalizeCompatibility(); // Vinz petit malin tu croyais pouvoir m'échapper ?
     str = replaceNumbersSimilarToCharacters(str);
     str = removeRepeatingCharacters(str);
     return str;

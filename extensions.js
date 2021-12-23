@@ -7,6 +7,10 @@ String.prototype.normalizeDiacritic = function () {
     return this.normalize("NFD").replace(/\p{Diacritic}/gu, "");
 }
 
+String.prototype.normalizeCompatibility = function () {
+    return this.normalize('NFKC');
+}
+
 String.prototype.escapeRegexPattern = function () {
     return this.replace(/[-[\]{}()+?.,\\^$|#\s]/g, '\\$&');
 }

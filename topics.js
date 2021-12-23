@@ -250,7 +250,7 @@ async function isVinzTopic(subject, author, topicUrl) {
         return false;
     }
 
-    const authorMayBeVinz = author.startsWith('vinz') || (author.length === 5 && author.charAt(0) === 'v');
+    const authorMayBeVinz = author.startsWith('vinz') || ((author.length >= 5 && author.length <= 7) && author.charAt(0) === 'v');
     const pureSubject = makeVinzSubjectPure(subject);
     let possibleBoucle = false;
     for (const boucle of vinzBoucleArray) {
