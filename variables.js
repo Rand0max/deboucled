@@ -3,7 +3,7 @@
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
-const deboucledVersion = '2.5.4'
+const deboucledVersion = '2.6.0'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -17,6 +17,8 @@ let authorBlacklistArray = [];
 let topicIdBlacklistMap = new Map();
 let subjectsBlacklistReg;
 let authorsBlacklistReg;
+
+let topicIdWhitelistArray = [];
 
 let pocTopicMap = new Map();
 

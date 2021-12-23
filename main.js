@@ -234,7 +234,7 @@ function handleBlSubjectIgnoreMessages(messageElement) {
     }
 }
 
-function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages, optionBlSubjectIgnoreMessages) {
+function handleMessage(message, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages) {
     let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
     if (!authorElement) return;
     let author = authorElement.textContent.trim();
@@ -261,7 +261,38 @@ function handleMessage(message, optionBoucledUseJvarchive, optionHideMessages, o
     handleBlSubjectIgnoreMessages(message);
 }
 
-function handleTopicHeader() {
+function getTopicId() {
+    const urlRegex = /^\/forums\/(42|1)-[0-9]+-(?<topicid>[0-9]+)-[0-9]+-0-1-0-.*\.htm$/gi;
+    const matches = urlRegex.exec(window.location.pathname);
+    if (!matches && !matches?.groups?.topicid) return;
+    return parseInt(matches.groups.topicid);
+}
+
+function handleTopicWhitelist() {
+    const titleBlocElement = document.querySelector('.titre-bloc.titre-bloc-forum');
+    if (!titleBlocElement) return false;
+    const topicId = getTopicId();
+    if (!topicId) return false;
+
+    const topicIdIndex = topicIdWhitelistArray.indexOf(topicId);
+    const isWhitelisted = topicIdIndex >= 0;
+
+    let whitelistButtonElement = document.createElement('span');
+    whitelistButtonElement.className = isWhitelisted ? 'deboucled-closed-eye-logo big' : 'deboucled-eye-logo big';
+    whitelistButtonElement.setAttribute('deboucled-data-tooltip', isWhitelisted ? 'Masquer les messages blacklist' : 'Afficher les messages blacklist');
+    whitelistButtonElement.setAttribute('data-tooltip-location', 'right');
+    whitelistButtonElement.onclick = async () => {
+        if (isWhitelisted) topicIdWhitelistArray.splice(topicIdIndex, 1);
+        else topicIdWhitelistArray.push(topicId);
+        await saveStorage()
+        location.reload();
+    };
+    titleBlocElement.prepend(whitelistButtonElement);
+
+    return isWhitelisted;
+}
+
+function highlightTopicTitle() {
     let titleElement = document.querySelector('#bloc-title-forum');
     if (!titleElement) return;
     const subjectMatches = getSubjectBlacklistMatches(titleElement.textContent);
@@ -269,18 +300,22 @@ function handleTopicHeader() {
     highlightBlacklistMatches(titleElement, subjectMatches);
 }
 
-function handleTopicMessages() {
-    let optionHideMessages = GM_getValue(storage_optionHideMessages, storage_optionHideMessages_default);
-    let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
-    let optionBlSubjectIgnoreMessages = GM_getValue(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default);
+function handleTopicHeader() {
+    highlightTopicTitle();
+    return handleTopicWhitelist();
+}
 
-    handleTopicHeader();
+function handleTopicMessages() {
+    const isWhitelistedTopic = handleTopicHeader();
+    let optionHideMessages = !isWhitelistedTopic && GM_getValue(storage_optionHideMessages, storage_optionHideMessages_default);
+    let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
+    let optionBlSubjectIgnoreMessages = !isWhitelistedTopic && GM_getValue(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default);
 
     handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages);
 
     let allMessages = getAllMessages(document);
     allMessages.forEach(function (message) {
-        handleMessage(message, optionBoucledUseJvarchive, optionHideMessages, optionBlSubjectIgnoreMessages);
+        handleMessage(message, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages);
     });
 
     buildMessagesHeader();
