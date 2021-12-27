@@ -72,16 +72,14 @@ function removeMessage(element) {
         Technique pour être compatible avec JVC Ghost :
          - on masque le message au lieu de le supprimer
          - on le met tout à la fin de la liste des messages pour ne pas casser le css jvc
+        */
 
-        --> Problème de compatibilité avec TopicLive qui place les messages à la fin.
-        
         elem.style.display = 'none';
         const parent = elem.parentElement;
         parent.removeChild(elem);
         parent.appendChild(elem);
-        */
 
-        elem.remove();
+        //elem.remove();
     }
     if (element.previousElementSibling) removeElement(element.previousElementSibling);
     else if (element.nextElementSibling) removeElement(element.nextElementSibling);
