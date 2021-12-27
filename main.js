@@ -279,7 +279,7 @@ function handleTopicWhitelist() {
 
     let whitelistButtonElement = document.createElement('span');
     whitelistButtonElement.className = isWhitelisted ? 'deboucled-closed-eye-logo big' : 'deboucled-eye-logo big';
-    whitelistButtonElement.setAttribute('deboucled-data-tooltip', isWhitelisted ? 'Masquer les messages blacklist' : 'Afficher les messages blacklist');
+    whitelistButtonElement.setAttribute('deboucled-data-tooltip', isWhitelisted ? 'Masquer les messages blacklist' : 'Afficher les messages blacklist pour ce topic');
     whitelistButtonElement.setAttribute('data-tooltip-location', 'right');
     whitelistButtonElement.onclick = async () => {
         if (isWhitelisted) topicIdWhitelistArray.splice(topicIdIndex, 1);

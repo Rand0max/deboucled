@@ -72,12 +72,16 @@ function removeMessage(element) {
         Technique pour être compatible avec JVC Ghost :
          - on masque le message au lieu de le supprimer
          - on le met tout à la fin de la liste des messages pour ne pas casser le css jvc
-        */
+
+        --> Problème de compatibilité avec TopicLive qui place les messages à la fin.
+        
         elem.style.display = 'none';
         const parent = elem.parentElement;
         parent.removeChild(elem);
         parent.appendChild(elem);
-        //elem.remove();
+        */
+
+        elem.remove();
     }
     if (element.previousElementSibling) removeElement(element.previousElementSibling);
     else if (element.nextElementSibling) removeElement(element.nextElementSibling);
@@ -138,17 +142,18 @@ function addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchiv
 }
 
 function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages) {
-    function removeLiveMessage(messageElement, author) {
-        removeMessage(messageElement);
+    function removeLiveMessage(messageElement, author, topicLiveEvent) {
+        if (topicLiveEvent) topicLiveEvent.detail.cancel();
+        else removeMessage(messageElement);
         hiddenMessages++;
         hiddenAuthorArray.add(author);
         updateMessagesHeader();
         saveTotalHidden();
     }
 
-    function handleBlacklistedAuthor(messageElement, authorElement, author) {
+    function handleBlacklistedAuthor(messageElement, authorElement, author, topicLiveEvent) {
         if (optionHideMessages) {
-            removeLiveMessage(messageElement, author);
+            removeLiveMessage(messageElement, author, topicLiveEvent);
             return true;
         }
         else {
@@ -169,20 +174,21 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
         jvchatTooltip.prepend(dbcBlacklistButton);
     }
 
-    function handleLiveMessage(messageElement, authorElement, jvchat) {
+    function handleLiveMessage(messageElement, authorElement, topicLiveEvent) {
         let author = authorElement.textContent.trim();
         if (getAuthorBlacklistMatches(author)?.length) {
-            if (handleBlacklistedAuthor(messageElement, authorElement, author))
+            if (handleBlacklistedAuthor(messageElement, authorElement, author, topicLiveEvent)) {
                 return; // si on a supprimé le message on se casse, plus rien à faire
+            }
         }
         else {
-            if (jvchat) {
-                createJvChatBlacklistButton(messageElement, authorElement, author);
-            }
-            else {
+            if (topicLiveEvent) {
                 let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
                 upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton);
                 addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive);
+            }
+            else {
+                createJvChatBlacklistButton(messageElement, authorElement, author);
             }
         }
 
@@ -195,7 +201,7 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
         let messageElement = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
         let authorElement = messageElement.querySelector('h5.jvchat-author');
         if (!authorElement) return;
-        handleLiveMessage(messageElement, authorElement, true);
+        handleLiveMessage(messageElement, authorElement);
     });
     addEventListener('jvchat:activation', function () {
         hiddenMessages = 0;
@@ -209,7 +215,7 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
         if (!messageElement) return;
         let authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
         if (!authorElement) return;
-        handleLiveMessage(messageElement, authorElement, false);
+        handleLiveMessage(messageElement, authorElement, event);
     });
 }
 
