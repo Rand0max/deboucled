@@ -530,7 +530,7 @@ function refreshSubjectKeys(filter = null) {
         [...subjectBlacklistArray],
         filter ? (array) => array.filter((value) => normalizeValue(value).includes(filter)) : null,
         async function (node) {
-            await removeEntityBlacklist(subjectBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
+            await removeEntityBlacklist(subjectBlacklistArray, node.textContent);
             refreshSubjectKeys();
             refreshCollapsibleContentHeight(entitySubject);
             clearSearchInputs();
@@ -556,7 +556,7 @@ function refreshAuthorKeys(filter = null) {
         [...authorBlacklistArray],
         filter ? (array) => array.filter((value) => normalizeValue(value).includes(filter)) : null,
         async function (node) {
-            await removeEntityBlacklist(authorBlacklistArray, node.innerHTML.replace(/<[^>]*>/g, ''));
+            await removeEntityBlacklist(authorBlacklistArray, node.textContent);
             refreshAuthorKeys();
             refreshCollapsibleContentHeight(entityAuthor);
             clearSearchInputs();
@@ -582,7 +582,7 @@ function refreshTopicIdKeys(filter = null) {
         new Map(topicIdBlacklistMap),
         filter ? (map) => new Map([...map].filter((value, key) => normalizeValue(value).includes(filter) || normalizeValue(key).includes(filter))) : null,
         async function (node) {
-            await removeTopicIdBlacklist(node.getAttribute('id').replace(/<[^>]*>/g, ''));
+            await removeTopicIdBlacklist(node.getAttribute('id'));
             refreshTopicIdKeys();
             refreshCollapsibleContentHeight(entityTopicId);
             clearSearchInputs();
