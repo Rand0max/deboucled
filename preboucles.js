@@ -84,3 +84,8 @@ function initVinzBoucles() {
     });
 }
 
+function initShadowent() {
+    const preShadowent = ['U3RvbmVHaWFudA==', 'QW5lcnls', 'Rmx1YnVz'];
+    preShadowent.forEach((s) => shadowent.push(window.atob(s)));
+}
+

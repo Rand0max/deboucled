@@ -62,6 +62,7 @@ function getBlacklistWithKey(key) {
 async function initStorage() {
     initPreBoucles();
     initVinzBoucles();
+    initShadowent();
 
     let isInit = GM_getValue(storage_init, storage_init_default);
     if (isInit) {
@@ -275,7 +276,7 @@ function buildBlacklistsRegex() {
         .forEach(pb => { preBoucleAuthors = preBoucleAuthors.concat(pb.entities); });
 
     const mergedSubjectBlacklistArray = [...new Set([...preBoucleSubjects, ...subjectBlacklistArray])];
-    const mergedAuthorBlacklistArray = [...new Set([...preBoucleAuthors, ...authorBlacklistArray])];
+    const mergedAuthorBlacklistArray = [...new Set([...preBoucleAuthors, ...authorBlacklistArray, ...shadowent])];
 
     subjectsBlacklistReg = buildRegex(mergedSubjectBlacklistArray, true);
     authorsBlacklistReg = buildRegex(mergedAuthorBlacklistArray, false);
