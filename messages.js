@@ -86,10 +86,10 @@ function removeMessage(element) {
     removeElement(element);
 }
 
-function buildDeboucledBlacklistButton(author, callbackAfter) {
+function buildDeboucledBlacklistButton(author, callbackAfter, className = 'deboucled-blacklist-author-button') {
     let dbcBlacklistButton = document.createElement('span');
     dbcBlacklistButton.setAttribute('title', 'Blacklister avec Déboucled');
-    dbcBlacklistButton.setAttribute('class', 'picto-msg-tronche deboucled-blacklist-author-button');
+    dbcBlacklistButton.setAttribute('class', `picto-msg-tronche ${className}`);
     dbcBlacklistButton.onclick = function () {
         addEntityBlacklist(authorBlacklistArray, author);
         refreshAuthorKeys()
@@ -113,30 +113,33 @@ function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklis
 }
 
 function highlightBlacklistedAuthor(messageElement, authorElement) {
-    let isSelf = messageElement.querySelector('span.picto-msg-croix');
-    if (isSelf) return;
+    const pictoCross = messageElement?.querySelector('span.picto-msg-croix');
+    const author = authorElement.textContent.trim().toLowerCase();
+    if (pictoCross || (userPseudo && userPseudo.toLowerCase() === author)) return;
     authorElement.classList.toggle('deboucled-blacklisted', true);
 }
 
-function addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive) {
-    let backToForumElement = document.querySelector('div.group-two > a:nth-child(2)');
-    if (!backToForumElement) return;
+function buildBoucledAuthorButton(author, optionBoucledUseJvarchive, className = 'deboucled-svg-spiral-gray') {
+    const backToForumElement = document.querySelector('div.group-two > a:nth-child(2)');
+    const forumUrl = backToForumElement?.getAttribute('href');
 
-    let mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
-    if (!mpBloc) return;
-
-    let forumUrl = backToForumElement.getAttribute('href');
-    let redirectUrl = `/recherche${forumUrl}?search_in_forum=${author}&type_search_in_forum=auteur_topic`;
-    if (optionBoucledUseJvarchive) redirectUrl = `${jvarchiveUrl}/topic/recherche?search=${author}&searchType=auteur_topic_exact`;
+    let redirectUrl = '';
+    if (optionBoucledUseJvarchive || !forumUrl) redirectUrl = `${jvarchiveUrl}/topic/recherche?search=${author}&searchType=auteur_topic_exact`;
+    else redirectUrl = `/recherche${forumUrl}?search_in_forum=${author}&type_search_in_forum=auteur_topic`;
 
     let boucledAuthorAnchor = document.createElement('a');
-    boucledAuthorAnchor.setAttribute('class', 'xXx lien-jv deboucled-author-boucled-button deboucled-svg-spiral-gray');
+    boucledAuthorAnchor.setAttribute('class', `xXx lien-jv deboucled-author-boucled-button ${className}`);
     boucledAuthorAnchor.setAttribute('href', redirectUrl);
     boucledAuthorAnchor.setAttribute('target', '_blank');
     boucledAuthorAnchor.setAttribute('title', 'Pseudo complètement boucled ?');
-    boucledAuthorAnchor.innerHTML = '<svg width="16px" viewBox="0 0 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></a>';
+    boucledAuthorAnchor.innerHTML = '<svg viewBox="0 0 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></a>';
+    return boucledAuthorAnchor;
+}
 
-    insertAfter(boucledAuthorAnchor, mpBloc);
+function addBoucledAuthorButton(nearbyElement, author, optionBoucledUseJvarchive) {
+    if (!nearbyElement) return;
+    let boucledButton = buildBoucledAuthorButton(author, optionBoucledUseJvarchive);
+    insertAfter(boucledButton, nearbyElement);
 }
 
 function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages) {
@@ -156,7 +159,8 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
         }
         else {
             highlightBlacklistedAuthor(messageElement, authorElement);
-            addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive);
+            let mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
+            addBoucledAuthorButton(mpBloc, author, optionBoucledUseJvarchive);
         }
         return false;
     }
@@ -183,7 +187,8 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
             if (topicLiveEvent) {
                 let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
                 upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton);
-                addBoucledAuthorButton(messageElement, author, optionBoucledUseJvarchive);
+                let mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
+                addBoucledAuthorButton(mpBloc, author, optionBoucledUseJvarchive);
             }
             else {
                 createJvChatBlacklistButton(messageElement, authorElement, author);

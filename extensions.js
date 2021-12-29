@@ -144,11 +144,10 @@ function addStyles(enableJvcDarkTheme) {
     }
 }
 
-function addSvg(svgHtml, selector) {
+function addSvg(svgHtml) {
     let svgElement = document.createElement('svg');
-    svgElement.innerHTML = svgHtml;
-    let selection = document.querySelector(selector)
-    if (selection !== null) selection.appendChild(svgElement);
+    document.body.appendChild(svgElement);
+    svgElement.outerHTML = svgHtml;
 }
 
 function decryptJvCare(jvCareClass) {

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.6.6
+// @version     2.7.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -13,12 +13,16 @@
 // @match       https://www.jeuxvideo.com/recherche/forums/*
 // @match       http://www.jeuxvideo.com/messages-prives/*
 // @match       https://www.jeuxvideo.com/messages-prives/*
+// @match       http://www.jeuxvideo.com/profil/*
+// @match       https://www.jeuxvideo.com/profil/*
 // @match       http://m.jeuxvideo.com/forums/*
 // @match       https://m.jeuxvideo.com/forums/*
 // @match       http://m.jeuxvideo.com/recherche/forums/*
 // @match       https://m.jeuxvideo.com/recherche/forums/*
 // @match       http://m.jeuxvideo.com/messages-prives/*
 // @match       https://m.jeuxvideo.com/messages-prives/*
+// @match       http://m.jeuxvideo.com/profil/*
+// @match       https://m.jeuxvideo.com/profil/*
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
