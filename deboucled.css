@@ -284,6 +284,9 @@ body.deboucled-dark-theme {
   left: 0.2rem;
   width: 16px;
 }
+.bloc-option-profil {
+  margin-right: 2.1875rem;
+}
 .bloc-option-profil .deboucled-author-boucled-button {
   display: inline-block;
   position: relative;

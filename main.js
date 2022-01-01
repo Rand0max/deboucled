@@ -393,10 +393,9 @@ function handleProfil() {
         blocOptionProfil.className = 'bloc-option-profil';
         insertAfter(blocOptionProfil, infosPseudoElement);
     }
-    blocOptionProfil.style.marginRight = '10px';
 
     let boucledButton = buildBoucledAuthorButton(author, true, 'deboucled-svg-spiral-white');
-    blocOptionProfil.prepend(boucledButton);
+    blocOptionProfil.append(boucledButton);
 
     const authorBlacklistMatches = getAuthorBlacklistMatches(author);
     if (authorBlacklistMatches?.length) {
@@ -404,7 +403,7 @@ function handleProfil() {
     }
     else {
         let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload() }, 'deboucled-blacklist-profil-button');
-        blocOptionProfil.prepend(dbcBlacklistButton);
+        blocOptionProfil.append(dbcBlacklistButton);
     }
 }
 
