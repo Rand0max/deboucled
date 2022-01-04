@@ -557,6 +557,7 @@ body.deboucled-dark-theme {
   text-align: center;
   font-weight: bold;
   font-size: 14px;
+  cursor: pointer;
 }
 .deboucled-messages-ignored-authors {
   margin-left: 5px;
@@ -877,6 +878,9 @@ input[type="search"] {
 }
 [data-tooltip-location="right"]:hover:before {
   transform: translate(5px, 50%) scale(1);
+}
+.data-tooltip-large {
+  cursor: pointer;
 }
 .data-tooltip-large:before {
   max-width: 48vw;
