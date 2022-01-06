@@ -493,7 +493,10 @@ function removeUselessTags(topics) {
     const regex = /(\[?a+y+a+o*\]?|[\{[(🛑🔴🚨 ]+(alerte.*?)[\}\])🛑🔴🚨]+|^alerte)\s?:?-?,?!?/giu;
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
-        let newTitle = titleElem.textContent.replace(regex, '').removeDoubleSpaces().trim().capitalize();
+        let newTitle = titleElem.textContent.replace(regex, '');
+        newTitle = newTitle.replace(/\(\)|\[\]|{}/g, '');
+        newTitle = newTitle.removeDoubleSpaces();
+        newTitle = newTitle.trim().capitalize();
         if (newTitle.length > 0) titleElem.textContent = newTitle;
     });
 }
