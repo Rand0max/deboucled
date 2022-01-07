@@ -3,7 +3,7 @@
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
-const deboucledVersion = '2.7.3'
+const deboucledVersion = '2.8.0'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';
@@ -46,7 +46,10 @@ let sortModeSubject = 0;
 let sortModeAuthor = 0;
 let sortModeTopicId = 0;
 
+let disabledFilteringForumSet = new Set();
+
 let userPseudo = undefined;
+let forumFilteringIsDisabled = false;
 
 const domParser = new DOMParser();
 

@@ -3,12 +3,25 @@
 // MAIN PAGE
 ///////////////////////////////////////////////////////////////////////////////////////
 
+function filteringIsDisabled(forumId = undefined) {
+    return disabledFilteringForumSet.has(forumId ?? getForumId());
+}
+
 function getUserPseudo() {
     const pseudoElem = document.querySelector('.account-pseudo');
     if (!pseudoElem || pseudoElem.textContent.trim().toLowerCase() === 'mon compte') return undefined;
     const linkAccountElem = document.querySelector('.nav-link-account')
     if (!linkAccountElem || !linkAccountElem.hasAttribute('data-account-id')) return undefined;
     return pseudoElem.textContent.trim();
+}
+
+function getForumId() {
+    const forumRegex = /^\/forums\/(?:0|1|42)-(?<forumid>[0-9]+)-[0-9]+-[0-9]+-0-1-0-.*\.htm$/i;
+    const currentUrl = window.location.pathname;
+    const matches = forumRegex.exec(currentUrl);
+    if (!matches) return null;
+    const forumId = parseInt(matches.groups.forumid.trim());
+    return forumId;
 }
 
 function getEntityTitle(entity) {
@@ -438,12 +451,9 @@ function handleError() {
     let homepageButton = document.querySelector('.btn-secondary');
     if (!homepageButton) return;
 
-    const forumRegex = /^\/forums\/(42|1)-(?<forumid>[0-9]+)-[0-9]+-[0-9]+-0-1-0-.*\.htm$/i;
-    const currentUrl = window.location.pathname;
-    const matches = forumRegex.exec(currentUrl);
-    if (!matches) return;
+    const forumId = getForumId();
+    if (!forumId) return;
 
-    const forumId = parseInt(matches.groups.forumid.trim());
     const forumUrl = `/forums/0-${forumId}-0-1-0-1-0-forum.htm`;
 
     homepageButton.textContent = 'Retour au forum';
@@ -469,6 +479,7 @@ async function init() {
     toggleDeboucledDarkTheme(enableDeboucledDarkTheme);
     buildSettingsPage();
     addSettingButton(firstLaunch);
+    addDisableFilteringButton();
     userPseudo = getUserPseudo();
 }
 
@@ -478,6 +489,7 @@ async function entryPoint() {
     switch (currentPageType) {
         case 'topiclist': {
             await init();
+            if (forumFilteringIsDisabled) break;
             createTopicListOverlay();
             const finalTopics = await handleTopicList(true);
             await handleTopicListOptions(finalTopics);
@@ -489,6 +501,7 @@ async function entryPoint() {
         }
         case 'topicmessages': {
             await init();
+            if (forumFilteringIsDisabled) break;
             handleTopicMessages();
             break;
         }

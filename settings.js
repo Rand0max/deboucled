@@ -710,6 +710,30 @@ function addSearchFilterToggle() {
     return optionFilterResearch;
 }
 
+function addDisableFilteringButton() {
+    const menuForumElement = document.querySelector('.menu-user-forum');
+    if (!menuForumElement) return;
+
+    const forumId = getForumId();
+    if (!forumId) return;
+    forumFilteringIsDisabled = filteringIsDisabled(forumId);
+
+    const enableFilteringId = 'deboucled-enable-filtering';
+    let menuChild = document.createElement('li');
+    menuChild.innerHTML = `<span class="float-start">Activer Déboucled sur ce forum</span><input type="checkbox" class="input-on-off" id="${enableFilteringId}"${forumFilteringIsDisabled ? '' : ' checked=""'}><label for="deboucled-enable-filtering" class="btn-on-off"></label>`;
+    menuForumElement.appendChild(menuChild);
+
+    const toggleFiltering = document.querySelector(`#${enableFilteringId}`);
+    toggleFiltering.onchange = (e) => {
+
+        const checked = e.currentTarget.checked; // Checked = filtrage activé
+        if (checked) disabledFilteringForumSet.delete(forumId);
+        else disabledFilteringForumSet.add(forumId);
+
+        GM_setValue(storage_disabledFilteringForums, JSON.stringify([...disabledFilteringForumSet]));
+    };
+}
+
 function showSettings() {
     let bgView = document.querySelector('#deboucled-settings-bg-view');
     bgView.style.display = 'block'
