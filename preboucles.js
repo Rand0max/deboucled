@@ -17,13 +17,13 @@ function addPreBoucle(id, title, type, enabled, entities) {
 
 function initPreBoucles() {
     addPreBoucle('boucledauthors', 'Pseudos boucled', entityAuthor, true,
-        ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki', 'leao', 'oael', 'surk', 'zemmourfinito', 'labelconfort', 'xinoz', 'zinzinabbath', 'rifson', 'garfield', 'qwertyofficial', 'vcxn']);
+        ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki', 'leao', 'oael', 'surk', 'zemmourfinito', 'labelconfort', 'xinoz', 'zinzinabbath', 'rifson', 'garfield', 'qwertyofficial', 'vcxn', 'kallyuga']);
 
     addPreBoucle('bots', 'BOTS (LREM, PCC, provax, etc.)', entityAuthor, true,
-        ['tontonfouilleur', 'squeezie-issou', '2__marches', 'anatoli_diatlov', 'soutien-rpc', 'lovemaze', 'leo2005', '1m54maisgrand', 'moussecerise', 'marduweb', 'pinnochiotte']);
+        ['tontonfouilleur', 'squeezie-issou', '2__marches', 'anatoli_diatlov', 'soutien-rpc', 'lovemaze', 'leo2005', '1m54maisgrand', 'moussecerise', 'marduweb', 'pinnochiotte', 'kallyuga', 'khalidfouhami_']);
 
     addPreBoucle('popularboucles', 'Boucles connues', entitySubject, true,
-        ['ces photos putain', 'yannick*tour eiffel', 'metisseur22cm', 'midsommar', 'eau*pasteque', 'celestin tu', 'l\'échéance est tombée', 'ai-je l\'air sympathique', 'pour avoir une copine en', 'no jump', 'john cena est mort', 'par le corps masculin', 'dicaprio au lidl', '2 sauces interdites', 'allemand fou detruit son clavier', 'ma caissiere', 'traduisez en anglais', 'sauce sonic', 'seth gueko', 'gros gamos allemand', 'eau blanche', '*ssache que', 'genre de mec plait', 'dwayne johnson', 'charles auvet', 'now cum', 'let\'s fucking go', 'boule blanche dans la mozarella', 'crocodile chelou', 'forumeur le plus eclatax', 'galet de poche', 'kebab breton', 'des chances font du bruits et foutent le bordel', 'femmes vulgaires au lit', 'rockeuse dans l\'âme']);
+        ['ces photos putain', 'yannick*tour eiffel', 'metisseur22cm', 'midsommar', 'eau*pasteque', 'celestin tu', 'l\'échéance est tombée', 'ai-je l\'air sympathique', 'pour avoir une copine en', 'no jump', 'john cena est mort', 'par le corps masculin', 'dicaprio au lidl', '2 sauces interdites', 'allemand fou detruit son clavier', 'ma caissiere', 'traduisez en anglais', 'sauce sonic', 'seth gueko', 'gros gamos allemand', 'eau blanche', '*ssache que', 'genre de mec plait', 'dwayne johnson', 'charles auvet', 'now cum', 'let\'s fucking go', 'boule blanche dans la mozarella', 'crocodile chelou', 'forumeur le plus eclatax', 'galet de poche', 'kebab breton', 'des chances font du bruits et foutent le bordel', 'femmes vulgaires au lit', 'rockeuse dans l\'âme', 'pris une audi a1']);
 
     addPreBoucle('covid19', 'Covid19', entitySubject, false,
         ['covid*', 'corona*', 'virus', 'gestes barriere', 'geste barriere', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*', 'reconfine*', '*pass', 'vizio', 'schwab', 'veran', 'castex', 'pcr', 'antigenique', 'thrombose*', 'oracle', 'omicron', 'cas contact', 'hospitalisations', 'taux d\'incidence', 'myocardite*', 'couvre*feu', 'wuhan', 'quarantaine']);
@@ -44,7 +44,7 @@ function initPreBoucles() {
         ['reacprout*', 'prout', 'caca', 'cacaprout', 'pipi', 'chibrax', 'post ou', 'postoo', 'pose toucan']);
 
     addPreBoucle('hatred', 'Haineux', entitySubject, false,
-        ['facho*', 'chofs', 'chofa*', 'qlf', 'paz', 'pazification', 'pazifie', 's2s', 'gwer*', 'raciste*', 'hagar', 'hagra', '🐊', '🐷', 'bassem', 'sadek', 'les porcs']);
+        ['facho*', 'chofs', 'chofa*', 'qlf', 'paz', 'pazification', 'pazifie', 's2s', 'gwer*', 'raciste*', 'hagar', 'hagra', '🐊', '🐷', 'bassem', 'sadek', 'les porcs', 'hitler', 'nazi*', 'mussolini', 'staline', 'negre*', 'bougnoul*', 'youtre*']);
 
     addPreBoucle('girls', 'Femmes', entitySubject, false,
         ['meuf', 'fille', 'femme', '*/10', '*/20', 'qlf', 'cul', 'sein*', 'boob*', 'bzez', '95e', 'kheyette*', 'colombienne', 'emma roberts', 'estelle redpill', 'lena situations', 'charlie danger', 'natoo', 'tatiana ventose', 'vedovelli', 'abella danger', 'agathe auprou*', 'amel bent', 'amouranth', 'ana de armas', 'copine', 'crush', 'cuck*', 'cunni*', 'dua lipa', 'fiak', 'gaelle', 'incel*', 'julia', 'levrette', 'milf*', 'nude*', 'porno', 'simp*', 'vagin']);
@@ -56,7 +56,7 @@ function initPreBoucles() {
         ['porn*', 'p0rn*', 'pron', 'blacked', 'mym', 'onlyfan', 'onlyfans', 'rimjob', 'chaturbate', 'abigail mac', 'addie andrews', 'agatha vega', 'aidra fox', 'alex clark', 'alex grey', 'alexas morgan', 'alina lopez', 'amber moore', 'anissa kate', 'aria sky', 'ariana marie', 'august ames', 'autumn falls', 'bailey mattingly', 'bella rolland', 'blake blossom', 'blake eden', 'bonnie kinz', 'bree daniels', 'brett rossi', 'brittanya razavi', 'celeste', 'dani daniels', 'darcie dolce', 'dillion harper', 'ella hughes', 'elsa jean', 'emily addison', 'emily willis', 'emma mae', 'eva lovia', 'foxy di', 'gabbie carter', 'gianna dior', 'hayden winters', 'hyley winters', 'janice griffith', 'jenna jameson', 'jia lissa', 'josephine jackson', 'kayla kayden', 'kayley gunner', 'keisha grey', 'kendra sunderland', 'kenna james', 'kenzie anne', 'kiera winters', 'lacy lennon', 'lana rhoades', 'leah gotti', 'lena paul', 'lexi belle', 'lily ivy', 'lily love', 'little caprice', 'liya silver', 'lola myluv', 'lucy li', 'luxury girl', 'madi meadows', 'madison ivy', 'malena morgan', 'megan salinas', 'mia malkova', 'mia melano', 'michaela isizzu', 'molly jane', 'nadya nabakova', 'nancy ace', 'natalia starr', 'nicole aniston', 'octokuro', 'peta jensen', 'red fox', 'riley anne', 'riley reid', 'ryan ryans', 'sabrina maree', 'samantha saint', 'scarlett hampton', 'serena becker', 'shae summers', 'simonn', 'skye blue', 'sofi ryan', 'sophia leone', 'stella cox', 'sunny leone', 'sybil a', 'tasha reign', 'tiffany thompson', 'tiny teen', 'tommie jo', 'tori black', 'traci lords', 'tru kait', 'victoria lynn', 'viola bailey', 'whitney westgate', 'woodman', 'bbc']);
 
     addPreBoucle('religion', 'Religion', entitySubject, false,
-        ['allah', 'jesus', 'christ*', 'juif*', 'chretien*', 'musulman*', 'islam*', 'judaisme', 'muslim*', 'burka', 'burqa', 'priere', 'dieu', 'religion']);
+        ['allah', 'jesus', 'christ*', 'juif*', 'chretien*', 'musulman*', 'islam*', 'judaisme', 'muslim*', 'burka', 'burqa', 'priere', 'dieu', 'religion', 'dhimmi']);
 
     addPreBoucle('crypto', 'Cryptomonnaies', entitySubject, false,
         ['*crypto*', 'blockchain', 'mineur', 'mining', 'minage', 'nft', 'wallet', 'satoshi', 'bitcoin', 'btc', 'cardano', 'shitcoin', 'ethereum', 'monero', 'libra', 'coinbase', 'eth', 'ripple', 'litecoin', 'tether', 'eos', 'binance', 'tezos', 'to the moon', 'to ze moon', 'bat', 'dogecoin', 'zynecoin', 'kcs', 'fee', 'fees', 'all in', 'kucoin', 'refill', 'bullrun', 'shiba inu']);
@@ -88,7 +88,7 @@ function initVinzBoucles() {
 }
 
 function initShadowent() {
-    const preShadowent = ['U3RvbmVHaWFudA==', 'QW5lcnls', 'Rmx1YnVz', 'bGVhbw==', 'dmlueg==', 'dGFjb3M=', 'a2luYWhl', 'TGVzWWV1eER1Rm9ydW0=', 'c3Vic2NyaWJlcg==', 'Y2lnYXJldHRl', 'd2luZG93c2JvdA==', 'YXJlbnls', 'YXpsb2s='];
+    const preShadowent = ['U3RvbmVHaWFudA==', 'QW5lcnls', 'Rmx1YnVz', 'bGVhbw==', 'dmlueg==', 'dGFjb3M=', 'a2luYWhl', 'TGVzWWV1eER1Rm9ydW0=', 'c3Vic2NyaWJlcg==', 'Y2lnYXJldHRl', 'd2luZG93c2JvdA==', 'YXJlbnls'];
     preShadowent.forEach((s) => shadowent.push(window.atob(s)));
 }
 
