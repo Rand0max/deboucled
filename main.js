@@ -451,23 +451,29 @@ function handleError() {
     let homepageButton = document.querySelector('.btn-secondary');
     if (!homepageButton) return;
 
+    function goToJvArchiveButton(pathUrl) {
+        let jvArchiveButton = document.createElement('a');
+        jvArchiveButton.className = 'btn btn-primary';
+        jvArchiveButton.href = `${jvarchiveUrl}${pathUrl}`;
+        jvArchiveButton.alt = 'JvArchive';
+        jvArchiveButton.target = '_blank';
+        jvArchiveButton.style.marginLeft = '15px';
+        jvArchiveButton.textContent = 'Consulter JvArchive';
+
+        insertAfter(jvArchiveButton, homepageButton);
+    }
+
     const forumId = getForumId();
-    if (!forumId) return;
+    if (forumId) { // 410 d'un topic
+        const forumUrl = `/forums/0-${forumId}-0-1-0-1-0-forum.htm`;
+        homepageButton.textContent = 'Retour au forum';
+        homepageButton.href = forumUrl;
 
-    const forumUrl = `/forums/0-${forumId}-0-1-0-1-0-forum.htm`;
-
-    homepageButton.textContent = 'Retour au forum';
-    homepageButton.href = forumUrl;
-
-    let jvArchiveButton = document.createElement('a');
-    jvArchiveButton.className = 'btn btn-primary';
-    jvArchiveButton.href = `${jvarchiveUrl}${window.location.pathname.slice(0, -4)}`;
-    jvArchiveButton.alt = 'JvArchive';
-    jvArchiveButton.target = '_blank';
-    jvArchiveButton.style.marginLeft = '15px';
-    jvArchiveButton.textContent = 'Consulter JvArchive';
-
-    insertAfter(jvArchiveButton, homepageButton);
+        goToJvArchiveButton(window.location.pathname.slice(0, -4));
+    }
+    else { // 410 d'un message
+        goToJvArchiveButton(window.location.pathname);
+    }
 }
 
 async function init() {
