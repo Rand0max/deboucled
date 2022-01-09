@@ -214,7 +214,7 @@ function getAuthorBlacklistMatches(author) {
     if (!authorsBlacklistReg) return null;
     const normAuthor = author.toLowerCase().normalizeDiacritic();
     if (normAuthor === 'rand0max') return null;
-    return authorsBlacklistReg.test(normAuthor) ? [author] : [];
+    return normAuthor.match(authorsBlacklistReg) ? [author] : null;
 }
 
 async function isVinzTopic(subject, author, topicUrl) {
@@ -281,7 +281,7 @@ async function isTopicPoC(element, optionDetectPocMode) {
 
     const title = titleElem.textContent.trim().normalizeDiacritic();
     const isTitlePocRegex = /(pos(t|te|tez|to|too|tou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan|postouk|postook|pose.*toucan/i;
-    let isTitlePoc = isTitlePocRegex.test(title);
+    let isTitlePoc = title.match(isTitlePocRegex);
 
     if (optionDetectPocMode === 1 && !isTitlePoc) {
         // Inutile de continuer si le titre n'est pas détecté PoC et qu'on n'est pas en deep mode
@@ -296,7 +296,7 @@ async function isTopicPoC(element, optionDetectPocMode) {
 
         const isMessagePocRegex = /pos(t|te|tez) ou/i;
         const maladies = ['cancer', 'ancer', 'cer', 'en serre', 'necrose', 'torsion', 'testiculaire', 'tumeur', 'cholera', 'sida', 'corona', 'coronavirus', 'covid', 'covid19', 'cerf', 'serf', 'phimosis', 'trisomie', 'diarrhee', 'charcot', 'lyme', 'avc', 'cirrhose', 'diabete', 'parkinson', 'alzheimer', 'mucoviscidose', 'lepre', 'tuberculose'];
-        const isMessagePoc = isMessagePocRegex.test(firstMessage) || (isTitlePoc && maladies.some(s => firstMessage.includes(s)));
+        const isMessagePoc = firstMessage.match(isMessagePocRegex) || (isTitlePoc && maladies.some(s => firstMessage.includes(s)));
 
         pocTopicMap.set(topicId, isMessagePoc);
 

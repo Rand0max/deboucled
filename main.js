@@ -205,7 +205,7 @@ function handleMessageBlacklistMatches(messageElement) {
 
     function highlightMatches(textChild) {
         const matches = getSubjectBlacklistMatches(textChild.textContent);
-        if (!matches?.length) return false;        
+        if (!matches?.length) return false;
         matchedSubjects.addArrayIncrement(matches);
         hiddenSubjects++;
         highlightBlacklistMatches(textChild, matches);
