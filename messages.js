@@ -148,7 +148,7 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
         else removeMessage(messageElement);
         hiddenMessages++;
         hiddenAuthorArray.add(author);
-        updateMessagesHeader();
+        if (!topicLiveEvent) updateMessagesHeader();
         saveTotalHidden();
     }
 

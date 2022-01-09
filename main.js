@@ -205,7 +205,9 @@ function handleMessageBlacklistMatches(messageElement) {
 
     function highlightMatches(textChild) {
         const matches = getSubjectBlacklistMatches(textChild.textContent);
-        if (!matches?.length) return false;
+        if (!matches?.length) return false;        
+        matchedSubjects.addArrayIncrement(matches);
+        hiddenSubjects++;
         highlightBlacklistMatches(textChild, matches);
         return true;
     }
@@ -258,11 +260,14 @@ function handleMessage(message, optionHideMessages, optionBoucledUseJvarchive, o
     let author = authorElement.textContent.trim();
     let mpBloc = message.querySelector('div.bloc-mp-pseudo');
 
-    if (getAuthorBlacklistMatches(author)?.length) {
+    const authorBlacklisted = getAuthorBlacklistMatches(author);
+    if (authorBlacklisted?.length) {
         if (optionHideMessages) {
             removeMessage(message);
             hiddenMessages++;
             hiddenAuthorArray.add(author);
+            matchedAuthors.addArrayIncrement(authorBlacklisted);
+            hiddenAuthors++;
             return; // si on a supprimé le message on se casse, plus rien à faire
         }
         else {
@@ -315,8 +320,13 @@ function handleTopicWhitelist() {
 function highlightTopicTitle() {
     let titleElement = document.querySelector('#bloc-title-forum');
     if (!titleElement) return;
+
     const subjectMatches = getSubjectBlacklistMatches(titleElement.textContent);
     if (!subjectMatches?.length) return;
+
+    matchedSubjects.addArrayIncrement(subjectMatches);
+    hiddenSubjects++;
+
     highlightBlacklistMatches(titleElement, subjectMatches);
 }
 
@@ -338,7 +348,8 @@ function handleTopicMessages() {
         handleMessage(message, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages);
     });
 
-    buildMessagesHeader();
+    //buildMessagesHeader();
+    addRightBlocMatches();
     saveTotalHidden();
     addMessageQuoteEvent();
 }

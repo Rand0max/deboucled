@@ -3,13 +3,22 @@
 // RIGHT COLUMN - STATS/CHARTS
 ///////////////////////////////////////////////////////////////////////////////////////
 
+
 function addRightBlocMatches() {
     let optionDisplayTopicMatches = GM_getValue(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
     if (!optionDisplayTopicMatches || (!matchedTopics.hasAny() && !matchedSubjects.hasAny() && !matchedAuthors.hasAny())) return;
 
+    function countMatchesOccurencies(matches) {
+        let res = 0;
+        matches.forEach((occ) => res += occ);
+        return res;
+    }
+
+    const totalMatchesHidden = countMatchesOccurencies(matchedTopics) + countMatchesOccurencies(matchedSubjects) + countMatchesOccurencies(matchedAuthors); // hiddenTotalTopics
+
     let html = '';
     html += '<div class="card card-jv-forum card-forum-margin">';
-    html += `<div class="card-header">CORRESPONDANCES<span class="deboucled-card-header-right">${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)}</span></div>`;
+    html += `<div class="card-header">CORRESPONDANCES<span class="deboucled-card-header-right">${totalMatchesHidden} ignoré${plural(totalMatchesHidden)}</span></div>`;
     html += '<div class="card-body">';
     html += '<div class="scrollable">';
     html += '<div class="scrollable-wrapper">';
