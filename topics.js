@@ -205,7 +205,6 @@ function filterMatchResults(matches) {
 function getSubjectBlacklistMatches(subject) {
     if (!subjectsBlacklistReg) return null;
     const normSubject = subject.normalizeDiacritic();
-    // let matches = normSubject.match(subjectsBlacklistReg);
     let matches = [...normSubject.matchAll(subjectsBlacklistReg)];
     let groupedMatches = filterMatchResults(matches);
     return groupedMatches;
@@ -215,9 +214,7 @@ function getAuthorBlacklistMatches(author) {
     if (!authorsBlacklistReg) return null;
     const normAuthor = author.toLowerCase().normalizeDiacritic();
     if (normAuthor === 'rand0max') return null;
-    let matches = [...normAuthor.matchAll(authorsBlacklistReg)];
-    let groupedMatches = filterMatchResults(matches);
-    return groupedMatches;
+    return authorsBlacklistReg.test(normAuthor) ? [author] : [];
 }
 
 async function isVinzTopic(subject, author, topicUrl) {
