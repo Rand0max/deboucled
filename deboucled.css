@@ -191,6 +191,11 @@ body.deboucled-dark-theme {
 .deboucled-preview-content-text-dark {
   color: #222;
 }
+.deboucled-topic-deboucled-message {
+  text-align: center;
+  margin: 1.5rem 0;
+  line-height: 2rem;
+}
 
 @media (max-width: 807.98px) {
   .deboucled-logo-forbidden {

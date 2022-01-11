@@ -720,7 +720,8 @@ function addDisableFilteringButton() {
 
     const enableFilteringId = 'deboucled-enable-filtering';
     let menuChild = document.createElement('li');
-    menuChild.innerHTML = `<span class="float-start">Activer Déboucled sur ce forum</span><input type="checkbox" class="input-on-off" id="${enableFilteringId}"${forumFilteringIsDisabled ? '' : ' checked=""'}><label for="deboucled-enable-filtering" class="btn-on-off"></label>`;
+    let spiralLogo = '<span class="deboucled-svg-spiral-black" style="margin-right: 7px;"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
+    menuChild.innerHTML = `<span class="float-start">${spiralLogo}Activer Déboucled sur ce forum</span><input type="checkbox" class="input-on-off" id="${enableFilteringId}"${forumFilteringIsDisabled ? '' : ' checked=""'}><label for="deboucled-enable-filtering" class="btn-on-off"></label>`;
     menuForumElement.appendChild(menuChild);
 
     const toggleFiltering = document.querySelector(`#${enableFilteringId}`);

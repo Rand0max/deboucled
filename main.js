@@ -335,6 +335,15 @@ function handleTopicHeader() {
     return handleTopicWhitelist();
 }
 
+function displayTopicDeboucledMessage() {
+    const topBlocPagi = document.querySelector('.bloc-pagi-default');
+    if (!topBlocPagi) return;
+    let topicDeboucledDiv = document.createElement('div');
+    topicDeboucledDiv.className = 'bloc-message-forum deboucled-topic-deboucled-message';
+    topicDeboucledDiv.textContent = 'Topic 100% déboucled !';
+    insertAfter(topicDeboucledDiv, topBlocPagi);
+}
+
 function handleTopicMessages() {
     const isWhitelistedTopic = handleTopicHeader();
     let optionHideMessages = !isWhitelistedTopic && GM_getValue(storage_optionHideMessages, storage_optionHideMessages_default);
@@ -347,6 +356,8 @@ function handleTopicMessages() {
     allMessages.forEach(function (message) {
         handleMessage(message, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages);
     });
+
+    if (hiddenMessages === allMessages.length) displayTopicDeboucledMessage();
 
     //buildMessagesHeader();
     addRightBlocMatches();
