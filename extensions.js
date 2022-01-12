@@ -20,7 +20,11 @@ String.prototype.handleGenericChar = function () {
 }
 
 String.prototype.capitalize = function () {
-    return this.charAt(0).toUpperCase() + this.slice(1);
+    if (this.length === 0) return this;
+    const regex = new RegExp(/\p{L}/, 'u');
+    const i = this.search(regex);
+    if (i < 0) return this;
+    return this.substring(0, i) + this.charAt(i).toUpperCase() + this.slice(i + 1);
 }
 
 String.prototype.removeDoubleSpaces = function () {

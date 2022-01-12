@@ -493,7 +493,7 @@ function removeUselessTags(topics) {
         let newTitle = titleElem.textContent.replace(regex, '');
         newTitle = newTitle.replace(/\(\)|\[\]|{}/g, '');
         newTitle = newTitle.removeDoubleSpaces();
-        newTitle = newTitle.trim().capitalize();
+        newTitle = newTitle.trim().toLowerCase().capitalize();
         if (newTitle.length > 0) titleElem.textContent = newTitle;
     });
 }

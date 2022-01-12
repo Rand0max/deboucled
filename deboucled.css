@@ -961,7 +961,7 @@ input[type="search"] {
 }
 .deboucled-td-left.full-width {
   width: 100%;
-  border-bottom: 1px dotted var(--deboucled-td-border-color);
+  border-bottom: 1px solid var(--deboucled-td-border-color);
 }
 .deboucled-td-right {
   width: 99%;

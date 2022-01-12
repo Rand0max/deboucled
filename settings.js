@@ -15,11 +15,11 @@ function buildSettingsPage() {
         const tooltipLocation = location === 'top' ? '' : ` data-tooltip-location="${location}"`;
         return `deboucled-data-tooltip="${hint}"${tooltipLocation}`;
     }
-    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false) {
+    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false, hintLocation = 'right') {
         let html = '';
         html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
         html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}">`;
-        html += `<span ${buildTooltip(hint)}>${title}</span>`;
+        html += `<span ${buildTooltip(hint, hintLocation)}>${title}</span>`;
         html += '</td>';
         html += `<td class="deboucled-td-right">`;
         html += '<label class="deboucled-switch">';
@@ -156,7 +156,7 @@ function buildSettingsPage() {
             storage_optionDetectPocMode_default,
             ['Désactivé', 'Mode simple', 'Mode approfondi ⚠']);
 
-        html += addToggleOption('Effacer les <i>balises abusives</i> du titre des topics', storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default, 'Effacer du titre des topics les balises inutiles et répétitives comme [ALERTE], ou l\'usage abusif du &quot;AYA&quot; et ses dérivés.\n\nExemple : &quot;[ALERTE] cet exemple incroyable AYAAAA&quot; => &quot;Cet exemple incroyable&quot;');
+        html += addToggleOption('Uniformiser et nettoyer les <i>titres des topics</i>', storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default, 'Uniformise le titre des topics et efface les balises inutiles/répétitives comme [ALERTE], ou l\'usage abusif du &quot;AYA&quot; et ses dérivés.\n\nExemple : &quot;[ALERTE] cet EXEMPLE incroyable AYAAAA&quot; => &quot;Cet exemple incroyable&quot;', undefined, undefined, 'top');
 
         html += '</table>';
         html += '</div>';
