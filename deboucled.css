@@ -555,6 +555,27 @@ body.deboucled-dark-theme {
 .deboucled-eye-logo.big:hover {
   opacity: 1;
 }
+.deboucled-preboucle-subject-logo {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAl0lEQVRIiWNgGAUkAA8GBobHDAwM/ynEDxkYGNywWfCICobD8H1sFsAkKQHMUDP+wASYKDSQIKC5BSwE5IkNMkZcEtT2AYaDCPkAp8uI1Teo44Ao3w3ZOICDIZvRsKaix1Ca3ALuNwMDQzg+Wz0YKC9R/0Dpf6R7mjAoR7KIJhYgW0IzC2CWwC1gpoEFRxkgqegADczGBADWA1owfhpmmQAAAABJRU5ErkJggg==)
+    0 no-repeat;
+  margin-right: 0.5rem;
+  width: 14px;
+  height: 14px;
+  background-size: 14px;
+  vertical-align: top;
+  display: inline-block;
+  filter: invert(100%);
+}
+.deboucled-preboucle-author-logo {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAYAAABr5z2BAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAN1wAADdcBQiibeAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACvSURBVCiRhZK9DcIwEIUvNEh0FEiZgJox0mYHpqCgyh706ZkhDUUkJghKEckFDf1Hc6DzJbGfdLLfZ/vJfwKIqQp4Ah9tKzc+Kw86YnW5gI3EOmb8TD5gl/CNiASt5k/dlgZ3hMGMBcPD2hEuCb9d7C9cjJXlveH92iukAmrDax9QAjdgdAGj8tKFR//gAEykNem8u/oHcAYKAdrM4p9a4OTYtQDIfRajvYi8jX99AaCHxzQQE5F1AAAAAElFTkSuQmCC)
+    0 no-repeat;
+  margin-right: 0.5rem;
+  width: 14px;
+  height: 14px;
+  background-size: 14px;
+  vertical-align: top;
+  display: inline-block;
+}
 
 .deboucled-preboucle-title {
   user-select: none;

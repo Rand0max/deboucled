@@ -31,7 +31,7 @@ function buildSettingsPage() {
         html += '</tr>';
         return html;
     }
-    function addToggleAltOption(title, optionId, defaultValue, hint) {
+    function addTogglePreboucle(title, optionId, defaultValue, hint) {
         let html = '';
         html += `<tr id="${optionId}-container">`;
         html += `<td class="deboucled-td-left full-width">`;
@@ -212,7 +212,10 @@ function buildSettingsPage() {
         html += '<table class="deboucled-option-table">';
         preBoucleArray.forEach(b => {
             const hint = `${getEntityTitle(b.type)} : ${b.entities.sort().join(', ')}`;
-            html += addToggleAltOption(b.title, `deboucled-preboucle-${b.id}`, b.enabled, hint);
+            let titleLogo = '';
+            if (b.type === entitySubject) titleLogo = '<span class="deboucled-preboucle-subject-logo"></span>';
+            else if (b.type === entityAuthor) titleLogo = '<span class="deboucled-preboucle-author-logo"></span>';
+            html += addTogglePreboucle(`${titleLogo}${b.title}`, `deboucled-preboucle-${b.id}`, b.enabled, hint);
         });
         html += '</table>';
         html += '</div>';
