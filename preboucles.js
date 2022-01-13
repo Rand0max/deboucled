@@ -19,7 +19,7 @@ function initPreBoucles() {
     addPreBoucle('boucledauthors', 'Pseudos boucled', entityAuthor, true,
         ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeurabsolu', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'erlinghaland', 'grifforzer', 'gutkaiser', 'hommecoussinet', 'huiledecoude', 'hyiga', 'jirenlechove', 'jvc-censure', 'kaguya', 'danmartin', 'kaitokid', 'kiwayjohansson', 'krimson', 'ptitcieux', 'stopcensure', 'supernominateur', 'wohaha', 'zeroavenir', 'windowsbot', 'ylliade', 'mirainikki', 'leao', 'oael', 'surk', 'zemmourfinito', 'labelconfort', 'xinoz', 'zinzinabbath', 'rifson', 'garfield', 'qwertyofficial', 'vcxn', 'kallyuga', '[raven-_]', 'tubedutemps', 'cubedutemps', 'cubeduclan', 'chouffomoting', 'pleinsdennuis', 'discord-gg-jvc']);
 
-    addPreBoucle('bots', 'BOTS (LREM, PCC, provax)', entityAuthor, false,
+    addPreBoucle('bots', 'BOTS', entityAuthor, false,
         ['tontonfouilleur', 'squeezie-issou', '2__marches', 'anatoli_diatlov', 'soutien-rpc', 'lovemaze', 'leo2005', '1m54maisgrand', 'moussecerise', 'marduweb', 'pinnochiotte', 'kallyuga', 'khalidfouhami_', 'passion-gaming', '2marches_', 'discord-gg-jvc', 'leao', 'oael']);
 
     addPreBoucle('kj', 'Kikoo-Japs', entityAuthor, false,

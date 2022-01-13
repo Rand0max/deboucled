@@ -233,7 +233,7 @@ function buildSettingsPage() {
         html += `<input type="text" id="deboucled-${entity}-input-key" class="deboucled-input-key" placeholder="${hint}" >`;
         html += `<span id="deboucled-${entity}-input-button" class="btn deboucled-button deboucled-add-button">Ajouter</span>`;
         if (messageHint) html += `<span class="deboucled-entity-message-hint">${messageHint}</span>`;
-        html += `<input type="search" id="deboucled-${entity}-search-key" class="deboucled-input-search" style="float: right;" placeholder="Rechercher..." >`;
+        html += `<input type="search" id="deboucled-${entity}-search-key" class="deboucled-input-search" placeholder="Rechercher..." >`;
         html += '</td>';
         html += '</tr>';
         html += '<td style="padding-top: 12px;padding-bottom: 0;">';
