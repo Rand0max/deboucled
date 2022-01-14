@@ -199,43 +199,6 @@ body.deboucled-dark-theme {
   line-height: 2rem;
 }
 
-@media (max-width: 807.98px) {
-  .deboucled-logo-forbidden {
-    width: 16px;
-  }
-  .deboucled-topic-blacklist {
-    position: absolute;
-    bottom: 0.4375rem;
-    display: block;
-    text-align: center;
-    left: 50%;
-    right: 50%;
-    max-width: 100%;
-    width: auto;
-  }
-  .deboucled-topic-title {
-    margin-left: 1.4rem !important;
-  }
-  .deboucled-topic-preview-col {
-    left: 1.7rem;
-    top: 0.9rem;
-  }
-  .deboucled-overlay-spinner {
-    left: 45%;
-    top: 10%;
-  }
-  .deboucled-overlay {
-    left: -12px;
-    width: 104%;
-  }
-}
-@media (max-width: 558px) {
-  .deboucled-overlay {
-    left: -12px;
-    width: 108%;
-  }
-}
-
 /* Button */
 .deboucled-button {
   background-color: #0050a6e1 !important;
@@ -324,17 +287,6 @@ body.deboucled-dark-theme {
 .deboucled-entity-message-hint:hover {
   opacity: 0.6;
 }
-@media (max-width: 452px) {
-  .deboucled-add-button {
-    margin: 5px 5px 5px 0;
-  }
-  .deboucled-input-search {
-    float: none;
-  }
-  .deboucled-entity-message-hint {
-    margin: 10px 0;
-  }
-}
 
 /* Bloc tool bar */
 #forum-main-col .bloc-pre-pagi-forum .bloc-rech-forum {
@@ -398,11 +350,6 @@ body.deboucled-dark-theme {
   float: right;
   min-width: 5.25rem;
   margin-left: 0.3125rem;
-}
-@media (min-width: 612px) and (max-width: 807px) {
-  .bloc-rech-forum .txt-search {
-    width: 8.25rem;
-  }
 }
 .form-rech-forum {
   display: flex;
@@ -751,18 +698,6 @@ input[type="search"] {
 .deboucled-settings-view.active {
   opacity: 1;
 }
-@media (max-width: 1479.98px) {
-  .deboucled-settings-view {
-    width: 80%;
-    margin-left: 10%;
-  }
-}
-@media (max-width: 999px) {
-  .deboucled-settings-view {
-    width: 96%;
-    margin-left: 2%;
-  }
-}
 
 .deboucled-about-version {
   color: gray;
@@ -918,16 +853,6 @@ input[type="search"] {
 .data-tooltip-large:before {
   max-width: 44vw;
 }
-@media (max-width: 1479.98px) {
-  .data-tooltip-large:before {
-    max-width: 58vw;
-  }
-}
-@media (max-width: 999px) {
-  .data-tooltip-large:before {
-    max-width: 53vw;
-  }
-}
 
 /* SVG */
 .deboucled-svg-forbidden-red #deboucled-forbidden-logo {
@@ -997,14 +922,6 @@ input[type="search"] {
 .deboucled-td-right-padding {
   padding-left: 10px;
 }
-@media (max-width: 500px) {
-  .deboucled-td-left {
-    white-space: break-spaces;
-  }
-  .deboucled-td-right {
-    width: auto;
-  }
-}
 .deboucled-option-table {
   font: bold 14px/16px sans-serif;
   border-spacing: 1rem 0.7rem;
@@ -1017,14 +934,6 @@ input[type="search"] {
 }
 .deboucled-option-table-entities {
   width: 100%;
-}
-@media (max-width: 420px) {
-  .deboucled-option-table {
-    font: bold 11px/14px sans-serif;
-  }
-  .deboucled-option-table-subcell {
-    font: 11px/14px sans-serif;
-  }
 }
 
 .deboucled-bg-img {
@@ -1246,4 +1155,92 @@ select.deboucled-dropdown::-ms-expand {
   background: #f3f3f3;
   color: #222;
   cursor: pointer;
+}
+
+/* Media queries */
+@media (max-width: 1479.98px) {
+  .deboucled-settings-view {
+    width: 80%;
+    margin-left: 10%;
+  }
+  .data-tooltip-large:before {
+    max-width: 58vw;
+  }
+}
+@media (max-width: 999px) {
+  .deboucled-settings-view {
+    width: 96%;
+    margin-left: 2%;
+  }
+  .data-tooltip-large:before {
+    max-width: 53vw;
+  }
+}
+@media (max-width: 807.98px) {
+  .deboucled-logo-forbidden {
+    width: 16px;
+  }
+  .deboucled-topic-blacklist {
+    position: absolute;
+    bottom: 0.4375rem;
+    display: block;
+    text-align: center;
+    left: 50%;
+    right: 50%;
+    max-width: 100%;
+    width: auto;
+  }
+  .deboucled-topic-title {
+    margin-left: 1.4rem !important;
+  }
+  .deboucled-topic-preview-col {
+    left: 1.7rem;
+    top: 0.9rem;
+  }
+  .deboucled-overlay-spinner {
+    left: 45%;
+    top: 10%;
+  }
+  .deboucled-overlay {
+    left: -12px;
+    width: 104%;
+  }
+}
+@media (min-width: 612px) and (max-width: 807.98px) {
+  .bloc-rech-forum .txt-search {
+    width: 8.25rem;
+  }
+}
+@media (max-width: 558px) {
+  .deboucled-overlay {
+    left: -12px;
+    width: 108%;
+  }
+}
+@media (max-width: 500px) {
+  .deboucled-td-left {
+    white-space: break-spaces;
+  }
+  .deboucled-td-right {
+    width: auto;
+  }
+}
+@media (max-width: 452px) {
+  .deboucled-add-button {
+    margin: 5px 5px 5px 0;
+  }
+  .deboucled-input-search {
+    float: none;
+  }
+  .deboucled-entity-message-hint {
+    margin: 10px 0;
+  }
+}
+@media (max-width: 420px) {
+  .deboucled-option-table {
+    font: bold 11px/14px sans-serif;
+  }
+  .deboucled-option-table-subcell {
+    font: 11px/14px sans-serif;
+  }
 }
