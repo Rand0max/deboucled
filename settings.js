@@ -84,7 +84,7 @@ function buildSettingsPage() {
         let html = '';
         html += '<tr>';
         html += `<td class="deboucled-td-left" rowspan="2">`;
-        html += `<span ${buildTooltip('Exportez ou importer vos préférences et/ou vos blacklists.')}>Restaurer/sauvegarder les préférences</span>`;
+        html += `<span ${buildTooltip('Exportez ou importer vos préférences et/ou vos listes noires.')}>Restaurer/sauvegarder les préférences</span>`;
         html += '</td>';
         html += '<td class="deboucled-td-left">';
         html += '<label for="deboucled-import-button" class="btn deboucled-button deboucled-setting-button">Restaurer</label>';
@@ -104,13 +104,13 @@ function buildSettingsPage() {
         html += '<input type="checkbox" id="deboucled-impexp-blonly"></input>';
         html += '<span class="deboucled-toggle-slider little round"></span>';
         html += '</label>';
-        html += '<span class="deboucled-toggle-title-right">Uniquement les blacklists</span>';
+        html += '<span class="deboucled-toggle-title-right">Uniquement les listes noires</span>';
 
         html += '<label class="deboucled-switch little">';
         html += '<input type="checkbox" id="deboucled-impexp-mergebl"></input>';
         html += '<span class="deboucled-toggle-slider little round"></span>';
         html += '</label>';
-        html += '<span class="deboucled-toggle-title-right">Fusionner les blacklists</span>';
+        html += '<span class="deboucled-toggle-title-right">Fusionner les listes noires</span>';
 
         html += '</td>';
         html += '</tr>';
@@ -136,7 +136,7 @@ function buildSettingsPage() {
         html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, storage_optionHideMessages_default, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.');
 
         let mpLogo = '<span class="deboucled-mp-logo nav-icon-pm"></span>'
-        html += addToggleOption(`Filtrer les <i>Messages Privés</i> ${mpLogo} des <i>auteurs blacklist</i>`, storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default, 'Ignorer les MPs des pseudos présents dans votre blacklist et les déplacer automatiquement dans le dossier &quot;Spam&quot;.');
+        html += addToggleOption(`Filtrer les <i>Messages Privés</i> ${mpLogo} des <i>auteurs blacklist</i>`, storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default, 'Ignorer les MPs des pseudos présents dans votre liste noire et les déplacer automatiquement dans le dossier &quot;Spam&quot;.');
 
         let messageLogo = '<span class="deboucled-msg-logo"></span>'
         html += addToggleOption(`Masquer les <i>messages</i> ${messageLogo} avec les <i>sujets blacklist</i>`, storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default, 'Masque les messages contenant les mots-clés présents dans la &quot;Blacklist Sujets&quot;.\nCliquez sur l\'oeil pour afficher le message, et les expressions blacklist apparaitront en rouge.');
@@ -316,9 +316,9 @@ function buildSettingsPage() {
     settingsHtml += addOptionsSection(false);
     settingsHtml += addCustomisationSection(false);
     settingsHtml += addPreBouclesSection(false);
-    settingsHtml += addEntitySettingSection(entitySubject, 'BLACKLIST SUJETS', 'Mot-clé', 'Utilisez le caractère étoile * pour remplacer n\'importe quelle expression.', true);
-    settingsHtml += addEntitySettingSection(entityAuthor, 'BLACKLIST AUTEURS', 'Pseudo', undefined, false);
-    settingsHtml += addEntitySettingSection(entityTopicId, 'BLACKLIST TOPICS', 'TopicId', undefined, false);
+    settingsHtml += addEntitySettingSection(entitySubject, 'LISTE NOIRE - SUJETS', 'Mot-clé', 'Utilisez le caractère étoile * pour remplacer n\'importe quelle expression.', true);
+    settingsHtml += addEntitySettingSection(entityAuthor, 'LISTE NOIRE - AUTEURS', 'Pseudo', undefined, false);
+    settingsHtml += addEntitySettingSection(entityTopicId, 'LISTE NOIRE - TOPICS', 'TopicId', undefined, false);
     settingsHtml += addAdvancedOptionsSection(false);
     settingsHtml += addStatsSection(false);
 
@@ -771,6 +771,8 @@ function addHighlightModeratedButton() {
     let anchor = document.createElement('a');
     anchor.className = 'titre-bloc deboucled-entity-moderated-button';
     anchor.setAttribute('role', 'button');
+    anchor.setAttribute('deboucled-data-tooltip', 'Recherche les topics supprimés (410) et les affiche en rouge.');
+    anchor.setAttribute('data-tooltip-location', 'left');
     anchor.innerHTML = buttonText;
     anchor.onclick = async function () {
         if (this.textContent === buttonStopText) {
