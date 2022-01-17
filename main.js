@@ -507,7 +507,7 @@ async function init(currentPageType) {
 
     const enableJvcDarkTheme = GM_getValue(storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default);
     addStyles(enableJvcDarkTheme);
-    if (currentPageType === 'sso') return;
+    if (currentPageType === 'sso' || currentPageType === 'error') return;
 
     addSvgs();
 
@@ -525,7 +525,7 @@ async function entryPoint() {
     //let start = performance.now();
     let currentPageType = getCurrentPageType(`${window.location.pathname}${window.location.search}`);
     //console.log('currentPageType : %s', currentPageType);
-    if (currentPageType && currentPageType !== 'unknown' && currentPageType !== 'error') {
+    if (currentPageType && currentPageType !== 'unknown') {
         await init(currentPageType);
     }
 
