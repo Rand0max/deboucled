@@ -158,7 +158,7 @@ async function handlePoc(finalTopics) {
     // On gère les PoC à la fin pour pas figer la page pendant le traitement
     await Promise.all(finalTopics.slice(1).map(async function (topic) {
         let poc = await isTopicPoC(topic, optionDetectPocMode);
-        if (poc) markTopicPoc(topic);
+        if (poc) markTopicPoc(topic, optionDetectPocMode === 3);
     }));
 
     await saveLocalStorage();

@@ -283,8 +283,8 @@ async function isTopicPoC(element, optionDetectPocMode) {
     const isTitlePocRegex = /(pos(t|te|tez|to|too|tou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan|postouk|postook|pose.*toucan/i;
     let isTitlePoc = title.match(isTitlePocRegex);
 
-    if (optionDetectPocMode === 1 && !isTitlePoc) {
-        // Inutile de continuer si le titre n'est pas détecté PoC et qu'on n'est pas en deep mode
+    if ((optionDetectPocMode === 1 || optionDetectPocMode === 3) && !isTitlePoc) {
+        // Inutile de continuer si le titre n'est pas détecté PoC et qu'on n'est pas en mode approfondi
         return false;
     }
 
@@ -318,7 +318,13 @@ async function isTopicPoC(element, optionDetectPocMode) {
     return isPoc;
 }
 
-function markTopicPoc(element) {
+function markTopicPoc(element, hide = false) {
+    if (hide) {
+        removeTopic(element);
+        hiddenTotalTopics++;
+        updateTopicsHeader();
+        return;
+    }
     let titleElem = element.querySelector('.lien-jv.topic-title');
     titleElem.innerHTML = '<span class="deboucled-title-poc">[PoC] </span>' + titleElem.innerHTML;
 }

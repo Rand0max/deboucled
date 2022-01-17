@@ -234,16 +234,17 @@ function addMessageQuoteEvent() {
     const textArea = document.querySelector('#message_topic');
 
     document.querySelectorAll('.picto-msg-quote').forEach(function (btn) {
+        const parentHeader = btn.parentElement.parentElement;
+        if (!parentHeader) return;
+
         btn.addEventListener('click', () => {
-            const parentHeader = btn.parentElement.parentElement;
-            if (!parentHeader) return;
             setTimeout(() => {
                 const author = getAuthorFromCitationBtn(parentHeader);
                 const date = getDateFromCitationBtn(parentHeader);
 
                 const regex = new RegExp(`> Le\\s+?${date}\\s+?:`);
                 textArea.value = textArea.value.replace(regex, `> Le ${date} ${author} a écrit : `);
-            }, 200);
+            }, 500);
         });
     });
 }
