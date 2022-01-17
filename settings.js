@@ -676,7 +676,7 @@ function addSettingButton(firstLaunch) {
     }
 
     let blocMenu = document.querySelectorAll('.bloc-pre-right');
-    if (blocMenu.length === 0) blocMenu = document.querySelectorAll('.action-left');
+    if (blocMenu.length === 0) blocMenu = document.querySelectorAll('div:not(.pagination) > .action-left');
     blocMenu.forEach(e => { e.prepend(createDeboucledButton()); });
 
     let optionOnclick = function (e) {

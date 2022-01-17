@@ -68,11 +68,15 @@ function getCurrentPageType(url) {
     let searchRegex = /^\/recherche\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*/i;
     if (url.match(searchRegex)) return 'search';
 
-    let privateMessagesRegex = /^(\/messages-prives\/boite-reception\.php(\?folder=0)?)$/i;
+    //let privateMessagesRegex = /^(\/messages-prives\/boite-reception\.php(\?folder=[0-9]+)?)$/i;
+    let privateMessagesRegex = /^\/messages-prives/i;
     if (url.match(privateMessagesRegex)) return 'privatemessages';
 
     let profilRegex = /^\/profil\/.*$/i;
     if (url.match(profilRegex)) return 'profil';
+
+    let ssoRegex = /^\/sso/i;
+    if (url.match(ssoRegex)) return 'sso';
 
     return 'unknown';
 }
@@ -498,25 +502,35 @@ function handleError() {
     }
 }
 
-async function init() {
+async function init(currentPageType) {
     let firstLaunch = await initStorage();
+
     const enableJvcDarkTheme = GM_getValue(storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default);
     addStyles(enableJvcDarkTheme);
+    if (currentPageType === 'sso') return;
+
     addSvgs();
+
     const enableDeboucledDarkTheme = GM_getValue(storage_optionEnableDeboucledDarkTheme, storage_optionEnableDeboucledDarkTheme_default);
     toggleDeboucledDarkTheme(enableDeboucledDarkTheme);
+
     buildSettingsPage();
     addSettingButton(firstLaunch);
     addDisableFilteringButton();
+
     userPseudo = getUserPseudo();
 }
 
 async function entryPoint() {
     //let start = performance.now();
     let currentPageType = getCurrentPageType(`${window.location.pathname}${window.location.search}`);
+    //console.log('currentPageType : %s', currentPageType);
+    if (currentPageType && currentPageType !== 'unknown' && currentPageType !== 'error') {
+        await init(currentPageType);
+    }
+
     switch (currentPageType) {
         case 'topiclist': {
-            await init();
             if (forumFilteringIsDisabled) break;
             createTopicListOverlay();
             const finalTopics = await handleTopicList(true);
@@ -528,23 +542,19 @@ async function entryPoint() {
             break;
         }
         case 'topicmessages': {
-            await init();
             if (forumFilteringIsDisabled) break;
             handleTopicMessages();
             break;
         }
         case 'search': {
-            await init();
             await handleSearch();
             break;
         }
         case 'privatemessages': {
-            await init();
             await handlePrivateMessages();
             break;
         }
         case 'profil': {
-            await init();
             handleProfil();
             break;
         }
