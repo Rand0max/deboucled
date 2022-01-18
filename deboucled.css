@@ -11,6 +11,7 @@ body {
   --deboucled-stat-value-color: #282828;
   --deboucled-anchor-moderated-color: #000;
   --deboucled-filter-invert: 0%;
+  --deboucled-filter-invert-reverse: 100%;
   --deboucled-text-shadow: none;
   --deboucled-overylay-background-color: #fff;
   --deboucled-button-shadow: #00000025 0 3px 8px;
@@ -29,6 +30,7 @@ body.deboucled-dark-theme {
   --deboucled-stat-value-color: #f0f0f0;
   --deboucled-anchor-moderated-color: #fff;
   --deboucled-filter-invert: 100%;
+  --deboucled-filter-invert-reverse: 0%;
   --deboucled-text-shadow: 1px 1px #000;
   --deboucled-overylay-background-color: #000;
   --deboucled-button-shadow: #00000080 0 3px 8px;
@@ -519,7 +521,7 @@ body.deboucled-dark-theme {
   background-size: 14px;
   vertical-align: top;
   display: inline-block;
-  filter: invert(100%);
+  filter: invert(var(--deboucled-filter-invert));
 }
 .deboucled-preboucle-author-logo {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAYAAABr5z2BAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAN1wAADdcBQiibeAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACvSURBVCiRhZK9DcIwEIUvNEh0FEiZgJox0mYHpqCgyh706ZkhDUUkJghKEckFDf1Hc6DzJbGfdLLfZ/vJfwKIqQp4Ah9tKzc+Kw86YnW5gI3EOmb8TD5gl/CNiASt5k/dlgZ3hMGMBcPD2hEuCb9d7C9cjJXlveH92iukAmrDax9QAjdgdAGj8tKFR//gAEykNem8u/oHcAYKAdrM4p9a4OTYtQDIfRajvYi8jX99AaCHxzQQE5F1AAAAAElFTkSuQmCC)
@@ -530,6 +532,7 @@ body.deboucled-dark-theme {
   background-size: 14px;
   vertical-align: top;
   display: inline-block;
+  filter: invert(var(--deboucled-filter-invert-reverse));
 }
 
 .deboucled-preboucle-title {

@@ -243,8 +243,8 @@ function addMessageQuoteEvent() {
                 const date = getDateFromCitationBtn(parentHeader);
 
                 const regex = new RegExp(`> Le\\s+?${date}\\s+?:`);
-                textArea.value = textArea.value.replace(regex, `> Le ${date} ${author} a écrit : `);
-            }, 500);
+                textArea.value = textArea.value.replace(regex, `> Le ${date} '''${author}''' a écrit : `);
+            }, 600);
         });
     });
 }

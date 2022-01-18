@@ -523,11 +523,9 @@ async function init(currentPageType) {
 
 async function entryPoint() {
     //let start = performance.now();
-    let currentPageType = getCurrentPageType(`${window.location.pathname}${window.location.search}`);
+    const currentPageType = getCurrentPageType(`${window.location.pathname}${window.location.search}`);
     //console.log('currentPageType : %s', currentPageType);
-    if (currentPageType && currentPageType !== 'unknown') {
-        await init(currentPageType);
-    }
+    if (currentPageType !== 'unknown') await init(currentPageType);
 
     switch (currentPageType) {
         case 'topiclist': {
