@@ -198,6 +198,8 @@ function buildSettingsPage() {
         let statsLogo = '<span class="deboucled-chart-logo"></span>'
         html += addToggleOption(`Afficher la <i>tendance de filtrage</i> ${statsLogo} des topics`, storage_optionDisplayTopicCharts, storage_optionDisplayTopicCharts_default, 'Afficher ou non le graphique des tendances de filtrage de topics sur la droite de la page.');
 
+        html += addToggleOption(`Afficher le nombre de <i>topics ignorés</i> dans l'entête`, storage_optionDisplayTopicIgnoredCount, storage_optionDisplayTopicIgnoredCount_default, 'Afficher ou non le nombre de topics ignorés dans l\'entête de la liste des sujets : &quot;SUJETS (X IGNORÉS)&quot; .');
+
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -411,6 +413,7 @@ function addSettingEvents() {
         })
     });
     addRangeEvent(storage_optionTopicMsgCountThreshold);
+    addToggleEvent(storage_optionDisplayTopicIgnoredCount);
 }
 
 function addSortEvent() {
@@ -506,7 +509,7 @@ function writeEntityKeys(entity, entries, filterCallback, removeCallback, entity
 
     let html = '<ul class="deboucled-entity-list">';
     entries.forEach(function (value, key) {
-        let cls = entityClassCallback ? entityClassCallback(key) : '';
+        let cls = entityClassCallback ? entityClassCallback(key, value) : '';
         html += `<li class="deboucled-entity-key deboucled-entity-element${cls}" id="${key}"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
     });
     html += '</ul>';
@@ -538,7 +541,7 @@ function refreshSubjectKeys(filter = null) {
             refreshCollapsibleContentHeight(entitySubject);
             clearSearchInputs();
         },
-        null,
+        function (key, value) { return isEntityInPreboucles(entitySubject, value) ? ' deboucled-entity-pre-element' : '' },
         sortCallback
     );
 }
@@ -564,7 +567,7 @@ function refreshAuthorKeys(filter = null) {
             refreshCollapsibleContentHeight(entityAuthor);
             clearSearchInputs();
         },
-        null,
+        function (key, value) { return isEntityInPreboucles(entityAuthor, value) ? ' deboucled-entity-pre-element' : '' },
         sortCallback
     );
 }

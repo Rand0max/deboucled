@@ -83,14 +83,17 @@ async function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
 }
 
 function updateTopicsHeader() {
-    //let optionDisplayTopicMatches = GM_getValue(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
-    //if (optionDisplayTopicMatches) return; // on n'affiche pas le nb de topics ignorés sur le header si le détail à droite est affiché.
+    let optionDisplayTopicIgnoredCount = GM_getValue(storage_optionDisplayTopicIgnoredCount, storage_optionDisplayTopicIgnoredCount_default);
+    if (optionDisplayTopicIgnoredCount) {
+        let subjectHeader = document.querySelector('.topic-head > span:nth-child(1)');
+        subjectHeader.innerHTML = `SUJET<span class="deboucled-topic-subject">(${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)})</span>`;
+    }
 
-    let subjectHeader = document.querySelector('.topic-head > span:nth-child(1)');
-    subjectHeader.innerHTML = `SUJET<span class="deboucled-topic-subject">(${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)})</span>`;
-
-    let lastMessageHeader = document.querySelector('.topic-head > span:nth-child(4)');
-    lastMessageHeader.style.width = '5.3rem';
+    let optionDisplayBlacklistTopicButton = GM_getValue(storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default);
+    if (optionDisplayBlacklistTopicButton) {
+        let lastMessageHeader = document.querySelector('.topic-head > span:nth-child(4)');
+        lastMessageHeader.style.width = '5.3rem';
+    }
 }
 
 function removeTopic(element) {
