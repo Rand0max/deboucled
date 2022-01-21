@@ -3,7 +3,7 @@
 // SETTINGS
 ///////////////////////////////////////////////////////////////////////////////////////
 
-function buildSettingsPage() {
+function buildSettingsPage(firstLaunch = false) {
     let bgView = document.createElement('div');
     bgView.setAttribute('id', 'deboucled-settings-bg-view');
     bgView.setAttribute('class', 'deboucled-settings-bg-view');
@@ -317,8 +317,8 @@ function buildSettingsPage() {
     let settingsHtml = '';
     settingsHtml += addOptionsSection(false);
     settingsHtml += addCustomisationSection(false);
-    settingsHtml += addPreBouclesSection(false);
-    settingsHtml += addEntitySettingSection(entitySubject, 'LISTE NOIRE - SUJETS', 'Mot-clé', 'Utilisez le caractère étoile * pour remplacer n\'importe quelle expression.', true);
+    settingsHtml += addPreBouclesSection(firstLaunch);
+    settingsHtml += addEntitySettingSection(entitySubject, 'LISTE NOIRE - SUJETS', 'Mot-clé', 'Utilisez le caractère étoile * pour remplacer n\'importe quelle expression.', !firstLaunch);
     settingsHtml += addEntitySettingSection(entityAuthor, 'LISTE NOIRE - AUTEURS', 'Pseudo', undefined, false);
     settingsHtml += addEntitySettingSection(entityTopicId, 'LISTE NOIRE - TOPICS', 'TopicId', undefined, false);
     settingsHtml += addAdvancedOptionsSection(false);

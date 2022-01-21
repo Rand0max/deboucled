@@ -135,11 +135,11 @@ body.deboucled-dark-theme {
   float: right;
 }
 .blinking {
-  animation: blinker 1.5s linear 10s;
+  animation: blinker 1.5s linear 10;
 }
 @keyframes blinker {
   50% {
-    opacity: 0.1;
+    opacity: 0.2;
   }
 }
 

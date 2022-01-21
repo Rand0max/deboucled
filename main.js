@@ -514,7 +514,7 @@ async function init(currentPageType) {
     const enableDeboucledDarkTheme = GM_getValue(storage_optionEnableDeboucledDarkTheme, storage_optionEnableDeboucledDarkTheme_default);
     toggleDeboucledDarkTheme(enableDeboucledDarkTheme);
 
-    buildSettingsPage();
+    buildSettingsPage(firstLaunch);
     addSettingButton(firstLaunch);
     addDisableFilteringButton();
 
