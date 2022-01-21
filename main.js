@@ -193,8 +193,8 @@ function highlightBlacklistMatches(element, matches) {
     if (element.nodeType == Node.TEXT_NODE) {
         let newNode = document.createElement('span');
         element.parentElement.insertBefore(newNode, element);
-        newNode.outerHTML = content;
         element.remove();
+        newNode.outerHTML = content;
     }
     else {
         element.innerHTML = content;
