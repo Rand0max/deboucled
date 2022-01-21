@@ -291,6 +291,9 @@ body.deboucled-dark-theme {
 .deboucled-entity-message-hint:hover {
   opacity: 0.6;
 }
+#discussion.mp-page div.action-bar div.action-right form {
+  display: inline-block;
+}
 
 /* Bloc tool bar */
 #forum-main-col .bloc-pre-pagi-forum .bloc-rech-forum {
