@@ -31,6 +31,10 @@ String.prototype.removeDoubleSpaces = function () {
     return this.replaceAll(/ +(?= )/g, '');
 }
 
+String.prototype.isMatch = function (s) {
+    return this.match(s) !== null
+}
+
 Array.prototype.sortNormalize = function () {
     return this.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 }
