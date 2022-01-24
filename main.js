@@ -514,7 +514,7 @@ function handleError() {
         jvArchiveButton.alt = 'JvArchive';
         jvArchiveButton.target = '_blank';
         jvArchiveButton.style.marginLeft = '15px';
-        jvArchiveButton.innerHTML = '<span class="deboucled-jvarchive-logo" style="margin-right:5px"></span>Consulter JvArchive';
+        jvArchiveButton.innerHTML = '<span class="deboucled-jvarchive-logo" style="margin-right:5px; vertical-align: sub;"></span>Consulter JvArchive';
 
         insertAfter(jvArchiveButton, homepageButton);
     }
