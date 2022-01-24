@@ -4,11 +4,16 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 String.prototype.normalizeDiacritic = function () {
-    return this.normalize("NFD").replace(/\p{Diacritic}/gu, "");
+    return this.normalize("NFD").replace(/\p{Diacritic}/gu, '');
 }
 
 String.prototype.normalizeCompatibility = function () {
     return this.normalize('NFKC');
+}
+
+String.prototype.removeSurrogatePairs = function () {
+    // eslint-disable-next-line no-useless-escape
+    return this.replace(/[^\p{L}\p{N}\p{P}\p{Z}\{\^\$\}]/gu, '');
 }
 
 String.prototype.escapeRegexPattern = function () {

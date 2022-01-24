@@ -502,6 +502,7 @@ function removeUselessTags(topics) {
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
         let newTitle = titleElem.textContent.replace(regex, '');
+        newTitle = newTitle.removeSurrogatePairs();
         newTitle = newTitle.replace(/\(\)|\[\]|{}/g, '');
         newTitle = newTitle.removeDoubleSpaces();
         newTitle = newTitle.trim().toLowerCase().capitalize();

@@ -173,9 +173,7 @@ function highlightBlacklistMatches(element, matches) {
 
     // Supprime les surrogate pairs car c'est ingérable
     // Surrogate pairs = grosse merde = JS = calvitie foudroyante
-    // eslint-disable-next-line no-useless-escape
-    const regex = /[^\p{L}\p{N}\p{P}\p{Z}{\^\$}]/gu;
-    const pureMatches = matches.map(m => m.replace(regex, '').trim()).filter(m => m !== '');
+    const pureMatches = matches.map(m => m.removeSurrogatePairs().trim()).filter(m => m !== '');
 
     let index = -1;
     pureMatches.every(match => {
