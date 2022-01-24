@@ -420,6 +420,33 @@ async function handlePrivateMessages() {
     }
 }
 
+function buildBoucledAuthorButton(author, optionBoucledUseJvarchive, className = 'deboucled-svg-spiral-gray') {
+    const backToForumElement = document.querySelector('div.group-two > a:nth-child(2)');
+    const forumUrl = backToForumElement?.getAttribute('href');
+
+    let redirectUrl = '';
+    if (optionBoucledUseJvarchive || !forumUrl) redirectUrl = `${jvarchiveUrl}/topic/recherche?search=${author}&searchType=auteur_topic_exact`;
+    else redirectUrl = `/recherche${forumUrl}?search_in_forum=${author}&type_search_in_forum=auteur_topic`;
+
+    let boucledAuthorAnchor = document.createElement('a');
+    boucledAuthorAnchor.setAttribute('class', `xXx lien-jv deboucled-author-boucled-button ${className}`);
+    boucledAuthorAnchor.setAttribute('href', redirectUrl);
+    boucledAuthorAnchor.setAttribute('target', '_blank');
+    boucledAuthorAnchor.setAttribute('title', 'Pseudo complètement boucled ?');
+    boucledAuthorAnchor.innerHTML = '<svg viewBox="0 0 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></a>';
+    return boucledAuthorAnchor;
+}
+
+function buildJvArchiveProfilButton(author) {
+    let redirectUrl = `${jvarchiveUrl}/profil/${author.toLowerCase()}`;
+    let profilAnchor = document.createElement('a');
+    profilAnchor.setAttribute('class', 'xXx lien-jv deboucled-jvarchive-logo deboucled-blackandwhite');
+    profilAnchor.setAttribute('href', redirectUrl);
+    profilAnchor.setAttribute('target', '_blank');
+    profilAnchor.setAttribute('title', 'Profil JvArchive');
+    return profilAnchor;
+}
+
 function handleProfil() {
     const infosPseudoElement = document.querySelector('.infos-pseudo');
     const author = infosPseudoElement.textContent.trim();
@@ -435,6 +462,9 @@ function handleProfil() {
 
     let boucledButton = buildBoucledAuthorButton(author, true, 'deboucled-svg-spiral-white');
     blocOptionProfil.append(boucledButton);
+
+    let jvArchiveProfilButton = buildJvArchiveProfilButton(author);
+    blocOptionProfil.append(jvArchiveProfilButton);
 
     const authorBlacklistMatches = getAuthorBlacklistMatches(author);
     if (authorBlacklistMatches?.length) {
@@ -484,7 +514,7 @@ function handleError() {
         jvArchiveButton.alt = 'JvArchive';
         jvArchiveButton.target = '_blank';
         jvArchiveButton.style.marginLeft = '15px';
-        jvArchiveButton.textContent = 'Consulter JvArchive';
+        jvArchiveButton.innerHTML = '<span class="deboucled-jvarchive-logo" style="margin-right:5px"></span>Consulter JvArchive';
 
         insertAfter(jvArchiveButton, homepageButton);
     }

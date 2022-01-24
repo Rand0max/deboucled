@@ -119,23 +119,6 @@ function highlightBlacklistedAuthor(messageElement, authorElement) {
     authorElement.classList.toggle('deboucled-blacklisted', true);
 }
 
-function buildBoucledAuthorButton(author, optionBoucledUseJvarchive, className = 'deboucled-svg-spiral-gray') {
-    const backToForumElement = document.querySelector('div.group-two > a:nth-child(2)');
-    const forumUrl = backToForumElement?.getAttribute('href');
-
-    let redirectUrl = '';
-    if (optionBoucledUseJvarchive || !forumUrl) redirectUrl = `${jvarchiveUrl}/topic/recherche?search=${author}&searchType=auteur_topic_exact`;
-    else redirectUrl = `/recherche${forumUrl}?search_in_forum=${author}&type_search_in_forum=auteur_topic`;
-
-    let boucledAuthorAnchor = document.createElement('a');
-    boucledAuthorAnchor.setAttribute('class', `xXx lien-jv deboucled-author-boucled-button ${className}`);
-    boucledAuthorAnchor.setAttribute('href', redirectUrl);
-    boucledAuthorAnchor.setAttribute('target', '_blank');
-    boucledAuthorAnchor.setAttribute('title', 'Pseudo complètement boucled ?');
-    boucledAuthorAnchor.innerHTML = '<svg viewBox="0 0 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></a>';
-    return boucledAuthorAnchor;
-}
-
 function addBoucledAuthorButton(nearbyElement, author, optionBoucledUseJvarchive) {
     if (!nearbyElement) return;
     let boucledButton = buildBoucledAuthorButton(author, optionBoucledUseJvarchive);
