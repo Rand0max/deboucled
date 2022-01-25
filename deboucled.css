@@ -599,7 +599,6 @@ body.deboucled-dark-theme {
   bottom: calc(100%);
   pointer-events: none;
   transition: 0.1s;
-  will-change: transform;
   padding: 5px 12px;
   min-width: 50px;
   max-width: 20vw;
@@ -845,7 +844,6 @@ input[type="search"] {
   bottom: calc(100%);
   pointer-events: none;
   transition: 0.1s;
-  will-change: transform;
   content: attr(deboucled-data-tooltip);
   padding: 5px 12px;
   min-width: 50px;
