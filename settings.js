@@ -138,11 +138,11 @@ function buildSettingsPage(firstLaunch = false) {
         let mpLogo = '<span class="deboucled-mp-logo nav-icon-pm"></span>'
         html += addToggleOption(`Filtrer les <i>Messages Privés</i> ${mpLogo} des <i>auteurs blacklist</i>`, storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default, 'Ignorer les MPs des pseudos présents dans votre liste noire et les déplacer automatiquement dans le dossier &quot;Spam&quot;.');
 
-        let messageLogo = '<span class="deboucled-msg-logo"></span>'
-        html += addToggleOption(`Masquer les <i>messages</i> ${messageLogo} avec les <i>sujets blacklist</i>`, storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default, 'Masque les messages contenant les mots-clés présents dans la &quot;Blacklist Sujets&quot;.\nCliquez sur l\'oeil pour afficher le message, et les expressions blacklist apparaitront en rouge.');
-
         let spiralLogo = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
         html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiralLogo}`, storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
+
+        let messageLogo = '<span class="deboucled-msg-logo"></span>'
+        html += addToggleOption(`Masquer les <i>messages</i> ${messageLogo} avec les <i>sujets blacklist</i>`, storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default, 'Masque les messages contenant les mots-clés présents dans la &quot;Blacklist Sujets&quot;.\nCliquez sur l\'oeil pour afficher le message, et les expressions blacklist apparaitront en rouge.');
 
         html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default, 'Autoriser l\'affichage des topics même si le sujet est blacklist, à partir d\'un certain nombre de messages.');
 
@@ -368,8 +368,8 @@ function addSettingEvents() {
         };
     }
 
-    const pave2022 = 'Juste pour rappel en 2022 :\n\n· Fin de la boucle temporelle.\n· Débug du script mathématique.\n· Révélation projet DéboucledV2.\n· Conscience des oldfags.\n· Avènement des proto-boucleurs.\n· Résonnance de Vinzmann.\n\nVous n\'êtes pas prêts.';
-    document.querySelector('.deboucled-about-version').onclick = () => alert(pave2022);
+    const boucleUrl = 'https://www.jeuxvideo.com/forums/42-51-62052373-1-0-1-0-ce-forum-est-une-putain-de-boucle-temporelle-sans-fin.htm';
+    document.querySelector('.deboucled-about-version').onclick = () => window.open(boucleUrl, '_blank').focus();
 
     addToggleEvent(storage_optionEnableDeboucledDarkTheme, undefined, toggleDeboucledDarkTheme);
     addToggleEvent(storage_optionEnableJvcDarkTheme);
