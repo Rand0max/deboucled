@@ -440,38 +440,39 @@ function addPrevisualizeTopicEvent(topics) {
 }
 
 function handleTopicPictos(topics, optionDisplayBlackTopic, optionReplaceResolvedPicto) {
-    const ignoredTopics = ['topic fermé', 'topic épinglé'];
+    const ignoredTopics = ['topic-lock', 'topic-pin-off', 'topic-pin-on', 'topic-removed'];
 
     function buildBlackPicto(topicImg) {
-        let span = document.createElement('span');
-        span.className = 'topic-img icon-topic-folder deboucled-topic-folder-black';
-        insertAfter(span, topicImg);
-        topicImg.remove();
+        topicImg.classList.toggle('topic-folder1', false);
+        topicImg.classList.toggle('topic-folder2', false);
+        topicImg.classList.toggle('deboucled-topic-folder-black', true);
     }
 
     topics.slice(1).forEach(function (topic) {
         const topicImg = topic.querySelector('.topic-img');
         if (!topicImg) return;
-        const currentPictoName = topicImg.title.trim().toLowerCase();
-        if (ignoredTopics.includes(currentPictoName)) return;
+
+        if (ignoredTopics.some((it) => topicImg.classList.contains(it))) return;
 
         const messageCount = topic.querySelector('.topic-count');
         if (!messageCount) return;
         const nbMessage = parseInt(messageCount.textContent.trim());
 
-        if (currentPictoName === 'topic résolu' && optionReplaceResolvedPicto) {
+        if (topicImg.classList.contains('topic-resolved') && optionReplaceResolvedPicto) {
+
+            topicImg.classList.toggle('topic-resolved', false);
+            topicImg.classList.toggle('icon-topic-resolved', false);
+            topicImg.classList.toggle('icon-topic-folder', true);
+            topicImg.title = 'Topic';
+
             if (nbMessage >= 100 && optionDisplayBlackTopic) {
                 buildBlackPicto(topicImg);
             }
             else if (nbMessage >= 25) {
-                topicImg.src = '/img/forums/topic-dossier2.png';
-                topicImg.alt = 'Topic hot';
-                topicImg.title = 'Topic hot';
+                topicImg.classList.toggle('topic-folder2', true);
             }
             else {
-                topicImg.src = '/img/forums/topic-dossier1.png';
-                topicImg.alt = 'Topic';
-                topicImg.title = 'Topic';
+                topicImg.classList.toggle('topic-folder1', true);
             }
         }
         else if (nbMessage >= 100 && optionDisplayBlackTopic) {
