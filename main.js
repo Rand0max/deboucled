@@ -8,11 +8,16 @@ function filteringIsDisabled(forumId = undefined) {
 }
 
 function getUserPseudo() {
-    const pseudoElem = document.querySelector('.account-pseudo');
-    if (!pseudoElem || pseudoElem.textContent.trim().toLowerCase() === 'mon compte') return undefined;
-    const linkAccountElem = document.querySelector('.nav-link-account')
+    const pseudoElem = document.querySelector('.headerAccount__pseudo');
+    if (!pseudoElem) return undefined;
+
+    const pseudo = pseudoElem.textContent.trim();
+    if (pseudo.toLowerCase() === 'mon compte' || pseudo.toLowerCase() === 'connexion') return undefined;
+
+    const linkAccountElem = document.querySelector('.headerAccount__link')
     if (!linkAccountElem || !linkAccountElem.hasAttribute('data-account-id')) return undefined;
-    return pseudoElem.textContent.trim();
+
+    return pseudo;
 }
 
 function getForumId() {
@@ -68,7 +73,6 @@ function getCurrentPageType(url) {
     let searchRegex = /^\/recherche\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*/i;
     if (url.match(searchRegex)) return 'search';
 
-    //let privateMessagesRegex = /^(\/messages-prives\/boite-reception\.php(\?folder=[0-9]+)?)$/i;
     let privateMessagesRegex = /^\/messages-prives/i;
     if (url.match(privateMessagesRegex)) return 'privatemessages';
 
@@ -449,8 +453,6 @@ function handleProfil() {
     const infosPseudoElement = document.querySelector('.infos-pseudo');
     const author = infosPseudoElement.textContent.trim();
 
-    if (userPseudo && userPseudo.toLocaleLowerCase() === author.toLocaleLowerCase()) return;
-
     let blocOptionProfil = document.querySelector('.bloc-option-profil');
     if (!blocOptionProfil) {
         blocOptionProfil = document.createElement('div');
@@ -468,7 +470,7 @@ function handleProfil() {
     if (authorBlacklistMatches?.length) {
         highlightBlacklistedAuthor(undefined, infosPseudoElement.firstElementChild ?? infosPseudoElement);
     }
-    else {
+    else if (!userPseudo || userPseudo.toLocaleLowerCase() !== author.toLocaleLowerCase()) {
         let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload() }, 'deboucled-blacklist-profil-button');
         blocOptionProfil.append(dbcBlacklistButton);
     }
@@ -597,6 +599,4 @@ async function entryPoint() {
 
 
 entryPoint();
-
-addEventListener('instantclick:newpage', entryPoint);
 

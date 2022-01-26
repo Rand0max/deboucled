@@ -365,9 +365,9 @@ function addPrevisualizeTopicEvent(topics) {
 
         // JvCare
         const avatar = messagePreview.querySelector('.user-avatar-msg');
-        if (avatar && avatar.hasAttribute('data-srcset') && avatar.hasAttribute('src')) {
-            avatar.setAttribute('src', avatar.getAttribute('data-srcset'));
-            avatar.removeAttribute('data-srcset');
+        if (avatar && avatar.hasAttribute('data-src') && avatar.hasAttribute('src')) {
+            avatar.setAttribute('src', avatar.getAttribute('data-src'));
+            avatar.removeAttribute('data-src');
         }
         messagePreview.querySelectorAll('.JvCare').forEach(function (m) {
             let anchor = document.createElement('a');
@@ -381,10 +381,10 @@ function addPrevisualizeTopicEvent(topics) {
         const text = messagePreview.querySelector('.txt-msg.text-enrichi-forum');
         if (!text) return messagePreview;
 
-        // Adjust text contrast for Dark Reader
-        const preferDark = document.documentElement.getAttribute('data-darkreader-scheme');
+        // Adjust text contrast for Dark Reader and JVC new Dark Theme
+        const preferDark = document.documentElement.getAttribute('data-darkreader-scheme') || !document.documentElement.classList.contains('theme-light');
         //window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (preferDark === 'dark') {
+        if (preferDark) {
             text.classList.toggle('deboucled-preview-content-text-light', true);
         }
         else {
@@ -444,7 +444,7 @@ function handleTopicPictos(topics, optionDisplayBlackTopic, optionReplaceResolve
 
     function buildBlackPicto(topicImg) {
         let span = document.createElement('span');
-        span.className = 'topic-img deboucled-topic-black-logo';
+        span.className = 'topic-img icon-topic-folder deboucled-topic-folder-black';
         insertAfter(span, topicImg);
         topicImg.remove();
     }
