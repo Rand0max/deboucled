@@ -751,7 +751,7 @@ input[type="search"] {
 .deboucled-settings-view {
   width: 60%;
   margin-left: 20%;
-  top: 90px;
+  top: 100px;
   max-height: calc(100vh - 140px);
   overflow-y: auto;
   position: fixed;
