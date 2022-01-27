@@ -44,7 +44,7 @@
     color: var(--jv-text-color);
     opacity: 0.9;
   }
-  .layout__row.layout__breadcrumb {
+  .layout__row.layout__breadcrumb:not(.layout__row--gutter) {
     display: none;
   }
 }
