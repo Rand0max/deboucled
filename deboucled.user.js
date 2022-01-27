@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.13.2
+// @version     2.14.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -17,16 +17,6 @@
 // @match       https://www.jeuxvideo.com/profil/*
 // @match       http://www.jeuxvideo.com/sso/*
 // @match       https://www.jeuxvideo.com/sso/*
-// @match       http://m.jeuxvideo.com/forums/*
-// @match       https://m.jeuxvideo.com/forums/*
-// @match       http://m.jeuxvideo.com/recherche/forums/*
-// @match       https://m.jeuxvideo.com/recherche/forums/*
-// @match       http://m.jeuxvideo.com/messages-prives/*
-// @match       https://m.jeuxvideo.com/messages-prives/*
-// @match       http://m.jeuxvideo.com/profil/*
-// @match       https://m.jeuxvideo.com/profil/*
-// @match       http://m.jeuxvideo.com/sso/*
-// @match       https://m.jeuxvideo.com/sso/*
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
@@ -34,7 +24,7 @@
 // @grant       GM_listValues
 // @grant       GM_getResourceText
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
-// @resource    PEEPODARKJVC_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/peepodarkjvc.css
+// @resource    PEEPODARKJVCV2_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/peepodarkjvcv2.css
 // @resource    CHARTS_CSS https://unpkg.com/charts.css/dist/charts.min.css
 // @require     https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js
 // @require     https://unpkg.com/@chocolateboy/uncommonjs

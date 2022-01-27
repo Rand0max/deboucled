@@ -1,14 +1,240 @@
 /* 
 ---------------------------------------------------------
 - Merci à Peepo, créateur de ce thème.
-- https://userstyles.org/styles/206703/peepojv
-- https://www.jeuxvideo.com/forums/message/1144955144
+- https://userstyles.org/styles/227645/peepojvc
+- https://www.jeuxvideo.com/forums/42-51-68805732-1-0-1-0-mon-theme-sombre-20.htm
 ---------------------------------------------------------
 */
+
+/* Peepo JVC (Alpha 0.3) - (27/01/22) */
+/*Partie haute du Header*/
+
+/*Suppression flèche bleue*/
+.header__navIcon--triangle::before,
+.header__navIcon {
+  display: none;
+}
+.header__navIcon ~ .header__navLink--lvl1 {
+  padding-right: 1rem;
+}
+
+/*Suppression du gras*/
+.header__navLink--lvl1 {
+  font-weight: initial;
+  font-size: 1.05rem;
+  text-transform: none;
+}
+
+/*Avatar Profil Agrandi*/
+.headerAccount__avatar {
+  border-radius: 0.25rem;
+  height: 2.5rem;
+  width: 2.5rem;
+  margin-right: 0.5rem;
+  margin-left: -0.25rem;
+}
+
+/*Backgrounds forum*/
+:root {
+  --jv-bg-color: #151515;
+}
+.layout__breadcrumb,
+.layout__contentAside,
+.layout--forum .layout__contentMain {
+  background-color: #1c1c1c;
+}
+
+.header__top {
+  background-color: #252525;
+}
+
+/*Jarter la barre des consoles*/
+.header__navLink--platform {
+  display: none;
+}
+
+/*Rendre la ligne noire transparente*/
+:root {
+  --jv-header-bottom-bg-color: transparent;
+}
+
+/*Fix Transparence défilement page*/
+.header--affix {
+  box-shadow: 0px 10px 10px -6px rgba(0, 0, 0, 0.3);
+  height: 3.4rem;
+}
+
+/*Fixer Hauteur Forums*/
+.layout {
+  margin-top: 3rem;
+}
+
+/*police Titre forum plus proche de l'originale*/
+.titre-head-bloc .titre-bloc,
+.titre-bloc-forum span:first-child {
+  font-family: "Roboto";
+  font-size: 1.2rem;
+  line-height: 1em;
+  letter-spacing: -0.05rem;
+  font-weight: 501;
+}
+
+/*PeepoJV Fil d'ariane*/
+.breadcrumb::before {
+  content: "PeepoJV";
+  color: #dedede;
+  font-weight: bold;
+}
+
+a.breadcrumb__item:nth-child(1) {
+  display: none;
+}
+
+/*Fil d'ariane plus propre*/
+.breadcrumb::before,
+.breadcrumb__item + .breadcrumb__item::before {
+  margin-right: 0.25rem;
+}
+.breadcrumb__item + .breadcrumb__item::before {
+  margin-left: 0.25rem;
+}
+
+/*police ariane plus proche de l'originale*/
+.breadcrumb {
+  font-family: "Roboto";
+  font-size: 0.8rem !important;
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+/*Titre dans contenu sidebar*/
+.card-jv-forum .titre-info-fofo {
+  background: #252525 !important;
+  border-bottom: none;
+  color: #bbb !important;
+  font-family: "Roboto";
+  line-height: 1em;
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+/*Couleur texte liste des topics*/
+.topic-list .topic-date > .lien-jv,
+.topic-list .topic-author,
+.topic-list .topic-count-adm,
+.topic-list .topic-count,
+.topic-list .topic-title {
+  color: #bbbbbb;
+}
+.topic-list .topic-title:visited {
+  color: #7a7a7a;
+}
+
+/*A partir de là fix en vrac flemme de documenter*/
+
+h2.titre-bloc > span:nth-child(1) {
+  display: none;
+}
+
+.layout__adPlaceHolder {
+  display: none;
+}
+
+.headerAccount__pseudo,
+.header__navLinkSearch,
+.headerAccount__pm,
+.headerAccount__notif,
+.header__navLink--lvl1 {
+  color: #aaa;
+}
+
+.header__navLink--lvl1:active,
+.header__navLink--lvl1:focus,
+.header__navLink--lvl1:hover {
+  color: #fff;
+  background-color: transparent;
+}
+
+div.row:nth-child(1) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) {
+  margin-left: -0.01rem !important;
+  margin-right: -0.01rem !important;
+}
+
+.headerAccount__pseudo:hover,
+.headerAccount__notif:hover,
+.headerAccount__pm:hover,
+.headerAccount__link:hover,
+.header__navLinkSearch:hover {
+  color: #fff;
+  --nav-bg-color: transparent;
+}
+
+.toggleTheme {
+  opacity: 0.6;
+}
+
+.toggleTheme:hover,
+.toggleTheme:hover::after {
+  color: #fff;
+  opacity: 1;
+  --nav-bg-color: transparent;
+  background-color: transparent;
+}
+
+.headerSearch {
+  background-color: #252525;
+}
+
+.headerAccount__dropdownContainerTop,
+.headerAccount__dropdownContainerContent,
+.headerAccount__dropdownContainerBottom,
+.headerAccount__account:nth-of-type(1) {
+  background-color: #1a1a1a;
+}
+
+.bloc-default-profil .bloc-default-profil-header,
+.menu-profil {
+  border: none !important;
+}
+
+.menu-profil::after {
+  background-color: transparent;
+}
+
+.bloc-default-profil {
+  margin-top: 1.5rem;
+}
+
+#header-profil::after {
+  background-color: #1c1c1c;
+}
+
+.bloc-default-profil .bloc-default-profil-header h2 {
+  color: #ccc;
+}
+
+.layout--withBackground .layout__row--gutte {
+  margin-top: 2rem;
+}
+
+.row {
+  margin-top: 1rem;
+}
+
+.table-profil-modif-default,
+.helper-profil {
+  background-color: #252525;
+}
 
 /*Header + Fix Hauteur du Body*/
 
 /*Partie haute du Header*/
+
+/*Logo Peepo au lieu de JV*/
+.jv-header-menu .jv-header-top .logo {
+  background-image: url(https://image.noelshack.com/fichiers/2021/25/4/1624505427-ekod37qxiaamoeb-removebg-preview.png);
+  height: 3.5rem;
+}
 
 /*Avatar Profil Agrandi*/
 .jv-header-menu .account-avatar-box {
@@ -148,6 +374,7 @@
   color: fff;
   background: #353535;
 }
+
 /*Body + Boutons en vrac - Couleurs */
 
 /*Scrollbar*/
@@ -208,6 +435,7 @@ body {
   background: #303030;
   color: #ddd;
 }
+
 /*Liste des forums - Couleurs */
 
 /*Partie "Rechercher un forum*/
@@ -325,7 +553,7 @@ body {
 
 /*"PeepoJV avant "Fil d'ariane" */
 .fil-ariane-crumb:before {
-  content: "jeuxvideo.com";
+  content: "PeepoJV";
   color: #dedede;
 }
 
@@ -530,6 +758,12 @@ a:hover {
   border-left: 0.15rem solid #404040 !important;
 }
 
+/*Code discret*/
+.text-enrichi-forum .code-jv {
+  color: #ccc;
+  background-color: #303030;
+}
+
 /*Couleur Pseudos+Date+MP blanc en hover*/
 .bloc-message-forum .bloc-pseudo-msg:hover,
 .picto-msg-lettre:hover,
@@ -588,6 +822,7 @@ a:hover {
 .bloc-editor-forum > .form-harassment {
   display: none;
 }
+
 /*Rédaction Post / Topic*/
 
 /*Titre du sujet*/
@@ -862,6 +1097,7 @@ blockquote {
 .form-post-topic .form-harassment {
   display: none;
 }
+
 /*Profil + Couleurs */
 
 /*Profil + Contenu*/
@@ -1188,88 +1424,6 @@ div.row:nth-child(1) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) {
 .panel .profil-gestion-abo,
 .panel-jv-info {
   border: 0;
-}
-
-/*Partie "Modifier le pseudo" (Pictogramme Crayon)*/
-
-/*Background général*/
-.table-profil-modif-default {
-  background: #252525;
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
-}
-
-/*Bordure sous chaque titre plus discrète*/
-.table-profil-modif-default thead tr {
-  border-bottom: 0.01rem solid #303030;
-}
-
-/*Bordure sous chaque catégorie supprimée*/
-.table-profil-modif-default {
-  border: 0;
-}
-
-/*Bordure au dessus de chaque ligne plus discrète*/
-.table-profil-modif-default tbody tr + tr {
-  border-top: 0.01rem solid #303030;
-}
-
-/*Couleur titre de la catégorie*/
-.table-profil-modif-default .titre-tab {
-  color: #bbb;
-}
-
-/*Couleur texte des différentes lignes*/
-.table-profil-modif-default .valeur {
-  color: #bbb;
-}
-
-/*Couleur pseudo + Texte en gras*/
-.bloc-alias > a:nth-child(2) {
-  color: #bbb;
-  font-weight: bold;
-}
-
-/*Couleur pseudo en hover*/
-.bloc-alias > a:nth-child(2):hover {
-  color: #fff;
-}
-
-/*Couleur des liens d'upload*/
-.table-profil-modif-default .file-upload {
-  color: #bbb;
-}
-
-/*Couleur des liens en hover*/
-.table-profil-modif-default .file-upload:hover {
-  color: #fff;
-}
-
-/*Couleur case de texte*/
-.table-profil-modif-default .p-inline-block .valeur input {
-  border: none !important;
-  background: #202020;
-  border-radius: 0.25rem;
-  color: #aaa;
-  filter: brightness(1.75);
-}
-
-/*"Mes machines"*/
-.table-profil-modif-default .bloc-list-select select {
-  border: none !important;
-  background: #303030;
-  color: #bbb;
-  border-radius: 0.25rem;
-}
-
-/*Background mes machines*/
-.table-profil-modif-default .bloc-list-select {
-  background: transparent;
-  border: 0;
-}
-
-/*Texte des topic favoris, DL infos personnelles et supp. Compte*/
-a {
-  color: #bbb;
 }
 
 /*Smileys (Merci DarkJVC)*/
@@ -1912,4 +2066,4 @@ img[data-code=":hapoelparty:"] {
   width: 0 !important;
   padding-left: 45px !important;
   padding-top: 27px !important;
-}
+} /*Messages Privés*/

@@ -1,0 +1,50 @@
+@-moz-document domain("jeuxvideo.com") {
+  .header {
+    position: absolute;
+  }
+  .header__bottom {
+    height: 0;
+  }
+  .header__nav.header__nav--platform {
+    display: none;
+  }
+  .layout {
+    --layout-mt: 3.375rem;
+  }
+  .layout__adHeader {
+    display: none;
+  }
+  .topic-list .topic-subject {
+    font-weight: 700;
+  }
+  .topic-list li {
+    font-size: 0.69rem;
+    line-height: 1.1rem;
+  }
+  .card-forum-margin {
+    margin-bottom: 1.25rem;
+  }
+  #didomi-host {
+    display: none;
+  }
+  body.didomi-popup-open {
+    overflow: scroll !important;
+  }
+  .titre-head-bloc {
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .spreadContainer {
+    margin-bottom: 1.1rem;
+  }
+  .bloc-message-forum .user-avatar-msg {
+    border-radius: 0;
+  }
+  .topic-list .topic-title {
+    color: var(--jv-text-color);
+    opacity: 0.9;
+  }
+  .layout__row.layout__breadcrumb {
+    display: none;
+  }
+}

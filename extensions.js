@@ -152,8 +152,8 @@ function addStyles(enableJvcDarkTheme) {
     GM_addStyle(deboucledCss);
 
     if (enableJvcDarkTheme) {
-        const peepodarkjvcCss = GM_getResourceText('PEEPODARKJVC_CSS');
-        GM_addStyle(peepodarkjvcCss);
+        const peepodarkjvcv2Css = GM_getResourceText('PEEPODARKJVCV2_CSS');
+        GM_addStyle(peepodarkjvcv2Css);
     }
 }
 
