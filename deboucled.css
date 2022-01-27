@@ -372,6 +372,9 @@ body.deboucled-dark-theme {
 }
 
 /* Logo */
+.deboucled-blackandwhite {
+  filter: grayscale(100%);
+}
 .deboucled-logo-forbidden {
   width: 14px;
 }
@@ -559,8 +562,13 @@ body.deboucled-dark-theme {
   height: 18px;
   background-size: 18px;
 }
-.deboucled-blackandwhite {
-  filter: grayscale(100%);
+.deboucled-stylish-logo {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABGdBTUEAALGPC/xhBQAAAe5JREFUWAntV7FOAkEQnVmOwmBlAlhK6C0IhMZoYYsdwUBhIcFKO3vXL7A1JrYUhJgYbE2MscEQiLYWVyKQmBhjJdw4exECp8DlgLvGTe5ud2f2zdu9mc0MwlCTJMVV4z2DBDkgiLMoRAC+IZWR7nP8DNVEM7XBan83ROyxpA1ANUAshmPbJZTS6GubAGqw/nQcga9embuxvnDa1w6BXxiIdQRMr1budSUT6qWMY7dX5a5t42qdo0YUI6Lq685mRK0X6tjVzokg6AjQ0SIKElCZpBTiuvGxyxiL37mVKJ9Eq36bEQYZWavMtTFRTvx4u2s2Rw1hXDlhaHTS1VFITIrzRVPhaPCZYbhoQ5PwtUlCuzLehbSra9WbC4HwzcOpFdjueC4EEhf6ll2DVr25ECCje2cFtjv23An/CfyfgMZpkrTrsYvQG6Rks4DHz1/G5oTTcLXPy5WTaUrj5IH8m+MbsI+pGeT8HmeQmQl4HwWIoPJ2T5qqGTglQy4avGnsuW31C2remAdArpY4JcOiVwSISzWxnD8s8b+ou06CbaYK0ZLgi9Dw+bU034gd10ggdITQ0hLRMMNwaa+la34t6cpJ8M6F8CcfC2u62vDgHlAkAvtHCZ7KcvVa4ac5jxA1y3M0sSogMJs6iCb6xhWBbzc2h0a44FEWAAAAAElFTkSuQmCC)
+    0 no-repeat;
+  width: 20px;
+  height: 22px;
+  background-size: 20px;
+  display: inline-block;
 }
 
 .deboucled-preboucle-title {
@@ -776,7 +784,7 @@ input[type="search"] {
   color: gray;
   user-select: none;
   cursor: pointer;
-  top: 45px;
+  top: 46px;
   right: 20px;
   position: absolute;
   opacity: 0.8;
@@ -787,7 +795,7 @@ input[type="search"] {
 .deboucled-about-link-jvc {
   cursor: pointer;
   top: 42px;
-  right: 97px;
+  right: 126px;
   position: absolute;
   opacity: 0.8;
 }
@@ -797,11 +805,21 @@ input[type="search"] {
 .deboucled-about-link-github {
   cursor: pointer;
   top: 43px;
-  right: 70px;
+  right: 99px;
   position: absolute;
   opacity: 0.8;
 }
 .deboucled-about-link-github:hover {
+  opacity: 1;
+}
+.deboucled-about-link-stylish {
+  cursor: pointer;
+  top: 43px;
+  right: 70px;
+  position: absolute;
+  opacity: 0.8;
+}
+.deboucled-about-link-stylish:hover {
   opacity: 1;
 }
 
