@@ -6,7 +6,8 @@
 ---------------------------------------------------------
 */
 
-/* Peepo JVC (Alpha 0.3) - (27/01/22) */
+/* Peepo JVC (Alpha 0.4) - (27/01/22) */
+
 /*Partie haute du Header*/
 
 /*Suppression flèche bleue*/
@@ -35,7 +36,8 @@
 }
 
 /*Backgrounds forum*/
-:root {
+:root,
+:root.theme-light {
   --jv-bg-color: #151515;
 }
 .layout__breadcrumb,
@@ -148,16 +150,15 @@ h2.titre-bloc > span:nth-child(1) {
   color: #aaa;
 }
 
+.topic-list li {
+  font-family: tahoma;
+}
+
 .header__navLink--lvl1:active,
 .header__navLink--lvl1:focus,
 .header__navLink--lvl1:hover {
   color: #fff;
   background-color: transparent;
-}
-
-div.row:nth-child(1) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) {
-  margin-left: -0.01rem !important;
-  margin-right: -0.01rem !important;
 }
 
 .headerAccount__pseudo:hover,
@@ -226,6 +227,137 @@ div.row:nth-child(1) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) {
   background-color: #252525;
 }
 
+div.row:nth-child(1) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) {
+  margin-left: -0.01rem !important;
+  margin-right: -0.01rem !important;
+}
+
+.icon-topic-folder::before,
+.icon-topic-pin::before,
+.icon-topic-resolved::before,
+.icon-star-on::before,
+.icon-rss-feed::before,
+.icon-pm::before,
+.icon-bell-off::before,
+.icon-config::before,
+.icon-star-off,
+.icon-topic-lock::before {
+  content: "";
+}
+
+.topic-folder1 {
+  background-image: url("https://i-postimg-cc.translate.goog/7LQSndMf/index.png");
+  width: 16px;
+  height: 16px;
+  margin-top: 0.1rem;
+  margin-left: 0.4rem;
+}
+
+.topic-folder2 {
+  background-image: url("https://i.postimg.cc/NF84DbjS/index.png");
+  width: 16px;
+  height: 16px;
+  margin-top: 0.1rem;
+  margin-left: 0.4rem;
+}
+
+.icon-topic-pin {
+  background-image: url("https://i.postimg.cc/R09vbZdY/index.png");
+  width: 16px;
+  height: 16px;
+  margin-top: 0.1rem;
+  margin-left: 0.4rem;
+  border-radius: 3px;
+}
+
+.icon-topic-resolved {
+  background-image: url("https://i.postimg.cc/9fnCXYV6/index.png");
+  width: 16px;
+  height: 16px;
+  margin-top: 0.1rem;
+  margin-left: 0.4rem;
+}
+
+.icon-topic-lock {
+  background-image: url("https://i.postimg.cc/4NFRzjJH/index.png");
+  width: 16px;
+  height: 16px;
+  margin-top: 0.1rem;
+  margin-left: 0.4rem;
+  filter: brightness(350%);
+}
+
+.icon-star-on {
+  background-image: url("https://i.postimg.cc/kXpccVJn/index.png");
+  background-position: -1.875rem 0px;
+  opacity: 0.5;
+  filter: invert(50%);
+  width: 20px;
+  height: 20px;
+  margin-top: 0.1rem;
+}
+
+.icon-rss-feed {
+  background-image: url("https://i.postimg.cc/kXpccVJn/index.png");
+  background-position: -5.625rem 0px;
+  opacity: 0.5;
+  filter: invert(50%);
+  width: 20px;
+  height: 20px;
+  margin-top: 0.1rem;
+}
+
+.icon-config {
+  background-image: url("https://i.postimg.cc/kXpccVJn/index.png");
+  background-position: 0px 0px;
+  display: inline-block;
+  opacity: 0.5;
+  filter: invert(50%);
+  width: 20px;
+  height: 20px;
+  margin-top: 0.1rem;
+}
+
+.icon-pm {
+  background-image: url("https://i.postimg.cc/2jBSHyfz/1.png");
+  margin-top: 0.1rem;
+  width: 1.5rem;
+  height: 1.2rem;
+  background-size: 1.5rem 1.2rem;
+}
+
+.icon-bell-off {
+  background-image: url("https://i.postimg.cc/1tDYt2dV/3.png");
+  opacity: 0.4;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: 0.1rem;
+  background-size: 1.2rem 1.2rem;
+  margin-left: 0.25rem;
+}
+
+i.icon-bell-off {
+  opacity: 1;
+}
+.icon-config:hover,
+.icon-rss-feed:hover,
+.icon-star-on:hover {
+  opacity: 1;
+  filter: invert(50%);
+}
+
+.icon-bell-off:hover,
+.icon-pm:hover {
+  filter: brightness(140%);
+}
+
+.icon-star-off {
+  background-image: url("https://i.postimg.cc/zvBWMRTD/3.png");
+}
+
+.header__bottom {
+  height: 0rem;
+}
 /*Header + Fix Hauteur du Body*/
 
 /*Partie haute du Header*/
