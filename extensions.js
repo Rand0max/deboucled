@@ -13,7 +13,7 @@ String.prototype.normalizeCompatibility = function () {
 
 String.prototype.removeSurrogatePairs = function () {
     // eslint-disable-next-line no-useless-escape
-    return this.replace(/[^\p{L}\p{N}\p{P}\p{Z}\{\^\$\}]/gu, '');
+    return this.replace(/[^\p{L}\p{N}\p{P}\p{Z}=\{\^\$\}\+\*\\<>|`£°~]/gu, '');
 }
 
 String.prototype.escapeRegexPattern = function () {

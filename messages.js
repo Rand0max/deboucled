@@ -69,7 +69,7 @@ function updateMessagesHeader() {
 function removeMessage(element) {
     function removeElement(elem) {
         /* 
-        Technique pour être compatible avec JVC Ghost :
+        Technique pour être compatible avec JVCGhost et JvArchive Compagnon :
          - on masque le message au lieu de le supprimer
          - on le met tout à la fin de la liste des messages pour ne pas casser le css jvc
         */

@@ -216,7 +216,7 @@ function getSubjectBlacklistMatches(subject) {
 function getAuthorBlacklistMatches(author) {
     if (!authorsBlacklistReg) return null;
     const normAuthor = author.toLowerCase().normalizeDiacritic();
-    if (normAuthor === 'rand0max') return null;
+    if (normAuthor === 'rand0max' || normAuthor === userPseudo.toLowerCase().normalizeDiacritic()) return null;
     return normAuthor.match(authorsBlacklistReg) ? [author] : null;
 }
 
