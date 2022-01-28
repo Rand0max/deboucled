@@ -18,7 +18,7 @@
     font-weight: 700;
   }
   .topic-list li {
-    font-size: 0.69rem;
+    font-size: 0.7rem;
     line-height: 1.1rem;
   }
   .card-forum-margin {
@@ -46,5 +46,23 @@
   }
   .layout__row.layout__breadcrumb:not(.layout__row--gutter) {
     display: none;
+  }
+  .topic-list .topic-img {
+    top: 0.1rem;
+    font-size: 1rem;
+  }
+  .icon-topic-folder::before {
+    content: "🖿";
+  }
+  @media (min-width: 807.99px) {
+    .topic-list .topic-title {
+      font-size: 0.72rem;
+    }
+  }
+  @media (min-width: 1480px) {
+    .layout {
+      --grid-template-columns: 1fr 52rem 24.5rem 1fr;
+      --ad-placeholder-w: 0;
+    }
   }
 }
