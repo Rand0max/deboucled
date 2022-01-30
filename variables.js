@@ -3,7 +3,7 @@
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
-const deboucledVersion = '2.14.6'
+const deboucledVersion = '2.14.7'
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';

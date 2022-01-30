@@ -132,9 +132,7 @@ a.breadcrumb__item:nth-child(1) {
   color: #7a7a7a;
 }
 
-/*A partir de là fix en vrac flemme de documenter*/
-
-h2.titre-bloc > span:nth-child(1) {
+h2.titre-bloc > span:nth-child(2) {
   display: none;
 }
 
@@ -321,9 +319,10 @@ div.row:nth-child(1) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) {
 .icon-pm {
   background-image: url("https://i.postimg.cc/2jBSHyfz/1.png");
   margin-top: 0.1rem;
-  width: 1.5rem;
-  height: 1.2rem;
-  background-size: 1.5rem 1.2rem;
+  width: 1rem;
+  height: 0.8rem;
+  background-size: 1rem 0.8rem;
+  background-repeat: no-repeat;
 }
 
 .icon-bell-off {
