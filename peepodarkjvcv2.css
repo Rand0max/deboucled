@@ -83,9 +83,7 @@
 
 /*PeepoJV Fil d'ariane*/
 .breadcrumb::before {
-  content: "PeepoJV";
   color: #dedede;
-  font-weight: bold;
 }
 
 a.breadcrumb__item:nth-child(1) {
