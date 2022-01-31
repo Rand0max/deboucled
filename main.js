@@ -89,6 +89,21 @@ function getCurrentPageType(url) {
     return 'unknown';
 }
 
+async function getTopicPageContent(page) {
+    let urlRegex = /^(\/forums\/(?:42|1)-[0-9]+-[0-9]+-)(?<pageid>[0-9]+)(-0-1-0-.*\.htm)$/i;
+
+    let currentPath = window.location.pathname;
+    let newPageUrl = currentPath.replace(urlRegex, `$1${page}$3`);
+
+    return fetch(newPageUrl).then(function (response) {
+        if (!response.ok) throw Error(response.statusText);
+        return response.text();
+    }).catch(function (err) {
+        console.warn(err);
+        return undefined;
+    });
+}
+
 async function getForumPageContent(page) {
     let urlRegex = /(\/forums\/0-[0-9]+-0-1-0-)(?<pageid>[0-9]+)(-0-.*)/i;
 
@@ -159,7 +174,18 @@ async function handleTopicListOptions(topics) {
     let optionRemoveUselessTags = GM_getValue(storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default);
     if (optionRemoveUselessTags) removeUselessTags(topics);
 
+    handleTopicListAuthors(topics);
     await handlePoc(topics);
+    await saveLocalStorage();
+}
+
+function handleTopicListAuthors(topics) {
+    topics.slice(1).forEach(function (topic) {
+        const author = topic.querySelector('.topic-author')?.textContent.trim().toLowerCase();
+        const topicId = parseInt(topic.getAttribute('data-id'));
+        if (!author || !topicId) return;
+        topicAuthorMap.set(topicId, author);
+    });
 }
 
 async function handlePoc(finalTopics) {
@@ -172,8 +198,6 @@ async function handlePoc(finalTopics) {
         let poc = await isTopicPoC(topic, optionDetectPocMode);
         if (poc) markTopicPoc(topic, optionDetectPocMode === 3);
     }));
-
-    await saveLocalStorage();
 }
 
 function highlightBlacklistMatches(element, matches) {
@@ -264,7 +288,7 @@ function handleBlSubjectIgnoreMessages(messageElement) {
     }
 }
 
-function handleMessage(message, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages) {
+function handleMessage(message, topicId, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages) {
     let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
     if (!authorElement) return;
     let author = authorElement.textContent.trim();
@@ -291,16 +315,69 @@ function handleMessage(message, optionHideMessages, optionBoucledUseJvarchive, o
         addBoucledAuthorButton(mpBloc, author, optionBoucledUseJvarchive);
     }
 
+    handleMessageHighlightTopicAuthor(topicId, author, authorElement);
+
     const isSelf = userPseudo && userPseudo.toLowerCase() === author.toLowerCase();
     if (!optionBlSubjectIgnoreMessages || isSelf) return;
     handleBlSubjectIgnoreMessages(message);
 }
 
+function handleMessageHighlightTopicAuthor(topicId, author, authorElement) {
+    if (topicId && topicAuthorMap.has(topicId) && author?.toLowerCase() === topicAuthorMap.get(topicId)) {
+        let crownElem = document.createElement('span');
+        crownElem.className = 'deboucled-crown-logo';
+        crownElem.title = 'Auteur du topic';
+        authorElement.prepend(crownElem);
+    }
+}
+
 function getTopicId() {
+    /*
     const urlRegex = /^\/forums\/(42|1)-[0-9]+-(?<topicid>[0-9]+)-[0-9]+-0-1-0-.*\.htm$/gi;
     const matches = urlRegex.exec(window.location.pathname);
     if (!matches?.groups?.topicid) return;
     return parseInt(matches.groups.topicid);
+    */
+
+    const blocFormulaireElem = document.querySelector('#bloc-formulaire-forum');
+    if (!blocFormulaireElem) return undefined;
+    return parseInt(blocFormulaireElem.getAttribute('data-topic-id'));
+}
+
+function getTopicCurrentPageId() {
+    /*
+    const urlRegex = /^\/forums\/(42|1)-[0-9]+-[0-9]+-(?<pageid>[0-9]+)-0-1-0-.*\.htm$/gi;
+    const matches = urlRegex.exec(window.location.pathname);
+    if (!matches?.groups?.pageid) return undefined;
+    return parseInt(matches.groups.pageid);
+    */
+
+    const pageActiveElem = document.querySelector('.page-active');
+    if (!pageActiveElem) return undefined;
+    return parseInt(pageActiveElem.textContent.trim())
+}
+
+async function setTopicAuthor(topicId) {
+    if (!topicId || topicAuthorMap.has(topicId)) return;
+
+    const pageId = getTopicCurrentPageId();
+    if (!pageId) return;
+
+    let currentDoc = document;
+    if (pageId !== 1) {
+        currentDoc = await getTopicPageContent('1').then((res) => domParser.parseFromString(res, 'text/html'));
+        if (!currentDoc) return;
+    }
+
+    let allMessages = getAllMessages(currentDoc);
+    if (allMessages.length === 0) return;
+    const firstMessage = allMessages[0];
+    if (!firstMessage) return;
+
+    const author = firstMessage.querySelector('.bloc-pseudo-msg')?.textContent.trim().toLowerCase();
+    topicAuthorMap.set(topicId, author);
+
+    await saveLocalStorage();
 }
 
 function handleTopicWhitelist() {
@@ -355,17 +432,20 @@ function displayTopicDeboucledMessage() {
     insertAfter(topicDeboucledDiv, topBlocPagi);
 }
 
-function handleTopicMessages() {
+async function handleTopicMessages() {
     const isWhitelistedTopic = handleTopicHeader();
     let optionHideMessages = !isWhitelistedTopic && GM_getValue(storage_optionHideMessages, storage_optionHideMessages_default);
     let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
     let optionBlSubjectIgnoreMessages = !isWhitelistedTopic && GM_getValue(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default);
 
+    const topicId = getTopicId();
+
     handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages);
 
     let allMessages = getAllMessages(document);
+    await setTopicAuthor(topicId);
     allMessages.forEach(function (message) {
-        handleMessage(message, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages);
+        handleMessage(message, topicId, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages);
     });
 
     if (hiddenMessages === allMessages.length) displayTopicDeboucledMessage();
@@ -576,7 +656,7 @@ async function entryPoint() {
         }
         case 'topicmessages': {
             if (forumFilteringIsDisabled) break;
-            handleTopicMessages();
+            await handleTopicMessages();
             break;
         }
         case 'search': {

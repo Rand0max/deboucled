@@ -4,6 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 const localstorage_pocTopics = 'deboucled_pocTopics';
+const localstorage_topicAuthors = 'deboucled_topicAuthors';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
 const storage_preBoucles = 'deboucled_preBoucles', storage_preBoucles_default = '[]';
@@ -113,18 +114,22 @@ async function saveStorage() {
 }
 
 async function loadLocalStorage() {
-    let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
-    if (optionDetectPocMode === 0) return;
-    // eslint-disable-next-line no-undef
-    const storagePocTopics = await localforage.getItem(localstorage_pocTopics);
+    //let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
+    //if (optionDetectPocMode === 0) return;
+
+    const storagePocTopics = await localforage.getItem(localstorage_pocTopics); // eslint-disable-line no-undef
     if (storagePocTopics) pocTopicMap = new Map([...JSON.parse(storagePocTopics)]);
+
+    const storageTopicAuthors = await localforage.getItem(localstorage_topicAuthors); // eslint-disable-line no-undef
+    if (storageTopicAuthors) topicAuthorMap = new Map([...JSON.parse(storageTopicAuthors)]);
 }
 
 async function saveLocalStorage() {
-    let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
-    if (optionDetectPocMode === 0) return;
-    // eslint-disable-next-line no-undef
-    await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
+    //let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
+    //if (optionDetectPocMode === 0) return;
+
+    await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap])); // eslint-disable-line no-undef
+    await localforage.setItem(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap])); // eslint-disable-line no-undef
 }
 
 async function removeTopicIdBlacklist(topicId) {
