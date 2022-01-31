@@ -1,3 +1,11 @@
+/* ==UserStyle==
+@name           JV Respawn Refined
+@namespace      deboucledjvcom
+@version        1.0.0
+@description    JV Respawn Refined
+@author         Rand0max
+==/UserStyle== */
+
 @-moz-document domain("jeuxvideo.com") {
   .header {
     position: absolute;

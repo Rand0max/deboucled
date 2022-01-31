@@ -130,7 +130,7 @@ function buildSettingsPage(firstLaunch = false) {
         html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/deboucled" target="_blank" title="Github officiel Déboucled">${githubLogo}</a>`;
 
         let stylishLogo = '<span class="deboucled-stylish-logo"></span>';
-        html += `<a class="deboucled-about-link-stylish" href="https://userstyles.org/styles/227655/jv-respawn-refined" target="_blank" title="Thème JVC par Rand0max">${stylishLogo}</a>`;
+        html += `<a class="deboucled-about-link-stylish" href="https://userstyles.world/style/3030/jv-respawn-refined" target="_blank" title="Thème JVC par Rand0max">${stylishLogo}</a>`;
 
         html += `<span class="deboucled-about-version">v${deboucledVersion}</span>`;
 
