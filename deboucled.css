@@ -494,25 +494,43 @@ body.deboucled-dark-theme {
   background-size: 24px;
   display: inline-block;
 }
+
+.deboucled-eye-white-logo {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGiSURBVEhL7ZSxSsNQFIYb6dZiVdxsKViwOPkGUtx8BGf1IRz0XTpJi+AiFgRBrIuDgg4uKr5ALVRRx+v335zEtKS2g9ilH3wk+c+5t+m9STJTJk5gx1SccwsctnAT13ARRQfvsIWHQRB0FY4NE2dxD99xFOpRb9aG/w6NRbzGiDPcxirmTJ0rUy1CY4o2TTo0lPFZ3fCE61YainrwUQNAY8tW6odCHh/UBZc4ZyXVSniEb+YxVq2segEvUGiOvJV+IKz7snO3GDdwrslfVRigiyVri25QY0Xd4hCCWpi7T6xY7OFady5OcAm1R6cKoGltHq4rqDlEzWJfaIeZO7AohkxLIuIN5Fz/SvQsiiHbD0uuresZn/7g7Dguaf2Dc/pfjZboA5ct9nCtDRVaFi2P7r6lABrW5uF6Bb98JblEgiDa5BvMWaxcz7w2dJAOJpdtFu9VgP5NFoTJx1SPXMFKqumum9gzG5icfB6vUKQ/poJC8kXTyzPOi7aBLxoAw1+0CBrSPhU7uIr6l1Lnu3iOEaM/FRE0/tnHbjKf6yn/SCbzDcCUuoiprpfXAAAAAElFTkSuQmCC)
+    0 no-repeat;
+}
 .deboucled-eye-logo {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABXElEQVRIie2UQUtCQRSFP8JdUta2HkFCj/6ERH+lWvkLWtR/cWkIbsRACCTbuMhFCzcmLdxWoFItX4s5L+fNG/W1MFp44MJwz7mHmXtnBtb479gFykADGAFfipFyZWl+jRxwCUyBaElMpc1lNd8HupZBCzgDQmBTESrXsnRd1S7EATBUwTNQyrChEjBQzVAeXuSBvoT3QMHiAqAGTBR1nSLGNtBWbV9eKVQk6DmCAHgj3ft3cfYGe+IqrvmJiE+g6HA1cQ1gD9PnpnI3jrYoj0ieP+goee052UScPcBAubFHfyWuA7DhkJGnYBF8etcTmLXoAzh0uLq4JuYUAXCrXNXRHmEeYqpFMBvyI+auxwgxA3WH/EqybVvAE3OGDMlr2sZcvRgBZqBjRdUx3wEeWHJNIfnQBmR7aKfACxkeWgzfV3EOHGtnea0vgDtLl+mriLHSz87Gyr7rNf4O31JZhMjSyXpfAAAAAElFTkSuQmCC)
     0 no-repeat;
+}
+.deboucled-eye-white-logo,
+.deboucled-eye-logo {
   width: 14px;
   height: 14px;
   background-size: 14px;
-  /* filter: invert(var(--deboucled-filter-invert)); */
   vertical-align: middle;
   display: inline-block;
+}
+
+.deboucled-closed-eye-white-logo {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAIISURBVEhL1ZXPSltBFIePxU0xNDZbU4RaWnwJEZ+hb9B25RN0Ud/FpWKJi0IhYBB1E7RdBOwqoQsh3cSFDf7ZlOn3m3vmJobrn0Cy8IMP75wzc+7NuTNXe5IEsx2/nDwU38UuNjw0OYaKH3jofkIIFVzHb3iG166uFVOuEueOU5xFs/gZ+/gQ/ZbZ6TjFq9iMSzPq+AHf4Zyra8Xquyzp4onZX8ZVL1MMExaxg6KNK54qRG25Mes1za6yJXHtoqdvQ6KEvzQLDnDeU8q9wh3UU8pa3+w4tYVxGfdRqEbJlw4guBnTIfzEfALXKn6uRIJGhz9m/67MePgMwnpArRWbHs4gsJrFg37qkocjjPXkQrtmQUV7Zje6CWz7tAjjJUztWvVwTBxmsbDhoRxiaomoxnbQFt3EYxc+LYfYlywVDjV+FqMDWF/M9czMV/68wfbzEN7HYPH80ZrxrqlFl/jawxHGNbVDbfEn1zv5jmLLp0UYv0UdRDFokSCQXvIPnPOwabfohXrPh+lhvu+5foEtJeD2SxYEh7eptlx5pOfbeOFu4XDxl3iEonibChL5QdPh0SHSTTxdCFPX8LfWwN0HLcGEqo69jr+3RZ+Kj7iM+pVS159wDxP6lfd/KkRqS8dMT/Wojx3qwzjrJe4mFU9tYdGjP9cPMlp8olC0MbXiCYpP7x/19DD7D5Oe+U1vQx+4AAAAAElFTkSuQmCC)
+    0 no-repeat;
 }
 .deboucled-closed-eye-logo {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIiSURBVEhL1ZU9a1RBFIYPki4STIpUmoAJBiutUopY518kwcJWkBRa+C+ClaWQYoUQQYiEmEb8KAJaRVIIG5CkMMaYRtbnGWfWu9ndS9C18IVn996ZM+89e2bO3fjv1IoYhhWYy0ODUzZvQBNewFCe+nudMt+E8TxVqzG4A6vwCb5nvHbMubE/MfenLcFXIL4/wxFH2xHvuTmz+UV4BcXkOczDDOCX8Hp+JGK9QUwT3kQc3o24znitJuEjaLwDN6CnCLA0jZOIfbI5Jm3XuFaPnjoPH8DATbgARZdgBQ5lImKN2r0mMJXlUcQ04xvgWj306tJjMOAdVAM0PwDnWmbK01t7ET+OKSWDpeauca1xenXoJjjBmphyoCIzd271XsQ1TfcjTnwItXiaIn7LtXoYr2dbL8HBB+muU5al5QYS4Clp+pBc8y8polP3wTk945wfFTnRJWvwMGKZL2u9Qxa3PzvRO/60Z1Ip0Te47ECRG2o5LIuZ56P4DIx/YkxFV8BGdK6jRKps8lvwrHsz7mlxQ31ILkuBZ6aeKaItgp5Lc12brKrHdMOjx0W75nlDrbmYedV8FLbAtX2PqUqNZqY2j02UH1KOYi/dgl3QvLbRkqyxbW/7WxaawAZagKtgZuL1IqyDxuLrpfqrumWmkMpCKrukffRruBZfiL4Y69/9RLbN87dlOdPrGurVx3wwwmwI/HsbvHkRprPgH/Xgzf+tIn4CwQL+fDJqaFUAAAAASUVORK5CYII=)
     0 no-repeat;
+}
+.deboucled-closed-eye-white-logo,
+.deboucled-closed-eye-logo {
   width: 14px;
   height: 14px;
   background-size: 14px;
   vertical-align: middle;
   display: inline-block;
 }
+
+.deboucled-eye-white-logo.big,
+.deboucled-closed-eye-white-logo.big,
 .deboucled-eye-logo.big,
 .deboucled-closed-eye-logo.big {
   width: 20px;
@@ -523,6 +541,8 @@ body.deboucled-dark-theme {
   opacity: 0.6;
   cursor: pointer;
 }
+.deboucled-closed-eye-white-logo.big:hover,
+.deboucled-eye-white-logo.big:hover,
 .deboucled-closed-eye-logo.big:hover,
 .deboucled-eye-logo.big:hover {
   opacity: 1;

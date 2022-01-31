@@ -3,6 +3,12 @@
 // MAIN PAGE
 ///////////////////////////////////////////////////////////////////////////////////////
 
+function preferDarkTheme() {
+    // Adjust text contrast for Dark Reader and JVC new Dark Theme
+    return document.documentElement.getAttribute('data-darkreader-scheme') || !document.documentElement.classList.contains('theme-light');
+    //window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
 function filteringIsDisabled(forumId = undefined) {
     return disabledFilteringForumSet.has(forumId ?? getForumId());
 }
@@ -307,7 +313,8 @@ function handleTopicWhitelist() {
     const isWhitelisted = topicIdIndex >= 0;
 
     let whitelistButtonElement = document.createElement('span');
-    whitelistButtonElement.className = isWhitelisted ? 'deboucled-closed-eye-logo big' : 'deboucled-eye-logo big';
+    const whiteEyeClass = preferDarkTheme() ? '-white' : '';
+    whitelistButtonElement.className = isWhitelisted ? `deboucled-closed-eye${whiteEyeClass}-logo big` : `deboucled-eye${whiteEyeClass}-logo big`;
     whitelistButtonElement.setAttribute('deboucled-data-tooltip', isWhitelisted ? 'Masquer les messages blacklist' : 'Afficher les messages blacklist pour ce topic');
     whitelistButtonElement.setAttribute('data-tooltip-location', 'right');
     whitelistButtonElement.onclick = async () => {

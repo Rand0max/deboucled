@@ -381,10 +381,7 @@ function addPrevisualizeTopicEvent(topics) {
         const text = messagePreview.querySelector('.txt-msg.text-enrichi-forum');
         if (!text) return messagePreview;
 
-        // Adjust text contrast for Dark Reader and JVC new Dark Theme
-        const preferDark = document.documentElement.getAttribute('data-darkreader-scheme') || !document.documentElement.classList.contains('theme-light');
-        //window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (preferDark) {
+        if (preferDarkTheme()) {
             text.classList.toggle('deboucled-preview-content-text-light', true);
         }
         else {
