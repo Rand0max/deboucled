@@ -599,6 +599,12 @@ body.deboucled-dark-theme {
   background-size: 20px;
   display: inline-block;
 }
+.deboucled-theme-logo {
+  width: 16px;
+  height: 18px;
+  background-size: 16px;
+  vertical-align: bottom;
+}
 
 .deboucled-preboucle-title {
   user-select: none;

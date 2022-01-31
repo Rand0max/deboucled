@@ -147,13 +147,18 @@ function plural(nb) {
     return nb > 1 ? 's' : '';
 }
 
-function addStyles(enableJvcDarkTheme) {
+function addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme) {
     const deboucledCss = GM_getResourceText('DEBOUCLED_CSS');
     GM_addStyle(deboucledCss);
 
-    if (enableJvcDarkTheme) {
-        const peepodarkjvcv2Css = GM_getResourceText('PEEPODARKJVCV2_CSS');
-        GM_addStyle(peepodarkjvcv2Css);
+    if (enablePeepoTheme) {
+        const peepoDarkJvcV2Css = GM_getResourceText('PEEPODARKJVCV2_CSS');
+        GM_addStyle(peepoDarkJvcV2Css);
+    }
+
+    if (enableJvRespawnRefinedTheme) {
+        const jvRespawnRefinedCss = GM_getResourceText('JVRESPAWNREFINED_CSS');
+        GM_addStyle(jvRespawnRefinedCss);
     }
 }
 

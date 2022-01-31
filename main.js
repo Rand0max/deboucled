@@ -620,8 +620,9 @@ function handleError() {
 async function init(currentPageType) {
     let firstLaunch = await initStorage();
 
-    const enableJvcDarkTheme = GM_getValue(storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default);
-    addStyles(enableJvcDarkTheme);
+    const enablePeepoTheme = GM_getValue(storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default);
+    const enableJvRespawnRefinedTheme = GM_getValue(storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableJvRespawnRefinedTheme_default);
+    addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme);
     if (currentPageType === 'sso' || currentPageType === 'error') return;
 
     addSvgs();
