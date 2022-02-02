@@ -44,7 +44,7 @@ body.didomi-popup-open {
 .topic-list .topic-title {
   color: var(--jv-text-color);
   opacity: 0.9;
-  letter-spacing: 0.1px;
+  /* letter-spacing: 0.1px; */
 }
 .layout__row.layout__breadcrumb:not(.layout__row--gutter) {
   display: none;

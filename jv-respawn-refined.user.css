@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.0.1
+@version        1.0.2
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -51,7 +51,7 @@
   .topic-list .topic-title {
     color: var(--jv-text-color);
     opacity: 0.9;
-    letter-spacing: 0.1px;
+    /* letter-spacing: 0.1px; */
   }
   .layout__row.layout__breadcrumb:not(.layout__row--gutter) {
     display: none;

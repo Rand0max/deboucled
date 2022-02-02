@@ -159,7 +159,7 @@ function buildSettingsPage(firstLaunch = false) {
             storage_optionDetectPocMode_default,
             ['Désactivé', 'Mode simple', 'Mode approfondi ⚠', 'Mode automatique']);
 
-        html += addToggleOption('Uniformiser et nettoyer les <i>titres des topics</i>', storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default, 'Uniformise le titre des topics et efface les balises inutiles/répétitives comme [ALERTE], ou l\'usage abusif du &quot;AYA&quot; et ses dérivés.\n\nExemple : &quot;[ALERTE] cet EXEMPLE incroyable AYAAAA&quot; => &quot;Cet exemple incroyable&quot;', undefined, undefined, 'top');
+        html += addToggleOption('Uniformiser et nettoyer les <i>titres des topics</i>', storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default, 'Uniformise le titre des topics et efface les balises inutiles/répétitives comme [ALERTE], ou l\'usage abusif du &quot;AYA&quot; et ses dérivés.\n\nExemple : &quot;[ALERTE] cet EXEMPLE incroyable AYAAAA&quot; => &quot;Cet exemple incroyable&quot;');
 
         html += '</table>';
         html += '</div>';
@@ -485,6 +485,7 @@ function addCollapsibleEvents() {
                 let view = document.querySelector('#deboucled-settings-view');
                 view.style.overflowY = 'scroll';
                 content.style.maxHeight = content.scrollHeight + 'px';
+                content.style.overflow = 'visible';
                 view.removeAttribute('style');
             }
         };
