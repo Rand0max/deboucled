@@ -237,7 +237,7 @@ function buildSettingsPage(firstLaunch = false) {
         html += '<div class="deboucled-setting-content">';
         html += '<table class="deboucled-option-table-entities">';
         html += '<tr>';
-        html += '<td>';
+        html += '<td class="deboucled-td-entity-menu">';
         html += `<input type="text" id="deboucled-${entity}-input-key" class="deboucled-input-key" placeholder="${hint}" >`;
         html += `<span id="deboucled-${entity}-input-button" class="btn deboucled-button deboucled-add-button">Ajouter</span>`;
         if (messageHint) html += `<span class="deboucled-entity-message-hint">${messageHint}</span>`;
