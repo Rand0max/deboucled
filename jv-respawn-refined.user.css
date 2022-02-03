@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.0.2
+@version        1.0.3
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -56,14 +56,14 @@
   .layout__row.layout__breadcrumb:not(.layout__row--gutter) {
     display: none;
   }
-  .topic-list .topic-img {
-    top: 0.1rem;
-    font-size: 1rem;
-  }
   .icon-topic-folder::before {
     content: "🖿";
   }
   @media (min-width: 807.99px) {
+    .topic-list .topic-img {
+      top: 0.1rem;
+      font-size: 1rem;
+    }
     .topic-list .topic-title {
       font-size: 0.72rem;
     }
