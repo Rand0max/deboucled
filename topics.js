@@ -496,7 +496,7 @@ async function topicIsModerated(topicId) {
 
 function removeUselessTags(topics) {
     // eslint-disable-next-line no-useless-escape
-    const regex = /(\[?a+y+a+o*\]?|[\{[(🛑🔴🚨 ]+(alerte.*?)[\}\])🛑🔴🚨]+|^alerte)\s?:?-?,?!?/giu;
+    const regex = /(\[?\ba+y+a+o*\b\]?|[\{[(🛑🔴🚨 ]+(alerte.*?)[\}\])🛑🔴🚨]+|^\balerte\b)\s?:?-?,?!?/giu;
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
         let newTitle = titleElem.textContent.replace(regex, '');
