@@ -244,7 +244,7 @@ function buildSettingsPage(firstLaunch = false) {
         html += `<input type="search" id="deboucled-${entity}-search-key" class="deboucled-input-search" placeholder="Rechercher..." >`;
         html += '</td>';
         html += '</tr>';
-        html += '<td style="padding-top: 12px;padding-bottom: 0;">';
+        html += '<td class="deboucled-td-entity-submenu">';
         html += `<a id="deboucled-${entity}-sortmode" class="deboucled-sort-button deboucled-sort-undefined-logo" role="button" title="Tri par défaut"></a>`;
         html += `<span id="deboucled-${entity}-entity-count" class="deboucled-entity-count"></span>`;
         html += '</td>';
@@ -343,12 +343,6 @@ function buildSettingsPage(firstLaunch = false) {
     addCollapsibleEvents();
 
     buildSettingEntities();
-
-    refreshEntityCounts();
-
-    addHighlightModeratedButton();
-
-    addSortEvent();
 }
 
 function addSettingEvents() {
@@ -509,6 +503,16 @@ function buildSettingEntities() {
     refreshSubjectKeys();
     refreshAuthorKeys();
     refreshTopicIdKeys();
+
+    addClearListButton(entitySubject, () => subjectBlacklistArray.splice(0, subjectBlacklistArray.length), refreshSubjectKeys);
+    addClearListButton(entityAuthor, () => authorBlacklistArray.splice(0, authorBlacklistArray.length), refreshAuthorKeys);
+    addClearListButton(entityTopicId, () => topicIdBlacklistMap.clear(), refreshTopicIdKeys);
+
+    addHighlightModeratedButton();
+
+    refreshEntityCounts();
+
+    addSortEvent();
 }
 
 function writeEntityKeys(entity, entries, filterCallback, removeCallback, entityClassCallback, sortCallback) {
@@ -776,29 +780,54 @@ function clearSearchInputs() {
     document.querySelectorAll('.deboucled-input-search').forEach(el => { el.value = '' });
 }
 
+function buildSettingLinkButton(text, tooltip, className, insertSelector, onclick) {
+    let anchor = document.createElement('a');
+    anchor.className = `titre-bloc deboucled-entity-link-button ${className}`;
+    anchor.setAttribute('role', 'button');
+    anchor.setAttribute('deboucled-data-tooltip', tooltip);
+    anchor.setAttribute('data-tooltip-location', 'left');
+    anchor.innerHTML = text;
+    anchor.onclick = onclick;
+    const labelCount = document.querySelector(insertSelector);
+    insertAfter(anchor, labelCount);
+}
+
+function addClearListButton(entity, clearCallback, refreshCallback) {
+    buildSettingLinkButton(
+        'Tout supprimer',
+        'Effacer entièrement cette liste noire.',
+        'deboucled-entity-clear-link-button',
+        `#deboucled-${entity}-entity-count`,
+        async () => {
+            if (!confirm('Êtes-vous sûr de vouloir effacer l\'intégralité de cette liste noire ?')) return;
+            clearCallback();
+            await saveStorage();
+            refreshCallback();
+        }
+    );
+}
+
 function addHighlightModeratedButton() {
     const buttonText = '410 ?';
     const buttonStopText = 'STOP';
-    let anchor = document.createElement('a');
-    anchor.className = 'titre-bloc deboucled-entity-moderated-button';
-    anchor.setAttribute('role', 'button');
-    anchor.setAttribute('deboucled-data-tooltip', 'Recherche les topics supprimés (410) et les affiche en rouge.');
-    anchor.setAttribute('data-tooltip-location', 'left');
-    anchor.innerHTML = buttonText;
-    anchor.onclick = async function () {
-        if (this.textContent === buttonStopText) {
-            stopHighlightModeratedTopics = true;
-            this.innerHTML = buttonText;
+    buildSettingLinkButton(
+        buttonText,
+        'Recherche les topics supprimés (410) et les affiche en rouge.',
+        undefined,
+        '#deboucled-topicid-entity-count',
+        async function () {
+            if (this.textContent === buttonStopText) {
+                stopHighlightModeratedTopics = true;
+                this.innerHTML = buttonText;
+            }
+            else {
+                this.innerHTML = `<b>${buttonStopText}</b>`;
+                await highlightModeratedTopics();
+                stopHighlightModeratedTopics = false;
+                this.innerHTML = buttonText;
+            }
         }
-        else {
-            this.innerHTML = `<b>${buttonStopText}</b>`;
-            await highlightModeratedTopics();
-            stopHighlightModeratedTopics = false;
-            this.innerHTML = buttonText;
-        }
-    };
-    const labelCount = document.querySelector('#deboucled-topicid-entity-count');
-    insertAfter(anchor, labelCount);
+    );
 }
 
 async function highlightModeratedTopics() {
