@@ -1,16 +1,14 @@
 [![DeepScan grade](https://deepscan.io/api/teams/16229/projects/19461/branches/505944/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=16229&pid=19461&bid=505944)
 
-# **Déboucled** *V2*
+# **Déboucled *V2***
 
 ## Masque les topics, les sujets et les auteurs indésirables et vous sort de la boucle.
 
 #### *Vous n'en pouvez plus des topics et des auteurs complètement boucled ?*
 #### *Vous n'en pouvez plus des Tacos et Vinz qui polluent le forum ?*
 #### *"Ton KJ de poche : ent --> ta reacprout" ça vous rend zinzin n'est-ce pas ?*
-#### *Les topics Covid19 ou Zemmour ne vous intéressent pas ?*
+#### *Les topics sur le Covid19 ou Zemmour ne vous intéressent pas ?*
 #### Ou vous souhaitez simplement avoir de nouvelles fonctionnalités et améliorer votre expérience sur les forums ?
-
-<br/>
 
 **Ce script est fait pour vous !**
 
@@ -70,3 +68,10 @@
 - **Compatible avec tous les forums JVC et sur mobile également.**
 
 Et plus encore !
+
+## Plus d'informations
+
+- [Topic JVC officiel](https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm)
+- [Topic sur JvArchive](https://jvarchive.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam)
+- [Page jvscript.fr](https://jvscript.fr/script/deboucled)
+- [Repository officiel](https://github.com/Rand0max/deboucled/)
