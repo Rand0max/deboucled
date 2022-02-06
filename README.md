@@ -8,11 +8,38 @@
 #### *Vous n'en pouvez plus des Tacos et Vinz qui polluent le forum ?*
 #### *"Ton KJ de poche : ent --> ta reacprout" ça vous rend zinzin n'est-ce pas ?*
 #### *Les topics Covid19 ou Zemmour ne vous intéressent pas ?*
-
 #### Ou vous souhaitez simplement avoir de nouvelles fonctionnalités et améliorer votre expérience sur les forums ?
 
+<br/>
 
-### **Ce script est fait pour vous !**
+**Ce script est fait pour vous !**
+
+<br/>
+
+# Installation
+
+### Étape pour mobile : Il faut d'abord installer le navigateur **Kiwi Browser** (équivalent de Chrome)
+
+<a src="https://play.google.com/store/apps/details?id=com.kiwibrowser.browser"><img src="https://kiwibrowser.com/wp-content/uploads/2019/09/cropped-Favicon-512x512-32x32.png" alt="Chrome" width="20"/> Kiwi Browser</a>
+
+### Étape 1 : Installez un gestionnaire d'userscript comme **TamperMonkey**
+
+<a src="https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=fr"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg" alt="Chrome" width="20"/> Chrome, Brave et Mobile (Kiwi)</a>
+
+<a src="https://addons.mozilla.org/fr/firefox/addon/tampermonkey/"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg" alt="Firefox" width="20"/> Firefox</a>
+
+<a src="https://addons.opera.com/fr/extensions/details/tampermonkey-beta/?display=en/"><img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.svg" alt="Opera" width="20"/> Opera</a>
+
+<a src="https://apps.apple.com/app/apple-store/id1482490089?pt=117945903&ct=tm.net&mt=8/"><img src="https://upload.wikimedia.org/wikipedia/en/7/71/Safari_14_icon.png" alt="Safari" width="20"/> Safari</a>
+
+<a src="https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd/"><img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Microsoft_Edge_logo_%282019%29.svg" alt="Edge" width="20"/> Edge</a>
+
+### Étape 2 : Installez **Déboucled**
+
+- Installez **Déboucled** en [cliquant ici](https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js) puis cliquez sur le bouton "Installer" dans la fenêtre qui s'ouvre
+
+<br/>
+
 
 ## Fonctionnalités :
 
@@ -37,12 +64,13 @@
 - **Graphique sur les tendances de filtrage** *à droite de la liste des topics*
 - **Pictogramme pour les topics *noirs*** *pour mettre en avant les topics avec plus de 100 messages*
 - **Vous pouvez choisir d'afficher plus que 25 topics** dans les options
-- **Masquer les balises abusives [ALERTE] ou les AYA à répétition dans les sujets**
-- **Thème sombre pour le script**
+- **Uniformise les titres des sujets, masque les balises abusives [ALERTE] ou les AYA à répétition** *pour gagne en lisibilité*
+- **Thème sombre et thème officiel pour le script et JVC**
 - **Les listes pré-enregistrées** : *listes anti-boucles intégrées au script et classées par catégories (Covid19, Politique, Réseaux sociaux, etc.)*
 - **Algorithme anti-Vinz** : *dites adieu à la boucle de Vinz en dépit de ses tentatives pour échapper au script*
 - **Filtrage des MPs** : *filtre les messages privés des pseudos blacklist ! Adieu Leao !*
 - **Masquer les messages dans les topics** : *les messages contenant une ou plusieurs expressions de votre "blacklist sujets" seront masqués*
+- **Intégration avec JvArchive**
 - **Régulièrement mis à jour, les suggestions et remarques sont les bienvenues**
 - **Compatible avec tous les forums JVC et sur mobile également.**
 
