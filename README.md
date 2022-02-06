@@ -14,8 +14,6 @@
 
 **Ce script est fait pour vous !**
 
-<br/>
-
 # Installation
 
 ### Étape pour mobile : Il faut d'abord installer le navigateur **Kiwi Browser** (équivalent de Chrome)
@@ -37,9 +35,6 @@
 ### Étape 2 : Installez **Déboucled**
 
 - Installez **Déboucled** en [cliquant ici](https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js) puis cliquez sur le bouton "Installer" dans la fenêtre qui s'ouvre
-
-<br/>
-
 
 ## Fonctionnalités :
 
