@@ -405,7 +405,7 @@ function addPrevisualizeTopicEvent(topics) {
     }
 
     async function onPreviewHover(topicUrl, previewDiv) {
-        if (previewDiv.querySelector('.bloc-message-forum')) return;
+        if (previewDiv.querySelector('.bloc-message-forum')) return; // already loaded
         const topicContent = await previewTopicCallback(topicUrl);
         if (!topicContent) return;
         previewDiv.firstChild.remove();

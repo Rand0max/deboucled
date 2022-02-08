@@ -112,7 +112,7 @@ function normalizeValue(value) {
     return value.toString().toUpperCase().normalizeDiacritic();
 }
 
-function buildRegex(array, withBoundaries) {
+function buildEntityRegex(array, withBoundaries) {
     if (!array?.length) return null;
 
     function transformGenericChars(str) {

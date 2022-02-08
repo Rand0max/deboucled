@@ -291,7 +291,7 @@ function buildBlacklistsRegex() {
     const mergedSubjectBlacklistArray = [...new Set([...preBoucleEnabledSubjects, ...subjectBlacklistArray])];
     const mergedAuthorBlacklistArray = [...new Set([...preBoucleEnabledAuthors, ...authorBlacklistArray, ...shadowent])];
 
-    subjectsBlacklistReg = buildRegex(mergedSubjectBlacklistArray, true);
-    authorsBlacklistReg = buildRegex(mergedAuthorBlacklistArray, false);
+    subjectsBlacklistReg = buildEntityRegex(mergedSubjectBlacklistArray, true);
+    authorsBlacklistReg = buildEntityRegex(mergedAuthorBlacklistArray, false);
 }
 

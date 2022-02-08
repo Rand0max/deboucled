@@ -130,10 +130,6 @@ a.breadcrumb__item:nth-child(1) {
   color: #7a7a7a;
 }
 
-h2.titre-bloc > span:nth-child(2) {
-  display: none;
-}
-
 .layout__adPlaceHolder {
   display: none;
 }

@@ -71,6 +71,7 @@ Et plus encore !
 
 ## Plus d'informations
 
+- [Contacter l'auteur](https://www.jeuxvideo.com/messages-prives/nouveau.php?all_dest=Rand0max)
 - [Topic JVC officiel](https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm)
 - [Topic sur JvArchive](https://jvarchive.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam)
 - [Page jvscript.fr](https://jvscript.fr/script/deboucled)
