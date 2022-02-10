@@ -24,8 +24,9 @@ function addRightBlocMatches() {
     html += '<div class="scrollable-wrapper">';
     html += '<div id="deboucled-matches-content" class="scrollable-content bloc-info-forum">';
 
+    const formatMatch = (str) => str.replaceAll(',', '').removeDoubleSpaces().trim().capitalize();
+
     function formatMatches(matches, withHint) {
-        let formatMatch = (str) => str.replaceAll(',', '').removeDoubleSpaces().trim().capitalize();
         let matchesSorted = matches.sortByValueThenKey(true);
         let matchesHtml = '';
         let index = 0;
