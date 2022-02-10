@@ -3,6 +3,18 @@
 // MAIN PAGE
 ///////////////////////////////////////////////////////////////////////////////////////
 
+function getCurrentScriptVersion() {
+    try {
+        return GM_info.script.version;
+    } catch (error) {
+        try {
+            return GM.info.script.version;
+        } catch (error) {
+            return '0.0.0';
+        }
+    }
+}
+
 function preferDarkTheme() {
     // Adjust text contrast for Dark Reader and JVC new Dark Theme
     return document.documentElement.getAttribute('data-darkreader-scheme') || !document.documentElement.classList.contains('theme-light');

@@ -132,7 +132,7 @@ function buildSettingsPage(firstLaunch = false) {
         let stylishLogo = '<span class="deboucled-stylish-logo"></span>';
         html += `<a class="deboucled-about-link-stylish" href="https://userstyles.world/style/3030/jv-respawn-refined" target="_blank" title="Thème JVC par Rand0max">${stylishLogo}</a>`;
 
-        html += `<span class="deboucled-about-version">v${deboucledVersion}</span>`;
+        html += `<span class="deboucled-about-version">v${getCurrentScriptVersion()}</span>`;
 
         html += '<table class="deboucled-option-table">';
 
