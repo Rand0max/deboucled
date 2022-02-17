@@ -145,7 +145,7 @@ function addAuthorSuggestionEvent() {
     function getWordAtCaret(clearCallback) {
         const [bStart, bEnd] = getWordBoundsAtPosition(textArea.value, textArea.selectionEnd);
         let wordAtCaret = textArea.value.substring(bStart, bEnd)?.trim();
-        if (!wordAtCaret.startsWith('@')) {
+        if (!wordAtCaret?.startsWith('@')) {
             clearCallback();
             return undefined;
         }
