@@ -205,30 +205,23 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
     });
 }
 
-function addMessageQuoteEvent() {
-    function getAuthorFromCitationBtn(e) {
-        return e.querySelector('.bloc-pseudo-msg.text-user').textContent.trim();
-    }
+function highlightQuotedAuthor(message) {
+    const messageContent = message.querySelector('.txt-msg.text-enrichi-forum');
+    if (!messageContent) return;
 
-    function getDateFromCitationBtn(e) {
-        return e.querySelector('.bloc-date-msg').textContent.trim();
-    }
+    let currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, storage_lastUsedPseudo_default);
+    currentUserPseudo = currentUserPseudo?.toLowerCase();
 
-    const textArea = document.querySelector('#message_topic');
+    const isSelf = (match) => match === currentUserPseudo || match === `@${currentUserPseudo}`;
 
-    document.querySelectorAll('.picto-msg-quote').forEach(function (btn) {
-        const parentHeader = btn.parentElement.parentElement;
-        if (!parentHeader) return;
+    // On met en surbrillance verte tous les pseudos cités avec l'@arobase sauf le compte de l'utilisateur
+    const quotedAuthorsRegex = new RegExp('@\\w+', 'gi');
+    messageContent.innerHTML = messageContent.innerHTML.replaceAll(quotedAuthorsRegex,
+        (match) => isSelf(match.toLowerCase()) ? match : `<span class="deboucled-highlighted">${match}</span>`);
 
-        btn.addEventListener('click', () => {
-            setTimeout(() => {
-                const author = getAuthorFromCitationBtn(parentHeader);
-                const date = getDateFromCitationBtn(parentHeader);
-
-                const regex = new RegExp(`> Le\\s+?${date}\\s+?:`);
-                textArea.value = textArea.value.replace(regex, `> Le ${date} '''${author}''' a écrit : `);
-            }, 600);
-        });
-    });
+    // On met en surbrillance bleue les citations du compte de l'utilisateur avec ou sans @arobase
+    const quotedSelfRegex = new RegExp(`@${currentUserPseudo}|${currentUserPseudo}`, 'gi');
+    messageContent.innerHTML = messageContent.innerHTML.replaceAll(quotedSelfRegex,
+        (match) => `<span class="deboucled-highlighted self">${match}</span>`);
 }
 

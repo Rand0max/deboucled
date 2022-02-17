@@ -285,7 +285,7 @@ async function isTopicPoC(element, optionDetectPocMode) {
     if (!titleElem) return false;
 
     const title = titleElem.textContent.trim().normalizeDiacritic();
-    const isTitlePocRegex = /(pos(t|te|tez|to|too|tou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan|postouk|postook|pose.*toucan/i;
+    const isTitlePocRegex = /(pos(t|te|tez|to|too|tou|ttou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan|postouk|postook|pose.*toucan/i;
     let isTitlePoc = title.isMatch(isTitlePocRegex);
 
     if ((optionDetectPocMode === 1 || optionDetectPocMode === 3) && !isTitlePoc) {
@@ -433,6 +433,7 @@ function addPrevisualizeTopicEvent(topics) {
 
         anchor.onclick = () => onPreviewHover(topicUrl, previewDiv);
         anchor.onmouseenter = () => onPreviewHover(topicUrl, previewDiv);
+        anchor.ontouchstart = () => onPreviewHover(topicUrl, previewDiv);
     });
 }
 

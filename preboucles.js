@@ -16,7 +16,6 @@ function addPreBoucle(id, title, type, enabled, entities) {
 }
 
 function initPreBoucles() {
-    // 'ambiguite' ?
     addPreBoucle('boucledauthors', 'Pseudos boucled', entityAuthor, true,
         ['vinz', 'tacos', 'aneryl', 'flubus', 'kinahe', 'cacadetruire', 'pazeur', 'antoineforum', 'regimeducamp', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre',
             'abbath', 'bobbob', 'croustipeau', 'cigarette', 'cigarrette', 'deratiseur', 'descogentil', 'draco-choc', 'erlinghaland', 'grifforzer', 'gutkaiser',
@@ -29,7 +28,8 @@ function initPreBoucles() {
             'cubarobusto', 'storev2', 'maikolinge', 'sanarik', 'encorebanni', 'gilbert733513', 'lydens', 'lionseul', 'lionseducteur', 'yarienapres4', 'timident',
             'lionbanni', 'liondoux', 'lionancestral', 'cubemalgache', 'charle*auvet', 'auvet*charle', 'nastyanass', 'op_tiffany', 'avortax3000', 'mikey3000',
             'maleau', 'maieau', 'sakuta', 'stopbanboucle', 'lerenoi*debxl', 'leblackprotrump', 'bannissement137', 'janullrich', 'marlounbrandon', 'tomcain',
-            'liondepressif', 'coulisdepet', 'arminiya', 'risitasultime']);
+            'liondepressif', 'coulisdepet', 'arminiya', 'risitasultime', 'puissance2khey', 'puissancedekhey', 'lickeurdepied', 'kyie_not_guilty', 'kyie_not_guilty',
+            'varhastra11-10', 'facksyer', 'captaine-marvel', 'fieldm', 'styx666', 'atlantiquem', 'alettaoceanv1', 'alettaoceanv2', 'camillezizi', 'doomdeathworth']);
 
     addPreBoucle('bots', 'BOTS', entityAuthor, false,
         ['tontonfouilleur', 'squeezie-issou', '2__marche', '2marche', 'deux-marche', 'anatoli_diatlov', 'soutien-rpc', 'lovemaze', 'leo2005', '1m54maisgrand', 'moussecerise',
@@ -37,16 +37,16 @@ function initPreBoucles() {
             'merci-macron99', 'poechips', 'avortax3000', 'avenoelsuce', 'mikey3000', 'giissadedesinge', 'glissadedesinge', 'quesais-je']);
 
     addPreBoucle('kj', 'Kikoo-Japs', entityAuthor, false,
-        ['kj', 'kikoojap', 'kaji', 'kajy', 'trap', 'feet', 'waifu', 'kawai', 'sissy', 'crucifist01', '_rsaaidesoutien', '-pazifion-', '[aleatoire]', '[arnak]', '[nft]',
+        ['kj', 'kikoojap', 'kaji', 'kajy', 'trap', 'feet', 'waifu', 'kawai', 'sissy', 'crucifist01', '_rsaaidesoutien', '-pazifion-', '[arbitraire]', '[aleatoire]', '[arnak]', '[nft]',
             '[pink]panther', '[raven-_]', '[-]raven[-]', 'aaargh_0degat', 'aaaarumi', 'aaargh_0knuckle', 'akambi', 'albatarrrrr', 'alcyonae', 'aleatoire423', 'alorspotetre',
             'amiamore', 'animexpert_01', 'aniviathefrozen', 'asnium', 'assnium', 'asniumbandant', 'ass2trefle', 'azerlax', 'bakjou', 'bbclove', 'beckycringeintp', 'beckyguwu',
             'bigredin', 'botanica', 'bousedekheyette', 'cage-i', 'celestinhoiii', 'charlesbuk', 'chatdutieks', 'cheuns', 'chucklaplante', 'chunchunmaru', 'chxrlotte', 'dankie',
-            'deadwapanese', 'deratisubuleryl', 'dokurorider', 'dqasdqdsqsdv', 'dqddqeaededzea', 'draco-choc', 'e-n-a', 'ecrevisse6', 'ecrevisse10', 'el_citrone', 'elgoldfag',
+            'deadwapanese', 'deratisubuleryl', 'dokurorider', 'dqasdqdsqsdv', 'dqddqeaededzea', 'draco-choc', 'e-n-a', 'ecrevisse6', 'ecrevisse10', 'el_citrone', 'elementarydesu', 'elgoldfag',
             'elilalilalulu', 'emptydudes', 'erikawaii', 'esclave_ankha', 'euhpile', 'evabien', 'femboy', 'fiondeky0ko', 'fiondekyoko', 'fragiluxur', 'fragilustucru', 'fukujuuu',
             'fullapesinge', 'furumia', 'gallys7', 'gamonstrebanni', 'gawr_gura', 'germanqueen', 'gio849', 'gockwach', 'goiemique', 'gommeblanc', 'gommebianc', 'goreprincess',
             'grifforzer', 'guiguifdp', 'haruko', 'heimtathurs', 'hollowness', 'hunterjahimees', 'hyacinthos', 'iamnokhey', 'icefairy', 'incognitosecret', 'incel2sur10ette',
             'inostranet', 'itoshirin', 'izumi_sagiri', 'jailedroibordel', 'jean_yahya', 'jeunessehonneur', 'jiva-chan', 'johanneslekhey', 'jteclaquelcul', 'jus_2_beat', 'jyren', 'kai-kod',
-            'kane', 'kawashimaurara', 'kesshouban', 'khaaal', 'kikoojapfangeux', 'kikoojapsordide', 'kiyoe', 'klaosuen', 'komisan', 'kyokotoshino', 'labynocle', 'laffey', 'lalena',
+            'kane', 'kawashimaurara', 'kesshouban', 'khaaal', 'kikoojapfangeux', 'kikoojapsordide', 'kirakira_', 'kiyoe', 'klaosuen', 'komisan', 'kyokotoshino', 'labynocle', 'laffey', 'lalena',
             'lastingchild', 'le*nettoyeur', 'lenticulaire', 'lighthalzen', 'lisabp', 'lizslennus', 'locuskitagawa', 'lorkhaj89', 'lostwar', 'louisenadjeda', 'luna-blu', 'lysae',
             'maeligg', 'maneirei', 'maneiret', 'margie_pkmn', 'marreduban', 'melkhor-dono', 'meowni', 'meragi', 'millefi', 'minatohiraishi', 'minseo', 'misakino_kukuru',
             'missmonochrome', 'mister_swing', 'miuyaaa', 'mukbang', 'mxthy', 'nancy*tomoe', 'nettoyeur2gland', 'nyamikyoto', 'nyctophobie', 'nysaee', 'okachinami', 'oneponey',
@@ -62,12 +62,13 @@ function initPreBoucles() {
             'arenyl', 'zemouroide', 'jefaisunlive', 'cub*t*mp', 'tub*dut*mp', 'ordredutemple-', 'cubedeletan', 'vulvedutemp', 'pubdutemp', 'cubeduclan', 'cubedurang',
             'cubedutime', 'clandutube', 'boucleur', 'stonegiant', 'cacadetruire', 'pazeur', 'antoineforum', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'croustipeau',
             'draco-choc', 'grifforzer', 'hommecoussinet', 'kiwayjohansson', 'surk', 'zeroavenir', 'huile7coude', 'huiledecoude', 'aklaros', 'britneysperm', 'avortax3000',
-            'avenoelsuce', 'stopbanboucle', 'pump101', 'fessesdefemme', 'janullrich', 'lans6', 'lans28', 'djanoug', 'le0tout', 'coulisdepet', 'leprofesor', 'vincentfreman']);
+            'avenoelsuce', 'stopbanboucle', 'pump101', 'fessesdefemme', 'janullrich', 'lans6', 'lans28', 'djanoug', 'le0tout', 'coulisdepet', 'leprofesor', 'vincentfreman',
+            'facksyer', 'multoo', 'sonicfan18', 'rayonceleste', 'ayaacescouilles', 'kdayone', 'camillezizi', 'ketchupent']);
 
     addPreBoucle('aw', 'AW', entityAuthor, false,
         ['peore', '[kj]', 'jojolechatgris', 'lecelestinsympa', 'suprakheyette', 'cheuns', 'lapetitegouine', 'kanou43', 'breod', 'titanlevrette', 'pump101', 'dandelotte',
             'pandore-', 'regimeducamp', 'oneponey', 'amandadu42', 'nabilis', 'sereinepyj', 'frimeuze', 'naomi_sama', 'rousse_radieuse', 'parvatikheyette', 'contedefees',
-            'saintepasteque', 'venus_noire', 'incel2sur10ette', 'sereineptiote', 'amiamore', 'esalamy69']);
+            'saintepasteque', 'venus_noire', 'incel2sur10ette', 'sereineptiote', 'amiamore', 'esalamy69', 'multoo', 'seuleavie', 'camillezizi']);
 
 
     addPreBoucle('popularboucles', 'Boucles connues', entitySubject, true,
@@ -76,15 +77,16 @@ function initPreBoucles() {
             'allemand fou detruit son clavier', 'ma caissiere', 'traduisez en anglais', 'sauce sonic', 'seth gueko', 'gros gamos allemand', 'eau blanche', 'sss sache que',
             'genre de mec', 'dwayne johnson', 'charles auvet', 'charle auvet', 'now cum', 'let\'s fucking go', 'boule blanche dans la mozarella', 'crocodile chelou',
             'forumeur le plus eclatax', 'galet de poche', 'kebab breton', 'kebeb breton', 'des chances font du bruits et foutent le bordel', 'femmes vulgaires au lit',
-            'rockeuse dans l\'âme', 'pris une audi a1', 'fortune d\'arthur', 'renault sort son', 'japonaise*cave*93', 'embauché chez microsoft', 'chié durant l\'accouchement',
-            'reddit entier sur un mmo', 'rizantrasse', 'chinois dans un wok', 'ans de spam sur le 18-25', 'gamecube est la pire console', 'famille bourgeoise est incroyable',
-            '300 jeux switch', 'je suis web dev', 'lara croft en legging', 'm\'avez vous déjà vu', 'jdg*youtube m\'ennuie', 'annonce son nouveau suv', 'hommes*qui font des métiers de bureau',
-            'si tu me trompes je te pardonne', '2m08', 'ancien complotiste', 'ami antivax est mort', 'disent*boucle*topics', 'volé un topic', 'do you know pomper l\'eau',
-            'cloudfare*antoineforum', 'cloudflare*antoineforum', 'action*antoineforum', 'antoineforum*ruine', 'dextre*antoineforum', 'frère*atteint de trisomie', 'khey*cuve de poulets',
-            'mais j’ai menti sur mon job', 'évolution*style vestimentaire', 'meufs*haute savoie', 'hanouna et tpmp explosent de rire', 'honte*voile', 'sarah fraisou*nue', 'bon...',
-            'la boucle jancovici', 'merde si t\'es pas millionnaire', 'millionnaire avec internet t\'es une merde', 'mecs*jeans*slim*skinny', 'classe de france en 2050', 'vole*meuf*tinder',
+            'rockeuse dans l\'âme', 'pris une audi a1', 'fortune d\'arthur', 'renault sort son*suv', 'renault présente son*suv', 'japonaise*cave*93', 'embauché chez microsoft',
+            'chié durant l\'accouchement', 'reddit entier sur un mmo', 'rizantrasse', 'chinois dans un wok', 'ans de spam sur le 18-25', 'gamecube est la pire console',
+            'famille bourgeoise est incroyable', '300 jeux switch', 'je suis web dev', 'lara croft en legging', 'm\'avez vous déjà vu', 'jdg*youtube m\'ennuie',
+            'annonce son nouveau suv', 'présente son nouveau suv', 'hommes*qui font des métiers de bureau', 'si tu me trompes je te pardonne', '2m08', 'ancien complotiste',
+            'ami antivax est mort', 'disent*boucle*topics', 'volé un topic', 'do you know pomper l\'eau', 'cloudfare*antoineforum', 'cloudflare*antoineforum',
+            'action*antoineforum', 'antoineforum*ruine', 'dextre*antoineforum', 'frère*atteint de trisomie', 'khey*cuve de poulets', 'mais j’ai menti sur mon job',
+            'évolution*style vestimentaire', 'meufs*haute savoie', 'hanouna et tpmp explosent de rire', 'honte*voile', 'sarah fraisou*nue', 'bon...', 'la boucle jancovici',
+            'merde si t\'es pas millionnaire', 'millionnaire avec internet t\'es une merde', 'mecs*jeans*slim*skinny', 'classe de france en 2050', 'vole*meuf*tinder',
             'game one dans la boucle', 'wallah*wesh*sur ma mère*gros*chaaaud*oubli du*en dirait*', 'gilles verdez*el con*gosse', 'arthur*gilles verdez*el con', 'arthur*el con',
-            'cette illusion d\'optique', 'sdf*degueulasse']);
+            'cette illusion d\'optique', 'sdf*degueulasse', 'ressemble*rogue', 'bol*4100', 'cereales*4100', 'aletta ocean*nietzschéenne', 'aletta ocean*surfemme', 'filles aiment ce style de mec', 'cap*chiottes*arteres', 'jeunes*passions*bancales*abrutissantes', 'fermez*dubstep']);
 
     addPreBoucle('covid19', 'Covid19', entitySubject, false,
         ['covid*', 'corona*', 'virus', 'gestes barriere', 'geste barriere', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*',
@@ -116,7 +118,8 @@ function initPreBoucles() {
         ['reacprout*', 'prout', 'caca', 'cacaprout', 'pipi', 'chibrax', 'post ou', 'postoo', 'pose toucan', 'chibre']);
 
     addPreBoucle('hatred', 'Haineux', entitySubject, false,
-        ['facho*', 'chofs', 'chofa*', 'qlf', 'paz', 'pazification', 'pazifie', 's2s', 'gwer*', 'raciste*', 'hagar', 'hagra', '🐊', '🐷', 'bassem', 'sadek', 'les porcs', 'hitler', 'nazi*', 'mussolini', 'staline', 'negre*', 'bougnoul*', 'youtre*']);
+        ['facho*', 'chofs', 'chofa*', 'qlf', 'paz', 'pazification', 'pazifie', 's2s', 'gwer*', 'raciste*', 'hagar', 'hagra', '🐊', '🐷', 'bassem', 'sadek', 'les porcs',
+            'hitler', 'nazi*', 'mussolini', 'staline', 'negre*', 'bougnoul*', 'youtre*']);
 
     addPreBoucle('girls', 'Femmes', entitySubject, false,
         ['meuf', 'fille', 'femme', '*/10', '*/20', 'cul', 'sein*', 'boob*', 'bzez', '95e', 'kheyette*', 'colombienne', 'emma roberts', 'estelle redpill', 'lena situations',
@@ -126,16 +129,17 @@ function initPreBoucles() {
     addPreBoucle('rap', 'Rap', entitySubject, false,
         ['rap', 'rappeur*', 'rappeuse*', 'maes', 'lacrim', 'orelsan', 'ninho', 'ziak', 'gambi', 'gazo', 'kalash', 'niska', 'rohff', 'booba', 'b2o', 'kaaris', 'pnl', 'qlf',
             'larse', 'vald', 'mister you', 'eminem', 'wiz khalifa', 'drake', 'xxxtentacion', 'nba youngboy', 'rick ross', 'future', 'travis scott', 'tyga', 'kid cudi', 'pop smoke',
-            'run the jewels', 'nas', 'tupac', '2pac', 'cardi b', 'kendrick lamar', 'lil wayne', 'nicki minaj', 'jul', 'freeze corleone', 'damso', 'the weekend', 'lil uzi', 'fianso', 'kery james']);
+            'run the jewels', 'nas', 'tupac', '2pac', 'cardi b', 'kendrick lamar', 'lil wayne', 'nicki minaj', 'jul', 'freeze corleone', 'damso', 'the weekend', 'lil uzi',
+            'fianso', 'kery james']);
 
     addPreBoucle('porn', 'Pornographie', entitySubject, false,
-        ['porn*', 'p0rn*', 'pron', 'blacked', 'mym', 'onlyfan', 'onlyfans', 'rimjob', 'chaturbate', 'abigail mac', 'addie andrews', 'agatha vega', 'aidra fox', 'alex clark',
+        ['porn*', 'p0rn*', 'pron', 'blacked', 'mym', 'onlyfan', 'onlyfans', 'rimjob', 'chaturbate', 'abigail mac', 'addie andrews', 'agatha vega', 'aidra fox', 'aletta ocean', 'alex clark',
             'alex grey', 'alexas morgan', 'alina lopez', 'amber moore', 'anissa kate', 'aria sky', 'ariana marie', 'august ames', 'autumn falls', 'bailey mattingly', 'bella rolland',
             'blake blossom', 'blake eden', 'bonnie kinz', 'bree daniels', 'brett rossi', 'brittanya razavi', 'celeste', 'dani daniels', 'darcie dolce', 'dillion harper', 'ella hughes',
             'elsa jean', 'emily addison', 'emily willis', 'emma mae', 'eva lovia', 'foxy di', 'gabbie carter', 'gianna dior', 'hayden winters', 'hyley winters', 'janice griffith',
             'jenna jameson', 'jia lissa', 'josephine jackson', 'kayla kayden', 'kayley gunner', 'keisha grey', 'kendra sunderland', 'kenna james', 'kenzie anne', 'kiera winters',
             'lacy lennon', 'lana rhoades', 'leah gotti', 'lena paul', 'lexi belle', 'lily ivy', 'lily love', 'little caprice', 'liya silver', 'lola myluv', 'lucy li', 'luxury girl',
-            'madi meadows', 'madison ivy', 'malena morgan', 'megan salinas', 'mia malkova', 'mia melano', 'michaela isizzu', 'molly jane', 'nadya nabakova', 'nancy ace',
+            'madi meadows', 'madison ivy', 'malena morgan', 'megan salinas', 'mia malkova', 'mia melano', 'michaela isizzu', 'molly jane', 'nadya nabakova', 'nancy ace', 'adriana chechik',
             'natalia starr', 'nicole aniston', 'octokuro', 'peta jensen', 'red fox', 'riley anne', 'riley reid', 'ryan ryans', 'sabrina maree', 'samantha saint', 'scarlett hampton',
             'serena becker', 'shae summers', 'simonn', 'skye blue', 'sofi ryan', 'sophia leone', 'stella cox', 'sunny leone', 'sybil a', 'tasha reign', 'tiffany thompson', 'jynx maze',
             'tiny teen', 'tommie jo', 'tori black', 'traci lords', 'tru kait', 'victoria lynn', 'viola bailey', 'whitney westgate', 'woodman', 'bbc', 'valentina nappi', 'angela white']);

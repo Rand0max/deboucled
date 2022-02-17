@@ -244,3 +244,108 @@ async function awaitElements(target, selector) {
     });
 }
 
+function getWordBoundsAtPosition(str, position) {
+    const isSpace = (c) => /\s/.exec(c);
+    let start = position - 1;
+    let end = position;
+
+    while (start >= 0 && !isSpace(str[start])) {
+        start -= 1;
+    }
+    start = Math.max(0, start + 1);
+
+    while (end < str.length && !isSpace(str[end])) {
+        end += 1;
+    }
+    end = Math.max(start, end);
+
+    return [start, end];
+}
+
+function getCaretCoordinates(element, position) {
+    // https://www.npmjs.com/package/textarea-caret
+    // - "Tu es un bon langage ?" - "Oui je ne donne pas la position du curseur." - ent
+
+    let properties = [
+        'direction',
+        'boxSizing',
+        'width',
+        'height',
+        'overflowX',
+        'overflowY',
+        'borderTopWidth',
+        'borderRightWidth',
+        'borderBottomWidth',
+        'borderLeftWidth',
+        'borderStyle',
+        'paddingTop',
+        'paddingRight',
+        'paddingBottom',
+        'paddingLeft',
+        'fontStyle',
+        'fontVariant',
+        'fontWeight',
+        'fontStretch',
+        'fontSize',
+        'fontSizeAdjust',
+        'lineHeight',
+        'fontFamily',
+        'textAlign',
+        'textTransform',
+        'textIndent',
+        'textDecoration',
+        'letterSpacing',
+        'wordSpacing',
+        'tabSize',
+        'MozTabSize'
+    ];
+
+    let isBrowser = (typeof window !== 'undefined');
+    let isFirefox = (isBrowser && window.mozInnerScreenX != null);
+
+    let div = document.createElement('div');
+    div.id = 'input-textarea-caret-position-mirror-div';
+    document.body.appendChild(div);
+
+    let style = div.style;
+    let computed = window.getComputedStyle ? window.getComputedStyle(element) : element.currentStyle;
+    let isInput = element.nodeName === 'INPUT';
+
+    style.whiteSpace = 'pre-wrap';
+    if (!isInput) style.wordWrap = 'break-word';
+
+    style.position = 'absolute';
+    style.visibility = 'hidden';
+
+    properties.forEach(function (prop) {
+        if (isInput && prop === 'lineHeight') {
+            style.lineHeight = computed.height;
+        } else {
+            style[prop] = computed[prop];
+        }
+    });
+
+    if (isFirefox) {
+        if (element.scrollHeight > parseInt(computed.height)) style.overflowY = 'scroll';
+    } else {
+        style.overflow = 'hidden';
+    }
+
+    div.textContent = element.value.substring(0, position);
+    if (isInput) div.textContent = div.textContent.replace(/\s/g, '\u00a0');
+
+    let span = document.createElement('span');
+    span.textContent = element.value.substring(position) || '.';
+    div.appendChild(span);
+
+    let coordinates = {
+        top: span.offsetTop + parseInt(computed['borderTopWidth']),
+        left: span.offsetLeft + parseInt(computed['borderLeftWidth']),
+        height: parseInt(computed['lineHeight'])
+    };
+
+    document.body.removeChild(div);
+
+    return coordinates;
+}
+

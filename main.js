@@ -300,7 +300,7 @@ function handleBlSubjectIgnoreMessages(messageElement) {
     }
 }
 
-function handleMessage(message, topicId, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages) {
+function handleMessage(message, topicId, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages, optionEnhanceQuotations) {
     let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
     if (!authorElement) return;
     let author = authorElement.textContent.trim();
@@ -328,6 +328,8 @@ function handleMessage(message, topicId, optionHideMessages, optionBoucledUseJva
     }
 
     handleMessageHighlightTopicAuthor(topicId, author, authorElement);
+
+    if (optionEnhanceQuotations) highlightQuotedAuthor(message);
 
     const isSelf = userPseudo && userPseudo.toLowerCase() === author.toLowerCase();
     if (!optionBlSubjectIgnoreMessages || isSelf) return;
@@ -449,6 +451,7 @@ async function handleTopicMessages() {
     let optionHideMessages = !isWhitelistedTopic && GM_getValue(storage_optionHideMessages, storage_optionHideMessages_default);
     let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
     let optionBlSubjectIgnoreMessages = !isWhitelistedTopic && GM_getValue(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default);
+    let optionEnhanceQuotations = GM_getValue(storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default);
 
     const topicId = getTopicId();
 
@@ -457,15 +460,24 @@ async function handleTopicMessages() {
     let allMessages = getAllMessages(document);
     await setTopicAuthor(topicId);
     allMessages.forEach(function (message) {
-        handleMessage(message, topicId, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages);
+        handleMessage(
+            message,
+            topicId,
+            optionHideMessages,
+            optionBoucledUseJvarchive,
+            optionBlSubjectIgnoreMessages,
+            optionEnhanceQuotations);
     });
 
     if (hiddenMessages === allMessages.length) displayTopicDeboucledMessage();
 
-    //buildMessagesHeader();
     addRightBlocMatches();
     saveTotalHidden();
-    addMessageQuoteEvent();
+
+    if (optionEnhanceQuotations) {
+        addMessageQuoteEvents(allMessages);
+        addAuthorSuggestionEvent();
+    }
 }
 
 async function handleSearch() {
@@ -647,6 +659,7 @@ async function init(currentPageType) {
     addDisableFilteringButton();
 
     userPseudo = getUserPseudo();
+    if (userPseudo?.length) GM_setValue(storage_lastUsedPseudo, userPseudo);
 }
 
 async function entryPoint() {

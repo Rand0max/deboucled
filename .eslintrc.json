@@ -18,6 +18,7 @@
     "stats.js",
     "topics.js",
     "messages.js",
+    "postmessage.js",
     "settings.js",
     "privatemessages.js",
     "main.js"

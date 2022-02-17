@@ -1,4 +1,6 @@
 body {
+  --deboucled-main-color: #035ebf;
+  --deboucled-main-dark-color: #023f80;
   --deboucled-background-color: #eee;
   --deboucled-text-color: #333;
   --deboucled-entity-pre-background-color: #ecba3e;
@@ -19,6 +21,8 @@ body {
   --deboucled-td-border-color: #00000066;
 }
 body.deboucled-dark-theme {
+  --deboucled-main-color: #035ebf;
+  --deboucled-main-dark-color: #023f80;
   --deboucled-background-color: #333;
   --deboucled-text-color: #eee;
   --deboucled-entity-pre-background-color: #b78c1e;
@@ -112,6 +116,14 @@ body.deboucled-dark-theme {
   }
 }
 
+.deboucled-highlighted {
+  background-color: var(--jv-text-success);
+  border-radius: 14%/50%;
+  padding: 3px 5px;
+}
+.deboucled-highlighted.self {
+  background-color: var(--jv-text-primary);
+}
 .deboucled-blacklisted {
   color: #e60000 !important;
 }
@@ -503,6 +515,17 @@ body.deboucled-dark-theme {
   background-size: 24px;
   display: inline-block;
 }
+.deboucled-quote-logo {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAAp0lEQVRIie2UUQqDMBBEn+IRSs9UDyA9Tnseb1X1p/QO2o9uwBqjG91QCj5YCLNkJglJ4CCCEmiBYWe14uXxMDB31cwF9NLciwsBIDcwXCR5QLHSnx5ZtqJ7/P8RjQOC27QKmCMDrjKuFfoiX/dXOAFP4AWcFXrIJ9ioRauUenTAFn73krvJCrYWfH5UD6vvugEumt2NJ900E2JJau4CkpkD3FOam/EGXNdt7gZ43WoAAAAASUVORK5CYII=)
+    0 no-repeat;
+  width: 20px;
+  height: 20px;
+  background-size: 20px;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 3px;
+  filter: invert(var(--deboucled-filter-invert));
+}
 
 .deboucled-eye-white-logo {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGiSURBVEhL7ZSxSsNQFIYb6dZiVdxsKViwOPkGUtx8BGf1IRz0XTpJi+AiFgRBrIuDgg4uKr5ALVRRx+v335zEtKS2g9ilH3wk+c+5t+m9STJTJk5gx1SccwsctnAT13ARRQfvsIWHQRB0FY4NE2dxD99xFOpRb9aG/w6NRbzGiDPcxirmTJ0rUy1CY4o2TTo0lPFZ3fCE61YainrwUQNAY8tW6odCHh/UBZc4ZyXVSniEb+YxVq2segEvUGiOvJV+IKz7snO3GDdwrslfVRigiyVri25QY0Xd4hCCWpi7T6xY7OFady5OcAm1R6cKoGltHq4rqDlEzWJfaIeZO7AohkxLIuIN5Fz/SvQsiiHbD0uuresZn/7g7Dguaf2Dc/pfjZboA5ct9nCtDRVaFi2P7r6lABrW5uF6Bb98JblEgiDa5BvMWaxcz7w2dJAOJpdtFu9VgP5NFoTJx1SPXMFKqumum9gzG5icfB6vUKQ/poJC8kXTyzPOi7aBLxoAw1+0CBrSPhU7uIr6l1Lnu3iOEaM/FRE0/tnHbjKf6yn/SCbzDcCUuoiprpfXAAAAAElFTkSuQmCC)
@@ -604,6 +627,56 @@ body.deboucled-dark-theme {
   height: 18px;
   background-size: 16px;
   vertical-align: bottom;
+}
+
+.deboucled-quote {
+  position: absolute;
+  font-size: 0;
+  opacity: 0;
+  transform: scale(0);
+  transition-duration: 200ms;
+  transition-property: opacity transform;
+  box-shadow: 1px 1px 2px -1px rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  height: 18px;
+  display: inline-block;
+}
+.deboucled-quote::after {
+  content: "";
+  position: absolute;
+  top: -15px;
+  border: solid 8px transparent;
+  display: block;
+  border-bottom-color: var(--deboucled-main-color);
+}
+.deboucled-quote.active {
+  opacity: 1;
+  transform: scale(1);
+}
+.deboucled-partial-quote-logo {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAEVJREFUeNpiYBgFFANGbIL/gQCuAAhwiYEAE6UuoI0BSE78gE8MpwFA7yZAmRvwiTHg0NwAxOeBuACIFXCJjQIqAoAAAwDEvS2y79EjywAAAABJRU5ErkJggg==)
+    0 no-repeat;
+  background-color: var(--deboucled-main-color);
+  background-position: -1px -1px;
+  display: inline-block;
+  vertical-align: top;
+  position: relative;
+  height: 16px;
+  width: 16px;
+  box-sizing: content-box;
+  border: 0;
+  padding: 0;
+  border-bottom: solid 2px var(--deboucled-main-dark-color);
+  color: #fff;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.deboucled-author-suggestion {
+  cursor: pointer;
+}
+.deboucled-author-suggestion.selected {
+  cursor: pointer;
+  background: var(--jv-blue-light);
 }
 
 .deboucled-preboucle-title {
@@ -875,12 +948,12 @@ input[type="search"] {
 .deboucled-bloc-header {
   font-weight: 700;
   color: #fff;
-  background-color: #035ebf;
+  background-color: var(--deboucled-main-color);
   margin: 0 0 0 0;
   padding: 7px 12px;
   width: auto;
   border-radius: 0;
-  border-color: #023f80;
+  border-color: var(--deboucled-main-dark-color);
   border-style: solid;
   border-width: thin;
   position: relative;

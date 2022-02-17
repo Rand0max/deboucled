@@ -161,6 +161,9 @@ function buildSettingsPage(firstLaunch = false) {
 
         html += addToggleOption('Uniformiser et nettoyer les <i>titres des topics</i>', storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default, 'Uniformise le titre des topics et efface les balises inutiles/répétitives comme [ALERTE], ou l\'usage abusif du &quot;AYA&quot; et ses dérivés.\n\nExemple : &quot;[ALERTE] cet EXEMPLE incroyable AYAAAA&quot; => &quot;Cet exemple incroyable&quot;');
 
+        let quoteLogo = '<span class="deboucled-quote-logo"></span>'
+        html += addToggleOption(`Améliorer les <i>citations</i> ${quoteLogo} des messages`, storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default, 'Améliore les citations avec plusieurs fonctionnalités :\n\n• Insère le pseudo du message cité\n• Citer une partie des messages en sélectionnant le texte\n• Citer et suggérer des pseudos en écrivant avec l\'arobase @ (conditions : connecté et minimum 3 lettres)\n• Mettre en couleur votre pseudo lorsqu\'il est cité');
+
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -395,6 +398,7 @@ function addSettingEvents() {
         })
     });
     addToggleEvent(storage_optionRemoveUselessTags);
+    addToggleEvent(storage_optionEnhanceQuotations);
     addRangeEvent(storage_optionDisplayThreshold);
     addRangeEvent(storage_optionMaxTopicCount);
     addSelectEvent(storage_optionDetectPocMode);
@@ -487,7 +491,7 @@ function addCollapsibleEvents() {
 }
 
 function buildSettingEntities() {
-    const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u2018-\u201F\u00A1-\u02AF\u{1F300}-\u{1FAD6}]*$/iu;
+    const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u2018-\u201F\u00A1-\u02AF\u2700-\u27BF\u{1F300}-\u{1FAD6}]*$/iu;
     // eslint-disable-next-line no-useless-escape
     const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]\*]*$/iu;
     const regexAllowedTopicId = /^[0-9]+$/i;
