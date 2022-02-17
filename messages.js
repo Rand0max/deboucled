@@ -212,16 +212,19 @@ function highlightQuotedAuthor(message) {
     let currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, storage_lastUsedPseudo_default);
     currentUserPseudo = currentUserPseudo?.toLowerCase();
 
-    const isSelf = (match) => match === currentUserPseudo || match === `@${currentUserPseudo}`;
+    const isSelf = (match) => (currentUserPseudo?.length && (match === currentUserPseudo || match === `@${currentUserPseudo}`));
 
     // On met en surbrillance verte tous les pseudos cités avec l'@arobase sauf le compte de l'utilisateur
     const quotedAuthorsRegex = new RegExp('@\\w+', 'gi');
     messageContent.innerHTML = messageContent.innerHTML.replaceAll(quotedAuthorsRegex,
         (match) => isSelf(match.toLowerCase()) ? match : `<span class="deboucled-highlighted">${match}</span>`);
 
-    // On met en surbrillance bleue les citations du compte de l'utilisateur avec ou sans @arobase
-    const quotedSelfRegex = new RegExp(`@${currentUserPseudo}|${currentUserPseudo}`, 'gi');
-    messageContent.innerHTML = messageContent.innerHTML.replaceAll(quotedSelfRegex,
-        (match) => `<span class="deboucled-highlighted self">${match}</span>`);
+
+    if (currentUserPseudo?.length) {
+        // On met en surbrillance bleue les citations du compte de l'utilisateur avec ou sans @arobase
+        const quotedSelfRegex = new RegExp(`@${currentUserPseudo}|${currentUserPseudo}`, 'gi');
+        messageContent.innerHTML = messageContent.innerHTML.replaceAll(quotedSelfRegex,
+            (match) => `<span class="deboucled-highlighted self">${match}</span>`);
+    }
 }
 
