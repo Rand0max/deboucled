@@ -214,16 +214,35 @@ function highlightQuotedAuthor(message) {
 
     const isSelf = (match) => (currentUserPseudo?.length && (match === currentUserPseudo || match === `@${currentUserPseudo}`));
 
+    function replaceAllTextQuotes(element, regex, replaceCallback) {
+        [...element.children].forEach(child => {
+            replaceAllTextQuotes(child, regex, replaceCallback)
+        });
+        const textChildren = getTextChildren(element);
+        textChildren.forEach(c => {
+            if (!c.textContent?.length) return;
+            const newText = c.textContent?.replaceAll(regex, replaceCallback);
+            if (c.textContent === newText) return;
+            let newNode = document.createElement('span');
+            c.parentElement.insertBefore(newNode, c);
+            c.remove(); // Toujours remove avant de changer l'outerHTML pour éviter le bug avec Chrome
+            newNode.outerHTML = newText;
+        });
+    }
+//|(?:\b|^)random(?:\b|$)
     // On met en surbrillance verte tous les pseudos cités avec l'@arobase sauf le compte de l'utilisateur
-    const quotedAuthorsRegex = new RegExp('@\\w+', 'gi');
-    messageContent.innerHTML = messageContent.innerHTML.replaceAll(quotedAuthorsRegex,
+    const quotedAuthorsRegex = new RegExp('\\B@\\w+', 'gi');
+    replaceAllTextQuotes(
+        messageContent,
+        quotedAuthorsRegex,
         (match) => isSelf(match.toLowerCase()) ? match : `<span class="deboucled-highlighted">${match}</span>`);
-
 
     if (currentUserPseudo?.length) {
         // On met en surbrillance bleue les citations du compte de l'utilisateur avec ou sans @arobase
-        const quotedSelfRegex = new RegExp(`@${currentUserPseudo}|${currentUserPseudo}`, 'gi');
-        messageContent.innerHTML = messageContent.innerHTML.replaceAll(quotedSelfRegex,
+        const quotedSelfRegex = new RegExp(`\\B@${currentUserPseudo}\\b|(?<!\\w|@)${currentUserPseudo}\\b`, 'gi');
+        replaceAllTextQuotes(
+            messageContent,
+            quotedSelfRegex,
             (match) => `<span class="deboucled-highlighted self">${match}</span>`);
     }
 }

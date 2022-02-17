@@ -349,3 +349,7 @@ function getCaretCoordinates(element, position) {
     return coordinates;
 }
 
+function getTextChildren(contentElement) {
+    return [...contentElement.childNodes].filter(c => c.nodeType === Node.TEXT_NODE && c.textContent.trim() !== '');
+}
+

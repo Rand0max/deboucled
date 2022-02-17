@@ -204,7 +204,12 @@ function backupStorage() {
     let map = new Map();
     GM_listValues().forEach(key => {
         if (onlyBlacklists && !storage_Keys_Blacklists.includes(key)) return;
-        map.set(key, JSON.parse(GM_getValue(key)));
+        const val = GM_getValue(key);
+        try {
+            map.set(key, JSON.parse(val));
+        } catch {
+            map.set(key, val);
+        }
     });
     let json = JSON.stringify(Object.fromEntries(map));
     var file = blobToFile(new Blob([json], { type: 'application/json' }), 'deboucled');

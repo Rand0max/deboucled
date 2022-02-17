@@ -247,8 +247,6 @@ function handleMessageBlacklistMatches(messageElement) {
     const allowedTags = ['P', 'STRONG', 'U', 'I', 'EM', 'B'];
     const getParagraphChildren = (contentElement) => [...contentElement.children].filter(c => allowedTags.includes(c.tagName) && c.textContent.trim() !== '');
 
-    const getTextChildren = (contentElement) => [...contentElement.childNodes].filter(c => c.nodeType === Node.TEXT_NODE && c.textContent.trim() !== '');
-
     function highlightMatches(textChild) {
         const matches = getSubjectBlacklistMatches(textChild.textContent);
         if (!matches?.length) return false;
