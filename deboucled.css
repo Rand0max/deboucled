@@ -118,6 +118,7 @@ body.deboucled-dark-theme {
 
 .deboucled-highlighted {
   background-color: var(--jv-text-success);
+  color: #ffffffd0;
   border-radius: 15px;
   padding: 2px 5px;
 }
