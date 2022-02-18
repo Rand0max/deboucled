@@ -118,8 +118,8 @@ body.deboucled-dark-theme {
 
 .deboucled-highlighted {
   background-color: var(--jv-text-success);
-  border-radius: 14%/50%;
-  padding: 3px 5px;
+  border-radius: 15px;
+  padding: 2px 5px;
 }
 .deboucled-highlighted.self {
   background-color: var(--jv-text-primary);

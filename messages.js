@@ -214,28 +214,49 @@ function highlightQuotedAuthor(message) {
 
     const isSelf = (match) => (currentUserPseudo?.length && (match === currentUserPseudo || match === `@${currentUserPseudo}`));
 
-    function replaceAllTextQuotes(element, regex, replaceCallback) {
+    function replaceAllTextQuotes(element, regex, replaceCallback, alternateCallback) {
         [...element.children].forEach(child => {
-            replaceAllTextQuotes(child, regex, replaceCallback)
+            replaceAllTextQuotes(child, regex, replaceCallback, alternateCallback)
         });
         const textChildren = getTextChildren(element);
-        textChildren.forEach(c => {
-            if (!c.textContent?.length) return;
-            const newText = c.textContent?.replaceAll(regex, replaceCallback);
-            if (c.textContent === newText) return;
+        textChildren.forEach(childNode => {
+            if (!childNode.textContent?.length) return;
+            if (alternateCallback) alternateCallback(childNode);
+
+            const newText = childNode.textContent?.replaceAll(regex, replaceCallback);
+            if (childNode.textContent === newText) return;
+
             let newNode = document.createElement('span');
-            c.parentElement.insertBefore(newNode, c);
-            c.remove(); // Toujours remove avant de changer l'outerHTML pour éviter le bug avec Chrome
+            childNode.parentElement.insertBefore(newNode, childNode);
+            childNode.remove(); // Toujours remove avant de changer l'outerHTML pour éviter le bug avec Chrome
             newNode.outerHTML = newText;
         });
     }
-//|(?:\b|^)random(?:\b|$)
-    // On met en surbrillance verte tous les pseudos cités avec l'@arobase sauf le compte de l'utilisateur
-    const quotedAuthorsRegex = new RegExp('\\B@\\w+', 'gi');
+
+    // On met en surbrillance verte tous les pseudos cités avec l'@arobase (sauf le compte de l'utilisateur)
+    const allowedPseudo = '[\\w\\-_\\[\\]]'; // lettres & chiffres & -_[]
+    const quotedAtAuthorsRegex = new RegExp(`\\B@${allowedPseudo}+`, 'gi');
     replaceAllTextQuotes(
         messageContent,
-        quotedAuthorsRegex,
+        quotedAtAuthorsRegex,
         (match) => isSelf(match.toLowerCase()) ? match : `<span class="deboucled-highlighted">${match}</span>`);
+
+
+    // On met en surbrillance verte tous les pseudos cités avec le bouton "standard" (sauf le compte de l'utilisateur)
+    const quotedAuthorsFullRegex = new RegExp(`(?!le\\s[0-9]{1,2}\\s[a-zéù]{3,10}\\s[0-9]{4}\\sà\\s[0-9]{2}:[0-9]{2}:[0-9]{2}\\s:)(?<author>${allowedPseudo}+)(?=\\sa\\sécrit\\s:)`, 'gi');
+    const quotedAuthorsPartRegex = new RegExp('le\\s[0-9]{1,2}\\s[a-zéù]{3,10}\\s[0-9]{4}\\sà\\s[0-9]{2}:[0-9]{2}:[0-9]{2}\\s(?!:)', 'gi');
+    replaceAllTextQuotes(
+        messageContent,
+        quotedAuthorsFullRegex,
+        (match) => isSelf(match.toLowerCase()) ? match : `<span class="deboucled-highlighted">${match}</span>`,
+        (n) => {
+            // S'il s'agit d'une citation où le pseudo est en html on vire le html et on fusionne le texte
+            if (!n.textContent.match(quotedAuthorsFullRegex) && n.textContent.match(quotedAuthorsPartRegex)) {
+                n.textContent = `${n.textContent}${n.nextSibling.textContent}${n.nextSibling.nextSibling.textContent}`;
+                n.nextSibling.nextSibling.remove();
+                n.nextSibling.remove();
+            }
+        });
 
     if (currentUserPseudo?.length) {
         // On met en surbrillance bleue les citations du compte de l'utilisateur avec ou sans @arobase
