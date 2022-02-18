@@ -428,7 +428,7 @@ function addPrevisualizeTopicEvent(topics) {
         let previewDiv = document.createElement('div');
         previewDiv.className = 'deboucled-preview-content bloc-message-forum';
         previewDiv.innerHTML = '<img class="deboucled-spinner" src="http://s3.noelshack.com/uploads/images/20188032684831_loading.gif" alt="Loading" />';
-        previewDiv.onclick = function (e) { e.preventDefault(); }
+        previewDiv.onclick = (e) => e.preventDefault();
         anchor.appendChild(previewDiv);
 
         anchor.onclick = () => onPreviewHover(topicUrl, previewDiv);

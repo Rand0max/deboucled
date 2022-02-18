@@ -162,7 +162,7 @@ function buildSettingsPage(firstLaunch = false) {
         html += addToggleOption('Uniformiser et nettoyer les <i>titres des topics</i>', storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default, 'Uniformise le titre des topics et efface les balises inutiles/répétitives comme [ALERTE], ou l\'usage abusif du &quot;AYA&quot; et ses dérivés.\n\nExemple : &quot;[ALERTE] cet EXEMPLE incroyable AYAAAA&quot; => &quot;Cet exemple incroyable&quot;');
 
         let quoteLogo = '<span class="deboucled-quote-logo"></span>'
-        html += addToggleOption(`Améliorer les <i>citations</i> ${quoteLogo} des messages`, storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default, 'Améliore les citations avec plusieurs fonctionnalités :\n\n• Insère le pseudo du message cité\n• Citer une partie des messages en sélectionnant le texte\n• Citer et suggérer des pseudos en écrivant avec l\'arobase @ (conditions : connecté et minimum 3 lettres)\n• Mettre en couleur votre pseudo lorsqu\'il est cité');
+        html += addToggleOption(`Améliorer les <i>citations</i> ${quoteLogo} des messages`, storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default, 'Améliore les citations avec plusieurs fonctionnalités :\n\n• Insère le pseudo du message cité\n• Citer une partie des messages en sélectionnant le texte\n• Citer et suggérer des pseudos en écrivant avec l\'arobase @ (conditions : connecté et minimum 3 lettres)\n• Mettre en couleur les pseudos lorsqu\'ils sont cités');
 
         html += '</table>';
         html += '</div>';

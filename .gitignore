@@ -10,3 +10,4 @@ tsconfig.json
 /package.json
 *.debug.js
 *.log
+*.ps1

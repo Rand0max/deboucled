@@ -29,7 +29,7 @@ function initPreBoucles() {
             'lionbanni', 'liondoux', 'lionancestral', 'cubemalgache', 'charle*auvet', 'auvet*charle', 'nastyanass', 'op_tiffany', 'avortax3000', 'mikey3000',
             'maleau', 'maieau', 'sakuta', 'stopbanboucle', 'lerenoi*debxl', 'leblackprotrump', 'bannissement137', 'janullrich', 'marlounbrandon', 'tomcain',
             'liondepressif', 'coulisdepet', 'arminiya', 'risitasultime', 'puissance2khey', 'puissancedekhey', 'lickeurdepied', 'kyie_not_guilty', 'kyie_not_guilty',
-            'varhastra11-10', 'facksyer', 'captaine-marvel', 'fieldm', 'styx666', 'atlantiquem', 'alettaoceanv1', 'alettaoceanv2', 'camillezizi', 'doomdeathworth']);
+            'varhastra11-10', 'facksyer', 'captaine-marvel', 'fieldm', 'styx666', 'atlantiquem', 'alettaoceanv1', 'alettaoceanv2', 'camillezizi', 'doomdeathworth', 'beagie']);
 
     addPreBoucle('bots', 'BOTS', entityAuthor, false,
         ['tontonfouilleur', 'squeezie-issou', '2__marche', '2marche', 'deux-marche', 'anatoli_diatlov', 'soutien-rpc', 'lovemaze', 'leo2005', '1m54maisgrand', 'moussecerise',
@@ -55,7 +55,8 @@ function initPreBoucles() {
             'riokanol', 'ronisiaa', 'sahary', 'sakuta', 'sashimimaruu', 'secalydesudesu', 'sereineptiote', 'sinfulweeb', 'shillzificator', 'shintamaru', 'slimeti2', 'snuffyherisson',
             'solio', 'sosca', 'soup71', 'sruoxo', 'steinhausen', 'steinhorst', 'steinherz', 'superoksuper', 'supertemmies', 'suyi', 'teslakite', 'thehatkid', 'tobiichi', 'toyaf',
             'tropfandetoi', 'twice-the-love', 'uchidato', 'uwo', 'venulon', 'violeteverdeen', 'viiviiiix', 'vivearl', 'vivrayman3', 'waifupeach', 'wainwright', 'wepper', 'whitepantyhose',
-            'xeenay', 'yameyakuna', 'yhria', 'ylliade', 'yofie', 'yojong', 'yokohama', 'yoshi_v', 'yoshiyosh', 'yotsuyamk', 'yuhina', 'yumiaaaa', 'zerotwo-']);
+            'xeenay', 'yameyakuna', 'yhria', 'ylliade', 'yofie', 'yojong', 'yokohama', 'yoshi_v', 'yoshiyosh', 'yotsuyamk', 'yuhina', 'yumiaaaa', 'zerotwo-', 'biancalapeste',
+            'luminadivina', 'pourquoipas-', 'gommebleu', 'kinojv']);
 
     addPreBoucle('insane', 'Zinzins', entityAuthor, false,
         ['vincenfreeman', 'aneryl', 'flubus', 'kinahe', 'leao', 'oael', 'vinz', 'vcxn', 'tacos', 'lesyeuxduforum', 'cigarette', 'cigarrette', 'deratiseur', 'windowsbot',
@@ -63,12 +64,13 @@ function initPreBoucles() {
             'cubedutime', 'clandutube', 'boucleur', 'stonegiant', 'cacadetruire', 'pazeur', 'antoineforum', 'jaxtaylor', 'procaine', 'antigwer', 'ademonstre', 'croustipeau',
             'draco-choc', 'grifforzer', 'hommecoussinet', 'kiwayjohansson', 'surk', 'zeroavenir', 'huile7coude', 'huiledecoude', 'aklaros', 'britneysperm', 'avortax3000',
             'avenoelsuce', 'stopbanboucle', 'pump101', 'fessesdefemme', 'janullrich', 'lans6', 'lans28', 'djanoug', 'le0tout', 'coulisdepet', 'leprofesor', 'vincentfreman',
-            'facksyer', 'multoo', 'sonicfan18', 'rayonceleste', 'ayaacescouilles', 'kdayone', 'camillezizi', 'ketchupent']);
+            'facksyer', 'multoo', 'sonicfan18', 'rayonceleste', 'ayaacescouilles', 'kdayone', 'camillezizi', 'ketchupent', 'zer0tonin', 'beagie']);
 
     addPreBoucle('aw', 'AW', entityAuthor, false,
         ['peore', '[kj]', 'jojolechatgris', 'lecelestinsympa', 'suprakheyette', 'cheuns', 'lapetitegouine', 'kanou43', 'breod', 'titanlevrette', 'pump101', 'dandelotte',
             'pandore-', 'regimeducamp', 'oneponey', 'amandadu42', 'nabilis', 'sereinepyj', 'frimeuze', 'naomi_sama', 'rousse_radieuse', 'parvatikheyette', 'contedefees',
-            'saintepasteque', 'venus_noire', 'incel2sur10ette', 'sereineptiote', 'amiamore', 'esalamy69', 'multoo', 'seuleavie', 'camillezizi']);
+            'saintepasteque', 'venus_noire', 'incel2sur10ette', 'sereineptiote', 'amiamore', 'esalamy69', 'multoo', 'seuleavie', 'camillezizi', 'rephya', 'pourquoipas-',
+            'miserette', 'anyataylorjoie']);
 
 
     addPreBoucle('popularboucles', 'Boucles connues', entitySubject, true,
@@ -86,7 +88,10 @@ function initPreBoucles() {
             'évolution*style vestimentaire', 'meufs*haute savoie', 'hanouna et tpmp explosent de rire', 'honte*voile', 'sarah fraisou*nue', 'bon...', 'la boucle jancovici',
             'merde si t\'es pas millionnaire', 'millionnaire avec internet t\'es une merde', 'mecs*jeans*slim*skinny', 'classe de france en 2050', 'vole*meuf*tinder',
             'game one dans la boucle', 'wallah*wesh*sur ma mère*gros*chaaaud*oubli du*en dirait*', 'gilles verdez*el con*gosse', 'arthur*gilles verdez*el con', 'arthur*el con',
-            'cette illusion d\'optique', 'sdf*degueulasse', 'ressemble*rogue', 'bol*4100', 'cereales*4100', 'aletta ocean*nietzschéenne', 'aletta ocean*surfemme', 'filles aiment ce style de mec', 'cap*chiottes*arteres', 'jeunes*passions*bancales*abrutissantes', 'fermez*dubstep']);
+            'cette illusion d\'optique', 'sdf*degueulasse', 'ressemble*rogue', 'bol*4100', 'cereales*4100', 'aletta ocean*nietzschéenne', 'aletta ocean*surfemme',
+            'filles aiment ce style de mec', 'cap*chiottes*arteres', 'jeunes*passions*bancales*abrutissantes', 'fermez*dubstep', 'fake jdg', 'jdg leader price',
+            'fake joueur du grenier', 'jdg eco+', 'jdg du pauvre', 'joueur du grenier leader price', 'joueur du grenier inférieur', 'joueur du grenier lidl',
+            'jdg lidl', 'joueur du grenier du pauvre']);
 
     addPreBoucle('covid19', 'Covid19', entitySubject, false,
         ['covid*', 'corona*', 'virus', 'gestes barriere', 'geste barriere', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*',

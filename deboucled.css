@@ -117,13 +117,18 @@ body.deboucled-dark-theme {
 }
 
 .deboucled-highlighted {
-  background-color: var(--jv-text-success);
-  color: #ffffffd0;
+  background-color: var(--jv-text-primary);
+  color: white;
   border-radius: 15px;
   padding: 2px 5px;
+  opacity: 0.9;
+  cursor: default;
+}
+.deboucled-highlighted:hover {
+  opacity: 1;
 }
 .deboucled-highlighted.self {
-  background-color: var(--jv-text-primary);
+  background-color: var(--jv-text-success);
 }
 .deboucled-blacklisted {
   color: #e60000 !important;
