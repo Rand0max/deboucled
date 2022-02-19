@@ -92,7 +92,7 @@ function buildSettingsPage(firstLaunch = false) {
         html += '<span id="deboucled-export-button" class="btn deboucled-button deboucled-setting-button">Sauvegarder</span>';
         html += '<span id="deboucled-import-tbl" class="btn deboucled-button deboucled-setting-button" style="min-width: 10rem;">Importer TotalBlacklist</span>';
         html += '</td>';
-        html += '<td class="deboucled-td-right" style="white-space: nowrap;">';
+        html += '<td class="deboucled-td-right info" style="white-space: nowrap;">';
         html += '<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message" style="display: block; text-align: center;">Restauration terminée</span>';
         html += '<span id="deboucled-impexp-message" class="deboucled-setting-impexp-message">⚠ Veuillez rafraichir la page ⚠</span>';
         html += '</td>';

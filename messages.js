@@ -205,10 +205,11 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
     });
 }
 
-function getParagraphChildren(element) {
+function getParagraphChildren(element, allowBlockQuote = false) {
     const allowedTags = ['P', 'STRONG', 'U', 'I', 'EM', 'B'];
+    if (allowBlockQuote) allowedTags.push('BLOCKQUOTE');
     return [...element.children].filter(c => allowedTags.includes(c.tagName) && c.textContent.trim() !== '');
-};
+}
 
 function fixMessageUrls(message) {
     const messageContent = message.querySelector('.txt-msg.text-enrichi-forum');
@@ -255,7 +256,7 @@ function highlightQuotedAuthor(message) {
     const isSelf = (match) => (currentUserPseudo?.length && (match === currentUserPseudo || match === `@${currentUserPseudo}`));
 
     function replaceAllTextQuotes(element, regex, replaceCallback, alternateCallback) {
-        [...element.children].forEach(child => {
+        getParagraphChildren(element, true).forEach(child => {
             replaceAllTextQuotes(child, regex, replaceCallback, alternateCallback)
         });
         const textChildren = getTextChildren(element);

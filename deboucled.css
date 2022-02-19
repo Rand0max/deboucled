@@ -117,12 +117,15 @@ body.deboucled-dark-theme {
 }
 
 .deboucled-highlighted {
-  background-color: var(--jv-text-primary);
-  color: white;
+  background-color: var(--jv-block-bg-color-hover-dark);
+  color: var(--jv-text-color);
   border-radius: 15px;
   padding: 2px 5px;
-  opacity: 0.8;
+  opacity: 0.95;
   cursor: default;
+}
+blockquote .deboucled-highlighted {
+  opacity: 0.8;
 }
 .deboucled-highlighted:hover {
   opacity: 1;
@@ -1390,6 +1393,14 @@ select.deboucled-dropdown::-ms-expand {
   .data-tooltip-large:before {
     max-width: 58vw;
   }
+  [deboucled-data-tooltip]::before {
+    max-width: 53vw;
+  }
+}
+@media (max-width: 1200px) {
+  .deboucled-td-right.info {
+    display: none;
+  }
 }
 @media (max-width: 999px) {
   .deboucled-settings-view {
@@ -1398,6 +1409,9 @@ select.deboucled-dropdown::-ms-expand {
   }
   .data-tooltip-large:before {
     max-width: 53vw;
+  }
+  [deboucled-data-tooltip]::before {
+    max-width: 50vw;
   }
 }
 @media (max-width: 807.98px) {
@@ -1434,11 +1448,17 @@ select.deboucled-dropdown::-ms-expand {
   .bloc-rech-forum .txt-search {
     width: 8.25rem;
   }
+  [deboucled-data-tooltip]::before {
+    max-width: 33vw;
+  }
 }
 @media (max-width: 558px) {
   .deboucled-overlay {
     left: -12px;
     width: 108%;
+  }
+  [deboucled-data-tooltip]::before {
+    max-width: 60vw;
   }
 }
 @media (max-width: 500px) {

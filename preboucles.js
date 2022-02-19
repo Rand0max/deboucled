@@ -29,7 +29,8 @@ function initPreBoucles() {
             'lionbanni', 'liondoux', 'lionancestral', 'cubemalgache', 'charle*auvet', 'auvet*charle', 'nastyanass', 'op_tiffany', 'avortax3000', 'mikey3000',
             'maleau', 'maieau', 'sakuta', 'stopbanboucle', 'lerenoi*debxl', 'leblackprotrump', 'bannissement137', 'janullrich', 'marlounbrandon', 'tomcain',
             'liondepressif', 'coulisdepet', 'arminiya', 'risitasultime', 'puissance2khey', 'puissancedekhey', 'lickeurdepied', 'kyie_not_guilty', 'kyie_not_guilty',
-            'varhastra11-10', 'facksyer', 'captaine-marvel', 'fieldm', 'styx666', 'atlantiquem', 'alettaoceanv1', 'alettaoceanv2', 'camillezizi', 'doomdeathworth', 'beagie']);
+            'varhastra11-10', 'facksyer', 'captaine-marvel', 'fieldm', 'styx666', 'atlantiquem', 'alettaoceanv1', 'alettaoceanv2', 'camillezizi', 'doomdeathworth',
+            'beagie', 'fr2u']);
 
     addPreBoucle('bots', 'BOTS', entityAuthor, false,
         ['tontonfouilleur', 'squeezie-issou', '2__marche', '2marche', 'deux-marche', 'anatoli_diatlov', 'soutien-rpc', 'lovemaze', 'leo2005', '1m54maisgrand', 'moussecerise',
@@ -92,7 +93,7 @@ function initPreBoucles() {
             'cette illusion d\'optique', 'sdf*degueulasse', 'ressemble*rogue', 'bol*4100', 'cereales*4100', 'aletta ocean*nietzschéenne', 'aletta ocean*surfemme',
             'filles aiment ce style de mec', 'cap*chiottes*arteres', 'jeunes*passions*bancales*abrutissantes', 'fermez*dubstep', 'fake jdg', 'jdg leader price',
             'fake joueur du grenier', 'jdg eco+', 'jdg du pauvre', 'joueur du grenier leader price', 'joueur du grenier inférieur', 'joueur du grenier lidl',
-            'jdg lidl', 'joueur du grenier du pauvre', 'adolescent*71*balles*ak-47']);
+            'jdg lidl', 'joueur du grenier du pauvre', 'adolescent*71*balles*ak-47', 'allez jamais au parc asterix']);
 
     addPreBoucle('covid19', 'Covid19', entitySubject, false,
         ['covid*', 'corona*', 'virus', 'gestes barriere', 'geste barriere', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*',
