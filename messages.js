@@ -232,14 +232,14 @@ function fixMessageUrls(message) {
     }
 
     // On traite d'abord les images car c'est des urls aussi
-    const imageUrlRegex = new RegExp(/\bhttps:[/|.|\w|\s|-]*\.(?:jpg|jpeg|gif|png|svg|bmp|tif|tiff)\b/, 'gi');
+    const imageUrlRegex = new RegExp(/\bhttps:[/.\w\s-]*\.(?:jpg|jpeg|gif|png|svg|bmp|tif|tiff)\b/, 'gi');
     parseElement(
         messageContent,
         imageUrlRegex,
         (m) => `<a href="${m}" target="_blank" class="xXx"><img class="img-shack" src="${m}" alt="${m}" width="68" height="51"></a>`);
 
     // Puis on traite les urls normales
-    const urlRegex = new RegExp(/\b(?:https?:\/\/)[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+/, 'gi');
+    const urlRegex = new RegExp(/\b(?:https?:\/\/)[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+/, 'gi');
     parseElement(
         messageContent,
         urlRegex,

@@ -367,7 +367,7 @@ function getTopicCurrentPageId() {
     return parseInt(pageActiveElem.textContent.trim())
 }
 
-async function setTopicAuthor(topicId, allMessages) {
+async function setTopicAuthor(topicId) {
     if (!topicId || topicAuthorMap.has(topicId)) return;
 
     const pageId = getTopicCurrentPageId();
@@ -379,6 +379,7 @@ async function setTopicAuthor(topicId, allMessages) {
         if (!currentDoc) return;
     }
 
+    let allMessages = getAllMessages(currentDoc);
     if (allMessages.length === 0) return;
     const firstMessage = allMessages[0];
     if (!firstMessage) return;
@@ -453,7 +454,7 @@ async function handleTopicMessages() {
     handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages);
 
     let allMessages = getAllMessages(document);
-    await setTopicAuthor(topicId, allMessages);
+    await setTopicAuthor(topicId);
     allMessages.forEach(function (message) {
         handleMessage(
             message,
