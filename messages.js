@@ -205,6 +205,46 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
     });
 }
 
+function getParagraphChildren(element) {
+    const allowedTags = ['P', 'STRONG', 'U', 'I', 'EM', 'B'];
+    return [...element.children].filter(c => allowedTags.includes(c.tagName) && c.textContent.trim() !== '');
+};
+
+function fixMessageUrls(message) {
+    const messageContent = message.querySelector('.txt-msg.text-enrichi-forum');
+    if (!messageContent) return;
+
+    function parseElement(element, regex, replaceCallback) {
+        getParagraphChildren(element).forEach(child => parseElement(child, regex, replaceCallback));
+
+        const textChildren = getTextChildren(element);
+        textChildren.forEach(textNode => {
+            if (!textNode.textContent?.length) return;
+            const newText = textNode.textContent?.replaceAll(regex, replaceCallback);
+            if (textNode.textContent === newText) return;
+
+            let newNode = document.createElement('a');
+            textNode.parentElement.insertBefore(newNode, textNode);
+            textNode.remove(); // Toujours remove avant de changer l'outerHTML pour éviter le bug avec Chrome
+            newNode.outerHTML = newText;
+        });
+    }
+
+    // On traite d'abord les images car c'est des urls aussi
+    const imageUrlRegex = new RegExp(/https?:[/|.|\w|\s|-]*\.(?:jpg|jpeg|gif|png|svg|bmp|tif|tiff)/, 'gi');
+    parseElement(
+        messageContent,
+        imageUrlRegex,
+        (m) => `<a href="${m}" target="_blank" class="xXx"><img class="img-shack" src="${m}" alt="${m}" width="68" height="51"></a>`);
+
+    // Puis on traite les urls normales
+    const urlRegex = new RegExp(/(?:https?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+/, 'gi');
+    parseElement(
+        messageContent,
+        urlRegex,
+        (m) => `<a class="xXx" href="${m}" title="${m}" target="_blank">${m}</a>`);
+}
+
 function highlightQuotedAuthor(message) {
     const messageContent = message.querySelector('.txt-msg.text-enrichi-forum');
     if (!messageContent) return;
@@ -219,16 +259,16 @@ function highlightQuotedAuthor(message) {
             replaceAllTextQuotes(child, regex, replaceCallback, alternateCallback)
         });
         const textChildren = getTextChildren(element);
-        textChildren.forEach(childNode => {
-            if (!childNode.textContent?.length) return;
-            if (alternateCallback) alternateCallback(childNode);
+        textChildren.forEach(textNode => {
+            if (!textNode.textContent?.length) return;
+            if (alternateCallback) alternateCallback(textNode);
 
-            const newText = childNode.textContent?.replaceAll(regex, replaceCallback);
-            if (childNode.textContent === newText) return;
+            const newText = textNode.textContent?.replaceAll(regex, replaceCallback);
+            if (textNode.textContent === newText) return;
 
             let newNode = document.createElement('span');
-            childNode.parentElement.insertBefore(newNode, childNode);
-            childNode.remove(); // Toujours remove avant de changer l'outerHTML pour éviter le bug avec Chrome
+            textNode.parentElement.insertBefore(newNode, textNode);
+            textNode.remove(); // Toujours remove avant de changer l'outerHTML pour éviter le bug avec Chrome
             newNode.outerHTML = newText;
         });
     }
@@ -244,7 +284,7 @@ function highlightQuotedAuthor(message) {
 
     // On met en surbrillance bleue tous les pseudos cités avec le bouton "standard" (sauf le compte de l'utilisateur)
     const quotedAuthorsFullRegex = new RegExp(`(?!le\\s[0-9]{1,2}\\s[a-zéù]{3,10}\\s[0-9]{4}\\sà\\s[0-9]{2}:[0-9]{2}:[0-9]{2}\\s:)(?<author>${allowedPseudo}+)(?=\\sa\\sécrit\\s:)`, 'gi');
-    const quotedAuthorsPartRegex = new RegExp('le\\s[0-9]{1,2}\\s[a-zéù]{3,10}\\s[0-9]{4}\\sà\\s[0-9]{2}:[0-9]{2}:[0-9]{2}\\s(?!:)', 'gi');
+    const quotedAuthorsPartRegex = new RegExp(/le\s[0-9]{1,2}\s[a-zéù]{3,10}\s[0-9]{4}\sà\s[0-9]{2}:[0-9]{2}:[0-9]{2}\s(?!:)/, 'gi');
     replaceAllTextQuotes(
         messageContent,
         quotedAuthorsFullRegex,

@@ -56,7 +56,8 @@ function initPreBoucles() {
             'solio', 'sosca', 'soup71', 'sruoxo', 'steinhausen', 'steinhorst', 'steinherz', 'superoksuper', 'supertemmies', 'suyi', 'teslakite', 'thehatkid', 'tobiichi', 'toyaf',
             'tropfandetoi', 'twice-the-love', 'uchidato', 'uwo', 'venulon', 'violeteverdeen', 'viiviiiix', 'vivearl', 'vivrayman3', 'waifupeach', 'wainwright', 'wepper', 'whitepantyhose',
             'xeenay', 'yameyakuna', 'yhria', 'ylliade', 'yofie', 'yojong', 'yokohama', 'yoshi_v', 'yoshiyosh', 'yotsuyamk', 'yuhina', 'yumiaaaa', 'zerotwo-', 'biancalapeste',
-            'luminadivina', 'pourquoipas-', 'gommebleu', 'kinojv']);
+            'luminadivina', 'pourquoipas-', 'gommebleu', 'kinojv', 'aidessoutien95', 'gladys_bonheur', 'asenir', 'pyj2sur10', 'petitebouche', 'hunterchasseur',
+            'kud-chan', 'lastral', 'kamui_bungee', '[explo]', '[ks]lilly_satou', 'fimi_', 'askeladden41', 'adhd-kun', 'edinu', 'miseron', 'couverturent', 'yuuthirohito']);
 
     addPreBoucle('insane', 'Zinzins', entityAuthor, false,
         ['vincenfreeman', 'aneryl', 'flubus', 'kinahe', 'leao', 'oael', 'vinz', 'vcxn', 'tacos', 'lesyeuxduforum', 'cigarette', 'cigarrette', 'deratiseur', 'windowsbot',
@@ -91,7 +92,7 @@ function initPreBoucles() {
             'cette illusion d\'optique', 'sdf*degueulasse', 'ressemble*rogue', 'bol*4100', 'cereales*4100', 'aletta ocean*nietzschéenne', 'aletta ocean*surfemme',
             'filles aiment ce style de mec', 'cap*chiottes*arteres', 'jeunes*passions*bancales*abrutissantes', 'fermez*dubstep', 'fake jdg', 'jdg leader price',
             'fake joueur du grenier', 'jdg eco+', 'jdg du pauvre', 'joueur du grenier leader price', 'joueur du grenier inférieur', 'joueur du grenier lidl',
-            'jdg lidl', 'joueur du grenier du pauvre']);
+            'jdg lidl', 'joueur du grenier du pauvre', 'adolescent*71*balles*ak-47']);
 
     addPreBoucle('covid19', 'Covid19', entitySubject, false,
         ['covid*', 'corona*', 'virus', 'gestes barriere', 'geste barriere', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*',

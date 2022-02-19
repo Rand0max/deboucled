@@ -244,9 +244,6 @@ function highlightBlacklistMatches(element, matches) {
 }
 
 function handleMessageBlacklistMatches(messageElement) {
-    const allowedTags = ['P', 'STRONG', 'U', 'I', 'EM', 'B'];
-    const getParagraphChildren = (contentElement) => [...contentElement.children].filter(c => allowedTags.includes(c.tagName) && c.textContent.trim() !== '');
-
     function highlightMatches(textChild) {
         const matches = getSubjectBlacklistMatches(textChild.textContent);
         if (!matches?.length) return false;
@@ -326,6 +323,7 @@ function handleMessage(message, topicId, optionHideMessages, optionBoucledUseJva
     }
 
     handleMessageHighlightTopicAuthor(topicId, author, authorElement);
+    fixMessageUrls(message);
 
     if (optionEnhanceQuotations) highlightQuotedAuthor(message);
 
@@ -369,7 +367,7 @@ function getTopicCurrentPageId() {
     return parseInt(pageActiveElem.textContent.trim())
 }
 
-async function setTopicAuthor(topicId) {
+async function setTopicAuthor(topicId, allMessages) {
     if (!topicId || topicAuthorMap.has(topicId)) return;
 
     const pageId = getTopicCurrentPageId();
@@ -381,7 +379,6 @@ async function setTopicAuthor(topicId) {
         if (!currentDoc) return;
     }
 
-    let allMessages = getAllMessages(currentDoc);
     if (allMessages.length === 0) return;
     const firstMessage = allMessages[0];
     if (!firstMessage) return;
@@ -456,7 +453,7 @@ async function handleTopicMessages() {
     handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages);
 
     let allMessages = getAllMessages(document);
-    await setTopicAuthor(topicId);
+    await setTopicAuthor(topicId, allMessages);
     allMessages.forEach(function (message) {
         handleMessage(
             message,
