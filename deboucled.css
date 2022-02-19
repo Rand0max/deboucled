@@ -132,6 +132,7 @@ blockquote .deboucled-highlighted {
 }
 .deboucled-highlighted.self {
   background-color: var(--jv-text-success);
+  color: white;
 }
 .deboucled-blacklisted {
   color: #e60000 !important;
