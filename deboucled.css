@@ -122,12 +122,14 @@ body.deboucled-dark-theme {
   border-radius: 15px;
   padding: 2px 5px;
   opacity: 0.95;
-  cursor: default;
+  cursor: pointer;
 }
 blockquote .deboucled-highlighted {
   opacity: 0.8;
 }
+.deboucled-highlighted:active,
 .deboucled-highlighted:hover {
+  color: var(--jv-text-color);
   opacity: 1;
 }
 .deboucled-highlighted.self {
@@ -229,6 +231,9 @@ blockquote .deboucled-highlighted {
 }
 .input-on-off {
   visibility: hidden;
+}
+.bloc-message-forum {
+  overflow: visible;
 }
 
 /* Button */

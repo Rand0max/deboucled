@@ -254,6 +254,8 @@ function highlightQuotedAuthor(message) {
     currentUserPseudo = currentUserPseudo?.toLowerCase();
 
     const isSelf = (match) => (currentUserPseudo?.length && (match === currentUserPseudo || match === `@${currentUserPseudo}`));
+    const buildProfilHighlightAnchor = (match, self = '') =>
+        `<a class="deboucled-highlighted${self}" href="/profil/${match.toLowerCase()}?mode=infos" target="_blank" title="Voir le profil de ${match}">${match}</a>`;
 
     function replaceAllTextQuotes(element, regex, replaceCallback, alternateCallback) {
         getParagraphChildren(element, true).forEach(child => {
@@ -267,7 +269,7 @@ function highlightQuotedAuthor(message) {
             const newText = textNode.textContent?.replaceAll(regex, replaceCallback);
             if (textNode.textContent === newText) return;
 
-            let newNode = document.createElement('span');
+            let newNode = document.createElement('a');
             textNode.parentElement.insertBefore(newNode, textNode);
             textNode.remove(); // Toujours remove avant de changer l'outerHTML pour éviter le bug avec Chrome
             newNode.outerHTML = newText;
@@ -280,7 +282,7 @@ function highlightQuotedAuthor(message) {
     replaceAllTextQuotes(
         messageContent,
         quotedAtAuthorsRegex,
-        (match) => isSelf(match.toLowerCase()) ? match : `<span class="deboucled-highlighted">${match}</span>`);
+        (match) => isSelf(match.toLowerCase()) ? match : buildProfilHighlightAnchor(match));
 
 
     // On met en surbrillance bleue tous les pseudos cités avec le bouton "standard" (sauf le compte de l'utilisateur)
@@ -289,7 +291,7 @@ function highlightQuotedAuthor(message) {
     replaceAllTextQuotes(
         messageContent,
         quotedAuthorsFullRegex,
-        (match) => isSelf(match.toLowerCase()) ? match : `<span class="deboucled-highlighted">${match}</span>`,
+        (match) => isSelf(match.toLowerCase()) ? match : buildProfilHighlightAnchor(match),
         (n) => {
             // S'il s'agit d'une citation où le pseudo est en html on vire le html et on fusionne le texte
             if (!n.textContent.match(quotedAuthorsFullRegex) && n.textContent.match(quotedAuthorsPartRegex)) {
@@ -305,7 +307,7 @@ function highlightQuotedAuthor(message) {
         replaceAllTextQuotes(
             messageContent,
             quotedSelfRegex,
-            (match) => `<span class="deboucled-highlighted self">${match}</span>`);
+            (match) => buildProfilHighlightAnchor(match, ' self'));
     }
 }
 
