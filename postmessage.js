@@ -166,6 +166,8 @@ function addAuthorSuggestionEvent() {
         element.classList.toggle('selected', true);
     }
 
+    const getFocusedChild = (table) => table.querySelector('.deboucled-author-suggestion.selected');
+
     // Afficher les suggestions pendant la saisie
     textArea.addEventListener('input', async () => {
         const autocompleteTable = autocompleteElement.querySelector('.autocomplete-jv-list');
@@ -186,8 +188,8 @@ function addAuthorSuggestionEvent() {
         autocompleteTable.querySelectorAll('.deboucled-author-suggestion')
             .forEach(s => s.onmouseover = () => {
                 unselectSuggestions(autocompleteTable);
-                s.classList.toggle('selected', true);
-            })
+                focusTableChild(s);
+            });
 
         // On place correctement la table
         var caret = getCaretCoordinates(textArea, textArea.selectionEnd);
@@ -196,6 +198,8 @@ function addAuthorSuggestionEvent() {
         const sWidth = 'width: auto !important;';
         autocompleteElement.style = `${sLeft} ${sTop} ${sWidth}`;
         autocompleteElement.classList.toggle('on', true);
+
+        if (!getFocusedChild(autocompleteTable)) focusTableChild(autocompleteTable.firstElementChild);
     });
 
     // Gestion des flèches haut/bas pour changer la sélection et entrée/tab pour valider
@@ -205,7 +209,7 @@ function addAuthorSuggestionEvent() {
         const autocompleteTable = autocompleteElement.querySelector('.autocomplete-jv-list');
         if (!autocompleteTable) return;
 
-        let focusedChild = autocompleteTable.querySelector('.deboucled-author-suggestion.selected');
+        let focusedChild = getFocusedChild(autocompleteTable);
 
         switch (e.key) {
             case 'Enter':

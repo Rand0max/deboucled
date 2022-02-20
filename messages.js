@@ -254,8 +254,11 @@ function highlightQuotedAuthor(message) {
     currentUserPseudo = currentUserPseudo?.toLowerCase();
 
     const isSelf = (match) => (currentUserPseudo?.length && (match === currentUserPseudo || match === `@${currentUserPseudo}`));
-    const buildProfilHighlightAnchor = (match, self = '') =>
-        `<a class="deboucled-highlighted${self}" href="/profil/${match.toLowerCase()}?mode=infos" target="_blank" title="Voir le profil de ${match}">${match}</a>`;
+    const getProfilMatch = (match) => match?.startsWith('@') ? match.substring(1) : match;
+    function buildProfilHighlightAnchor(match, self = '') {
+        const profilMatch = getProfilMatch(match);
+        return `<a class="deboucled-highlighted${self}" href="/profil/${profilMatch.toLowerCase()}?mode=infos" target="_blank" title="Voir le profil de ${profilMatch}">${match}</a>`;
+    }
 
     function replaceAllTextQuotes(element, regex, replaceCallback, alternateCallback) {
         getParagraphChildren(element, true).forEach(child => {
