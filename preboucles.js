@@ -30,7 +30,7 @@ function initPreBoucles() {
             'maleau', 'maieau', 'sakuta', 'stopbanboucle', 'lerenoi*debxl', 'leblackprotrump', 'bannissement137', 'janullrich', 'marlounbrandon', 'tomcain',
             'liondepressif', 'coulisdepet', 'arminiya', 'risitasultime', 'puissance2khey', 'puissancedekhey', 'lickeurdepied', 'kyie_not_guilty', 'kyie_not_guilty',
             'varhastra11-10', 'facksyer', 'captaine-marvel', 'fieldm', 'styx666', 'atlantiquem', 'alettaoceanv1', 'alettaoceanv2', 'camillezizi', 'doomdeathworth',
-            'beagie', 'fr2u', 'patisserie_adhd']);
+            'beagie', 'fr2u', 'patisserie_adhd', 'finaleffect4', 'finaleffect5', 'aftereffects5', 'legamermagique', 'aaargh_0fan', 'allezmonpoutoc', 'lioncalvitie']);
 
     addPreBoucle('bots', 'BOTS', entityAuthor, false,
         ['tontonfouilleur', 'squeezie-issou', '2__marche', '2marche', 'deux-marche', 'anatoli_diatlov', 'soutien-rpc', 'lovemaze', 'leo2005', '1m54maisgrand', 'moussecerise',
@@ -59,7 +59,7 @@ function initPreBoucles() {
             'xeenay', 'yameyakuna', 'yhria', 'ylliade', 'yofie', 'yojong', 'yokohama', 'yoshi_v', 'yoshiyosh', 'yotsuyamk', 'yuhina', 'yumiaaaa', 'zerotwo-', 'biancalapeste',
             'luminadivina', 'pourquoipas-', 'gommebleu', 'kinojv', 'aidessoutien95', 'gladys_bonheur', 'asenir', 'pyj2sur10', 'petitebouche', 'hunterchasseur',
             'kud-chan', 'lastral', 'kamui_bungee', '[explo]', '[ks]lilly_satou', 'fimi_', 'askeladden41', 'adhd-kun', 'edinu', 'miseron', 'couverturent', 'yuuthirohito',
-            'bisexwouale']);
+            'bisexwouale', 'turbincel2sur10', 'aaargh_0fan', 'loulina', 'minatohiraishin', 'feu_blanc', 'notready69', 'steinheir']);
 
     addPreBoucle('insane', 'Zinzins', entityAuthor, false,
         ['vincenfreeman', 'aneryl', 'flubus', 'kinahe', 'leao', 'oael', 'vinz', 'vcxn', 'tacos', 'lesyeuxduforum', 'cigarette', 'cigarrette', 'deratiseur', 'windowsbot',
@@ -68,13 +68,13 @@ function initPreBoucles() {
             'draco-choc', 'grifforzer', 'hommecoussinet', 'kiwayjohansson', 'surk', 'zeroavenir', 'huile7coude', 'huiledecoude', 'aklaros', 'britneysperm', 'avortax3000',
             'avenoelsuce', 'stopbanboucle', 'pump101', 'fessesdefemme', 'janullrich', 'lans6', 'lans28', 'djanoug', 'le0tout', 'coulisdepet', 'leprofesor', 'vincentfreman',
             'facksyer', 'multoo', 'sonicfan18', 'rayonceleste', 'ayaacescouilles', 'kdayone', 'camillezizi', 'ketchupent', 'zer0tonin', 'beagie', 'tahbik', 'bisexwouale',
-            'vulcain_rageux', 'xjahxsehx', 'jeunealgerien', 'soniclelion', 'jdilla', 'groscharclo', 'lultimm']);
+            'vulcain_rageux', 'xjahxsehx', 'jeunealgerien', 'soniclelion', 'jdilla', 'groscharclo', 'lultimm', 'lioncalvitie', 'finaleffect4', 'finaleffect5', 'aftereffects5']);
 
     addPreBoucle('aw', 'AW', entityAuthor, false,
-        ['peore', '[kj]', 'jojolechatgris', 'lecelestinsympa', 'suprakheyette', 'cheuns', 'lapetitegouine', 'kanou43', 'breod', 'titanlevrette', 'pump101', 'dandelotte',
+        ['peore', '[kj]', 'kheyette', 'jojolechatgris', 'lecelestinsympa', 'suprakheyette', 'cheuns', 'lapetitegouine', 'kanou43', 'breod', 'titanlevrette', 'pump101', 'dandelotte',
             'pandore-', 'regimeducamp', 'oneponey', 'amandadu42', 'nabilis', 'sereinepyj', 'frimeuze', 'naomi_sama', 'rousse_radieuse', 'parvatikheyette', 'contedefees',
             'saintepasteque', 'venus_noire', 'incel2sur10ette', 'sereineptiote', 'amiamore', 'esalamy69', 'multoo', 'seuleavie', 'camillezizi', 'rephya', 'pourquoipas-',
-            'miserette', 'anyataylorjoie', 'ninouchedu07']);
+            'miserette', 'anyataylorjoie', 'ninouchedu07', 'miss-ninaa', 'watikroko', 'loulina', 'damesanjo', 'chalumeau2']);
 
 
     addPreBoucle('popularboucles', 'Boucles connues', entitySubject, true,
@@ -95,7 +95,9 @@ function initPreBoucles() {
             'cette illusion d\'optique', 'sdf*degueulasse', 'ressemble*rogue', 'bol*4100', 'cereales*4100', 'cereales*4k', '4100*cereales', '4k*cereales',
             'aletta ocean*nietzschéenne', 'aletta ocean*surfemme', 'filles aiment ce style de mec', 'cap*chiottes*arteres', 'jeunes*passions*bancales*abrutissantes',
             'fermez*dubstep', 'fake jdg', 'jdg leader price', 'fake joueur du grenier', 'jdg eco+', 'jdg du pauvre', 'joueur du grenier leader price', 'joueur du grenier inférieur',
-            'joueur du grenier lidl', 'jdg lidl', 'joueur du grenier du pauvre', 'adolescent*71*balles*ak-47', 'allez jamais au parc asterix']);
+            'joueur du grenier lidl', 'jdg lidl', 'joueur du grenier du pauvre', 'adolescent*71*balles*ak-47', 'allez jamais au parc asterix', 'davidlafarge eco+',
+            'mr toc du pauvre', 'chef otaku du pauvre', 'video inedite*joueur du grenier', 'rare*ancien*jdg', 'video*inedite*jdg', 'astronogeek du pauvre',
+            '300 jeux nintendo switch']);
 
     addPreBoucle('covid19', 'Covid19', entitySubject, false,
         ['covid*', 'corona*', 'virus', 'gestes barriere', 'geste barriere', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*',
@@ -116,7 +118,8 @@ function initPreBoucles() {
             'desu', 'desu~', ':desu:', 'twink*', 'grindr', 'scat', 'scato', 'uro']);
 
     addPreBoucle('socials', 'Réseaux sociaux', entitySubject, false,
-        ['tinder', 'twitter', 'facebook', 'tik*tok', 'adopte un mec', 'meetic', 'badoo', 'okcupid', 'bumble', 'happn', 'insta', 'instagram', 'snapchat', 'mym', 'onlyfan', 'onlyfans', 'grindr']);
+        ['tinder', 'twitter', 'facebook', 'tik*tok', 'adopte un mec', 'meetic', 'badoo', 'okcupid', 'bumble', 'happn', 'insta', 'instagram', 'snapchat', 'mym',
+            'onlyfan', 'onlyfans', 'grindr', 'reddit']);
 
     addPreBoucle('youtube', 'Youtube', entitySubject, false,
         ['youtube', 'feldup', 'norman', 'cyprien', 'natoo', 'kemar', 'jdg', 'joueur du grenier', 'amixem', 'squeezie', 'rire jaune', 'kevin tran', 'michou', 'mcfly',
@@ -133,7 +136,8 @@ function initPreBoucles() {
     addPreBoucle('girls', 'Femmes', entitySubject, false,
         ['meuf', 'fille', 'femme', '*/10', '*/20', 'cul', 'sein*', 'boob*', 'bzez', '95e', 'kheyette*', 'colombienne', 'emma roberts', 'estelle redpill', 'lena situations',
             'charlie danger', 'natoo', 'tatiana ventose', 'vedovelli', 'abella danger', 'agathe auprou*', 'amel bent', 'amouranth', 'ana de armas', 'copine', 'crush', 'cuck*',
-            'cunni*', 'dua lipa', 'fiak', 'gaelle', 'incel*', 'julia', 'levrette', 'milf*', 'nude*', 'porno', 'simp', 'simps', 'vagin', 'pinkgeek', 'pink geek', 'aline*dessine', 'gourgandine']);
+            'cunni*', 'dua lipa', 'fiak', 'gaelle', 'incel*', 'julia', 'levrette', 'milf*', 'nude*', 'porno', 'simp', 'simps', 'vagin', 'pinkgeek', 'pink geek', 'aline*dessine',
+            'gourgandine']);
 
     addPreBoucle('rap', 'Rap', entitySubject, false,
         ['rap', 'rappeur*', 'rappeuse*', 'maes', 'lacrim', 'orelsan', 'ninho', 'ziak', 'gambi', 'gazo', 'kalash', 'niska', 'rohff', 'booba', 'b2o', 'kaaris', 'pnl', 'qlf',
@@ -149,12 +153,13 @@ function initPreBoucles() {
             'jenna jameson', 'jia lissa', 'josephine jackson', 'kayla kayden', 'kayley gunner', 'keisha grey', 'kendra sunderland', 'kenna james', 'kenzie anne', 'kiera winters',
             'lacy lennon', 'lana rhoades', 'leah gotti', 'lena paul', 'lexi belle', 'lily ivy', 'lily love', 'little caprice', 'liya silver', 'lola myluv', 'lucy li', 'luxury girl',
             'madi meadows', 'madison ivy', 'malena morgan', 'megan salinas', 'mia malkova', 'mia melano', 'michaela isizzu', 'molly jane', 'nadya nabakova', 'nancy ace', 'adriana chechik',
-            'natalia starr', 'nicole aniston', 'octokuro', 'peta jensen', 'red fox', 'riley anne', 'riley reid', 'ryan ryans', 'sabrina maree', 'samantha saint', 'scarlett hampton',
-            'serena becker', 'shae summers', 'simonn', 'skye blue', 'sofi ryan', 'sophia leone', 'stella cox', 'sunny leone', 'sybil a', 'tasha reign', 'tiffany thompson', 'jynx maze',
-            'tiny teen', 'tommie jo', 'tori black', 'traci lords', 'tru kait', 'victoria lynn', 'viola bailey', 'whitney westgate', 'woodman', 'bbc', 'valentina nappi', 'angela white']);
+            'natalia starr', 'nicole aniston', 'octokuro', 'peta jensen', 'red fox', 'riley anne', 'riley reid', 'riley reyd', 'ryan ryans', 'sabrina maree', 'samantha saint',
+            'scarlett hampton', 'serena becker', 'shae summers', 'simonn', 'skye blue', 'sofi ryan', 'sophia leone', 'stella cox', 'sunny leone', 'sybil a', 'tasha reign',
+            'tiffany thompson', 'jynx maze', 'tiny teen', 'tommie jo', 'tori black', 'traci lords', 'tru kait', 'victoria lynn', 'viola bailey', 'whitney westgate', 'woodman',
+            'bbc', 'valentina nappi', 'angela white']);
 
     addPreBoucle('religion', 'Religion', entitySubject, false,
-        ['allah', 'jesus', 'christ*', 'juif*', 'chretien*', 'musulman*', 'islam*', 'judaisme', 'muslim*', 'burka', 'burqa', 'priere', 'dieu', 'religion', 'dhimmi']);
+        ['allah', 'jesus', 'christ*', 'juif*', 'chretien*', 'musulman*', 'islam*', 'judaisme', 'muslim*', 'burka', 'burqa', 'priere', 'dieu', 'religion', 'dhimmi', 'ramadan']);
 
     addPreBoucle('crypto', 'Cryptomonnaies', entitySubject, false,
         ['*crypto*', 'blockchain', 'mineur', 'mining', 'minage', 'nft', 'wallet', 'satoshi', 'bitcoin', 'btc', 'cardano', 'shitcoin', 'ethereum', 'monero', 'libra', 'coinbase',
@@ -165,8 +170,10 @@ function initPreBoucles() {
 }
 
 function isEntityInPreboucles(entityType, entity) {
-    let enabledPreboucles = preBoucleArray.filter(pb => pb.enabled && pb.type === entityType).flatMap(pb => pb.entities);
-    return enabledPreboucles.includes(entity.toLowerCase());
+    let preBoucles = preBoucleArray.filter(pb => pb.enabled && pb.type === entityType).flatMap(pb => pb.entities);
+    const entityLower = entity.toLowerCase();
+    const entities = [entityLower, `${entityLower}*`, `*${entityLower}`, `*${entityLower}*`];
+    return entities.some(e => preBoucles.includes(e));
 }
 
 function makeVinzSubjectPure(str) {
@@ -179,9 +186,9 @@ function makeVinzSubjectPure(str) {
 }
 
 function initVinzBoucles() {
-    vinzBoucleArray = ['ces photos putain', '"Célestin tu-" "Ferme-là"', 'Yannick, 19 ans, se jette du haut de la Tour Eiffel', '"J\'appelle Metisseur22cm a la barre"', 'Si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', '[DILEMME] 100 000 000 000 000€ mais...', 'Il est bien Midsommar ?', 'AYA CETTE HALLUCINATION AUDITIVE bordel', '(PHOTO) Je me suis gréfé un zizi métallique', '"I call Metisseur22cm a la bar"', '[DILEMME] 100 00000 000 000 000 000 000 000€ à condition...', '"Célestin tu-" "Shut up"', 'Yaniq, dix9 ans, se jette du haut de la Tour Eiffel', 'Is it good MIDSOMMAR ??', 'Si on RAJUSTE dix% d\'O in a PASTÉK qui en CONTI11 quatrevingdix%...', 'But if we put 10% de WATER à une PASTQUE qui en CONTI1 90%...', '[DILEMME] 100 000 000 000 000€ sauf...', 'La tristesse de ces IMAGES bordel', 'Yanique, se suicide haut Tour Eifel'];
+    vinzBoucleArray = ['ces photos putain', '"célestin tu-" "ferme-là"', 'yannick, 19 ans, se jette du haut de la tour eiffel', '"j\'appelle metisseur22cm a la barre"', 'si on rajoute 10% d\'eau à une pastèque qui en contient 90%...', '[dilemme] 100 000 000 000 000€ mais...', 'il est bien midsommar ?', 'aya cette hallucination auditive bordel', '(photo) je me suis gréfé un zizi métallique', '"i call metisseur22cm a la bar"', '[dilemme] 100 00000 000 000 000 000 000 000€ à condition...', '"célestin tu-" "shut up"', 'yaniq, dix9 ans, se jette du haut de la tour eiffel', 'is it good midsommar ??', 'si on rajuste dix% d\'o in a pasték qui en conti11 quatrevingdix%...', 'but if we put 10% de water à une pastque qui en conti1 90%...', '[dilemme] 100 000 000 000 000€ sauf...', 'la tristesse de ces images bordel', 'yanique, se suicide haut tour eifel'];
 
-    vinzBoucleMessageArray = ['ouvrez vos paupières', 'ouvrez vos gros cons', 'Il tire des lasers', 'je peux m\'autosucer', 'Metisseur22cm à la barre', 'Tu habites dans cette villa', 'vous engagez de les yeux que ne faire pour le regarder malcolm', 'Célestin tu', 'Ferme-la', 'Yannick', 'moi au moins j\'ai une famille', 'film d\'horreur cliché de jumpscares', 'La pastèque se transformerait', 'DO YOU KNOW POMPER L’EAU', 'YOU GOT TO POMPER L’EAU'];
+    vinzBoucleMessageArray = ['ouvrez vos paupières', 'ouvrez vos gros cons', 'il tire des lasers', 'je peux m\'autosucer', 'metisseur22cm à la barre', 'tu habites dans cette villa', 'vous engagez de les yeux que ne faire pour le regarder malcolm', 'célestin tu', 'ferme-la', 'yannick', 'moi au moins j\'ai une famille', 'film d\'horreur cliché de jumpscares', 'la pastèque se transformerait', 'do you know pomper l’eau', 'you got to pomper l’eau'];
 
     vinzBoucleArray.forEach((val, index) => {
         vinzBoucleArray[index] = makeVinzSubjectPure(val);

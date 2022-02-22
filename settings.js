@@ -557,7 +557,7 @@ function refreshSubjectKeys(filter = null) {
             refreshCollapsibleContentHeight(entitySubject);
             clearSearchInputs();
         },
-        function (key, value) { return isEntityInPreboucles(entitySubject, value) ? ' deboucled-entity-pre-element' : '' },
+        (key, value) => isEntityInPreboucles(entitySubject, value) ? ' deboucled-entity-pre-element' : '',
         sortCallback
     );
 }

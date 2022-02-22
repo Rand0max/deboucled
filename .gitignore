@@ -11,3 +11,4 @@ tsconfig.json
 *.debug.js
 *.log
 *.ps1
+backend/**
