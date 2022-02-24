@@ -139,6 +139,13 @@ function buildEntityRegex(array, withBoundaries) {
     return new RegExp(regex, 'gi');
 }
 
+function buildArrayRegex(array) {
+    const bStart = '(?<=\\W|^)';
+    const bEnd = '(?=\\W|$)';
+    let regexMap = array.map((e) => e.escapeRegexPattern().normalizeDiacritic());
+    return new RegExp(`${bStart}(${regexMap.join('|')})${bEnd}`, 'gi');
+}
+
 function insertAfter(newNode, referenceNode) {
     referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }

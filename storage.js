@@ -39,6 +39,7 @@ const storage_optionTopicMsgCountThreshold = 'deboucled_optionTopicMsgCountThres
 const storage_optionReplaceResolvedPicto = 'deboucled_optionReplaceResolvedPicto', storage_optionReplaceResolvedPicto_default = false;
 const storage_optionDisplayTopicIgnoredCount = 'deboucled_optionDisplayTopicIgnoredCount', storage_optionDisplayTopicIgnoredCount_default = true;
 const storage_optionEnhanceQuotations = 'deboucled_optionEnhanceQuotations', storage_optionEnhanceQuotations_default = true;
+const storage_optionAntiSpam = 'deboucled_optionAntiSpam', storage_optionAntiSpam_default = true;
 
 const storage_disabledFilteringForums = 'deboucled_disabledFilteringForums', storage_disabledFilteringForums_default = '[]';
 
@@ -47,9 +48,13 @@ const storage_totalHiddenSubjects = 'deboucled_totalHiddenSubjects';
 const storage_totalHiddenAuthors = 'deboucled_totalHiddenAuthors';
 const storage_totalHiddenMessages = 'deboucled_totalHiddenMessages';
 const storage_totalHiddenPrivateMessages = 'deboucled_totalHiddenPrivateMessages';
+const storage_totalHiddenSpammers = 'deboucled_totalHiddenSpammers';
 const storage_TopicStats = 'deboucled_TopicStats';
 
-const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_whitelistedTopicIds, storage_optionEnableJvcDarkTheme, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_TopicStats];
+const storage_youtubeBlacklist = 'deboucled_youtubeBlacklist', storage_youtubeBlacklist_default = '[]';
+const storage_youtubeBlacklistLastUpdate = 'deboucled_youtubeBlacklistLastUpdate', storage_youtubeBlacklistLastUpdate_default = new Date(0);
+
+const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_whitelistedTopicIds, storage_optionEnableJvcDarkTheme, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_optionAntiSpam, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_totalHiddenSpammers, storage_TopicStats];
 
 const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors];
 
@@ -96,6 +101,10 @@ async function loadStorage() {
     topicIdWhitelistArray = [...new Set(JSON.parse(GM_getValue(storage_whitelistedTopicIds, storage_whitelistedTopicIds_default)))];
 
     disabledFilteringForumSet = new Set(JSON.parse(GM_getValue(storage_disabledFilteringForums, storage_disabledFilteringForums_default)));
+
+    youtubeBlacklistArray = JSON.parse(GM_getValue(storage_youtubeBlacklist, storage_youtubeBlacklist_default));
+    if (!youtubeBlacklistArray?.length || mustRefreshYoutubeBlacklist()) await queryYoutubeBlacklist();
+    if (youtubeBlacklistArray?.length) youtubeBlacklistReg = buildArrayRegex(youtubeBlacklistArray);
 
     await loadLocalStorage();
 }
@@ -189,6 +198,7 @@ function saveTotalHidden() {
     incrementTotalHidden(storage_totalHiddenAuthors, hiddenAuthors);
     incrementTotalHidden(storage_totalHiddenMessages, hiddenMessages);
     incrementTotalHidden(storage_totalHiddenPrivateMessages, hiddenPrivateMessages);
+    incrementTotalHidden(storage_totalHiddenSpammers, hiddenSpammers);
 }
 
 function backupStorage() {
@@ -287,18 +297,23 @@ async function importFromTotalBlacklist() {
     alert(`${blacklistFromTblArray.length} pseudos TotalBlacklist ont été importés dans Déboucled avec succès.`);
 }
 
-function buildBlacklistsRegex() {
-    let preBoucleEnabledSubjects = [];
-    let preBoucleEnabledAuthors = [];
-    preBoucleArray.filter(pb => pb.enabled && pb.type === entitySubject)
-        .forEach(pb => { preBoucleEnabledSubjects = preBoucleEnabledSubjects.concat(pb.entities); });
-    preBoucleArray.filter(pb => pb.enabled && pb.type === entityAuthor)
-        .forEach(pb => { preBoucleEnabledAuthors = preBoucleEnabledAuthors.concat(pb.entities); });
+function buildBlacklistsRegex(option = 'both') {
+    if (option === 'both' || option === entitySubject) {
+        let preBoucleEnabledSubjects = [];
+        preBoucleArray.filter(pb => pb.enabled && pb.type === entitySubject)
+            .forEach(pb => { preBoucleEnabledSubjects = preBoucleEnabledSubjects.concat(pb.entities); });
 
-    const mergedSubjectBlacklistArray = [...new Set([...preBoucleEnabledSubjects, ...subjectBlacklistArray])];
-    const mergedAuthorBlacklistArray = [...new Set([...preBoucleEnabledAuthors, ...authorBlacklistArray, ...shadowent])];
+        const mergedSubjectBlacklistArray = [...new Set([...preBoucleEnabledSubjects, ...subjectBlacklistArray])];
+        subjectsBlacklistReg = buildEntityRegex(mergedSubjectBlacklistArray, true);
+    }
 
-    subjectsBlacklistReg = buildEntityRegex(mergedSubjectBlacklistArray, true);
-    authorsBlacklistReg = buildEntityRegex(mergedAuthorBlacklistArray, false);
+    if (option === 'both' || option === entityAuthor) {
+        let preBoucleEnabledAuthors = [];
+        preBoucleArray.filter(pb => pb.enabled && pb.type === entityAuthor)
+            .forEach(pb => { preBoucleEnabledAuthors = preBoucleEnabledAuthors.concat(pb.entities); });
+
+        const mergedAuthorBlacklistArray = [...new Set([...preBoucleEnabledAuthors, ...authorBlacklistArray, ...shadowent])];
+        authorsBlacklistReg = buildEntityRegex(mergedAuthorBlacklistArray, false);
+    }
 }
 

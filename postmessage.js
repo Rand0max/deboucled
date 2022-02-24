@@ -51,15 +51,13 @@ function getTextSelection() {
     return window.getSelection ? window.getSelection() : document.selection
 }
 
-function getSelectionOffset(container, mouseEvent, touchEvent) {
+function getSelectionOffset(container, pointerEvent) {
     const selectionRect = getTextSelection().getRangeAt(0).getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
 
     const selectionOffsetLeft = selectionRect.left - containerRect.left + selectionRect.width - 9;
 
-    const mouseOffsetLeft = mouseEvent ? mouseEvent.pageX : 0;
-    const touchOffsetLeft = touchEvent ? touchEvent.changedTouches[0].pageX : 0;
-    const eventOffsetLeft = (touchOffsetLeft > mouseOffsetLeft ? touchOffsetLeft : mouseOffsetLeft) - container.offsetLeft - 7;
+    const eventOffsetLeft = pointerEvent.pageX - container.offsetLeft - 7;
 
     const offsetLeft = eventOffsetLeft > selectionOffsetLeft ? selectionOffsetLeft : eventOffsetLeft;
     const offsetTop = selectionRect.top - containerRect.top + selectionRect.height + 10; // mouseEvent.pageY - container.offsetTop + 14
@@ -87,13 +85,13 @@ function addMessageQuoteEvents(allMessages) {
     allMessages.forEach((message) => {
         const partialQuoteButton = buildPartialQuoteButton(message); // Partial quote
 
-        async function partialQuoteEvent(mouseEvent, touchEvent) {
+        async function partialQuoteEvent(pointerEvent) {
             const selection = getTextSelection().toString();
             if (selection?.length === 0) return;
 
             partialQuoteButton.onclick = () => buildQuoteMessage(message, selection);
 
-            const selectionOffset = getSelectionOffset(message, mouseEvent, touchEvent);
+            const selectionOffset = getSelectionOffset(message, pointerEvent);
             partialQuoteButton.style.left = `${selectionOffset.offsetLeft}px`;
             partialQuoteButton.style.top = `${selectionOffset.offsetTop}px`;
 
@@ -102,8 +100,7 @@ function addMessageQuoteEvents(allMessages) {
             partialQuoteButton.classList.toggle('active', true);
         }
 
-        message.onmouseup = (me) => partialQuoteEvent(me, undefined);
-        message.ontouchend = (te) => partialQuoteEvent(undefined, te);
+        message.onpointerup = (pe) => partialQuoteEvent(pe); // Pointer events = mouse + touch + pen
 
         const quoteButton = message.querySelector('.picto-msg-quote');
         if (quoteButton) quoteButton.onclick = () => buildQuoteMessage(message); // Full quote
@@ -186,7 +183,7 @@ function addAuthorSuggestionEvent() {
         // On construit les éléments de la table avec les suggestions
         autocompleteTable.innerHTML = suggestions.map(s => `<li class="deboucled-author-suggestion">${s}</li>`).join('');
         autocompleteTable.querySelectorAll('.deboucled-author-suggestion')
-            .forEach(s => s.onmouseover = () => {
+            .forEach(s => s.onpointerover = () => {
                 unselectSuggestions(autocompleteTable);
                 focusTableChild(s);
             });

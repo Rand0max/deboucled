@@ -92,7 +92,7 @@ function buildDeboucledBlacklistButton(author, callbackAfter, className = 'debou
     dbcBlacklistButton.setAttribute('class', `picto-msg-tronche ${className}`);
     dbcBlacklistButton.onclick = function () {
         addEntityBlacklist(authorBlacklistArray, author);
-        refreshAuthorKeys()
+        refreshAuthorKeys();
         if (callbackAfter) callbackAfter();
     };
     return dbcBlacklistButton;
@@ -211,8 +211,7 @@ function getParagraphChildren(element, allowBlockQuote = false) {
     return [...element.children].filter(c => allowedTags.includes(c.tagName) && c.textContent.trim() !== '');
 }
 
-function fixMessageUrls(message) {
-    const messageContent = message.querySelector('.txt-msg.text-enrichi-forum');
+function fixMessageUrls(messageContent) {
     if (!messageContent) return;
 
     function parseElement(element, regex, replaceCallback) {
@@ -246,8 +245,7 @@ function fixMessageUrls(message) {
         (m) => `<a class="xXx" href="${m}" title="${m}" target="_blank">${m}</a>`);
 }
 
-function highlightQuotedAuthor(message) {
-    const messageContent = message.querySelector('.txt-msg.text-enrichi-forum');
+function highlightQuotedAuthor(messageContent) {
     if (!messageContent) return;
 
     let currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, storage_lastUsedPseudo_default);

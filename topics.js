@@ -220,6 +220,11 @@ function getAuthorBlacklistMatches(author) {
     return normAuthor.match(authorsBlacklistReg) ? [author] : null;
 }
 
+function isContentYoutubeBlacklisted(content) {
+    if (!youtubeBlacklistReg) return null;
+    return content.trim().match(youtubeBlacklistReg);
+}
+
 async function isVinzTopic(subject, author, topicUrl) {
     // TODO : implémenter du cache comme pour les poc
 
@@ -432,8 +437,7 @@ function addPrevisualizeTopicEvent(topics) {
         anchor.appendChild(previewDiv);
 
         anchor.onclick = () => onPreviewHover(topicUrl, previewDiv);
-        anchor.onmouseenter = () => onPreviewHover(topicUrl, previewDiv);
-        anchor.ontouchstart = () => onPreviewHover(topicUrl, previewDiv);
+        anchor.onpointerenter = () => onPreviewHover(topicUrl, previewDiv);
     });
 }
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.18.3
+// @version     2.19.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -17,6 +17,7 @@
 // @match       https://www.jeuxvideo.com/profil/*
 // @match       http://www.jeuxvideo.com/sso/*
 // @match       https://www.jeuxvideo.com/sso/*
+// @connect     deboucled.jvflux.fr
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
@@ -34,6 +35,7 @@
 // @require     storage.js
 // @require     extensions.js
 // @require     preboucles.js
+// @require     antispam.js
 // @require     stats.js
 // @require     topics.js
 // @require     messages.js

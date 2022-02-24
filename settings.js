@@ -10,6 +10,7 @@ function buildSettingsPage(firstLaunch = false) {
     bgView.innerHTML = '<div></div>';
     document.body.prepend(bgView);
     document.querySelector('#deboucled-settings-bg-view').style.display = 'none';
+    const collapsibleMaxHeight = 'style="max-height: max-content;"';
 
     function buildTooltip(hint, location = 'right') {
         const tooltipLocation = location === 'top' ? '' : ` data-tooltip-location="${location}"`;
@@ -120,7 +121,7 @@ function buildSettingsPage(firstLaunch = false) {
     function addOptionsSection(sectionIsActive) {
         let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">OPTIONS</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
 
         let jvcLogo = '<span class="deboucled-jvc-logo"></span>';
@@ -172,7 +173,7 @@ function buildSettingsPage(firstLaunch = false) {
     function addCustomisationSection(sectionIsActive) {
         let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">PERSONNALISATION</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-customisation-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-customisation-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
 
         html += '<table class="deboucled-option-table">';
@@ -217,7 +218,7 @@ function buildSettingsPage(firstLaunch = false) {
     function addPreBouclesSection(sectionIsActive) {
         let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">ANTI-BOUCLES</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
         html += `<div class="deboucled-preboucle-title" ${buildTooltip('Cochez les catégories que vous souhaitez filtrer sur le forum.\nPassez la souris ou cliquez sur les intitulés de catégorie pour voir les mots-clés qui seront utilisés.', 'bottom')}>Listes anti-boucle pré-enregistrées</div>`;
         html += '<table class="deboucled-option-table">';
@@ -236,7 +237,7 @@ function buildSettingsPage(firstLaunch = false) {
     function addEntitySettingSection(entity, header, hint, messageHint, sectionIsActive) {
         let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">${header}</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-${entity}-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-${entity}-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
         html += '<table class="deboucled-option-table-entities">';
         html += '<tr>';
@@ -264,13 +265,17 @@ function buildSettingsPage(firstLaunch = false) {
     function addAdvancedOptionsSection(sectionIsActive) {
         let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">OPTIONS AVANCÉES</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
         html += '<table class="deboucled-option-table">';
 
-        html += addToggleOption('Algorithme de filtrage <i>anti-Vinz</i>', storage_optionAntiVinz, storage_optionAntiVinz_default, 'Algorithme intelligent pour éradiquer totalement Vinz et sa boucle infernale, en dépit de ses tentatives d\'évitement.');
+        let vinzLogo = '<span class="deboucled-vinz-logo"></span>';
+        html += addToggleOption(`Algorithme de filtrage <i>anti-Vinz</i> ${vinzLogo}`, storage_optionAntiVinz, storage_optionAntiVinz_default, 'Algorithme intelligent pour éradiquer totalement Vinz et sa boucle infernale, en dépit de ses tentatives d\'évitement.');
 
-        let resolvedLogo = '<span class="deboucled-topic-resolved-logo"></span>'
+        let spamLogo = '<span class="deboucled-spam-logo"></span>';
+        html += addToggleOption(`Algorithme <i>anti-spam et publicité</i> ${spamLogo}`, storage_optionAntiSpam, storage_optionAntiSpam_default, 'Algorithme pour blacklister automatiquement les spammeurs (publicité Youtube).');
+
+        let resolvedLogo = '<span class="deboucled-topic-resolved-logo"></span>';
         html += addToggleOption(`Remplacer le pictogramme ${resolvedLogo} <i>résolu</i> des topics`, storage_optionReplaceResolvedPicto, storage_optionReplaceResolvedPicto_default, 'Remplacer le pictogramme résolu sur la gauche des topics par le picto normal (jaune, rouge, verrouillé, etc).');
 
         html += addRangeOption('Nombre de topics à afficher sur la page', storage_optionMaxTopicCount, storage_optionMaxTopicCount_default, defaultTopicCount, 50, 1, 'Nombre de topics à afficher sur la page (25 par défaut).', true, false);
@@ -302,7 +307,7 @@ function buildSettingsPage(firstLaunch = false) {
         }
         let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">STATISTIQUES</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? 'style="max-height: inherit;"' : ''}>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
         html += '<table class="deboucled-option-table">';
         let totalHiddenSubjects = GM_getValue(storage_totalHiddenSubjects, '0');
@@ -310,12 +315,14 @@ function buildSettingsPage(firstLaunch = false) {
         let totalHiddenTopicIds = GM_getValue(storage_totalHiddenTopicIds, '0');
         let totalHiddenMessages = GM_getValue(storage_totalHiddenMessages, '0');
         let totalHiddenPrivateMessages = GM_getValue(storage_totalHiddenPrivateMessages, '0');
-        let totalHidden = parseInt(totalHiddenSubjects + totalHiddenAuthors + totalHiddenTopicIds + totalHiddenMessages + totalHiddenPrivateMessages);
+        let totalHiddenSpammers = GM_getValue(storage_totalHiddenSpammers, '0');
+        let totalHidden = parseInt(totalHiddenSubjects + totalHiddenAuthors + totalHiddenTopicIds + totalHiddenMessages + totalHiddenPrivateMessages + totalHiddenSpammers);
         html += addStat('Sujets ignorés', totalHiddenSubjects);
         html += addStat('Pseudos ignorés', totalHiddenAuthors);
         html += addStat('Topics ignorés', totalHiddenTopicIds);
         html += addStat('Messages ignorés', totalHiddenMessages);
         html += addStat('Messages privés ignorés', totalHiddenPrivateMessages);
+        html += addStat('Spammeurs ignorés', totalHiddenSpammers);
         html += addStat('Total ignorés', totalHidden);
         html += '</table>';
         html += '</div>';
@@ -411,6 +418,7 @@ function addSettingEvents() {
     });
 
     addToggleEvent(storage_optionAntiVinz);
+    addToggleEvent(storage_optionAntiSpam);
     addToggleEvent(storage_optionReplaceResolvedPicto);
     addToggleEvent(storage_optionEnableTopicMsgCountThreshold, undefined, function () {
         document.querySelectorAll(`[id = ${storage_optionTopicMsgCountThreshold}-container]`).forEach(function (el) {

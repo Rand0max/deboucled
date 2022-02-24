@@ -306,19 +306,19 @@ function handleBlSubjectIgnoreMessages(messageElement) {
     }
 }
 
-function handleMessage(message, topicId, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages, optionEnhanceQuotations) {
-    let authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+function handleMessage(message, topicId, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages, optionEnhanceQuotations, optionAntiSpam) {
+    const authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
     if (!authorElement) return;
-    let author = authorElement.textContent.trim();
-    let mpBloc = message.querySelector('div.bloc-mp-pseudo');
+    const author = authorElement.textContent.trim();
+    const mpBloc = message.querySelector('div.bloc-mp-pseudo');
+    const messageContent = message.querySelector('.txt-msg.text-enrichi-forum');
 
-    const authorBlacklisted = getAuthorBlacklistMatches(author);
-    if (authorBlacklisted?.length) {
+    function handleBlacklistedAuthor(authorMatch) {
         if (optionHideMessages) {
             removeMessage(message);
             hiddenMessages++;
             hiddenAuthorArray.add(author);
-            matchedAuthors.addArrayIncrement(authorBlacklisted);
+            matchedAuthors.addArrayIncrement(authorMatch);
             hiddenAuthors++;
             return; // si on a supprimé le message on se casse, plus rien à faire
         }
@@ -327,6 +327,17 @@ function handleMessage(message, topicId, optionHideMessages, optionBoucledUseJva
             addBoucledAuthorButton(mpBloc, author, optionBoucledUseJvarchive);
         }
     }
+
+    const authorBlacklistedMatch = getAuthorBlacklistMatches(author);
+    if (authorBlacklistedMatch?.length) {
+        handleBlacklistedAuthor(authorBlacklistedMatch);
+    }
+    else if (optionAntiSpam && isContentYoutubeBlacklisted(messageContent.textContent)) {
+        addEntityBlacklist(authorBlacklistArray, author); // on rajoute automatiquement le spammeur à la BL        
+        buildBlacklistsRegex(entityAuthor);
+        hiddenSpammers++;
+        handleBlacklistedAuthor([author]);
+    }
     else {
         let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
         upgradeJvcBlacklistButton(message, author, optionShowJvcBlacklistButton);
@@ -334,9 +345,9 @@ function handleMessage(message, topicId, optionHideMessages, optionBoucledUseJva
     }
 
     handleMessageHighlightTopicAuthor(topicId, author, authorElement);
-    fixMessageUrls(message);
+    fixMessageUrls(messageContent);
 
-    if (optionEnhanceQuotations) highlightQuotedAuthor(message);
+    if (optionEnhanceQuotations) highlightQuotedAuthor(messageContent);
 
     const isSelf = userPseudo && userPseudo.toLowerCase() === author.toLowerCase();
     if (!optionBlSubjectIgnoreMessages || isSelf) return;
@@ -459,6 +470,7 @@ async function handleTopicMessages() {
     let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
     let optionBlSubjectIgnoreMessages = !isWhitelistedTopic && GM_getValue(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default);
     let optionEnhanceQuotations = GM_getValue(storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default);
+    let optionAntiSpam = GM_getValue(storage_optionAntiSpam, storage_optionAntiSpam_default);
 
     const topicId = getTopicId();
 
@@ -473,9 +485,11 @@ async function handleTopicMessages() {
             optionHideMessages,
             optionBoucledUseJvarchive,
             optionBlSubjectIgnoreMessages,
-            optionEnhanceQuotations);
+            optionEnhanceQuotations,
+            optionAntiSpam);
     });
 
+    if (hiddenSpammers > 0) refreshAuthorKeys();
     if (hiddenMessages === allMessages.length) displayTopicDeboucledMessage();
 
     addRightBlocMatches();
