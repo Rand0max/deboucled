@@ -50,7 +50,7 @@ function getUserPseudo() {
 }
 
 function getForumId() {
-    const forumRegex = /^\/forums\/(?:0|1|42)-(?<forumid>[0-9]+)-[0-9]+-[0-9]+-0-1-0-.*\.htm$/i;
+    const forumRegex = /^\/forums\/(?:0|1|42)-(?<forumid>[0-9]+)-[0-9]+-[0-9]+-0-[0-9]+-0-.*\.htm$/i;
     const currentUrl = window.location.pathname;
     const matches = forumRegex.exec(currentUrl);
     if (!matches) return null;
