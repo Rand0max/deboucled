@@ -332,7 +332,7 @@ function handleMessage(message, topicId, optionHideMessages, optionBoucledUseJva
     if (authorBlacklistedMatch?.length) {
         handleBlacklistedAuthor(authorBlacklistedMatch);
     }
-    else if (optionAntiSpam && isContentYoutubeBlacklisted(messageContent.textContent)) {
+    else if (optionAntiSpam && isContentYoutubeBlacklisted(messageContent)) {
         addEntityBlacklist(authorBlacklistArray, author); // on rajoute automatiquement le spammeur à la BL        
         buildBlacklistsRegex(entityAuthor);
         hiddenSpammers++;

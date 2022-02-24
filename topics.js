@@ -220,9 +220,10 @@ function getAuthorBlacklistMatches(author) {
     return normAuthor.match(authorsBlacklistReg) ? [author] : null;
 }
 
-function isContentYoutubeBlacklisted(content) {
-    if (!youtubeBlacklistReg) return null;
-    return content.trim().match(youtubeBlacklistReg);
+function isContentYoutubeBlacklisted(messageContentElement) {
+    const content = getMessageContentWithoutQuotes(messageContentElement);
+    if (!youtubeBlacklistReg || !content?.length) return null;
+    return content.match(youtubeBlacklistReg);
 }
 
 async function isVinzTopic(subject, author, topicUrl) {

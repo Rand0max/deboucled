@@ -211,6 +211,12 @@ function getParagraphChildren(element, allowBlockQuote = false) {
     return [...element.children].filter(c => allowedTags.includes(c.tagName) && c.textContent.trim() !== '');
 }
 
+function getMessageContentWithoutQuotes(messageElement) {
+    let content = '';
+    getParagraphChildren(messageElement).forEach(c => { content = `${content}\n${c.textContent}` });
+    return content.trim();
+}
+
 function fixMessageUrls(messageContent) {
     if (!messageContent) return;
 
