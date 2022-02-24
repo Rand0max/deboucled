@@ -99,7 +99,7 @@ function initPreBoucles() {
             'fermez*dubstep', 'fake jdg', 'jdg leader price', 'fake joueur du grenier', 'jdg eco+', 'jdg du pauvre', 'joueur du grenier leader price', 'joueur du grenier inférieur',
             'joueur du grenier lidl', 'jdg lidl', 'joueur du grenier du pauvre', 'adolescent*71*balles*ak-47', 'allez jamais au parc asterix', 'davidlafarge eco+',
             'mr toc du pauvre', 'chef otaku du pauvre', 'video inedite*joueur du grenier', 'rare*ancien*jdg', 'video*inedite*jdg', 'astronogeek du pauvre',
-            '300 jeux nintendo switch', 'antoine daniel*baghera*ponce*angle droit*étoiles*littlebigwhale', 'marie laforet']);
+            '300 jeux nintendo switch', 'antoine daniel*baghera*ponce*angle droit*étoiles*littlebigwhale', 'marie laforet', 'char*bellecour']);
 
     addPreBoucle('covid19', 'Covid19', entitySubject, false,
         ['covid*', 'corona*', 'virus', 'gestes barriere', 'geste barriere', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*',
@@ -169,8 +169,8 @@ function initPreBoucles() {
             'refill', 'bullrun', 'shiba inu']);
 
     addPreBoucle('geopolitic', 'Géopolitique', entitySubject, false,
-        ['ww3', 'ukrain*', 'kiev', 'poutine', 'russe', 'russes', 'russie', '3gm', 'otan', 'kremlin', 'troisieme guerre mondiale', '3e guerre mondiale', '3eme guerre mondiale',
-            'nwo', 'new world order']);
+        ['ww3', 'ww 3', 'world war 3', 'ukrain*', 'kiev', 'poutine', 'russe', 'russes', 'russie', '3gm', 'otan', 'kremlin', 'troisieme guerre mondiale', '3e guerre mondiale',
+            '3eme guerre mondiale', 'nwo', 'new world order']);
 
     loadPreBouclesStatuses();
 }
