@@ -54,14 +54,10 @@ function getTextSelection() {
 function getSelectionOffset(container, pointerEvent) {
     const selectionRect = getTextSelection().getRangeAt(0).getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
-
     const selectionOffsetLeft = selectionRect.left - containerRect.left + selectionRect.width - 9;
-
     const eventOffsetLeft = pointerEvent.pageX - container.offsetLeft - 7;
-
     const offsetLeft = eventOffsetLeft > selectionOffsetLeft ? selectionOffsetLeft : eventOffsetLeft;
     const offsetTop = selectionRect.top - containerRect.top + selectionRect.height + 10; // mouseEvent.pageY - container.offsetTop + 14
-
     return { offsetLeft: offsetLeft, offsetTop: offsetTop };
 }
 
@@ -101,6 +97,7 @@ function addMessageQuoteEvents(allMessages) {
         }
 
         message.onpointerup = (pe) => partialQuoteEvent(pe); // Pointer events = mouse + touch + pen
+        message.oncontextmenu = (pe) => partialQuoteEvent(pe); // TouchEnd/MouseUp/PointerUp does not fire on mobile (in despite of)
 
         const quoteButton = message.querySelector('.picto-msg-quote');
         if (quoteButton) quoteButton.onclick = () => buildQuoteMessage(message); // Full quote

@@ -975,6 +975,12 @@ input[type="search"] {
   opacity: 1;
 }
 
+.deboucled-randomax-pseudo {
+  overflow: visible;
+  text-shadow: 0px 0px 10px var(--jv-text-primary);
+  color: var(--jv-text-hover-primary);
+}
+
 .deboucled-bloc {
   background-color: var(--deboucled-background-color);
   border-radius: 0;
@@ -1489,6 +1495,9 @@ select.deboucled-dropdown::-ms-expand {
   }
 }
 @media (max-width: 500px) {
+  #forum-main-col .bloc-pre-pagi-forum {
+    margin: 0 4px !important;
+  }
   .deboucled-td-left {
     white-space: break-spaces;
   }

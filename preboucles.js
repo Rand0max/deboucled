@@ -31,7 +31,7 @@ function initPreBoucles() {
             'liondepressif', 'coulisdepet', 'arminiya', 'risitasultime', 'puissance2khey', 'puissancedekhey', 'lickeurdepied', 'kyie_not_guilty', 'kyie_not_guilty',
             'varhastra11-10', 'facksyer', 'captaine-marvel', 'fieldm', 'styx666', 'atlantiquem', 'alettaoceanv1', 'alettaoceanv2', 'camillezizi', 'doomdeathworth',
             'beagie', 'fr2u', 'patisserie_adhd', 'finaleffect4', 'finaleffect5', 'aftereffects5', 'legamermagique', 'aaargh_0fan', 'allezmonpoutoc', 'lioncalvitie',
-            'lixy_nocturne', 'serpe123', 'pazekip']);
+            'lixy_nocturne', 'serpe123', 'pazekip', 'boteur0']);
 
     addPreBoucle('bots', 'BOTS', entityAuthor, false,
         ['tontonfouilleur', 'squeezie-issou', '2__marche', '2marche', 'deux-marche', 'anatoli_diatlov', 'soutien-rpc', 'lovemaze', 'leo2005', '1m54maisgrand', 'moussecerise',
@@ -60,7 +60,8 @@ function initPreBoucles() {
             'xeenay', 'yameyakuna', 'yhria', 'ylliade', 'yofie', 'yojong', 'yokohama', 'yoshi_v', 'yoshiyosh', 'yotsuyamk', 'yuhina', 'yumiaaaa', 'zerotwo-', 'biancalapeste',
             'luminadivina', 'pourquoipas-', 'gommebleu', 'kinojv', 'aidessoutien95', 'gladys_bonheur', 'asenir', 'pyj2sur10', 'petitebouche', 'hunterchasseur',
             'kud-chan', 'lastral', 'kamui_bungee', '[explo]', '[ks]lilly_satou', 'fimi_', 'askeladden41', 'adhd-kun', 'edinu', 'miseron', 'couverturent', 'yuuthirohito',
-            'bisexwouale', 'turbincel2sur10', 'aaargh_0fan', 'loulina', 'minatohiraishin', 'feu_blanc', 'notready69', 'steinheir', 'elgoldfag', 'snuffyherisson', 'kai-kod', 'lalena']);
+            'bisexwouale', 'turbincel2sur10', 'aaargh_0fan', 'loulina', 'minatohiraishin', 'feu_blanc', 'notready69', 'steinheir', 'elgoldfag', 'snuffyherisson', 'kai-kod',
+            'lalena', 'mvd-jumpstyle', 'proutmdrgchie', 'techlead2', 'missmonochr0me', 'julia-lux', 'inceldeuxsur10', 'rinnelidov25', 'mezero', 'pinazzachi', 'resade']);
 
     addPreBoucle('insane', 'Zinzins', entityAuthor, false,
         ['vincenfreeman', 'aneryl', 'flubus', 'kinahe', 'leao', 'oael', 'vinz', 'vcxn', 'tacos', 'lesyeuxduforum', 'cigarette', 'cigarrette', 'deratiseur', 'windowsbot',
@@ -99,7 +100,8 @@ function initPreBoucles() {
             'fermez*dubstep', 'fake jdg', 'jdg leader price', 'fake joueur du grenier', 'jdg eco+', 'jdg du pauvre', 'joueur du grenier leader price', 'joueur du grenier inférieur',
             'joueur du grenier lidl', 'jdg lidl', 'joueur du grenier du pauvre', 'adolescent*71*balles*ak-47', 'allez jamais au parc asterix', 'davidlafarge eco+',
             'mr toc du pauvre', 'chef otaku du pauvre', 'video inedite*joueur du grenier', 'rare*ancien*jdg', 'video*inedite*jdg', 'astronogeek du pauvre',
-            '300 jeux nintendo switch', 'antoine daniel*baghera*ponce*angle droit*étoiles*littlebigwhale', 'marie laforet', 'char*bellecour', 'je m\'ennuie']);
+            '300 jeux nintendo switch', 'antoine daniel*baghera*ponce*angle droit*étoiles*littlebigwhale', 'marie laforet', 'char*bellecour', 'je m\'ennuie',
+            'perdu*bande*potes', 'perdu*bande*potos', 'perdu*bande*amis']);
 
     addPreBoucle('covid19', 'Covid19', entitySubject, false,
         ['covid*', 'corona*', 'virus', 'gestes barriere', 'geste barriere', '*vaccin*', '*vax*', 'variant*', 'pfizer', 'moderna', 'sanitaire', 'dose*', '*confinement*',
@@ -125,7 +127,8 @@ function initPreBoucles() {
 
     addPreBoucle('geopolitic', 'Géopolitique', entitySubject, false,
         ['ww3', 'ww 3', 'world war 3', 'wwiii', 'ukrain*', 'prayforukraine', 'kiev', 'poutine', 'russe', 'russes', 'russie', '3gm', 'otan', 'kremlin', 'crimee',
-            'troisieme guerre mondiale', '3e guerre mondiale', '3eme guerre mondiale', 'nwo', 'new world order', 'tchernobyl', 'bombe tsar', 'tsar bomba', 'biden', 'trump']);
+            'troisieme guerre mondiale', '3e guerre mondiale', '3eme guerre mondiale', 'nwo', 'new world order', 'tchernobyl', 'bombe tsar', 'tsar bomba', 'biden', 'trump',
+            'zelensky']);
 
     addPreBoucle('hatred', 'Haineux', entitySubject, false,
         ['facho*', 'chofs', 'chofa*', 'chofix*', 'qlf', 'paz', 'pazification', 'pazifie', 's2s', 'gwer*', 'raciste*', 'hagar', 'hagra', '🐊', '🐷', 'bassem', 'sadek', 'les porcs',
