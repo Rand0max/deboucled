@@ -306,61 +306,55 @@ function handleBlSubjectIgnoreMessages(messageElement) {
     }
 }
 
-function handleMessage(message, topicId, optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages, optionEnhanceQuotations, optionAntiSpam) {
-    const authorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+function handleMessage(messageElement, topicId, messageOptions) {
+    const authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
     if (!authorElement) return;
+
     const author = authorElement.textContent.trim();
-    const mpBloc = message.querySelector('div.bloc-mp-pseudo');
-    const messageContent = message.querySelector('.txt-msg.text-enrichi-forum');
+    const isSelf = userPseudo?.toLowerCase() === author.toLowerCase();
+    const mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
+    const messageContent = messageElement.querySelector('.txt-msg.text-enrichi-forum');
 
     function handleBlacklistedAuthor(authorMatch) {
-        if (optionHideMessages) {
-            removeMessage(message);
+        if (messageOptions.optionHideMessages) {
+            removeMessage(messageElement);
             hiddenMessages++;
             hiddenAuthorArray.add(author);
             matchedAuthors.addArrayIncrement(authorMatch);
             hiddenAuthors++;
-            return; // si on a supprimé le message on se casse, plus rien à faire
+            return false; // si on a supprimé le message on se casse, plus rien à faire
         }
         else {
-            highlightBlacklistedAuthor(message, authorElement);
-            addBoucledAuthorButton(mpBloc, author, optionBoucledUseJvarchive);
+            highlightBlacklistedAuthor(messageElement, authorElement);
+            addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
         }
+        return true;
     }
 
-    const authorBlacklistedMatch = getAuthorBlacklistMatches(author);
+    const authorBlacklistedMatch = getAuthorBlacklistMatches(author, isSelf);
     if (authorBlacklistedMatch?.length) {
-        handleBlacklistedAuthor(authorBlacklistedMatch);
+        if (!handleBlacklistedAuthor(authorBlacklistedMatch)) return;
     }
-    else if (optionAntiSpam && isContentYoutubeBlacklisted(messageContent)) {
+    else if (messageOptions.optionAntiSpam && isContentYoutubeBlacklisted(messageContent)) {
         addEntityBlacklist(authorBlacklistArray, author); // on rajoute automatiquement le spammeur à la BL        
         buildBlacklistsRegex(entityAuthor);
         hiddenSpammers++;
-        handleBlacklistedAuthor([author]);
+        if (!handleBlacklistedAuthor([author])) return;
     }
     else {
         let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
-        upgradeJvcBlacklistButton(message, author, optionShowJvcBlacklistButton);
-        addBoucledAuthorButton(mpBloc, author, optionBoucledUseJvarchive);
+        upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton);
+        addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
     }
 
-    handleMessageHighlightTopicAuthor(topicId, author, authorElement);
+    highlightSpecialAuthors(author, authorElement, isSelf);
+    handleMessageSetTopicAuthor(topicId, author, authorElement);
     fixMessageUrls(messageContent);
 
-    if (optionEnhanceQuotations) highlightQuotedAuthor(messageContent);
+    if (messageOptions.optionEnhanceQuotations) highlightQuotedAuthor(messageContent);
 
-    const isSelf = userPseudo && userPseudo.toLowerCase() === author.toLowerCase();
-    if (!optionBlSubjectIgnoreMessages || isSelf) return;
-    handleBlSubjectIgnoreMessages(message);
-}
-
-function handleMessageHighlightTopicAuthor(topicId, author, authorElement) {
-    if (topicId && topicAuthorMap.has(topicId) && author?.toLowerCase() === topicAuthorMap.get(topicId)) {
-        let crownElem = document.createElement('span');
-        crownElem.className = 'deboucled-crown-logo';
-        crownElem.title = 'Auteur du topic';
-        authorElement.prepend(crownElem);
-    }
+    if (!messageOptions.optionBlSubjectIgnoreMessages || isSelf) return;
+    handleBlSubjectIgnoreMessages(messageElement);
 }
 
 function getTopicId() {
@@ -464,30 +458,33 @@ function displayTopicDeboucledMessage() {
     insertAfter(topicDeboucledDiv, topBlocPagi);
 }
 
-async function handleTopicMessages() {
+function prepareMessageOptions() {
     const isWhitelistedTopic = handleTopicHeader();
-    let optionHideMessages = !isWhitelistedTopic && GM_getValue(storage_optionHideMessages, storage_optionHideMessages_default);
-    let optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
-    let optionBlSubjectIgnoreMessages = !isWhitelistedTopic && GM_getValue(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default);
-    let optionEnhanceQuotations = GM_getValue(storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default);
-    let optionAntiSpam = GM_getValue(storage_optionAntiSpam, storage_optionAntiSpam_default);
+    const optionHideMessages = !isWhitelistedTopic && GM_getValue(storage_optionHideMessages, storage_optionHideMessages_default);
+    const optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
+    const optionBlSubjectIgnoreMessages = !isWhitelistedTopic && GM_getValue(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default);
+    const optionEnhanceQuotations = GM_getValue(storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default);
+    const optionAntiSpam = GM_getValue(storage_optionAntiSpam, storage_optionAntiSpam_default);
+    const messageOptions = {
+        optionHideMessages: optionHideMessages,
+        optionBoucledUseJvarchive: optionBoucledUseJvarchive,
+        optionBlSubjectIgnoreMessages: optionBlSubjectIgnoreMessages,
+        optionEnhanceQuotations: optionEnhanceQuotations,
+        optionAntiSpam: optionAntiSpam
+    };
+    return messageOptions;
+}
+
+async function handleTopicMessages() {
+    const messageOptions = prepareMessageOptions();
 
     const topicId = getTopicId();
 
-    handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages);
+    handleJvChatAndTopicLive(messageOptions);
 
-    let allMessages = getAllMessages(document);
+    const allMessages = getAllMessages(document);
     await setTopicAuthor(topicId);
-    allMessages.forEach(function (message) {
-        handleMessage(
-            message,
-            topicId,
-            optionHideMessages,
-            optionBoucledUseJvarchive,
-            optionBlSubjectIgnoreMessages,
-            optionEnhanceQuotations,
-            optionAntiSpam);
-    });
+    allMessages.forEach((message) => handleMessage(message, topicId, messageOptions));
 
     if (hiddenSpammers > 0) refreshAuthorKeys();
     if (hiddenMessages === allMessages.length) displayTopicDeboucledMessage();
@@ -495,7 +492,7 @@ async function handleTopicMessages() {
     addRightBlocMatches();
     saveTotalHidden();
 
-    if (optionEnhanceQuotations) {
+    if (messageOptions.optionEnhanceQuotations) {
         addMessageQuoteEvents(allMessages);
         addAuthorSuggestionEvent();
     }

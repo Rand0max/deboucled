@@ -31,12 +31,12 @@ function initPreBoucles() {
             'liondepressif', 'coulisdepet', 'arminiya', 'risitasultime', 'puissance2khey', 'puissancedekhey', 'lickeurdepied', 'kyie_not_guilty', 'kyie_not_guilty',
             'varhastra11-10', 'facksyer', 'captaine-marvel', 'fieldm', 'styx666', 'atlantiquem', 'alettaoceanv1', 'alettaoceanv2', 'camillezizi', 'doomdeathworth',
             'beagie', 'fr2u', 'patisserie_adhd', 'finaleffect4', 'finaleffect5', 'aftereffects5', 'legamermagique', 'aaargh_0fan', 'allezmonpoutoc', 'lioncalvitie',
-            'lixy_nocturne', 'serpe123', 'pazekip', 'boteur0']);
+            'lixy_nocturne', 'serpe123', 'pazekip', 'boteur0', 'darkloop', 'galacticloop']);
 
     addPreBoucle('bots', 'BOTS', entityAuthor, false,
         ['tontonfouilleur', 'squeezie-issou', '2__marche', '2marche', 'deux-marche', 'anatoli_diatlov', 'soutien-rpc', 'lovemaze', 'leo2005', '1m54maisgrand', 'moussecerise',
             'marduweb', 'pinnochiotte', 'kallyuga', 'khalidfouhami', 'passion-gaming', 'dokurorider', 'discord-gg-jvc', 'leao', 'oael', 'singemechant', 'jenaimarreptnsh', 'vinz',
-            'merci-macron99', 'poechips', 'avortax3000', 'avenoelsuce', 'mikey3000', 'giissadedesinge', 'glissadedesinge', 'quesais-je']);
+            'merci-macron99', 'poechips', 'avortax3000', 'avenoelsuce', 'mikey3000', 'giissadedesinge', 'glissadedesinge', 'quesais-je', 'dechethumain01']);
 
     addPreBoucle('kj', 'Kikoo-Japs', entityAuthor, false,
         ['kj', 'kikoojap', 'kaji', 'kajy', 'trap', 'feet', 'waifu', 'kawai', 'sissy', 'crucifist01', '_rsaaidesoutien', '-pazifion-', '[arbitraire]', '[aleatoire]', '[arnak]', '[nft]',
@@ -61,7 +61,8 @@ function initPreBoucles() {
             'luminadivina', 'pourquoipas-', 'gommebleu', 'kinojv', 'aidessoutien95', 'gladys_bonheur', 'asenir', 'pyj2sur10', 'petitebouche', 'hunterchasseur',
             'kud-chan', 'lastral', 'kamui_bungee', '[explo]', '[ks]lilly_satou', 'fimi_', 'askeladden41', 'adhd-kun', 'edinu', 'miseron', 'couverturent', 'yuuthirohito',
             'bisexwouale', 'turbincel2sur10', 'aaargh_0fan', 'loulina', 'minatohiraishin', 'feu_blanc', 'notready69', 'steinheir', 'elgoldfag', 'snuffyherisson', 'kai-kod',
-            'lalena', 'mvd-jumpstyle', 'proutmdrgchie', 'techlead2', 'missmonochr0me', 'julia-lux', 'inceldeuxsur10', 'rinnelidov25', 'mezero', 'pinazzachi', 'resade']);
+            'lalena', 'mvd-jumpstyle', 'proutmdrgchie', 'techlead2', 'missmonochr0me', 'julia-lux', 'inceldeuxsur10', 'rinnelidov25', 'mezero', 'pinazzachi', 'resade',
+            'parvati']);
 
     addPreBoucle('insane', 'Zinzins', entityAuthor, false,
         ['vincenfreeman', 'aneryl', 'flubus', 'kinahe', 'leao', 'oael', 'vinz', 'vcxn', 'tacos', 'lesyeuxduforum', 'cigarette', 'cigarrette', 'deratiseur', 'windowsbot',
@@ -77,7 +78,8 @@ function initPreBoucles() {
         ['peore', '[kj]', 'kheyette', 'jojolechatgris', 'lecelestinsympa', 'suprakheyette', 'cheuns', 'lapetitegouine', 'kanou43', 'breod', 'titanlevrette', 'pump101', 'dandelotte',
             'pandore-', 'regimeducamp', 'oneponey', 'amandadu42', 'nabilis', 'sereinepyj', 'frimeuze', 'naomi_sama', 'rousse_radieuse', 'parvatikheyette', 'contedefees',
             'saintepasteque', 'venus_noire', 'incel2sur10ette', 'sereineptiote', 'sereine', 'amiamore', 'esalamy69', 'multoo', 'seuleavie', 'camillezizi', 'rephya', 'pourquoipas-',
-            'misere', 'anyataylorjoie', 'ninouchedu07', 'miss-ninaa', 'watikroko', 'loulina', 'damesanjo', 'chalumeau2', '-henriette-', 'paulinephoto', 'pastranquille', '[l]raven[l]']);
+            'misere', 'anyataylorjoie', 'ninouchedu07', 'miss-ninaa', 'watikroko', 'loulina', 'damesanjo', 'chalumeau2', '-henriette-', 'paulinephoto', 'pastranquille', '[l]raven[l]',
+            'amourpur', 'parvati']);
 
 
     addPreBoucle('popularboucles', 'Boucles connues', entitySubject, true,
@@ -117,7 +119,7 @@ function initPreBoucles() {
         ['feet*', 'trap*', 'kj', 'adf', 'papa du forum', 'blacked', 'cuck', 'reine fatima', 'reine popo', 'shemale*', 'domina', 'fetichiste', 'fetichisme', 'mym',
             'onlyfan', 'onlyfans', 'sissy*', 'trans', 'transexuel', 'transsexuel', 'transexuelle', 'transsexuelle', 'lgbt*', 'm2f', 'f2m', 'asmr', 'trav', 'travelo',
             'femdom', 'cage de chastete', 'rimjob', 'chaturbate', 'salazar', 'sugar daddy', 'woodman', 'waifu', 'moneyslave', 'bbc', 'plug anal', 'edging', 'femboy*',
-            'desu', 'desu~', ':desu:', 'twink*', 'grindr', 'scat', 'scato', 'uro', 'lovense']);
+            'desu', 'desu~', ':desu:', 'twink*', 'grindr', 'scat', 'scato', 'uro', 'lovense', 'facesitting']);
 
     addPreBoucle('girls', 'Femmes', entitySubject, false,
         ['meuf', 'fille', 'femme', '*/10', '*/20', 'cul', 'sein*', 'boob*', 'bzez', '95e', 'kheyette*', 'colombienne', 'emma roberts', 'estelle redpill', 'lena situations',
@@ -128,7 +130,7 @@ function initPreBoucles() {
     addPreBoucle('geopolitic', 'Géopolitique', entitySubject, false,
         ['ww3', 'ww 3', 'world war 3', 'wwiii', 'ukrain*', 'prayforukraine', 'kiev', 'poutine', 'russe', 'russes', 'russie', '3gm', 'otan', 'kremlin', 'crimee',
             'troisieme guerre mondiale', '3e guerre mondiale', '3eme guerre mondiale', 'nwo', 'new world order', 'tchernobyl', 'bombe tsar', 'tsar bomba', 'biden', 'trump',
-            'zelensky']);
+            'zelensky', 'zelenski']);
 
     addPreBoucle('hatred', 'Haineux', entitySubject, false,
         ['facho*', 'chofs', 'chofa*', 'chofix*', 'qlf', 'paz', 'pazification', 'pazifie', 's2s', 'gwer*', 'raciste*', 'hagar', 'hagra', '🐊', '🐷', 'bassem', 'sadek', 'les porcs',
@@ -143,7 +145,7 @@ function initPreBoucles() {
             'lrem', 'messiha', 'pecresse', 'xavier bertrand', 'yannick jadot', 'hidalgo', 'bruno lemaire', 'bruno le maire', 'castex', 'darmanin', 'sarkozy', 'sarko',
             'taubira', 'ornellas', 'tatiana ventose', 'afghan*', 'ciotti', 'greg toussaint', 'livre noir', 'naulleau', 'rochedy', 'taliban*', 'thais', 'stanislas rigault',
             'stanislas', 'generation z', 'corbiere', 'nathalie arthaud', 'odoul', 'collard', 'jancovici', 'trudeau', 'ottawa', 'president*', 'premier ministre',
-            '1er ministre']);
+            '1er ministre', 'aberkane']);
 
     addPreBoucle('porn', 'Pornographie', entitySubject, false,
         ['porn*', 'p0rn*', 'pron', 'blacked', 'mym', 'onlyfan', 'onlyfans', 'rimjob', 'chaturbate', 'abigail mac', 'addie andrews', 'agatha vega', 'aidra fox', 'aletta ocean',
@@ -174,7 +176,7 @@ function initPreBoucles() {
     addPreBoucle('youtube', 'Youtube', entitySubject, false,
         ['youtube', 'feldup', 'norman', 'cyprien', 'natoo', 'kemar', 'jdg', 'joueur du grenier', 'amixem', 'squeezie', 'rire jaune', 'kevin tran', 'michou', 'mcfly',
             'carlito', 'inoxtag', 'seblafrite', 'joyca', 'julien chieze', 'kyan khojandi', 'lena situations', 'charlie danger', 'florianonair', 'bench', 'bigflo', 'corda',
-            'fastgoodcuisine', 'julia', 'otaku', 'papacito', 'stephane edouard', 'nikocado', 'logan paul', 'aline*dessine']);
+            'fastgoodcuisine', 'julia', 'otaku', 'papacito', 'stephane edouard', 'nikocado', 'logan paul', 'aline*dessine', 'hooper']);
 
     loadPreBouclesStatuses();
 }

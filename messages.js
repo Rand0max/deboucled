@@ -125,7 +125,7 @@ function addBoucledAuthorButton(nearbyElement, author, optionBoucledUseJvarchive
     insertAfter(boucledButton, nearbyElement);
 }
 
-function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive, optionBlSubjectIgnoreMessages) {
+function handleJvChatAndTopicLive(messageOptions) {
     function removeLiveMessage(messageElement, author, topicLiveEvent) {
         if (topicLiveEvent) topicLiveEvent.detail.cancel();
         else removeMessage(messageElement);
@@ -136,14 +136,14 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
     }
 
     function handleBlacklistedAuthor(messageElement, authorElement, author, topicLiveEvent) {
-        if (optionHideMessages) {
+        if (messageOptions.optionHideMessages) {
             removeLiveMessage(messageElement, author, topicLiveEvent);
             return true;
         }
         else {
             highlightBlacklistedAuthor(messageElement, authorElement);
             let mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
-            addBoucledAuthorButton(mpBloc, author, optionBoucledUseJvarchive);
+            addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
         }
         return false;
     }
@@ -160,7 +160,10 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
     }
 
     function handleLiveMessage(messageElement, authorElement, topicLiveEvent) {
-        let author = authorElement.textContent.trim();
+        const messageContent = messageElement.querySelector('.txt-msg.text-enrichi-forum');
+        const author = authorElement.textContent.trim();
+        const isSelf = userPseudo?.toLowerCase() === author.toLowerCase();
+
         if (getAuthorBlacklistMatches(author)?.length) {
             if (handleBlacklistedAuthor(messageElement, authorElement, author, topicLiveEvent)) {
                 return; // si on a supprimé le message on se casse, plus rien à faire
@@ -171,23 +174,31 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
                 let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
                 upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton);
                 let mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
-                addBoucledAuthorButton(mpBloc, author, optionBoucledUseJvarchive);
+                addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
             }
             else {
                 createJvChatBlacklistButton(messageElement, authorElement, author);
             }
         }
 
-        if (!optionBlSubjectIgnoreMessages) return;
+        highlightSpecialAuthors(author, authorElement, isSelf);
+
+        if (messageOptions.optionEnhanceQuotations) highlightQuotedAuthor(messageContent);
+
+        if (!messageOptions.optionBlSubjectIgnoreMessages || isSelf) return;
         handleBlSubjectIgnoreMessages(messageElement);
     }
 
+    enableJvChatAndTopicLiveEvents(handleLiveMessage);
+}
+
+function enableJvChatAndTopicLiveEvents(handleCallback) {
     // JvChat
     addEventListener('jvchat:newmessage', function (event) {
-        let messageElement = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
-        let authorElement = messageElement.querySelector('h5.jvchat-author');
+        const messageElement = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
+        const authorElement = messageElement.querySelector('h5.jvchat-author');
         if (!authorElement) return;
-        handleLiveMessage(messageElement, authorElement);
+        handleCallback(messageElement, authorElement);
     });
     addEventListener('jvchat:activation', function () {
         hiddenMessages = 0;
@@ -197,11 +208,11 @@ function handleJvChatAndTopicLive(optionHideMessages, optionBoucledUseJvarchive,
 
     // TopicLive
     addEventListener('topiclive:newmessage', function (event) {
-        let messageElement = document.querySelector(`.bloc-message-forum[data-id="${event.detail.id}"]`);
+        const messageElement = document.querySelector(`.bloc-message-forum[data-id="${event.detail.id}"]`);
         if (!messageElement) return;
-        let authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+        const authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
         if (!authorElement) return;
-        handleLiveMessage(messageElement, authorElement, event);
+        handleCallback(messageElement, authorElement, event);
     });
 }
 
@@ -315,6 +326,21 @@ function highlightQuotedAuthor(messageContent) {
             messageContent,
             quotedSelfRegex,
             (match) => buildProfilHighlightAnchor(match, ' self'));
+    }
+}
+
+function handleMessageSetTopicAuthor(topicId, author, authorElement) {
+    if (topicId && topicAuthorMap.has(topicId) && author?.toLowerCase() === topicAuthorMap.get(topicId)) {
+        let crownElem = document.createElement('span');
+        crownElem.className = 'deboucled-crown-logo';
+        crownElem.title = 'Auteur du topic';
+        authorElement.prepend(crownElem);
+    }
+}
+
+function highlightSpecialAuthors(author, authorElement, isSelf) {
+    if (deboucledPseudos.includes(author?.toLowerCase()) || isSelf) {
+        authorElement.classList.toggle('deboucled-randomax-pseudo', true);
     }
 }
 

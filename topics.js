@@ -213,10 +213,10 @@ function getSubjectBlacklistMatches(subject) {
     return groupedMatches;
 }
 
-function getAuthorBlacklistMatches(author) {
+function getAuthorBlacklistMatches(author, isSelf) {
     if (!authorsBlacklistReg) return null;
     const normAuthor = author.toLowerCase().normalizeDiacritic();
-    if (normAuthor === 'rand0max' || (normAuthor === userPseudo?.toLowerCase().normalizeDiacritic())) return null;
+    if (deboucledPseudos.includes(normAuthor) || isSelf) return null;
     return normAuthor.match(authorsBlacklistReg) ? [author] : null;
 }
 

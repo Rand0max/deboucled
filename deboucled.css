@@ -976,9 +976,9 @@ input[type="search"] {
 }
 
 .deboucled-randomax-pseudo {
-  overflow: visible;
-  text-shadow: 0px 0px 10px var(--jv-text-primary);
-  color: var(--jv-text-hover-primary);
+  overflow: visible !important;
+  text-shadow: 0px 0px 10px var(--jv-text-primary) !important;
+  /* color: var(--jv-text-hover-primary) !important; */
 }
 
 .deboucled-bloc {
@@ -1496,7 +1496,8 @@ select.deboucled-dropdown::-ms-expand {
 }
 @media (max-width: 500px) {
   #forum-main-col .bloc-pre-pagi-forum {
-    margin: 0 4px !important;
+    margin-left: 4px !important;
+    margin-right: 4px !important;
   }
   .deboucled-td-left {
     white-space: break-spaces;

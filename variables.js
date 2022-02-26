@@ -61,3 +61,5 @@ let forumFilteringIsDisabled = false;
 
 const domParser = new DOMParser();
 
+const deboucledPseudos = ['rand0max', 'deboucled'];
+
