@@ -112,19 +112,15 @@ function getCurrentPageType(url) {
     return 'unknown';
 }
 
-async function getTopicPageContent(page) {
+function buildTopicNewPageUri(newPageId) {
     let urlRegex = /^(\/forums\/(?:42|1)-[0-9]+-[0-9]+-)(?<pageid>[0-9]+)(-0-1-0-.*\.htm)$/i;
-
     let currentPath = window.location.pathname;
-    let newPageUrl = currentPath.replace(urlRegex, `$1${page}$3`);
+    let newPageUrl = currentPath.replace(urlRegex, `$1${newPageId}$3`);
+    return newPageUrl;
+}
 
-    return fetch(newPageUrl).then(function (response) {
-        if (!response.ok) throw Error(response.statusText);
-        return response.text();
-    }).catch(function (err) {
-        console.warn(err);
-        return undefined;
-    });
+async function getTopicPageContent(pageId) {
+    return fetchHtml(buildTopicNewPageUri(pageId));
 }
 
 async function getForumPageContent(page) {
@@ -137,13 +133,7 @@ async function getForumPageContent(page) {
     let nextPageId = currentPageId + ((page - 1) * defaultTopicCount);
     let nextPageUrl = currentPath.replace(urlRegex, `$1${nextPageId}$3`);
 
-    return fetch(nextPageUrl).then(function (response) {
-        if (!response.ok) throw Error(response.statusText);
-        return response.text();
-    }).catch(function (err) {
-        console.warn(err);
-        return undefined;
-    });
+    return fetchHtml(nextPageUrl);
 }
 
 async function handleTopicList(canFillTopics) {
@@ -306,7 +296,7 @@ function handleBlSubjectIgnoreMessages(messageElement) {
     }
 }
 
-function handleMessage(messageElement, topicId, messageOptions) {
+function handleMessage(messageElement, messageOptions) {
     const authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
     if (!authorElement) return;
 
@@ -348,7 +338,7 @@ function handleMessage(messageElement, topicId, messageOptions) {
     }
 
     highlightSpecialAuthors(author, authorElement, isSelf);
-    handleMessageSetTopicAuthor(topicId, author, authorElement);
+    handleMessageSetTopicAuthor(author, authorElement);
     fixMessageUrls(messageContent);
 
     if (messageOptions.optionEnhanceQuotations) highlightQuotedAuthor(messageContent);
@@ -357,41 +347,15 @@ function handleMessage(messageElement, topicId, messageOptions) {
     handleBlSubjectIgnoreMessages(messageElement);
 }
 
-function getTopicId() {
-    /*
-    const urlRegex = /^\/forums\/(42|1)-[0-9]+-(?<topicid>[0-9]+)-[0-9]+-0-1-0-.*\.htm$/gi;
-    const matches = urlRegex.exec(window.location.pathname);
-    if (!matches?.groups?.topicid) return;
-    return parseInt(matches.groups.topicid);
-    */
-
-    const blocFormulaireElem = document.querySelector('#bloc-formulaire-forum');
-    if (!blocFormulaireElem) return undefined;
-    return parseInt(blocFormulaireElem.getAttribute('data-topic-id'));
-}
-
-function getTopicCurrentPageId() {
-    /*
-    const urlRegex = /^\/forums\/(42|1)-[0-9]+-[0-9]+-(?<pageid>[0-9]+)-0-1-0-.*\.htm$/gi;
-    const matches = urlRegex.exec(window.location.pathname);
-    if (!matches?.groups?.pageid) return undefined;
-    return parseInt(matches.groups.pageid);
-    */
-
-    const pageActiveElem = document.querySelector('.page-active');
-    if (!pageActiveElem) return undefined;
-    return parseInt(pageActiveElem.textContent.trim())
-}
-
-async function setTopicAuthor(topicId) {
-    if (!topicId || topicAuthorMap.has(topicId)) return;
+async function setTopicAuthor() {
+    if (!currentTopicId || topicAuthorMap.has(currentTopicId)) return;
 
     const pageId = getTopicCurrentPageId();
     if (!pageId) return;
 
     let currentDoc = document;
     if (pageId !== 1) {
-        currentDoc = await getTopicPageContent('1').then((res) => domParser.parseFromString(res, 'text/html'));
+        currentDoc = await getTopicPageContent('1');
         if (!currentDoc) return;
     }
 
@@ -401,7 +365,7 @@ async function setTopicAuthor(topicId) {
     if (!firstMessage) return;
 
     const author = firstMessage.querySelector('.bloc-pseudo-msg')?.textContent.trim().toLowerCase();
-    topicAuthorMap.set(topicId, author);
+    topicAuthorMap.set(currentTopicId, author);
 
     await saveLocalStorage();
 }
@@ -409,10 +373,9 @@ async function setTopicAuthor(topicId) {
 function handleTopicWhitelist() {
     const titleBlocElement = document.querySelector('.titre-bloc.titre-bloc-forum');
     if (!titleBlocElement) return false;
-    const topicId = getTopicId();
-    if (!topicId) return false;
+    if (!currentTopicId) return false;
 
-    const topicIdIndex = topicIdWhitelistArray.indexOf(topicId);
+    const topicIdIndex = topicIdWhitelistArray.indexOf(currentTopicId);
     const isWhitelisted = topicIdIndex >= 0;
 
     let whitelistButtonElement = document.createElement('span');
@@ -422,7 +385,7 @@ function handleTopicWhitelist() {
     whitelistButtonElement.setAttribute('data-tooltip-location', 'right');
     whitelistButtonElement.onclick = async () => {
         if (isWhitelisted) topicIdWhitelistArray.splice(topicIdIndex, 1);
-        else topicIdWhitelistArray.push(topicId);
+        else topicIdWhitelistArray.push(currentTopicId);
         await saveStorage()
         location.reload();
     };
@@ -459,18 +422,21 @@ function displayTopicDeboucledMessage() {
 }
 
 function prepareMessageOptions() {
+    currentTopicId = getTopicId();
     const isWhitelistedTopic = handleTopicHeader();
     const optionHideMessages = !isWhitelistedTopic && GM_getValue(storage_optionHideMessages, storage_optionHideMessages_default);
     const optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
     const optionBlSubjectIgnoreMessages = !isWhitelistedTopic && GM_getValue(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default);
     const optionEnhanceQuotations = GM_getValue(storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default);
     const optionAntiSpam = GM_getValue(storage_optionAntiSpam, storage_optionAntiSpam_default);
+    const optionSmoothScroll = GM_getValue(storage_optionSmoothScroll, storage_optionSmoothScroll_default);
     const messageOptions = {
         optionHideMessages: optionHideMessages,
         optionBoucledUseJvarchive: optionBoucledUseJvarchive,
         optionBlSubjectIgnoreMessages: optionBlSubjectIgnoreMessages,
         optionEnhanceQuotations: optionEnhanceQuotations,
-        optionAntiSpam: optionAntiSpam
+        optionAntiSpam: optionAntiSpam,
+        optionSmoothScroll: optionSmoothScroll
     };
     return messageOptions;
 }
@@ -478,13 +444,11 @@ function prepareMessageOptions() {
 async function handleTopicMessages() {
     const messageOptions = prepareMessageOptions();
 
-    const topicId = getTopicId();
-
     handleJvChatAndTopicLive(messageOptions);
 
     const allMessages = getAllMessages(document);
-    await setTopicAuthor(topicId);
-    allMessages.forEach((message) => handleMessage(message, topicId, messageOptions));
+    await setTopicAuthor();
+    allMessages.forEach((message) => handleMessage(message, messageOptions));
 
     if (hiddenSpammers > 0) refreshAuthorKeys();
     if (hiddenMessages === allMessages.length) displayTopicDeboucledMessage();
@@ -496,6 +460,8 @@ async function handleTopicMessages() {
         addMessageQuoteEvents(allMessages);
         addAuthorSuggestionEvent();
     }
+
+    if (messageOptions.optionSmoothScroll) createSmoothScroll((m) => handleMessage(m, messageOptions));
 }
 
 async function handleSearch() {
@@ -725,7 +691,6 @@ async function entryPoint() {
     //let end = performance.now();
     //console.log(`total time = ${end - start} ms`);
 }
-
 
 entryPoint();
 

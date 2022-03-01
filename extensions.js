@@ -360,3 +360,31 @@ function getTextChildren(contentElement) {
     return [...contentElement.childNodes].filter(c => c.nodeType === Node.TEXT_NODE && c.textContent.trim() !== '');
 }
 
+async function fetchHtml(url) {
+    return fetch(url)
+        .then(function (response) {
+            if (!response.ok) throw Error(response.statusText);
+            return response.text();
+        }).then(function (res) {
+            return domParser.parseFromString(res, 'text/html');
+        }).catch(function (err) {
+            console.warn(err);
+            return undefined;
+        });
+}
+
+async function fetchJson(url) {
+    return fetch(url)
+        .then(function (response) {
+            if (!response.ok) throw Error(response.statusText);
+            return response.text();
+        })
+        .then(function (text) {
+            return JSON.parse(text);
+        })
+        .catch(function (err) {
+            console.warn(err);
+            return undefined;
+        });
+}
+

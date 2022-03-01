@@ -33,17 +33,7 @@ async function suggestAuthors(authorHint) {
 
     const url = `/sso/ajax_suggest_pseudo.php?pseudo=${authorHint.trim()}`;
 
-    let suggestions = await fetch(url)
-        .then(function (response) {
-            if (!response.ok) throw Error(response.statusText);
-            return response.text();
-        }).then(function (r) {
-            return JSON.parse(r);
-        }).catch(function (err) {
-            console.warn(err);
-            return undefined;
-        });
-
+    let suggestions = await fetchJson(url);
     return suggestions ? [...suggestions.alias.map(s => s.pseudo)] : undefined;
 }
 

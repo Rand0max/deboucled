@@ -4,20 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 async function queryYoutubeBlacklist() {
-
-    let newYoutubeBlacklist = await fetch(youtubeBlacklistUrl)
-        .then(function (response) {
-            if (!response.ok) throw Error(response.statusText);
-            return response.text();
-        })
-        .then(function (text) {
-            return JSON.parse(text);
-        })
-        .catch(function (err) {
-            console.warn(err);
-            return undefined;
-        });
-
+    let newYoutubeBlacklist = await fetchJson(youtubeBlacklistUrl);
     if (!newYoutubeBlacklist?.length) return;
 
     youtubeBlacklistArray = newYoutubeBlacklist.flatMap(yp => yp.videos);

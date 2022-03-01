@@ -195,6 +195,9 @@ function buildSettingsPage(firstLaunch = false) {
         let previewLogo = '<span><svg width="16px" viewBox="0 0 30 30" id="deboucled-preview-logo"><use href="#previewlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour avoir un <i>aperçu du topic</i> ${previewLogo}`, storage_optionPrevisualizeTopic, storage_optionPrevisualizeTopic_default, 'Afficher ou non l\'icone \'loupe\' à côté du sujet pour prévisualiser le topic au survol.');
 
+        let scrollLogo = '<span class="deboucled-scroll-logo"></span>'
+        html += addToggleOption(`Activer le <i>défilement automatique</i> ${scrollLogo} des messages (BETA)`, storage_optionSmoothScroll, storage_optionSmoothScroll_default, 'Activer le chargement automatique des messages du topic en faisant défiler la page vers le bas.');
+
         let blJvcLogo = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
         html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvcLogo} de JVC`, storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
 
@@ -419,6 +422,7 @@ function addSettingEvents() {
 
     addToggleEvent(storage_optionAntiVinz);
     addToggleEvent(storage_optionAntiSpam);
+    addToggleEvent(storage_optionSmoothScroll);
     addToggleEvent(storage_optionReplaceResolvedPicto);
     addToggleEvent(storage_optionEnableTopicMsgCountThreshold, undefined, function () {
         document.querySelectorAll(`[id = ${storage_optionTopicMsgCountThreshold}-container]`).forEach(function (el) {
@@ -531,12 +535,12 @@ function writeEntityKeys(entity, entries, filterCallback, removeCallback, entity
     if (filterCallback) entries = filterCallback(entries);
     if (sortCallback) entries = sortCallback(entries);
 
-    let html = '<ul class="deboucled-entity-list">';
+    let html = '<table class="deboucled-entity-list">';
     entries.forEach(function (value, key) {
         let cls = entityClassCallback ? entityClassCallback(key, value) : '';
-        html += `<li class="deboucled-entity-key deboucled-entity-element${cls}" id="${key}"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</li>`;
+        html += `<td class="deboucled-entity-key deboucled-entity-element${cls}" id="${key}"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</td>`;
     });
-    html += '</ul>';
+    html += '</table>';
     document.querySelector(`#deboucled-${entity}List`).innerHTML = html;
 
     document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(function (input) {

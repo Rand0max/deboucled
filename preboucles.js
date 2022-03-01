@@ -30,8 +30,8 @@ function initPreBoucles() {
             'maleau', 'maieau', 'sakuta', 'stopbanboucle', 'lerenoi*debxl', 'leblackprotrump', 'bannissement137', 'janullrich', 'marlounbrandon', 'tomcain',
             'liondepressif', 'coulisdepet', 'arminiya', 'risitasultime', 'puissance2khey', 'puissancedekhey', 'lickeurdepied', 'kyie_not_guilty', 'kyie_not_guilty',
             'varhastra11-10', 'facksyer', 'captaine-marvel', 'fieldm', 'styx666', 'atlantiquem', 'alettaoceanv1', 'alettaoceanv2', 'camillezizi', 'doomdeathworth',
-            'beagie', 'fr2u', 'patisserie_adhd', 'finaleffect4', 'finaleffect5', 'aftereffects5', 'legamermagique', 'aaargh_0fan', 'allezmonpoutoc', 'lioncalvitie',
-            'lixy_nocturne', 'serpe123', 'pazekip', 'boteur0', 'darkloop', 'galacticloop']);
+            'beagie', 'fr2u', 'patisserie_adhd', 'finaleffect4', 'finaleffect5', 'aftereffects5', 'legamermagique', 'aaargh_0fan', 'allezmonpouto', 'lioncalvitie',
+            'lixy_nocturne', 'serpe123', 'pazekip', 'boteur0', 'darkloop', 'galacticloop', 'redpilletudiant', 'laideronsourire', 'macronleboufon']);
 
     addPreBoucle('bots', 'BOTS', entityAuthor, false,
         ['tontonfouilleur', 'squeezie-issou', '2__marche', '2marche', 'deux-marche', 'anatoli_diatlov', 'soutien-rpc', 'lovemaze', 'leo2005', '1m54maisgrand', 'moussecerise',
@@ -62,7 +62,7 @@ function initPreBoucles() {
             'kud-chan', 'lastral', 'kamui_bungee', '[explo]', '[ks]lilly_satou', 'fimi_', 'askeladden41', 'adhd-kun', 'edinu', 'miseron', 'couverturent', 'yuuthirohito',
             'bisexwouale', 'turbincel2sur10', 'aaargh_0fan', 'loulina', 'minatohiraishin', 'feu_blanc', 'notready69', 'steinheir', 'elgoldfag', 'snuffyherisson', 'kai-kod',
             'lalena', 'mvd-jumpstyle', 'proutmdrgchie', 'techlead2', 'missmonochr0me', 'julia-lux', 'inceldeuxsur10', 'rinnelidov25', 'mezero', 'pinazzachi', 'resade',
-            'parvati']);
+            'parvati', 'shinjipucix', 'blackpinku', 'sophietwilight', 'morika', 'ultimatoy', 'jun_togawa', 'nextday']);
 
     addPreBoucle('insane', 'Zinzins', entityAuthor, false,
         ['vincenfreeman', 'aneryl', 'flubus', 'kinahe', 'leao', 'oael', 'vinz', 'vcxn', 'tacos', 'lesyeuxduforum', 'cigarette', 'cigarrette', 'deratiseur', 'windowsbot',
@@ -72,14 +72,14 @@ function initPreBoucles() {
             'avenoelsuce', 'stopbanboucle', 'pump101', 'fessesdefemme', 'janullrich', 'lans6', 'lans28', 'djanoug', 'le0tout', 'coulisdepet', 'leprofesor', 'vincentfreman',
             'facksyer', 'multoo', 'sonicfan18', 'rayonceleste', 'ayaacescouilles', 'kdayone', 'camillezizi', 'ketchupent', 'zer0tonin', 'beagie', 'tahbik', 'bisexwouale',
             'vulcain_rageux', 'xjahxsehx', 'jeunealgerien', 'soniclelion', 'jdilla', 'groscharclo', 'lultimm', 'lioncalvitie', 'finaleffect4', 'finaleffect5', 'aftereffects5',
-            'souritimah', 'pazekip', 'blaguueritor', 'mustafarrr', 'ouestmaaah', 'misere']);
+            'souritimah', 'pazekip', 'blaguueritor', 'mustafarrr', 'ouestmaaah', 'misere', 'laideronsourire', '_elkheyos_', 'suceurdebityl', 'banbaoh']);
 
     addPreBoucle('aw', 'AW', entityAuthor, false,
         ['peore', '[kj]', 'kheyette', 'jojolechatgris', 'lecelestinsympa', 'suprakheyette', 'cheuns', 'lapetitegouine', 'kanou43', 'breod', 'titanlevrette', 'pump101', 'dandelotte',
-            'pandore-', 'regimeducamp', 'oneponey', 'amandadu42', 'nabilis', 'sereinepyj', 'frimeuze', 'naomi_sama', 'rousse_radieuse', 'parvatikheyette', 'contedefees',
+            'pandore-', 'regimeducamp', 'oneponey', 'amandadu42', 'nabilis', 'sereinepyj', 'frimeuze', 'naomi_sama', 'rousse_radieuse', 'parvatikheyette', 'contedefee',
             'saintepasteque', 'venus_noire', 'incel2sur10ette', 'sereineptiote', 'sereine', 'amiamore', 'esalamy69', 'multoo', 'seuleavie', 'camillezizi', 'rephya', 'pourquoipas-',
             'misere', 'anyataylorjoie', 'ninouchedu07', 'miss-ninaa', 'watikroko', 'loulina', 'damesanjo', 'chalumeau2', '-henriette-', 'paulinephoto', 'pastranquille', '[l]raven[l]',
-            'amourpur', 'parvati']);
+            'amourpur', 'parvati', 'pizzahamburger', 'psychodose', '_elkheyos_', 'gelina', 'rinesa', 'nextday']);
 
 
     addPreBoucle('popularboucles', 'Boucles connues', entitySubject, true,
@@ -119,7 +119,7 @@ function initPreBoucles() {
         ['feet*', 'trap*', 'kj', 'adf', 'papa du forum', 'blacked', 'cuck', 'reine fatima', 'reine popo', 'shemale*', 'domina', 'fetichiste', 'fetichisme', 'mym',
             'onlyfan', 'onlyfans', 'sissy*', 'trans', 'transexuel', 'transsexuel', 'transexuelle', 'transsexuelle', 'lgbt*', 'm2f', 'f2m', 'asmr', 'trav', 'travelo',
             'femdom', 'cage de chastete', 'rimjob', 'chaturbate', 'salazar', 'sugar daddy', 'woodman', 'waifu', 'moneyslave', 'bbc', 'plug anal', 'edging', 'femboy*',
-            'desu', 'desu~', ':desu:', 'twink*', 'grindr', 'scat', 'scato', 'uro', 'lovense', 'facesitting']);
+            'desu', 'desu~', ':desu:', 'twink*', 'grindr', 'scat', 'scato', 'uro', 'lovense', 'facesitting', 'tucking']);
 
     addPreBoucle('girls', 'Femmes', entitySubject, false,
         ['meuf', 'fille', 'femme', '*/10', '*/20', 'cul', 'sein*', 'boob*', 'bzez', '95e', 'kheyette*', 'colombienne', 'emma roberts', 'estelle redpill', 'lena situations',
@@ -130,7 +130,7 @@ function initPreBoucles() {
     addPreBoucle('geopolitic', 'Géopolitique', entitySubject, false,
         ['ww3', 'ww 3', 'world war 3', 'wwiii', 'ukrain*', 'prayforukraine', 'kiev', 'poutine', 'russe', 'russes', 'russie', '3gm', 'otan', 'kremlin', 'crimee',
             'troisieme guerre mondiale', '3e guerre mondiale', '3eme guerre mondiale', 'nwo', 'new world order', 'tchernobyl', 'bombe tsar', 'tsar bomba', 'biden', 'trump',
-            'zelensky', 'zelenski']);
+            'zelensky', 'zelenski', 'nuke', 'satan 2', 'guerre', 'bombe', 'nucleaire', 'atome', 'front', 'armee', 'missile', 'malette nucleaire']);
 
     addPreBoucle('hatred', 'Haineux', entitySubject, false,
         ['facho*', 'chofs', 'chofa*', 'chofix*', 'qlf', 'paz', 'pazification', 'pazifie', 's2s', 'gwer*', 'raciste*', 'hagar', 'hagra', '🐊', '🐷', 'bassem', 'sadek', 'les porcs',
@@ -182,10 +182,10 @@ function initPreBoucles() {
 }
 
 function isEntityInPreboucles(entityType, entity) {
-    let preBoucles = preBoucleArray.filter(pb => pb.enabled && pb.type === entityType).flatMap(pb => pb.entities);
+    if (!preBoucleEnabledArray?.length) preBoucleEnabledArray = preBoucleArray.filter(pb => pb.enabled && pb.type === entityType).flatMap(pb => pb.entities);
     const entityLower = entity.toLowerCase();
     const entities = [entityLower, `${entityLower}*`, `*${entityLower}`, `*${entityLower}*`];
-    return entities.some(e => preBoucles.includes(e));
+    return entities.some(e => preBoucleEnabledArray.includes(e));
 }
 
 function makeVinzSubjectPure(str) {

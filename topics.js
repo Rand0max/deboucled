@@ -18,11 +18,7 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
 
     while (actualTopics < maxTopicCount && pageBrowse <= maxPages) {
         pageBrowse++;
-        const nextPageTopics = await getForumPageContent(pageBrowse)
-            .then((res) => {
-                let nextPageDoc = domParser.parseFromString(res, 'text/html');
-                return getAllTopics(nextPageDoc);
-            });
+        const nextPageTopics = await getForumPageContent(pageBrowse).then((nextPageDoc) => getAllTopics(nextPageDoc));
 
         for (let topic of nextPageTopics.slice(1)) {
             const topicBlacklisted = await isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz);
@@ -80,6 +76,43 @@ async function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
         hiddenTotalTopics++;
         updateTopicsHeader();
     }
+}
+
+function getTopicId() {
+    /*
+    const urlRegex = /^\/forums\/(42|1)-[0-9]+-(?<topicid>[0-9]+)-[0-9]+-0-1-0-.*\.htm$/gi;
+    const matches = urlRegex.exec(window.location.pathname);
+    if (!matches?.groups?.topicid) return;
+    return parseInt(matches.groups.topicid);
+    */
+    const blocFormulaireElem = document.querySelector('#bloc-formulaire-forum');
+    if (!blocFormulaireElem) return undefined;
+    return parseInt(blocFormulaireElem.getAttribute('data-topic-id'));
+}
+
+function getTopicCurrentPageId(doc) {
+    if (!doc) doc = document;
+    const pageActiveElem = doc.querySelector('.page-active');
+    if (!pageActiveElem) return undefined;
+    return parseInt(pageActiveElem.textContent.trim());
+}
+
+function getTopicPageIdFromUri(url) {
+    const urlRegex = /^\/forums\/(42|1)-[0-9]+-[0-9]+-(?<pageid>[0-9]+)-0-1-0-.*\.htm$/gi;
+    const matches = urlRegex.exec(url);
+    if (!matches?.groups?.pageid) return;
+    return parseInt(matches.groups.pageid);
+}
+
+function getTopicLastPageId(doc) {
+    if (!doc) doc = document;
+    const lastPageButton = doc.querySelector('.pagi-fin-actif.icon-next2');
+    if (!lastPageButton) return undefined;
+    let pageId = getTopicPageIdFromUri(lastPageButton.getAttribute('href'));
+    if (!pageId) {
+        pageId = getTopicPageIdFromUri(decryptJvCare(lastPageButton.getAttribute('class')));
+    }
+    return parseInt(pageId);
 }
 
 function updateTopicsHeader() {
@@ -397,22 +430,9 @@ function addPrevisualizeTopicEvent(topics) {
         return messagePreview;
     }
 
-    async function previewTopicCallback(topicUrl) {
-        return await fetch(topicUrl).then(function (response) {
-            if (!response.ok) throw Error(response.statusText);
-            return response.text();
-        }).then(function (r) {
-            const html = domParser.parseFromString(r, 'text/html');
-            return prepareMessagePreview(html);
-        }).catch(function (err) {
-            console.error(err);
-            return null;
-        });
-    }
-
     async function onPreviewHover(topicUrl, previewDiv) {
         if (previewDiv.querySelector('.bloc-message-forum')) return; // already loaded
-        const topicContent = await previewTopicCallback(topicUrl);
+        const topicContent = await fetchHtml(topicUrl).then((html) => prepareMessagePreview(html));
         if (!topicContent) return;
         previewDiv.firstChild.remove();
         previewDiv.appendChild(topicContent);
@@ -433,7 +453,7 @@ function addPrevisualizeTopicEvent(topics) {
 
         let previewDiv = document.createElement('div');
         previewDiv.className = 'deboucled-preview-content bloc-message-forum';
-        previewDiv.innerHTML = '<img class="deboucled-spinner" src="http://s3.noelshack.com/uploads/images/20188032684831_loading.gif" alt="Loading" />';
+        previewDiv.innerHTML = '<img class="deboucled-preview-spinner" src="http://s3.noelshack.com/uploads/images/20188032684831_loading.gif" alt="Loading" />';
         previewDiv.onclick = (e) => e.preventDefault();
         anchor.appendChild(previewDiv);
 
@@ -512,5 +532,129 @@ function removeUselessTags(topics) {
         newTitle = newTitle.trim().toLowerCase().capitalize();
         if (newTitle.length > 0) titleElem.textContent = newTitle;
     });
+}
+
+function buildLoaderStatus() {
+    const loaderRequest = `
+    <div class="loader-ellips infinite-scroll-request">
+    <span class="loader-ellips__dot"></span>
+    <span class="loader-ellips__dot"></span>
+    <span class="loader-ellips__dot"></span>
+    <span class="loader-ellips__dot"></span>
+    </div>`;
+    const loaderLast = '<p class="infinite-scroll-last">Fin du topic</p>';
+    const loaderError = '<p class="infinite-scroll-error">Fin des messages</p>';
+
+    let loadStatusElement = document.createElement('div');
+    loadStatusElement.className = 'page-load-status';
+    loadStatusElement.innerHTML = `${loaderRequest}${loaderLast}${loaderError}`;
+    return loadStatusElement;
+}
+
+function buildFloatingNavbar(infScroll) {
+    const messageTopicElement = document.querySelector('#message_topic');
+
+    const navbar = document.createElement('div');
+    navbar.className = 'deboucled-floating-container';
+
+    const container = document.querySelector('.layout__contentAside');
+    container.prepend(navbar);
+
+    const setTooltip = (bt, txt) => { bt.setAttribute('deboucled-data-tooltip', txt); bt.setAttribute('data-tooltip-location', 'left'); };
+
+    const buttonTop = document.createElement('div');
+    buttonTop.className = 'deboucled-floating-button deboucled-arrow-up-logo';
+    setTooltip(buttonTop, 'Retour en haut de page');
+
+    buttonTop.onclick = () => {
+        document.querySelector('#bloc-title-forum')?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    };
+    navbar.appendChild(buttonTop);
+
+    const buttonAnswer = document.createElement('div');
+    buttonAnswer.className = 'deboucled-floating-button deboucled-answer-logo';
+    setTooltip(buttonAnswer, 'Répondre au topic');
+    buttonAnswer.onclick = () => {
+        toggleInfiniteScroll(infScroll, false);
+        messageTopicElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    navbar.appendChild(buttonAnswer);
+
+    const buttonToggleSmooth = document.createElement('div');
+    buttonToggleSmooth.className = 'deboucled-floating-button deboucled-smoothscroll-logo';
+    setTooltip(buttonToggleSmooth, 'Activer/désactiver le défilement automatique');
+    buttonToggleSmooth.onclick = () => toggleInfiniteScroll(infScroll, !infScroll.options.loadOnScroll);
+    navbar.appendChild(buttonToggleSmooth);
+
+    /* Handle navbar transparency */
+    let messageTopicIsVisible = true;
+    function toggleTransparentButton() {
+        const isTransparent = messageTopicIsVisible;// window.scrollY < 350 || messageTopicIsVisible;
+        buttonTop.classList.toggle('transparent', isTransparent);
+        buttonAnswer.classList.toggle('transparent', isTransparent);
+        buttonToggleSmooth.classList.toggle('transparent', isTransparent);
+    }
+    toggleTransparentButton();
+    window.addEventListener('scroll', toggleTransparentButton, { passive: true });
+    var observer = new IntersectionObserver((entries) => { messageTopicIsVisible = entries[0].isIntersecting }, { threshold: [1] });
+    observer.observe(messageTopicElement);
+    observer.observe(document.querySelector('.bloc-pagi-default'));
+
+}
+
+function toggleInfiniteScroll(infScroll, status) {
+    if (!infScroll) return;
+    infScroll.options.loadOnScroll = status;
+    infScroll.options.scrollThreshold = status ? -200 : false;
+    document.querySelector('.deboucled-smoothscroll-logo')?.classList.toggle('disabled', !status);
+}
+
+function createSmoothScroll(handleMessageCallback) {
+    const initialPageId = getTopicCurrentPageId();
+    const lastPageId = getTopicLastPageId();
+
+    const forumContainer = document.querySelector('#forum-main-col');
+    const bottomPagi = document.querySelectorAll('.bloc-pagi-default')[1];
+
+    if (!bottomPagi || !forumContainer) return;
+
+    const loaderStatus = buildLoaderStatus();
+    forumContainer.appendChild(loaderStatus);
+
+    function getInfScrollPath() {
+        const nextPageId = initialPageId + this.pageIndex;
+        if (lastPageId && nextPageId <= lastPageId) return buildTopicNewPageUri(nextPageId);
+    }
+
+    // eslint-disable-next-line no-undef
+    let infScroll = new InfiniteScroll('.conteneur-messages-pagi', {
+        // debug: true,        
+        //hideNav: '.bloc-pagi-default:nth-of-type(2n)',
+        scrollThreshold: -200,
+        status: '.page-load-status',
+        checkLastPage: true,
+        path: getInfScrollPath
+    });
+
+    infScroll.on('load', function (body) {
+        const allMessages = getAllMessages(body);
+
+        const separator = document.createElement('div');
+        separator.className = 'deboucled-message-separator';
+        bottomPagi.insertAdjacentElement('beforebegin', separator);
+
+        allMessages.forEach(m => {
+            let fixedMessage = fixMessageJvCare(m);
+            bottomPagi.insertAdjacentElement('beforebegin', fixedMessage);
+            handleMessageCallback(fixedMessage);
+        });
+
+        separator.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+    });
+
+    document.querySelector('.btn-repondre-msg')?.addEventListener('click', () => toggleInfiniteScroll(infScroll, false));
+    document.querySelector('#message_topic')?.addEventListener('focus', () => toggleInfiniteScroll(infScroll, false));
+
+    buildFloatingNavbar(infScroll);
 }
 

@@ -41,6 +41,7 @@ let hiddenAuthorArray = new Set();
 let deboucledTopicStatsMap = new Map();
 
 let preBoucleArray = [];
+let preBoucleEnabledArray;
 let vinzBoucleArray = [];
 let vinzBoucleMessageArray = [];
 
@@ -57,6 +58,7 @@ let sortModeTopicId = 0;
 let disabledFilteringForumSet = new Set();
 
 let userPseudo = undefined;
+let currentTopicId = undefined;
 let forumFilteringIsDisabled = false;
 
 const domParser = new DOMParser();

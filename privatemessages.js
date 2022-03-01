@@ -9,21 +9,9 @@ function findPrivateMessageDefaultParams(doc) {
         .map(fs => ({ name: fs.getAttribute('name'), value: fs.getAttribute('value') }));
 }
 
-async function getPrivateMessageDocument(url) {
-    return await fetch(url).then(function (response) {
-        if (!response.ok) throw Error(response.statusText);
-        return response.text();
-    }).then(function (r) {
-        return domParser.parseFromString(r, 'text/html');
-    }).catch(function (err) {
-        console.warn(err);
-        return null;
-    });
-}
-
 async function sendPrivateMessagesToSpam(messageIds, onMpPage) {
     const url = 'https://www.jeuxvideo.com/messages-prives/boite-reception.php';
-    let mpDoc = onMpPage ? document : await getPrivateMessageDocument(url);
+    let mpDoc = onMpPage ? document : await fetchHtml(url);
     let mpFsElements = findPrivateMessageDefaultParams(mpDoc);
     if (!mpFsElements) return;
 

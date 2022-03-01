@@ -181,9 +181,10 @@ function handleJvChatAndTopicLive(messageOptions) {
             }
         }
 
-        highlightSpecialAuthors(author, authorElement, isSelf);
-
-        if (messageOptions.optionEnhanceQuotations) highlightQuotedAuthor(messageContent);
+        if (messageOptions.optionEnhanceQuotations) {
+            highlightSpecialAuthors(author, authorElement, isSelf);
+            highlightQuotedAuthor(messageContent);
+        }
 
         if (!messageOptions.optionBlSubjectIgnoreMessages || isSelf) return;
         handleBlSubjectIgnoreMessages(messageElement);
@@ -329,8 +330,8 @@ function highlightQuotedAuthor(messageContent) {
     }
 }
 
-function handleMessageSetTopicAuthor(topicId, author, authorElement) {
-    if (topicId && topicAuthorMap.has(topicId) && author?.toLowerCase() === topicAuthorMap.get(topicId)) {
+function handleMessageSetTopicAuthor(author, authorElement) {
+    if (currentTopicId && topicAuthorMap.has(currentTopicId) && author?.toLowerCase() === topicAuthorMap.get(currentTopicId)) {
         let crownElem = document.createElement('span');
         crownElem.className = 'deboucled-crown-logo';
         crownElem.title = 'Auteur du topic';
@@ -342,5 +343,22 @@ function highlightSpecialAuthors(author, authorElement, isSelf) {
     if (deboucledPseudos.includes(author?.toLowerCase()) || isSelf) {
         authorElement.classList.toggle('deboucled-randomax-pseudo', true);
     }
+}
+
+function fixMessageJvCare(messageElement) {
+    const avatar = messageElement.querySelector('.user-avatar-msg');
+    if (avatar && avatar.hasAttribute('data-src') && avatar.hasAttribute('src')) {
+        avatar.setAttribute('src', avatar.getAttribute('data-src'));
+        avatar.removeAttribute('data-src');
+    }
+    messageElement.querySelectorAll('.JvCare').forEach(function (m) {
+        let anchor = document.createElement('a');
+        anchor.setAttribute('target', '_blank');
+        anchor.setAttribute('href', decryptJvCare(m.getAttribute('class')));
+        anchor.className = m.className.split(' ').splice(2).join(' ');
+        anchor.innerHTML = m.innerHTML;
+        m.outerHTML = anchor.outerHTML;
+    });
+    return messageElement;
 }
 
