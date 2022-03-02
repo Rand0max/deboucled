@@ -295,7 +295,7 @@ function highlightQuotedAuthor(messageContent) {
         });
     }
 
-    // On met en surbrillance bleue tous les pseudos cités avec l'@arobase (sauf le compte de l'utilisateur)
+    // On met en surbrillance grise tous les pseudos cités avec l'@arobase (sauf le compte de l'utilisateur)
     const allowedPseudo = '[\\w\\-_\\[\\]]'; // lettres & chiffres & -_[]
     const quotedAtAuthorsRegex = new RegExp(`\\B@${allowedPseudo}+`, 'gi');
     replaceAllTextQuotes(
@@ -304,7 +304,7 @@ function highlightQuotedAuthor(messageContent) {
         (match) => isSelf(match.toLowerCase()) ? match : buildProfilHighlightAnchor(match));
 
 
-    // On met en surbrillance bleue tous les pseudos cités avec le bouton "standard" (sauf le compte de l'utilisateur)
+    // On met en surbrillance grise tous les pseudos cités avec le bouton "standard" (sauf le compte de l'utilisateur)
     const quotedAuthorsFullRegex = new RegExp(`(?!le\\s[0-9]{1,2}\\s[a-zéù]{3,10}\\s[0-9]{4}\\sà\\s[0-9]{2}:[0-9]{2}:[0-9]{2}\\s:)(?<author>${allowedPseudo}+)(?=\\sa\\sécrit\\s:)`, 'gi');
     const quotedAuthorsPartRegex = new RegExp(/le\s[0-9]{1,2}\s[a-zéù]{3,10}\s[0-9]{4}\sà\s[0-9]{2}:[0-9]{2}:[0-9]{2}\s(?!:)/, 'gi');
     replaceAllTextQuotes(
@@ -322,7 +322,8 @@ function highlightQuotedAuthor(messageContent) {
 
     if (currentUserPseudo?.length) {
         // On met en surbrillance verte les citations du compte de l'utilisateur avec ou sans @arobase
-        const quotedSelfRegex = new RegExp(`\\B@${currentUserPseudo}\\b|(?<!\\w|@)${currentUserPseudo}\\b`, 'gi');
+        const selfPseudo = currentUserPseudo.escapeRegexPattern();
+        const quotedSelfRegex = new RegExp(`\\B@${selfPseudo}\\b|(?<!\\w|@)${selfPseudo}\\b`, 'gi');
         replaceAllTextQuotes(
             messageContent,
             quotedSelfRegex,

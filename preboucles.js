@@ -62,7 +62,7 @@ function initPreBoucles() {
             'kud-chan', 'lastral', 'kamui_bungee', '[explo]', '[ks]lilly_satou', 'fimi_', 'askeladden41', 'adhd-kun', 'edinu', 'miseron', 'couverturent', 'yuuthirohito',
             'bisexwouale', 'turbincel2sur10', 'aaargh_0fan', 'loulina', 'minatohiraishin', 'feu_blanc', 'notready69', 'steinheir', 'elgoldfag', 'snuffyherisson', 'kai-kod',
             'lalena', 'mvd-jumpstyle', 'proutmdrgchie', 'techlead2', 'missmonochr0me', 'julia-lux', 'inceldeuxsur10', 'rinnelidov25', 'mezero', 'pinazzachi', 'resade',
-            'parvati', 'shinjipucix', 'blackpinku', 'sophietwilight', 'morika', 'ultimatoy', 'jun_togawa', 'nextday']);
+            'parvati', 'shinjipucix', 'blackpinku', 'sophietwilight', 'morika', 'ultimatoy', 'jun_togawa', 'nextday', 'quiche2foutre']);
 
     addPreBoucle('insane', 'Zinzins', entityAuthor, false,
         ['vincenfreeman', 'aneryl', 'flubus', 'kinahe', 'leao', 'oael', 'vinz', 'vcxn', 'tacos', 'lesyeuxduforum', 'cigarette', 'cigarrette', 'deratiseur', 'windowsbot',
@@ -122,10 +122,10 @@ function initPreBoucles() {
             'desu', 'desu~', ':desu:', 'twink*', 'grindr', 'scat', 'scato', 'uro', 'lovense', 'facesitting', 'tucking']);
 
     addPreBoucle('girls', 'Femmes', entitySubject, false,
-        ['meuf', 'fille', 'femme', '*/10', '*/20', 'cul', 'sein*', 'boob*', 'bzez', '95e', 'kheyette*', 'colombienne', 'emma roberts', 'estelle redpill', 'lena situations',
+        ['meuf', 'meufs', 'fille', 'femme', '*/10', '*/20', 'cul', 'sein*', 'boob*', 'bzez', '95e', 'kheyette*', 'colombienne', 'emma roberts', 'estelle redpill', 'lena situations',
             'charlie danger', 'natoo', 'tatiana ventose', 'vedovelli', 'abella danger', 'agathe auprou*', 'amel bent', 'amouranth', 'ana de armas', 'copine', 'crush', 'cuck*',
             'cunni*', 'dua lipa', 'fiak', 'gaelle', 'incel*', 'julia', 'levrette', 'milf*', 'nude*', 'porno', 'simp', 'simps', 'vagin', 'pinkgeek', 'pink geek', 'aline*dessine',
-            'gourgandine']);
+            'gourgandine', 'gourgandines']);
 
     addPreBoucle('geopolitic', 'Géopolitique', entitySubject, false,
         ['ww3', 'ww 3', 'world war 3', 'wwiii', 'ukrain*', 'prayforukraine', 'kiev', 'poutine', 'russe', 'russes', 'russie', '3gm', 'otan', 'kremlin', 'crimee',

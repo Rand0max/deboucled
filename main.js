@@ -202,14 +202,15 @@ function handleTopicListAuthors(topics) {
 }
 
 async function handlePoc(finalTopics) {
-    // 0 = désactivé ; 1 = recherche simple ; 2 = recherche approfondie
+    // 0 = désactivé ; 1 = recherche simple ; 2 = recherche approfondie ; 3 = recherche simple automatique ; 4 = recherche approfondie automatique
     let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     if (optionDetectPocMode === 0) return;
 
     // On gère les PoC à la fin pour pas figer la page pendant le traitement
     await Promise.all(finalTopics.slice(1).map(async function (topic) {
         let poc = await isTopicPoC(topic, optionDetectPocMode);
-        if (poc) markTopicPoc(topic, optionDetectPocMode === 3);
+        const hideTopic = optionDetectPocMode === 3 || optionDetectPocMode === 4;
+        if (poc) markTopicPoc(topic, hideTopic);
     }));
 }
 

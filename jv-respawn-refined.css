@@ -50,7 +50,7 @@ body.didomi-popup-open {
   display: none;
 }
 .icon-topic-folder::before {
-  content: "🖿";
+  content: "\1F5BF";
 }
 @media (min-width: 807.99px) {
   .topic-list .topic-img {
