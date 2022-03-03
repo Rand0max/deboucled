@@ -3,6 +3,11 @@
 // SETTINGS
 ///////////////////////////////////////////////////////////////////////////////////////
 
+function buildTooltip(hint, location = 'right') {
+    const tooltipLocation = location === 'top' ? '' : ` data-tooltip-location="${location}"`;
+    return `deboucled-data-tooltip="${hint}"${tooltipLocation}`;
+}
+
 function buildSettingsPage(firstLaunch = false) {
     let bgView = document.createElement('div');
     bgView.setAttribute('id', 'deboucled-settings-bg-view');
@@ -12,10 +17,6 @@ function buildSettingsPage(firstLaunch = false) {
     document.querySelector('#deboucled-settings-bg-view').style.display = 'none';
     const collapsibleMaxHeight = 'style="max-height: max-content; overflow: visible;"';
 
-    function buildTooltip(hint, location = 'right') {
-        const tooltipLocation = location === 'top' ? '' : ` data-tooltip-location="${location}"`;
-        return `deboucled-data-tooltip="${hint}"${tooltipLocation}`;
-    }
     function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false, hintLocation = 'right') {
         let html = '';
         html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
@@ -23,22 +24,6 @@ function buildSettingsPage(firstLaunch = false) {
         html += `<span ${buildTooltip(hint, hintLocation)}>${title}</span>`;
         html += '</td>';
         html += `<td class="deboucled-td-right">`;
-        html += '<label class="deboucled-switch">';
-        let checkedStr = GM_getValue(optionId, defaultValue) ? 'checked' : '';
-        html += `<input type="checkbox" id="${optionId}" ${checkedStr}></input>`;
-        html += '<span class="deboucled-toggle-slider round"></span>';
-        html += '</label>';
-        html += '</td>';
-        html += '</tr>';
-        return html;
-    }
-    function addTogglePreboucle(title, optionId, defaultValue, hint) {
-        let html = '';
-        html += `<tr id="${optionId}-container">`;
-        html += `<td class="deboucled-td-left full-width">`;
-        html += `<span class="data-tooltip-large" ${buildTooltip(hint)}>${title}</span>`;
-        html += '</td>';
-        html += `<td class="deboucled-td-right deboucled-td-right-padding">`;
         html += '<label class="deboucled-switch">';
         let checkedStr = GM_getValue(optionId, defaultValue) ? 'checked' : '';
         html += `<input type="checkbox" id="${optionId}" ${checkedStr}></input>`;
@@ -223,15 +208,20 @@ function buildSettingsPage(firstLaunch = false) {
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">ANTI-BOUCLES</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
-        html += `<div class="deboucled-preboucle-title" ${buildTooltip('Cochez les catégories que vous souhaitez filtrer sur le forum.\nPassez la souris ou cliquez sur les intitulés de catégorie pour voir les mots-clés qui seront utilisés.', 'bottom')}>Listes anti-boucle pré-enregistrées</div>`;
-        html += '<table class="deboucled-option-table">';
-        preBoucleArray.forEach(b => {
-            const hint = `${getEntityTitle(b.type)} : ${b.entities.sort().join(', ')}`;
-            let titleLogo = '';
-            if (b.type === entitySubject) titleLogo = '<span class="deboucled-preboucle-subject-logo"></span>';
-            else if (b.type === entityAuthor) titleLogo = '<span class="deboucled-preboucle-author-logo"></span>';
-            html += addTogglePreboucle(`${titleLogo}${b.title}`, `deboucled-preboucle-${b.id}`, b.enabled, hint);
-        });
+
+        html += '<div class="deboucled-preboucle-header">';
+
+        const titleTooltip = buildTooltip('Cochez les catégories que vous souhaitez filtrer sur le forum.\nPassez la souris ou cliquez sur les intitulés de catégorie pour voir les mots-clés qui seront utilisés.', 'bottom');
+        html += `<span class="deboucled-preboucle-title" ${titleTooltip}>Listes anti-boucle pré-enregistrées</span>`;
+
+        const lastUpdate = formatDateToFrenchFormat(new Date(GM_getValue(storage_prebouclesLastUpdate)));
+        const refreshTooltip = buildTooltip(`Dernière mise à jour : ${lastUpdate}`, 'left');
+        html += `<span class="deboucled-svg-refresh" ${refreshTooltip}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" id="deboucled-refresh-logo"><use href="#refreshlogo"/></svg></span>`;
+
+        html += '</div>';
+
+        html += '<table class="deboucled-option-table" id="deboucled-preboucles-table">';
+        html += buildPrebouclesTable();
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -358,31 +348,36 @@ function buildSettingsPage(firstLaunch = false) {
     buildSettingEntities();
 }
 
+function addToggleEvent(id, setValue = true, callback = undefined) {
+    const toggleSlider = document.querySelector('#' + id);
+    toggleSlider.oninput = (e) => {
+        const checked = e.currentTarget.checked;
+        if (setValue) GM_setValue(id, checked);
+        if (callback) callback(checked);
+    };
+}
+
+function addRangeEvent(id) {
+    const rangeSlider = document.querySelector('#' + id);
+    rangeSlider.oninput = function () {
+        GM_setValue(id, parseInt(this.value));
+        document.querySelector(`#${id}-value`).innerHTML = this.value;
+    };
+}
+
+function addSelectEvent(id) {
+    const select = document.querySelector('#' + id);
+    select.oninput = (e) => {
+        GM_setValue(id, parseInt(e.currentTarget.value));
+    };
+}
+
 function addSettingEvents() {
-    function addToggleEvent(id, setValue = true, callback = undefined) {
-        const toggleSlider = document.querySelector('#' + id);
-        toggleSlider.onchange = (e) => {
-            const checked = e.currentTarget.checked;
-            if (setValue) GM_setValue(id, checked);
-            if (callback) callback(checked);
-        };
-    }
-    function addRangeEvent(id) {
-        const rangeSlider = document.querySelector('#' + id);
-        rangeSlider.oninput = function () {
-            GM_setValue(id, parseInt(this.value));
-            document.querySelector(`#${id}-value`).innerHTML = this.value;
-        };
-    }
-    function addSelectEvent(id) {
-        const select = document.querySelector('#' + id);
-        select.onchange = (e) => {
-            GM_setValue(id, parseInt(e.currentTarget.value));
-        };
-    }
 
     const boucleUrl = 'https://www.jeuxvideo.com/forums/42-51-62052373-1-0-1-0-ce-forum-est-une-putain-de-boucle-temporelle-sans-fin.htm';
     document.querySelector('.deboucled-about-version').onclick = () => window.open(boucleUrl, '_blank').focus();
+
+    document.querySelector('.deboucled-svg-refresh').onclick = forcePrebouclesRefresh;
 
     addToggleEvent(storage_optionEnableDeboucledDarkTheme, undefined, toggleDeboucledDarkTheme);
     addToggleEvent(storage_optionEnableJvcDarkTheme);
@@ -413,13 +408,6 @@ function addSettingEvents() {
     addRangeEvent(storage_optionMaxTopicCount);
     addSelectEvent(storage_optionDetectPocMode);
 
-    preBoucleArray.forEach(b => {
-        addToggleEvent(`deboucled-preboucle-${b.id}`, false, function (checked) {
-            togglePreBoucleStatus(b.id, checked);
-            savePreBouclesStatuses();
-        });
-    });
-
     addToggleEvent(storage_optionAntiVinz);
     addToggleEvent(storage_optionAntiSpam);
     addToggleEvent(storage_optionSmoothScroll);
@@ -431,6 +419,19 @@ function addSettingEvents() {
     });
     addRangeEvent(storage_optionTopicMsgCountThreshold);
     addToggleEvent(storage_optionDisplayTopicIgnoredCount);
+
+    addPrebouclesEvents();
+}
+
+function addPrebouclesEvents() {
+    preBoucleArray.forEach(b => {
+        const inputId = `deboucled-preboucle-${b.id}-input`;
+        addToggleEvent(inputId, false, function (checked) {
+            togglePreBoucleStatus(b.id, checked);
+            savePreBouclesStatuses();
+        });
+        document.querySelector(`#deboucled-preboucle-${b.id}-title`).onclick = () => document.querySelector(`#${inputId}`)?.click();
+    });
 }
 
 function addSortEvent() {
@@ -469,7 +470,7 @@ function addSortEvent() {
 
 function addImportExportEvent() {
     document.querySelector('#deboucled-export-button').onclick = () => backupStorage();
-    document.querySelector('#deboucled-import-button').onchange = (fe) => loadFile(fe);
+    document.querySelector('#deboucled-import-button').oninput = (fe) => loadFile(fe);
     document.querySelector('#deboucled-import-tbl').onclick = () => importFromTotalBlacklist();
 }
 
@@ -500,6 +501,36 @@ function addCollapsibleEvents() {
             }
         };
     });
+}
+
+function buildPrebouclesTable() {
+
+    function addTogglePreboucle(title, optionId, defaultValue, hint) {
+        let html = '';
+        html += `<tr id="${optionId}-container">`;
+        html += `<td class="deboucled-td-left full-width">`;
+        html += `<span id="${optionId}-title" class="data-tooltip-large" ${buildTooltip(hint)}>${title}</span>`;
+        html += '</td>';
+        html += `<td class="deboucled-td-right deboucled-td-right-padding">`;
+        html += '<label class="deboucled-switch">';
+        let checkedStr = GM_getValue(optionId, defaultValue) ? 'checked' : '';
+        html += `<input type="checkbox" id="${optionId}-input" ${checkedStr}></input>`;
+        html += '<span class="deboucled-toggle-slider round"></span>';
+        html += '</label>';
+        html += '</td>';
+        html += '</tr>';
+        return html;
+    }
+
+    let html = '';
+    preBoucleArray.forEach(b => {
+        const hint = `${getEntityTitle(b.type)} : ${b.entities.sort().join(', ')}`;
+        let titleLogo = '';
+        if (b.type === entitySubject) titleLogo = '<span class="deboucled-preboucle-subject-logo"></span>';
+        else if (b.type === entityAuthor) titleLogo = '<span class="deboucled-preboucle-author-logo"></span>';
+        html += addTogglePreboucle(`${titleLogo}${b.title}`, `deboucled-preboucle-${b.id}`, b.enabled, hint);
+    });
+    return html;
 }
 
 function buildSettingEntities() {
@@ -736,7 +767,7 @@ function addSearchFilterToggle() {
     toggleElem.innerHTML = `<input type="checkbox" id="deboucled-search-filter-toggle" ${optionFilterResearch ? 'checked' : ''}><span class="deboucled-toggle-slider round red"></span>`;
     document.querySelector('.form-rech-forum').appendChild(toggleElem);
 
-    document.querySelector('#deboucled-search-filter-toggle').onchange = (e) => {
+    document.querySelector('#deboucled-search-filter-toggle').oninput = (e) => {
         GM_setValue(storage_optionFilterResearch, e.currentTarget.checked);
         location.reload();
     };
@@ -759,7 +790,7 @@ function addDisableFilteringButton() {
     menuForumElement.appendChild(menuChild);
 
     const toggleFiltering = document.querySelector(`#${enableFilteringId}`);
-    toggleFiltering.onchange = (e) => {
+    toggleFiltering.oninput = (e) => {
 
         const checked = e.currentTarget.checked; // Checked = filtrage activé
         if (checked) disabledFilteringForumSet.delete(forumId);
@@ -862,5 +893,22 @@ async function highlightModeratedTopics() {
         }
         entity.classList.toggle('deboucled-entity-moderated-key', moderatedTopics.get(key));
     }
+}
+
+async function forcePrebouclesRefresh() {
+    const refreshLogo = document.querySelector('#deboucled-refresh-logo');
+    if (!refreshLogo) return;
+    refreshLogo.onanimationend = () => refreshLogo.classList.toggle('rotate', false);
+    refreshLogo.classList.toggle('rotate', true);
+
+    await refreshApiData(true);
+
+    const lastUpdate = formatDateToFrenchFormat(new Date(GM_getValue(storage_prebouclesLastUpdate)));
+    this.setAttribute('deboucled-data-tooltip', `Dernière mise à jour : ${lastUpdate}`);
+
+    const prebouclesTable = document.querySelector('#deboucled-preboucles-table');
+    if (!prebouclesTable) return;
+    prebouclesTable.innerHTML = buildPrebouclesTable();
+    addPrebouclesEvents();
 }
 

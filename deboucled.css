@@ -771,10 +771,15 @@ blockquote .deboucled-highlighted {
   background: var(--jv-blue-light);
 }
 
+.deboucled-preboucle-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  column-gap: 15px;
+  align-items: center;
+}
 .deboucled-preboucle-title {
   user-select: none;
-  margin-bottom: 10px;
-  text-align: center;
   font-weight: bold;
   font-size: 14px;
   cursor: pointer;
@@ -1186,6 +1191,29 @@ input[type="search"] {
 .deboucled-svg-github #deboucled-github-logo {
   fill: var(--deboucled-text-color);
   color: var(--deboucled-text-color);
+}
+.deboucled-svg-refresh {
+  padding-bottom: 2px;
+  cursor: pointer;
+}
+.deboucled-svg-refresh #deboucled-refresh-logo {
+  transition: transform 800ms cubic-bezier(0.17, 0.67, 0.36, 1.04) 0s,
+    opacity 250ms ease 0s;
+  transform-origin: center center 0px;
+  color: var(--deboucled-text-color);
+  display: inline-block;
+  opacity: 0.5;
+  border: medium none;
+  background: transparent none repeat scroll 0% 0%;
+  text-align: left;
+  font: inherit;
+}
+.deboucled-svg-refresh #deboucled-refresh-logo.rotate { 
+  animation: spinner-rotation 1s normal linear;
+}
+.deboucled-svg-refresh #deboucled-refresh-logo:hover,
+.deboucled-svg-refresh #deboucled-refresh-logo:active {
+  opacity: 0.9;
 }
 
 /* Div Table */

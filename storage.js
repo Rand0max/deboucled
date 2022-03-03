@@ -146,13 +146,20 @@ async function saveLocalStorage() {
     await localforage.setItem(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap])); // eslint-disable-line no-undef
 }
 
-async function refreshApiData() {
+async function refreshApiData(forceUpdate = false) {
     youtubeBlacklistArray = JSON.parse(GM_getValue(storage_youtubeBlacklist, storage_youtubeBlacklist_default));
-    if (!youtubeBlacklistArray?.length || mustRefreshApiData(storage_youtubeBlacklistLastUpdate, youtubeBlacklistRefreshExpire)) await queryYoutubeBlacklist();
+    if (!youtubeBlacklistArray?.length || forceUpdate
+        || mustRefreshApiData(storage_youtubeBlacklistLastUpdate, youtubeBlacklistRefreshExpire)) {
+        await queryYoutubeBlacklist();
+    }
     if (youtubeBlacklistArray?.length) youtubeBlacklistReg = buildArrayRegex(youtubeBlacklistArray);
 
+
     preBoucleArray = JSON.parse(GM_getValue(storage_preBouclesData, storage_preBouclesData_default));
-    if (!preBoucleArray?.length || mustRefreshApiData(storage_prebouclesLastUpdate, prebouclesRefreshExpire)) await queryPreboucles();
+    if (!preBoucleArray?.length || forceUpdate
+        || mustRefreshApiData(storage_prebouclesLastUpdate, prebouclesRefreshExpire)) {
+        await queryPreboucles();
+    }
     if (preBoucleArray?.length) loadPreBouclesStatuses();
 }
 

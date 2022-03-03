@@ -388,3 +388,9 @@ async function fetchJson(url) {
         });
 }
 
+function formatDateToFrenchFormat(date) {
+    var dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    var timeOptions = { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    return `${date.toLocaleDateString('fr-FR', dateOptions)} ${date.toLocaleTimeString('fr-FR', timeOptions)}`;
+}
+
