@@ -93,6 +93,8 @@ async function initStorage() {
 }
 
 async function loadStorage() {
+    await refreshApiData();
+
     subjectBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedSubjects, storage_blacklistedSubjects_default)))];
     authorBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedAuthors, storage_blacklistedAuthors_default)))];
     topicIdBlacklistMap = new Map([...JSON.parse(GM_getValue(storage_blacklistedTopicIds, storage_blacklistedTopicIds_default))]);
@@ -105,8 +107,6 @@ async function loadStorage() {
     topicIdWhitelistArray = [...new Set(JSON.parse(GM_getValue(storage_whitelistedTopicIds, storage_whitelistedTopicIds_default)))];
 
     disabledFilteringForumSet = new Set(JSON.parse(GM_getValue(storage_disabledFilteringForums, storage_disabledFilteringForums_default)));
-
-    await refreshApiData();
 
     await loadLocalStorage();
 }

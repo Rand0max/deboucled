@@ -322,7 +322,7 @@ function highlightQuotedAuthor(messageContent) {
 
     if (currentUserPseudo?.length) {
         // On met en surbrillance verte les citations du compte de l'utilisateur avec ou sans @arobase
-        const selfPseudo = currentUserPseudo.escapeRegexPattern();
+        const selfPseudo = currentUserPseudo.escapeRegexPatterns();
         const quotedSelfRegex = new RegExp(`\\B@${selfPseudo}\\b|(?<!\\w|@)${selfPseudo}\\b`, 'gi');
         replaceAllTextQuotes(
             messageContent,

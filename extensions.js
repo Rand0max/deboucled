@@ -16,8 +16,8 @@ String.prototype.removeSurrogatePairs = function () {
     return this.replace(/[^\p{L}\p{N}\p{P}\p{Z}=\{\^\$\}\+\*\\<>|`£°~€]/gu, '');
 }
 
-String.prototype.escapeRegexPattern = function () {
-    return this.replace(/[-[\]{}()+?.,\\^$|#\s]/g, '\\$&');
+String.prototype.escapeRegexPatterns = function () {
+    return this.replaceAll(/[-[\]{}()+?.,\\^$|#]/g, '\\$&');
 }
 
 String.prototype.handleGenericChar = function () {
@@ -130,7 +130,7 @@ function buildEntityRegex(array, withBoundaries) {
     let bEnd = withBoundaries ? '(?=\\W|$)' : '';
 
     let regexMap = array.map((e) => {
-        let word = e.escapeRegexPattern().normalizeDiacritic();
+        let word = e.escapeRegexPatterns().normalizeDiacritic();
         word = transformGenericChars(word);
         return `${bStart}${word}${bEnd}`;
     });
@@ -142,7 +142,7 @@ function buildEntityRegex(array, withBoundaries) {
 function buildArrayRegex(array) {
     const bStart = '(?<=\\W|^)';
     const bEnd = '(?=\\W|$)';
-    let regexMap = array.map((e) => e.escapeRegexPattern().normalizeDiacritic());
+    let regexMap = array.map((e) => e.escapeRegexPatterns().normalizeDiacritic());
     return new RegExp(`${bStart}(${regexMap.join('|')})${bEnd}`, 'gi');
 }
 
