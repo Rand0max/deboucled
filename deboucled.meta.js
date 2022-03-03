@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.20.1
+// @version     2.20.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -36,7 +36,7 @@
 // @require     storage.js
 // @require     extensions.js
 // @require     preboucles.js
-// @require     antispam.js
+// @require     apidata.js
 // @require     stats.js
 // @require     topics.js
 // @require     messages.js

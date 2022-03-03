@@ -10,7 +10,7 @@ function buildSettingsPage(firstLaunch = false) {
     bgView.innerHTML = '<div></div>';
     document.body.prepend(bgView);
     document.querySelector('#deboucled-settings-bg-view').style.display = 'none';
-    const collapsibleMaxHeight = 'style="max-height: max-content;"';
+    const collapsibleMaxHeight = 'style="max-height: max-content; overflow: visible;"';
 
     function buildTooltip(hint, location = 'right') {
         const tooltipLocation = location === 'top' ? '' : ` data-tooltip-location="${location}"`;

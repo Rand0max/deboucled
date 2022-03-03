@@ -53,7 +53,10 @@ const storage_totalHiddenSpammers = 'deboucled_totalHiddenSpammers';
 const storage_TopicStats = 'deboucled_TopicStats';
 
 const storage_youtubeBlacklist = 'deboucled_youtubeBlacklist', storage_youtubeBlacklist_default = '[]';
-const storage_youtubeBlacklistLastUpdate = 'deboucled_youtubeBlacklistLastUpdate', storage_youtubeBlacklistLastUpdate_default = new Date(0);
+const storage_youtubeBlacklistLastUpdate = 'deboucled_youtubeBlacklistLastUpdate';
+
+const storage_preBouclesData = 'deboucled_preBouclesData', storage_preBouclesData_default = '[]';
+const storage_prebouclesLastUpdate = 'deboucled_prebouclesLastUpdate';
 
 const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_whitelistedTopicIds, storage_optionEnableJvcDarkTheme, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_optionAntiSpam, storage_optionSmoothScroll, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_totalHiddenSpammers, storage_TopicStats];
 
@@ -73,7 +76,6 @@ function getBlacklistWithKey(key) {
 }
 
 async function initStorage() {
-    initPreBoucles();
     initVinzBoucles();
     initShadowent();
 
@@ -83,6 +85,7 @@ async function initStorage() {
         return false;
     }
     else {
+        await refreshApiData();
         await saveStorage();
         GM_setValue(storage_init, true);
         return true;
@@ -103,9 +106,7 @@ async function loadStorage() {
 
     disabledFilteringForumSet = new Set(JSON.parse(GM_getValue(storage_disabledFilteringForums, storage_disabledFilteringForums_default)));
 
-    youtubeBlacklistArray = JSON.parse(GM_getValue(storage_youtubeBlacklist, storage_youtubeBlacklist_default));
-    if (!youtubeBlacklistArray?.length || mustRefreshYoutubeBlacklist()) await queryYoutubeBlacklist();
-    if (youtubeBlacklistArray?.length) youtubeBlacklistReg = buildArrayRegex(youtubeBlacklistArray);
+    await refreshApiData();
 
     await loadLocalStorage();
 }
@@ -145,11 +146,14 @@ async function saveLocalStorage() {
     await localforage.setItem(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap])); // eslint-disable-line no-undef
 }
 
-async function removeTopicIdBlacklist(topicId) {
-    if (topicIdBlacklistMap.has(topicId)) {
-        topicIdBlacklistMap.delete(topicId);
-        await saveStorage();
-    }
+async function refreshApiData() {
+    youtubeBlacklistArray = JSON.parse(GM_getValue(storage_youtubeBlacklist, storage_youtubeBlacklist_default));
+    if (!youtubeBlacklistArray?.length || mustRefreshApiData(storage_youtubeBlacklistLastUpdate, youtubeBlacklistRefreshExpire)) await queryYoutubeBlacklist();
+    if (youtubeBlacklistArray?.length) youtubeBlacklistReg = buildArrayRegex(youtubeBlacklistArray);
+
+    preBoucleArray = JSON.parse(GM_getValue(storage_preBouclesData, storage_preBouclesData_default));
+    if (!preBoucleArray?.length || mustRefreshApiData(storage_prebouclesLastUpdate, prebouclesRefreshExpire)) await queryPreboucles();
+    if (preBoucleArray?.length) loadPreBouclesStatuses();
 }
 
 function loadPreBouclesStatuses() {
@@ -184,6 +188,13 @@ async function removeEntityBlacklist(array, key) {
     let index = array.indexOf(key);
     if (index > -1) {
         array.splice(index, 1);
+        await saveStorage();
+    }
+}
+
+async function removeTopicIdBlacklist(topicId) {
+    if (topicIdBlacklistMap.has(topicId)) {
+        topicIdBlacklistMap.delete(topicId);
         await saveStorage();
     }
 }

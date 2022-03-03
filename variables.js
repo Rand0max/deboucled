@@ -13,6 +13,10 @@ const jvarchiveUrl = 'https://jvarchive.com';
 
 const deboucledBackendUrl = 'https://deboucled.jvflux.fr';
 const youtubeBlacklistUrl = `${deboucledBackendUrl}/blacklisted-youtube-profiles-v2.json`;
+const prebouclesDataUrl = `${deboucledBackendUrl}/deboucled-preboucles.json`;
+
+const youtubeBlacklistRefreshExpire = 4;
+const prebouclesRefreshExpire = 24;
 
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
@@ -25,7 +29,6 @@ let shadowent = [];
 
 let youtubeBlacklistArray = [];
 let youtubeBlacklistReg;
-const youtubeBlacklistRefreshExpire = 4;
 
 let pocTopicMap = new Map();
 let topicAuthorMap = new Map();

@@ -399,6 +399,7 @@ function addIgnoreButtons(topics) {
 function addPrevisualizeTopicEvent(topics) {
 
     function prepareMessagePreview(page) {
+        if (!page) return;
         let messagePreview = page.querySelector('.bloc-message-forum');
         messagePreview.querySelector('.bloc-options-msg').remove(); // remove buttons
 

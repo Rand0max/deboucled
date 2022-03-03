@@ -648,7 +648,7 @@ async function init(currentPageType) {
 }
 
 async function entryPoint() {
-    //let start = performance.now();
+    let start = performance.now();
     const currentPageType = getCurrentPageType(`${window.location.pathname}${window.location.search}`);
     //console.log('currentPageType : %s', currentPageType);
     if (currentPageType !== 'unknown') await init(currentPageType);
@@ -689,8 +689,11 @@ async function entryPoint() {
         default:
             break;
     }
-    //let end = performance.now();
-    //console.log(`total time = ${end - start} ms`);
+
+    console.log('Déboucled loaded');
+
+    let elapsed = performance.now() - start;
+    if (elapsed >= 1500) console.warn(`Déboucled slow load : totaltime = ${elapsed}ms`);
 }
 
 entryPoint();

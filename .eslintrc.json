@@ -15,7 +15,7 @@
     "storage.js",
     "extensions.js",
     "preboucles.js",
-    "antispam.js",
+    "apidata.js",
     "stats.js",
     "topics.js",
     "messages.js",
