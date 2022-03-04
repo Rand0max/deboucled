@@ -582,8 +582,11 @@ function buildFloatingNavbar(infScroll) {
     navbar.appendChild(buttonAnswer);
 
     const buttonToggleSmooth = document.createElement('div');
-    buttonToggleSmooth.className = 'deboucled-floating-button deboucled-smoothscroll-logo';
+    let smoothScrollLogo = '<svg width="24px" viewBox="0 20 460.088 460.088" id="deboucled-smoothscroll-logo" fill="#000" style="margin: auto;"><use href="#smoothscrolllogo"/></svg>';
+    buttonToggleSmooth.className = 'deboucled-floating-button';
+    buttonToggleSmooth.id = 'deboucled-smoothscroll-toggle';
     setTooltip(buttonToggleSmooth, 'Activer/désactiver le défilement automatique');
+    buttonToggleSmooth.innerHTML = smoothScrollLogo;
     buttonToggleSmooth.onclick = () => toggleInfiniteScroll(infScroll, !infScroll.options.loadOnScroll);
     navbar.appendChild(buttonToggleSmooth);
 
@@ -607,7 +610,7 @@ function toggleInfiniteScroll(infScroll, status) {
     if (!infScroll) return;
     infScroll.options.loadOnScroll = status;
     infScroll.options.scrollThreshold = status ? -200 : false;
-    document.querySelector('.deboucled-smoothscroll-logo')?.classList.toggle('disabled', !status);
+    document.querySelector('#deboucled-smoothscroll-toggle')?.classList.toggle('disabled', !status);
 }
 
 function createSmoothScroll(handleMessageCallback) {
@@ -657,5 +660,22 @@ function createSmoothScroll(handleMessageCallback) {
     document.querySelector('#message_topic')?.addEventListener('focus', () => toggleInfiniteScroll(infScroll, false));
 
     buildFloatingNavbar(infScroll);
+}
+
+function buildEnableSmoothScrollButton(smoothScrollCallback) {
+    const bottomMenu = document.querySelector('.bloc-outils-bottom > .bloc-pre-right');
+    if (!bottomMenu) return;
+
+    const buttonEnableSC = document.createElement('button');
+
+    let smoothScrollLogo = '<svg width="18px" viewBox="0 20 460.088 460.088" id="deboucled-smoothscroll-logo" fill="var(--jv-text-secondary)"><use href="#smoothscrolllogo"/></svg>';
+    buttonEnableSC.className = 'btn deboucled-button deboucled-smoothscroll-button';
+    buttonEnableSC.title = 'Activer le défilement automatique des messages avec Déboucled';
+    buttonEnableSC.innerHTML = smoothScrollLogo;
+    buttonEnableSC.onclick = () => {
+        smoothScrollCallback();
+        buttonEnableSC.style.display = 'none';
+    }
+    bottomMenu.appendChild(buttonEnableSC);
 }
 

@@ -3,11 +3,24 @@
 // ANTI-BOUCLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
+function loadPreboucleCache(entityType) {
+    if (entityType === entitySubject) {
+        if (!preBoucleSubjectEnabledArray?.length) {
+            preBoucleSubjectEnabledArray = preBoucleArray.filter(pb => pb.enabled && pb.type === entityType).flatMap(pb => pb.entities);
+        }
+    }
+    else if (entityType === entityAuthor) {
+        if (!preBoucleAuthorEnabledArray?.length) {
+            preBoucleAuthorEnabledArray = preBoucleArray.filter(pb => pb.enabled && pb.type === entityType).flatMap(pb => pb.entities);
+        }
+    }
+}
+
 function isEntityInPreboucles(entityType, entity) {
-    if (!preBoucleEnabledArray?.length) preBoucleEnabledArray = preBoucleArray.filter(pb => pb.enabled && pb.type === entityType).flatMap(pb => pb.entities);
     const entityLower = entity.toLowerCase();
     const entities = [entityLower, `${entityLower}*`, `*${entityLower}`, `*${entityLower}*`];
-    return entities.some(e => preBoucleEnabledArray.includes(e));
+    if (entityType === entitySubject) return entities.some(e => preBoucleSubjectEnabledArray.includes(e));
+    else if (entityType === entityAuthor) return entities.some(e => preBoucleAuthorEnabledArray.includes(e));
 }
 
 function makeVinzSubjectPure(str) {

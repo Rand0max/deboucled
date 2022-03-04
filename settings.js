@@ -590,6 +590,8 @@ function refreshSubjectKeys(filter = null) {
             break;
     }
 
+    loadPreboucleCache(entitySubject);
+
     writeEntityKeys(
         entitySubject,
         [...subjectBlacklistArray],
@@ -615,6 +617,8 @@ function refreshAuthorKeys(filter = null) {
             sortCallback = (array) => array.sort().reverse();
             break;
     }
+
+    loadPreboucleCache(entityAuthor);
 
     writeEntityKeys(
         entityAuthor,
@@ -898,7 +902,7 @@ async function highlightModeratedTopics() {
 async function forcePrebouclesRefresh() {
     const button = document.querySelector('.deboucled-svg-refresh');
     button.onclick = undefined;
-    
+
     const refreshLogo = document.querySelector('#deboucled-refresh-logo');
     if (!refreshLogo) return;
     refreshLogo.onanimationend = () => refreshLogo.classList.toggle('rotate', false);

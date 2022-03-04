@@ -44,7 +44,8 @@ let hiddenAuthorArray = new Set();
 let deboucledTopicStatsMap = new Map();
 
 let preBoucleArray = [];
-let preBoucleEnabledArray;
+let preBoucleSubjectEnabledArray;
+let preBoucleAuthorEnabledArray;
 let vinzBoucleArray = [];
 let vinzBoucleMessageArray = [];
 
