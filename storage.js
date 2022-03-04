@@ -233,6 +233,7 @@ function backupStorage() {
     let map = new Map();
     GM_listValues().forEach(key => {
         if (onlyBlacklists && !storage_Keys_Blacklists.includes(key)) return;
+        if (!storage_Keys.includes(key)) return;
         const val = GM_getValue(key);
         try {
             map.set(key, JSON.parse(val));

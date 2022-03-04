@@ -896,6 +896,9 @@ async function highlightModeratedTopics() {
 }
 
 async function forcePrebouclesRefresh() {
+    const button = document.querySelector('.deboucled-svg-refresh');
+    button.onclick = undefined;
+    
     const refreshLogo = document.querySelector('#deboucled-refresh-logo');
     if (!refreshLogo) return;
     refreshLogo.onanimationend = () => refreshLogo.classList.toggle('rotate', false);
@@ -910,5 +913,10 @@ async function forcePrebouclesRefresh() {
     if (!prebouclesTable) return;
     prebouclesTable.innerHTML = buildPrebouclesTable();
     addPrebouclesEvents();
+
+    button.classList.toggle('deboucled-disabled', true);
+    await sleep(2000);
+    button.onclick = forcePrebouclesRefresh;
+    button.classList.toggle('deboucled-disabled', false);
 }
 
