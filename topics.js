@@ -4,6 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function getAllTopics(doc) {
+    if (!doc) return;
     let allTopics = doc.querySelectorAll('.topic-list.topic-list-admin > li:not(.dfp__atf):not(.message)');
     return [...allTopics];
 }
@@ -13,12 +14,12 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
     let pageBrowse = 1;
     let filledTopics = [];
     const maxPages = 15;
-
     const maxTopicCount = parseInt(GM_getValue(storage_optionMaxTopicCount, storage_optionMaxTopicCount_default));
 
     while (actualTopics < maxTopicCount && pageBrowse <= maxPages) {
         pageBrowse++;
         const nextPageTopics = await getForumPageContent(pageBrowse).then((nextPageDoc) => getAllTopics(nextPageDoc));
+        if (!nextPageTopics) break;
 
         for (let topic of nextPageTopics.slice(1)) {
             const topicBlacklisted = await isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz);
