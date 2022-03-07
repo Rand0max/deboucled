@@ -43,6 +43,16 @@ body.deboucled-dark-theme {
   --deboucled-td-border-color: #ffffff66;
 }
 
+.layout__adHeader {
+  display: none;
+}
+.form-harassment {
+  display: none;
+}
+.layout__videoFooter {
+  display: none;
+}
+
 /* Overlay */
 #deboucled-topic-list-wrapper {
   position: relative;

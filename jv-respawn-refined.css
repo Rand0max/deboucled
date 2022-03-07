@@ -52,6 +52,12 @@ body.didomi-popup-open {
 .icon-topic-folder::before {
   content: "\1F5BF";
 }
+.layout__videoFooter {
+  display: none;
+}
+.form-harassment {
+  display: none;
+}
 @media (min-width: 807.99px) {
   .topic-list .topic-img {
     top: 0.1rem;

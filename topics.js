@@ -553,7 +553,7 @@ function buildLoaderStatus() {
 }
 
 function buildFloatingNavbar(infScroll) {
-    const messageTopicElement = document.querySelector('#message_topic');
+    const messageTopicElement = document.querySelector('#message_topic, .message-lock-topic');
 
     const navbar = document.createElement('div');
     navbar.className = 'deboucled-floating-container';
