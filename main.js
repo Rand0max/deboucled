@@ -638,12 +638,15 @@ function handleError() {
     }
 }
 
-async function init(currentPageType) {
-    let firstLaunch = await initStorage();
-
+function preInit() {
     const enablePeepoTheme = GM_getValue(storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default);
     const enableJvRespawnRefinedTheme = GM_getValue(storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableJvRespawnRefinedTheme_default);
     addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme);
+}
+
+async function init(currentPageType) {
+    let firstLaunch = await initStorage();
+
     if (currentPageType === 'sso' || currentPageType === 'error') return;
 
     addSvgs();
@@ -707,5 +710,5 @@ async function entryPoint() {
     if (elapsed >= 1500) console.warn(`Déboucled slow load : totaltime = ${elapsed}ms`);
 }
 
-entryPoint();
-
+preInit(); // speedup loading
+window.addEventListener('DOMContentLoaded', () => entryPoint());

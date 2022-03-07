@@ -139,9 +139,9 @@ function buildSettingsPage(firstLaunch = false) {
         html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, storage_optionDisplayThreshold_default, 10, 1000, 10, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.', allowDisplayThreshold, true);
 
         let pocLogo = '<span class="deboucled-poc-logo"></span>'
-        html += addDropdownOption(`Protection contre les <i>PoC</i> ${pocLogo} <span style="opacity: 0.3;font-style: italic;font-size: xx-small;">(beta)</span>`,
+        html += addDropdownOption(`Protection contre les <i>PoC</i> ${pocLogo}`,
             storage_optionDetectPocMode,
-            'Protection contre les topics &quot;post ou cancer&quot; et les dérivés.\n• Désactivé : aucune protection\n• Mode simple (rapide) : recherche dans le contenu uniquement si le titre contient un indice\n• Mode approfondi (plus lent) : recherche systématiquement dans le contenu et le titre\n• Mode automatique (rapide) : mode simple + masque automatiquement le topic\n• Mode auto approfondi (plus lent) : mode approfondi + masque automatiquement le topic.',
+            'Protection contre les topics &quot;post ou cancer&quot; et les dérivés.\n• Désactivé : aucune protection\n• Mode simple (rapide) : recherche dans les messages uniquement si le titre contient un indice\n• Mode approfondi (plus lent) : recherche systématiquement dans les messages et le titre\n• Mode automatique (rapide) : mode simple + masque automatiquement le topic\n• Mode auto approfondi (plus lent) : mode approfondi + masque automatiquement le topic.',
             storage_optionDetectPocMode_default,
             ['Désactivé', 'Mode simple', 'Mode approfondi ⚠', 'Mode automatique', 'Mode auto approfondi ⚠']);
 
