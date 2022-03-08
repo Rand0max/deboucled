@@ -13,7 +13,7 @@ const entityTopicId = 'topicid';
 
 const jvarchiveUrl = 'https://jvarchive.com';
 
-const deboucledBackendUrl = 'https://deboucled.jvflux.fr/api';
+const deboucledBackendUrl = 'https://deboucled.jvflux.fr/deboucledapi';
 const youtubeBlacklistUrl = `${deboucledBackendUrl}/youtubeblacklist`;
 const prebouclesDataUrl = `${deboucledBackendUrl}/preboucles`;
 
