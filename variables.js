@@ -1,4 +1,6 @@
 
+'use strict';
+
 ///////////////////////////////////////////////////////////////////////////////////////
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -11,9 +13,9 @@ const entityTopicId = 'topicid';
 
 const jvarchiveUrl = 'https://jvarchive.com';
 
-const deboucledBackendUrl = 'https://deboucled.jvflux.fr';
-const youtubeBlacklistUrl = `${deboucledBackendUrl}/blacklisted-youtube-profiles-v2.json`;
-const prebouclesDataUrl = `${deboucledBackendUrl}/deboucled-preboucles.json`;
+const deboucledBackendUrl = 'https://deboucled.jvflux.fr/api';
+const youtubeBlacklistUrl = `${deboucledBackendUrl}/youtubeblacklist`;
+const prebouclesDataUrl = `${deboucledBackendUrl}/preboucles`;
 
 const youtubeBlacklistRefreshExpire = 4;
 const prebouclesRefreshExpire = 24;

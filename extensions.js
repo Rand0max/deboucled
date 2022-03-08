@@ -170,8 +170,9 @@ function addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme) {
 }
 
 function addSvg(svgHtml) {
+    const container = document.querySelector('#deboucled-svg-container');
     let svgElement = document.createElement('svg');
-    document.body.appendChild(svgElement);
+    container.appendChild(svgElement);
     svgElement.outerHTML = svgHtml;
 }
 
