@@ -16,7 +16,10 @@ const jvarchiveUrl = 'https://jvarchive.com';
 const deboucledBackendUrl = 'https://deboucled.jvflux.fr/deboucledapi';
 const youtubeBlacklistUrl = `${deboucledBackendUrl}/youtubeblacklist`;
 const prebouclesDataUrl = `${deboucledBackendUrl}/preboucles`;
+const checkUpdateUrl = `${deboucledBackendUrl}/checkupdate`;
 
+const checkUpdateExpire = 2;
+const checkUpdateDeferredExpire = 72;
 const youtubeBlacklistRefreshExpire = 4;
 const prebouclesRefreshExpire = 12;
 
@@ -63,6 +66,7 @@ let sortModeTopicId = 0;
 
 let disabledFilteringForumSet = new Set();
 
+let userId = undefined;
 let userPseudo = undefined;
 let currentTopicId = undefined;
 let forumFilteringIsDisabled = false;

@@ -15,6 +15,25 @@ function getCurrentScriptVersion() {
     }
 }
 
+async function suggestUpdate() {
+    function toggleDeferUpdate(defer) {
+        if (defer) GM_setValue(storage_lastUpdateDeferredCheck, Date.now());
+        else GM_deleteValue(storage_lastUpdateDeferredCheck);
+    }
+
+    const updateRes = await checkUpdate();
+    if (updateRes?.length && mustRefresh(storage_lastUpdateDeferredCheck, checkUpdateDeferredExpire)) {
+        if (confirm('Nouvelle version de Déboucled disponible. Voulez-vous l\'installer ?')) {
+            toggleDeferUpdate(false);
+            document.location.href = updateRes;
+            //window.open(updateRes, '_blank').focus();
+        }
+        else {
+            toggleDeferUpdate(true);
+        }
+    }
+}
+
 function preferDarkTheme() {
     // Adjust text contrast for Dark Reader and JVC new Dark Theme
     // N.B : JVC qui troll en switchant le thème tout seul en fonction des réglages de Dark Reader
@@ -670,7 +689,9 @@ async function init(currentPageType) {
 async function entryPoint() {
     let start = performance.now();
     const currentPageType = getCurrentPageType(`${window.location.pathname}${window.location.search}`);
-    if (currentPageType !== 'unknown') await init(currentPageType);
+    if (currentPageType === 'unknown') return;
+
+    await init(currentPageType);
 
     switch (currentPageType) {
         case 'topiclist': {
@@ -713,6 +734,8 @@ async function entryPoint() {
 
     let elapsed = performance.now() - start;
     if (elapsed >= 1500) console.warn(`Déboucled slow load : totaltime = ${elapsed}ms`);
+
+    await suggestUpdate();
 }
 
 preInit(); // speedup loading

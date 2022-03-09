@@ -7,6 +7,7 @@ const localstorage_pocTopics = 'deboucled_pocTopics';
 const localstorage_topicAuthors = 'deboucled_topicAuthors';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
+const storage_userId = 'deboucled_userId', storage_userId_default = '';
 const storage_lastUsedPseudo = 'deboucled_lastUsedPseudo', storage_lastUsedPseudo_default = '';
 const storage_preBoucles = 'deboucled_preBoucles', storage_preBoucles_default = '[]';
 const storage_blacklistedTopicIds = 'deboucled_blacklistedTopicIds', storage_blacklistedTopicIds_default = '[]';
@@ -52,6 +53,9 @@ const storage_totalHiddenPrivateMessages = 'deboucled_totalHiddenPrivateMessages
 const storage_totalHiddenSpammers = 'deboucled_totalHiddenSpammers';
 const storage_TopicStats = 'deboucled_TopicStats';
 
+const storage_lastUpdateCheck = 'deboucled_lastUpdateCheck';
+const storage_lastUpdateDeferredCheck = 'deboucled_lastUpdateDeferredCheck';
+
 const storage_youtubeBlacklist = 'deboucled_youtubeBlacklist', storage_youtubeBlacklist_default = '[]';
 const storage_youtubeBlacklistLastUpdate = 'deboucled_youtubeBlacklistLastUpdate';
 
@@ -75,7 +79,16 @@ function getBlacklistWithKey(key) {
     return null;
 }
 
+function initUserId() {
+    userId = GM_getValue(storage_userId, storage_userId_default);
+    if (!userId?.length) {
+        userId = crypto.randomUUID();
+        GM_setValue(storage_userId, userId);
+    }
+}
+
 async function initStorage() {
+    initUserId();
     initVinzBoucles();
     initShadowent();
 
@@ -149,7 +162,7 @@ async function saveLocalStorage() {
 async function refreshApiData(forceUpdate = false) {
     youtubeBlacklistArray = JSON.parse(GM_getValue(storage_youtubeBlacklist, storage_youtubeBlacklist_default));
     if (!youtubeBlacklistArray?.length || forceUpdate
-        || mustRefreshApiData(storage_youtubeBlacklistLastUpdate, youtubeBlacklistRefreshExpire)) {
+        || mustRefresh(storage_youtubeBlacklistLastUpdate, youtubeBlacklistRefreshExpire)) {
         await queryYoutubeBlacklist();
     }
     if (youtubeBlacklistArray?.length) youtubeBlacklistReg = buildArrayRegex(youtubeBlacklistArray);
@@ -157,7 +170,7 @@ async function refreshApiData(forceUpdate = false) {
 
     preBoucleArray = JSON.parse(GM_getValue(storage_preBouclesData, storage_preBouclesData_default));
     if (!preBoucleArray?.length || forceUpdate
-        || mustRefreshApiData(storage_prebouclesLastUpdate, prebouclesRefreshExpire)) {
+        || mustRefresh(storage_prebouclesLastUpdate, prebouclesRefreshExpire)) {
         await queryPreboucles();
     }
     if (preBoucleArray?.length) loadPreBouclesStatuses();

@@ -3,7 +3,7 @@
 // API DATA
 ///////////////////////////////////////////////////////////////////////////////////////
 
-function mustRefreshApiData(storageLastUpdateId, dataExpire) {
+function mustRefresh(storageLastUpdateId, dataExpire) {
     let lastUpdate = new Date(GM_getValue(storageLastUpdateId, new Date(0)));
     let datenow = new Date();
     let dateExpireRange = new Date(datenow.setHours(datenow.getHours() - dataExpire));
@@ -28,5 +28,24 @@ async function queryPreboucles() {
 
     GM_setValue(storage_preBouclesData, JSON.stringify(preBoucleArray));
     GM_setValue(storage_prebouclesLastUpdate, Date.now());
+}
+
+async function checkUpdate() {
+    if (!mustRefresh(storage_lastUpdateCheck, checkUpdateExpire)) return;
+
+    const bodyJson = `{"userid":"${userId}","username":"${userPseudo ?? 'anonymous'}","version":"${getCurrentScriptVersion()}"}`;
+    let checkRes;
+    await GM.xmlHttpRequest({
+        method: 'POST',
+        url: checkUpdateUrl,
+        data: bodyJson,
+        headers: { 'Content-Type': 'application/json' },
+        onload: (response) => { checkRes = response.responseText; },
+        onerror: (response) => { console.error("error : %o", response) }
+    });
+
+    GM_setValue(storage_lastUpdateCheck, Date.now());
+
+    return checkRes;
 }
 
