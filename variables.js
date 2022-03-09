@@ -18,7 +18,7 @@ const youtubeBlacklistUrl = `${deboucledBackendUrl}/youtubeblacklist`;
 const prebouclesDataUrl = `${deboucledBackendUrl}/preboucles`;
 
 const youtubeBlacklistRefreshExpire = 4;
-const prebouclesRefreshExpire = 24;
+const prebouclesRefreshExpire = 12;
 
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
