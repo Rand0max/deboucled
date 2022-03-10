@@ -33,7 +33,8 @@ async function queryPreboucles() {
 async function checkUpdate() {
     if (!mustRefresh(storage_lastUpdateCheck, checkUpdateExpire)) return;
 
-    const bodyJson = `{"userid":"${userId}","username":"${userPseudo ?? 'anonymous'}","version":"${getCurrentScriptVersion()}"}`;
+    let currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo);
+    const bodyJson = `{"userid":"${userId}","username":"${currentUserPseudo.toLowerCase() ?? 'anonymous'}","version":"${getCurrentScriptVersion()}"}`;
     let checkRes;
     await GM.xmlHttpRequest({
         method: 'POST',
