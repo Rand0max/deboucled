@@ -70,7 +70,7 @@ function buildSettingsPage(firstLaunch = false) {
         let html = '';
         html += '<tr>';
         html += `<td class="deboucled-td-left" rowspan="2">`;
-        html += `<span ${buildTooltip('Exportez ou importer vos préférences et/ou vos listes noires.')}>Restaurer/sauvegarder les préférences</span>`;
+        html += `<span ${buildTooltip('Exportez ou importer vos paramètres et/ou vos listes noires.')}>Restaurer/sauvegarder les paramètres</span>`;
         html += '</td>';
         html += '<td class="deboucled-td-left">';
         html += '<label for="deboucled-import-button" class="btn deboucled-button deboucled-setting-button">Restaurer</label>';

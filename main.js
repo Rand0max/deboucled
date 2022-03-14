@@ -301,13 +301,7 @@ function handleMessageBlacklistMatches(messageElement) {
     return highlightChildren(messageElement);
 }
 
-function handleBlSubjectIgnoreMessages(messageElement) {
-    let contentElement = messageElement.querySelector('.txt-msg.text-enrichi-forum');
-    if (!contentElement) return;
-
-    let hasAnyMatch = handleMessageBlacklistMatches(contentElement);
-    if (!hasAnyMatch) return;
-
+function hideMessageContent(contentElement) {
     const blocContenu = contentElement.parentElement;
     blocContenu.style.display = 'none';
 
@@ -315,7 +309,8 @@ function handleBlSubjectIgnoreMessages(messageElement) {
     divWrapper.className = 'deboucled-matches-wrapper deboucled-message-wrapper';
     blocContenu.parentElement.appendChild(divWrapper);
     let spanEye = document.createElement('span');
-    spanEye.className = 'deboucled-eye-logo deboucled-display-matches';
+    const whiteEyeClass = preferDarkTheme() ? '-white' : '';
+    spanEye.className = `deboucled-eye${whiteEyeClass}-logo deboucled-display-matches`;
     divWrapper.appendChild(spanEye);
     divWrapper.appendChild(blocContenu);
 
@@ -327,7 +322,17 @@ function handleBlSubjectIgnoreMessages(messageElement) {
     }
 }
 
-function handleMessage(messageElement, messageOptions) {
+function handleBlSubjectIgnoreMessages(messageElement) {
+    let contentElement = messageElement.querySelector('.txt-msg.text-enrichi-forum');
+    if (!contentElement) return;
+
+    let hasAnyMatch = handleMessageBlacklistMatches(contentElement);
+    if (!hasAnyMatch) return;
+
+    hideMessageContent(contentElement);
+}
+
+function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     const authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
     if (!authorElement) return;
 
@@ -337,7 +342,7 @@ function handleMessage(messageElement, messageOptions) {
     const messageContent = messageElement.querySelector('.txt-msg.text-enrichi-forum');
 
     function handleBlacklistedAuthor(authorMatch) {
-        if (messageOptions.optionHideMessages) {
+        if (messageOptions.optionHideMessages && !isFirstMessage) {
             removeMessage(messageElement);
             hiddenMessages++;
             hiddenAuthorArray.add(author);
@@ -348,7 +353,9 @@ function handleMessage(messageElement, messageOptions) {
         else {
             highlightBlacklistedAuthor(messageElement, authorElement);
             addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
+            if (isFirstMessage && !messageOptions.isWhitelistedTopic) hideMessageContent(messageContent);
         }
+
         return true;
     }
 
@@ -378,10 +385,10 @@ function handleMessage(messageElement, messageOptions) {
     handleBlSubjectIgnoreMessages(messageElement);
 }
 
-async function setTopicAuthor() {
+async function setTopicAuthor(pageId) {
     if (!currentTopicId || topicAuthorMap.has(currentTopicId)) return;
 
-    const pageId = getTopicCurrentPageId();
+    if (!pageId) pageId = getTopicCurrentPageId();
     if (!pageId) return;
 
     let currentDoc = document;
@@ -467,7 +474,8 @@ function prepareMessageOptions() {
         optionBlSubjectIgnoreMessages: optionBlSubjectIgnoreMessages,
         optionEnhanceQuotations: optionEnhanceQuotations,
         optionAntiSpam: optionAntiSpam,
-        optionSmoothScroll: optionSmoothScroll
+        optionSmoothScroll: optionSmoothScroll,
+        isWhitelistedTopic: isWhitelistedTopic
     };
     return messageOptions;
 }
@@ -478,8 +486,12 @@ async function handleTopicMessages() {
     handleJvChatAndTopicLive(messageOptions);
 
     const allMessages = getAllMessages(document);
-    await setTopicAuthor();
-    allMessages.forEach((message) => handleMessage(message, messageOptions));
+    const currentPageId = getTopicCurrentPageId()
+
+    await setTopicAuthor(currentPageId);
+
+    const isFirstMessage = (index) => index === 0 && currentPageId === 1;
+    allMessages.forEach((message, index) => handleMessage(message, messageOptions, isFirstMessage(index)));
 
     if (hiddenSpammers > 0) refreshAuthorKeys();
     if (hiddenMessages === allMessages.length) displayTopicDeboucledMessage();
