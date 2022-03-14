@@ -179,7 +179,7 @@ async function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDi
     if (!element.hasAttribute('data-id')) return true;
 
     let topicId = element.getAttribute('data-id');
-    if (topicIdBlacklistMap.has(topicId) && topicId !== '67697509' && topicId !== '68410257') {
+    if (topicIdBlacklistMap.has(topicId) && !deboucledTopics.includes(topicId)) {
         matchedTopics.set(topicIdBlacklistMap.get(topicId), 1);
         hiddenTopicsIds++;
         return true;
@@ -315,7 +315,7 @@ async function isTopicPoC(element, optionDetectPocMode) {
     if (!element.hasAttribute('data-id')) return false;
     let topicId = element.getAttribute('data-id');
 
-    if (topicId === '67697509' || topicId === '68410257') return false;
+    if (deboucledTopics.includes(topicId)) return false;
 
     if (pocTopicMap.has(topicId)) {
         return pocTopicMap.get(topicId);

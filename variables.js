@@ -13,15 +13,16 @@ const entityTopicId = 'topicid';
 
 const jvarchiveUrl = 'https://jvarchive.com';
 
-const deboucledBackendUrl = 'https://deboucled.jvflux.fr/deboucledapi';
-const youtubeBlacklistUrl = `${deboucledBackendUrl}/youtubeblacklist`;
-const prebouclesDataUrl = `${deboucledBackendUrl}/preboucles`;
-const checkUpdateUrl = `${deboucledBackendUrl}/checkupdate`;
+const deboucledBackendUrl = 'https://deboucled.jvflux.fr';
+const deboucledApiUrl = `${deboucledBackendUrl}/deboucledapi`;
+const youtubeBlacklistUrl = `${deboucledApiUrl}/youtubeblacklist`;
+const prebouclesDataUrl = `${deboucledApiUrl}/preboucles`;
+const checkUpdateUrl = `${deboucledApiUrl}/checkupdate`;
 
-const checkUpdateExpire = 2;
+const checkUpdateExpire = 1;
 const checkUpdateDeferredExpire = 72;
 const youtubeBlacklistRefreshExpire = 4;
-const prebouclesRefreshExpire = 12;
+const prebouclesRefreshExpire = 6;
 
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
@@ -74,4 +75,5 @@ let forumFilteringIsDisabled = false;
 const domParser = new DOMParser();
 
 const deboucledPseudos = ['rand0max', 'deboucled'];
+const deboucledTopics = ['67697509', '68410257', '68982055'];
 
