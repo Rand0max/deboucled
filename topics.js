@@ -432,7 +432,8 @@ function addPrevisualizeTopicEvent(topics) {
         return messagePreview;
     }
 
-    async function onPreviewHover(topicUrl, previewDiv) {
+    async function onPreviewHover(anchor, topicUrl, previewDiv) {
+        anchor.classList.toggle('active', true);
         if (previewDiv.querySelector('.bloc-message-forum')) return; // already loaded
         const topicContent = await fetchHtml(topicUrl).then((html) => prepareMessagePreview(html));
         if (!topicContent) return;
@@ -455,12 +456,19 @@ function addPrevisualizeTopicEvent(topics) {
 
         let previewDiv = document.createElement('div');
         previewDiv.className = 'deboucled-preview-content bloc-message-forum';
-        previewDiv.innerHTML = '<img class="deboucled-preview-spinner" src="http://s3.noelshack.com/uploads/images/20188032684831_loading.gif" alt="Loading" />';
+        previewDiv.innerHTML = '<span class="deboucled-preview-spinner deboucled-spinner active"/>';
         previewDiv.onclick = (e) => e.preventDefault();
         anchor.appendChild(previewDiv);
 
-        anchor.onclick = () => onPreviewHover(topicUrl, previewDiv);
-        anchor.onpointerenter = () => onPreviewHover(topicUrl, previewDiv);
+        const onPreviewStart = () => onPreviewHover(anchor, topicUrl, previewDiv);
+        const onPreviewEnd = () => anchor.classList.toggle('active', false);
+
+        // For mobile
+        topicImg.ontouchstart = onPreviewStart;
+        topicImg.ontouchend = onPreviewEnd;
+        // For everything else
+        anchor.onpointerenter = onPreviewStart;
+        anchor.onpointerleave = onPreviewEnd;
     });
 }
 

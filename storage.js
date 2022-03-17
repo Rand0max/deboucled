@@ -82,7 +82,7 @@ function getBlacklistWithKey(key) {
 function initUserId() {
     userId = GM_getValue(storage_userId, storage_userId_default);
     if (!userId?.length) {
-        userId = crypto.randomUUID();
+        userId = getUUIDv4();
         GM_setValue(storage_userId, userId);
     }
 }

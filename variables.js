@@ -22,7 +22,7 @@ const checkUpdateUrl = `${deboucledApiUrl}/checkupdate`;
 const checkUpdateExpire = 1;
 const checkUpdateDeferredExpire = 72;
 const youtubeBlacklistRefreshExpire = 4;
-const prebouclesRefreshExpire = 6;
+const prebouclesRefreshExpire = 4;
 
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
