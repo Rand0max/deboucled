@@ -34,7 +34,7 @@ async function checkUpdate() {
     if (!mustRefresh(storage_lastUpdateCheck, checkUpdateExpire)) return;
 
     let currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, userId);
-    const bodyJson = `{"userid":"${userId}","username":"${currentUserPseudo.toLowerCase() ?? 'anonymous'}","version":"${getCurrentScriptVersion()}"}`;
+    const bodyJson = `{"userid":"${userId}","username":"${currentUserPseudo?.toLowerCase() ?? 'anonymous'}","version":"${getCurrentScriptVersion()}"}`;
     let checkRes;
     await GM.xmlHttpRequest({
         method: 'POST',

@@ -612,11 +612,11 @@ function buildFloatingNavbar(infScroll) {
     var observer = new IntersectionObserver((entries) => { messageTopicIsVisible = entries[0].isIntersecting }, { threshold: [1] });
     observer.observe(messageTopicElement);
     observer.observe(document.querySelector('.bloc-pagi-default'));
-
 }
 
 function toggleInfiniteScroll(infScroll, status) {
     if (!infScroll) return;
+    document.querySelector('#bloc-formulaire-forum').style.display = status ? 'none' : 'block';
     infScroll.options.loadOnScroll = status;
     infScroll.options.scrollThreshold = status ? -200 : false;
     document.querySelector('#deboucled-smoothscroll-toggle')?.classList.toggle('disabled', !status);
@@ -628,8 +628,11 @@ function createSmoothScroll(handleMessageCallback) {
 
     const forumContainer = document.querySelector('#forum-main-col');
     const bottomPagi = document.querySelectorAll('.bloc-pagi-default')[1];
+    const blocFormulaire = document.querySelector('#bloc-formulaire-forum');
 
-    if (!bottomPagi || !forumContainer) return;
+    if (!bottomPagi || !forumContainer || !blocFormulaire) return;
+
+    blocFormulaire.style.display = 'none';
 
     const loaderStatus = buildLoaderStatus();
     forumContainer.appendChild(loaderStatus);
