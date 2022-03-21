@@ -734,6 +734,7 @@ blockquote .deboucled-highlighted {
   background-position: center;
 }
 
+/* Quotes */
 .deboucled-quote {
   position: absolute;
   font-size: 0;
@@ -782,6 +783,32 @@ blockquote .deboucled-highlighted {
 .deboucled-author-suggestion.selected {
   cursor: pointer;
   background: var(--jv-blue-light);
+}
+.deboucled-blockquote-container {
+  display: none;
+  overflow: visible !important;
+  padding-top: 0 !important;
+  height: auto !important;
+}
+.deboucled-blockquote-button {
+  margin-left: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0 10px 10px 10px;
+  z-index: 15;
+  position: relative;
+  background-color: var(--jv-bg-color-light);
+  line-height: 22px;
+  padding: 1px 5px;
+  vertical-align: baseline;
+  opacity: 0.9;
+}
+.deboucled-blockquote-button::after {
+  color: #7dc3f7;
+  margin-left: 5px;
+  content: attr(blockquote-number);
+}
+.deboucled-blockquote-button.opened::after {
+  color: #f66031;
 }
 
 .deboucled-preboucle-header {

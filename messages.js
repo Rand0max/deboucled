@@ -181,9 +181,12 @@ function handleJvChatAndTopicLive(messageOptions) {
             }
         }
 
+        handleMessageSetTopicAuthor(author, authorElement);
+
         if (messageOptions.optionEnhanceQuotations) {
             highlightSpecialAuthors(author, authorElement, isSelf);
             highlightQuotedAuthor(messageContent);
+            enhanceBlockquotes(messageContent);
         }
 
         if (!messageOptions.optionBlSubjectIgnoreMessages || isSelf) return;
@@ -361,5 +364,44 @@ function fixMessageJvCare(messageElement) {
         m.outerHTML = anchor.outerHTML;
     });
     return messageElement;
+}
+
+async function enhanceBlockquotes(messageContent) {
+    const bqContainers = messageContent.querySelectorAll('blockquote > blockquote');
+    if (!bqContainers?.length) return; // ne concerne que les citations imbriquées
+
+    function toggleQuoteDisplay(btn, index) {
+        let nextBq = btn.parentNode.nextSibling;
+        btn.classList.toggle('opened');
+        const isOpened = btn.classList.contains('opened');
+        nextBq.style.display = isOpened ? 'block' : 'none';
+        btn.textContent = isOpened ? 'fermer' : 'ouvrir';
+        btn.setAttribute('blockquote-number', `(${index})`);
+    }
+
+    function createBlockquoteButton(index) {
+        let btn = document.createElement('button');
+        btn.className = 'btn deboucled-blockquote-button';
+        btn.textContent = 'ouvrir';
+        btn.setAttribute('blockquote-number', `(${index})`);
+        btn.onclick = () => toggleQuoteDisplay(btn, index);
+        return btn;
+    }
+
+    bqContainers.forEach((e) => e.classList.add('deboucled-blockquote-container'));
+
+    const blockquotes = messageContent.querySelectorAll('.blockquote-jv');
+    blockquotes.forEach((bq) => {
+        if (bq.parentNode.parentNode.classList.contains('bloc-contenu')) return;
+        bq.style.display = 'none';
+        let numberNestedBq = bq.querySelectorAll('blockquote').length;
+        const blockquoteButton = createBlockquoteButton(numberNestedBq + 1);
+        if (!bq.previousElementSibling) bq.parentElement.prepend(document.createElement('p'));
+        bq.previousElementSibling.append(blockquoteButton);
+    });
+
+
+    let nestedQuotes = await awaitElements(messageContent, '.nested-quote-toggle-box');
+    nestedQuotes.forEach((e) => e.remove());
 }
 

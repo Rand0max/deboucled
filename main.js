@@ -375,11 +375,14 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
         addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
     }
 
-    highlightSpecialAuthors(author, authorElement, isSelf);
     handleMessageSetTopicAuthor(author, authorElement);
     fixMessageUrls(messageContent);
 
-    if (messageOptions.optionEnhanceQuotations) highlightQuotedAuthor(messageContent);
+    if (messageOptions.optionEnhanceQuotations) {
+        highlightSpecialAuthors(author, authorElement, isSelf);
+        highlightQuotedAuthor(messageContent);
+        enhanceBlockquotes(messageContent);
+    }
 
     if (!messageOptions.optionBlSubjectIgnoreMessages || isSelf) return;
     handleBlSubjectIgnoreMessages(messageElement);
