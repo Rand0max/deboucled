@@ -55,12 +55,11 @@ const storage_TopicStats = 'deboucled_TopicStats';
 
 const storage_lastUpdateCheck = 'deboucled_lastUpdateCheck';
 const storage_lastUpdateDeferredCheck = 'deboucled_lastUpdateDeferredCheck';
-
 const storage_youtubeBlacklist = 'deboucled_youtubeBlacklist', storage_youtubeBlacklist_default = '[]';
 const storage_youtubeBlacklistLastUpdate = 'deboucled_youtubeBlacklistLastUpdate';
-
 const storage_preBouclesData = 'deboucled_preBouclesData', storage_preBouclesData_default = '[]';
 const storage_prebouclesLastUpdate = 'deboucled_prebouclesLastUpdate';
+const storage_lastUpdateUser = 'deboucled_lastUpdateUser';
 
 const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_whitelistedTopicIds, storage_optionEnableJvcDarkTheme, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_optionAntiSpam, storage_optionSmoothScroll, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_totalHiddenSpammers, storage_TopicStats];
 
@@ -233,16 +232,7 @@ function saveTotalHidden() {
     incrementTotalHidden(storage_totalHiddenSpammers, hiddenSpammers);
 }
 
-function backupStorage() {
-    function blobToFile(blob, fileName) {
-        let file = new File([blob], fileName);
-        file.lastModifiedDate = new Date();
-        file.name = fileName;
-        return file;
-    }
-
-    const onlyBlacklists = document.querySelector('#deboucled-impexp-blonly').checked;
-
+function getStorageJson(onlyBlacklists = false) {
     let map = new Map();
     GM_listValues().forEach(key => {
         if (onlyBlacklists && !storage_Keys_Blacklists.includes(key)) return;
@@ -254,7 +244,19 @@ function backupStorage() {
             map.set(key, val);
         }
     });
-    let json = JSON.stringify(Object.fromEntries(map));
+    const json = JSON.stringify(Object.fromEntries(map));
+    return json;
+}
+
+function backupStorage() {
+    function blobToFile(blob, fileName) {
+        let file = new File([blob], fileName);
+        file.lastModifiedDate = new Date();
+        file.name = fileName;
+        return file;
+    }
+    const onlyBlacklists = document.querySelector('#deboucled-impexp-blonly').checked;
+    const json = getStorageJson(onlyBlacklists);
     var file = blobToFile(new Blob([json], { type: 'application/json' }), 'deboucled');
     var anchor = document.createElement('a');
     anchor.download = 'deboucled-settings.json';

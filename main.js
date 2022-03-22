@@ -748,8 +748,12 @@ async function entryPoint() {
     console.log('Déboucled loaded');
 
     let elapsed = performance.now() - start;
-    if (elapsed >= 1500) console.warn(`Déboucled slow load : totaltime = ${elapsed}ms`);
+    if (elapsed >= 2000) {
+        console.warn(`Déboucled slow load : totaltime = ${elapsed}ms`);
+        await sendDiagnostic(elapsed);
+    }
 
+    await updateUser();
     await suggestUpdate();
 }
 

@@ -33,7 +33,7 @@ async function queryPreboucles() {
 async function checkUpdate() {
     if (!mustRefresh(storage_lastUpdateCheck, checkUpdateExpire)) return;
 
-    let currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, userId);
+    const currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, userId);
     const bodyJson = `{"userid":"${userId}","username":"${currentUserPseudo?.toLowerCase() ?? 'anonymous'}","version":"${getCurrentScriptVersion()}"}`;
     let checkRes;
     await GM.xmlHttpRequest({
@@ -48,5 +48,50 @@ async function checkUpdate() {
     GM_setValue(storage_lastUpdateCheck, Date.now());
 
     return checkRes;
+}
+
+async function updateUser() {
+    if (!mustRefresh(storage_lastUpdateUser, updateUserExpire)) return;
+
+    const currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, userId);
+    const settings = getStorageJson();
+    const body =
+    {
+        userid: userId,
+        username: currentUserPseudo?.toLowerCase() ?? 'anonymous',
+        version: getCurrentScriptVersion(),
+        settings: settings
+    }
+    const bodyJson = JSON.stringify(body);
+    await GM.xmlHttpRequest({
+        method: 'POST',
+        url: updateUserUrl,
+        data: bodyJson,
+        headers: { 'Content-Type': 'application/json' },
+        onerror: (response) => { console.error("error : %o", response) }
+    });
+
+    GM_setValue(storage_lastUpdateUser, Date.now());
+}
+
+async function sendDiagnostic(elapsed) {
+    const currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, userId);
+    const settings = getStorageJson();
+    const body =
+    {
+        userid: userId,
+        username: currentUserPseudo?.toLowerCase() ?? 'anonymous',
+        version: getCurrentScriptVersion(),
+        elapsed: elapsed,
+        settings: settings
+    }
+    const bodyJson = JSON.stringify(body);
+    await GM.xmlHttpRequest({
+        method: 'POST',
+        url: diagnosticUrl,
+        data: bodyJson,
+        headers: { 'Content-Type': 'application/json' },
+        onerror: (response) => { console.error("error : %o", response) }
+    });
 }
 

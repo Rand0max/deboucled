@@ -18,11 +18,14 @@ const deboucledApiUrl = `${deboucledBackendUrl}/deboucledapi`;
 const youtubeBlacklistUrl = `${deboucledApiUrl}/youtubeblacklist`;
 const prebouclesDataUrl = `${deboucledApiUrl}/preboucles`;
 const checkUpdateUrl = `${deboucledApiUrl}/checkupdate`;
+const updateUserUrl = `${deboucledApiUrl}/user`;
+const diagnosticUrl = `${deboucledApiUrl}/diagnostic`;
 
 const checkUpdateExpire = 1;
 const checkUpdateDeferredExpire = 72;
 const youtubeBlacklistRefreshExpire = 4;
 const prebouclesRefreshExpire = 4;
+const updateUserExpire = 24;
 
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];

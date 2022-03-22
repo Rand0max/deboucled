@@ -186,7 +186,7 @@ function handleJvChatAndTopicLive(messageOptions) {
         if (messageOptions.optionEnhanceQuotations) {
             highlightSpecialAuthors(author, authorElement, isSelf);
             highlightQuotedAuthor(messageContent);
-            enhanceBlockquotes(messageContent);
+            if (topicLiveEvent) enhanceBlockquotes(messageContent);
         }
 
         if (!messageOptions.optionBlSubjectIgnoreMessages || isSelf) return;
