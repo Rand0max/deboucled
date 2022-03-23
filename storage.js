@@ -13,6 +13,7 @@ const storage_preBoucles = 'deboucled_preBoucles', storage_preBoucles_default = 
 const storage_blacklistedTopicIds = 'deboucled_blacklistedTopicIds', storage_blacklistedTopicIds_default = '[]';
 const storage_blacklistedSubjects = 'deboucled_blacklistedSubjects', storage_blacklistedSubjects_default = '[]';
 const storage_blacklistedAuthors = 'deboucled_blacklistedAuthors', storage_blacklistedAuthors_default = '[]';
+const storage_blacklistedShadows = 'deboucled_blacklistedShadows', storage_blacklistedShadows_default = '[]';
 const storage_whitelistedTopicIds = 'deboucled_whitelistedTopicIds', storage_whitelistedTopicIds_default = '[]';
 const storage_optionEnableJvcDarkTheme = 'deboucled_optionEnableJvcDarkTheme', storage_optionEnableJvcDarkTheme_default = false;
 const storage_optionEnableJvRespawnRefinedTheme = 'deboucled_optionEnableJvRespawnRefinedTheme', storage_optionEnableJvRespawnRefinedTheme_default = false;
@@ -60,10 +61,13 @@ const storage_youtubeBlacklistLastUpdate = 'deboucled_youtubeBlacklistLastUpdate
 const storage_preBouclesData = 'deboucled_preBouclesData', storage_preBouclesData_default = '[]';
 const storage_prebouclesLastUpdate = 'deboucled_prebouclesLastUpdate';
 const storage_lastUpdateUser = 'deboucled_lastUpdateUser';
+const storage_DiagnosticLastUpdate = 'deboucled_DiagnosticLastUpdate';
 
-const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_whitelistedTopicIds, storage_optionEnableJvcDarkTheme, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_optionAntiSpam, storage_optionSmoothScroll, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_totalHiddenSpammers, storage_TopicStats];
+const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_blacklistedShadows, storage_whitelistedTopicIds, storage_optionEnableJvcDarkTheme, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_optionAntiSpam, storage_optionSmoothScroll, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_totalHiddenSpammers, storage_TopicStats];
 
-const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors];
+const storage_excluded_user_Keys = [storage_TopicStats];
+
+const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_blacklistedShadows];
 
 
 function getBlacklistWithKey(key) {
@@ -74,6 +78,8 @@ function getBlacklistWithKey(key) {
             return subjectBlacklistArray;
         case storage_blacklistedAuthors:
             return authorBlacklistArray;
+        case storage_blacklistedShadows:
+            return shadowent;
     }
     return null;
 }
@@ -89,7 +95,7 @@ function initUserId() {
 async function initStorage() {
     initUserId();
     initVinzBoucles();
-    initShadowent();
+    //initShadowent();
 
     let isInit = GM_getValue(storage_init, storage_init_default);
     if (isInit) {
@@ -111,6 +117,8 @@ async function loadStorage() {
     authorBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedAuthors, storage_blacklistedAuthors_default)))];
     topicIdBlacklistMap = new Map([...JSON.parse(GM_getValue(storage_blacklistedTopicIds, storage_blacklistedTopicIds_default))]);
 
+    shadowent = [...new Set(JSON.parse(GM_getValue(storage_blacklistedShadows, storage_blacklistedShadows_default)))];
+
     buildBlacklistsRegex();
 
     let topicStats = GM_getValue(storage_TopicStats);
@@ -127,6 +135,8 @@ async function saveStorage() {
     GM_setValue(storage_blacklistedSubjects, JSON.stringify([...new Set(subjectBlacklistArray)]));
     GM_setValue(storage_blacklistedAuthors, JSON.stringify([...new Set(authorBlacklistArray)]));
     GM_setValue(storage_blacklistedTopicIds, JSON.stringify([...topicIdBlacklistMap]));
+
+    GM_setValue(storage_blacklistedShadows, JSON.stringify([...new Set(shadowent)]));
 
     GM_setValue(storage_whitelistedTopicIds, JSON.stringify([...new Set(topicIdWhitelistArray)]));
 
@@ -232,11 +242,12 @@ function saveTotalHidden() {
     incrementTotalHidden(storage_totalHiddenSpammers, hiddenSpammers);
 }
 
-function getStorageJson(onlyBlacklists = false) {
+function getStorageJson(onlyBlacklists = false, excludedKeys = undefined) {
     let map = new Map();
     GM_listValues().forEach(key => {
         if (onlyBlacklists && !storage_Keys_Blacklists.includes(key)) return;
         if (!storage_Keys.includes(key)) return;
+        if (excludedKeys?.includes(key)) return;
         const val = GM_getValue(key);
         try {
             map.set(key, JSON.parse(val));
@@ -332,8 +343,8 @@ async function importFromTotalBlacklist() {
     alert(`${blacklistFromTblArray.length} pseudos TotalBlacklist ont été importés dans Déboucled avec succès.`);
 }
 
-function buildBlacklistsRegex(option = 'both') {
-    if (option === 'both' || option === entitySubject) {
+function buildBlacklistsRegex(entityOption = 'both') {
+    if (entityOption === 'both' || entityOption === entitySubject) {
         let preBoucleEnabledSubjects = [];
         preBoucleArray.filter(pb => pb.enabled && pb.type === entitySubject)
             .forEach(pb => { preBoucleEnabledSubjects = preBoucleEnabledSubjects.concat(pb.entities); });
@@ -342,7 +353,7 @@ function buildBlacklistsRegex(option = 'both') {
         subjectsBlacklistReg = buildEntityRegex(mergedSubjectBlacklistArray, true);
     }
 
-    if (option === 'both' || option === entityAuthor) {
+    if (entityOption === 'both' || entityOption === entityAuthor) {
         let preBoucleEnabledAuthors = [];
         preBoucleArray.filter(pb => pb.enabled && pb.type === entityAuthor)
             .forEach(pb => { preBoucleEnabledAuthors = preBoucleEnabledAuthors.concat(pb.entities); });

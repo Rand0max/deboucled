@@ -54,7 +54,7 @@ async function updateUser() {
     if (!mustRefresh(storage_lastUpdateUser, updateUserExpire)) return;
 
     const currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, userId);
-    const settings = getStorageJson();
+    const settings = getStorageJson(false, storage_excluded_user_Keys);
     const body =
     {
         userid: userId,
@@ -75,8 +75,10 @@ async function updateUser() {
 }
 
 async function sendDiagnostic(elapsed) {
+    if (!mustRefresh(storage_DiagnosticLastUpdate, diagnosticExpire)) return;
+
     const currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, userId);
-    const settings = getStorageJson();
+    const settings = getStorageJson(false, storage_excluded_user_Keys);
     const body =
     {
         userid: userId,
@@ -93,5 +95,7 @@ async function sendDiagnostic(elapsed) {
         headers: { 'Content-Type': 'application/json' },
         onerror: (response) => { console.error("error : %o", response) }
     });
+
+    GM_setValue(storage_DiagnosticLastUpdate, Date.now());
 }
 

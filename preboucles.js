@@ -46,11 +46,11 @@ function initVinzBoucles() {
     });
 }
 
+/*
 function initShadowent() {
-    /*
-    const preShadowent = ['U3RvbmVHaWFudA==', 'QW5lcnls', 'Rmx1YnVz', 'bGVhbw==', 'dmlueg==', 'dGFjb3M=', 'a2luYWhl', 'TGVzWWV1eER1Rm9ydW0=', 'Y2lnYXJldHRl', 'd2luZG93c2JvdA==', 'YXJlbnls', 'emVtb3Vyb2lkZQ==', 'amVmYWlzdW5saXZl', 'dHViZWR1dGVtcA==', 'Y3ViZWR1dGVtcA==', 'Y3ViZWR1Y2xhbg==', 'Y3ViZWR1dGFtcA=='];
-    preShadowent.forEach((s) => shadowent.push(window.atob(s).trim().toLowerCase()));
-    */
-    //console.log('shadowent : %o', shadowent);
+const preShadowent = ['U3RvbmVHaWFudA==', 'QW5lcnls', 'Rmx1YnVz', 'bGVhbw==', 'dmlueg==', 'dGFjb3M=', 'a2luYWhl', 'TGVzWWV1eER1Rm9ydW0=', 'Y2lnYXJldHRl', 'd2luZG93c2JvdA==', 'YXJlbnls', 'emVtb3Vyb2lkZQ==', 'amVmYWlzdW5saXZl', 'dHViZWR1dGVtcA==', 'Y3ViZWR1dGVtcA==', 'Y3ViZWR1Y2xhbg==', 'Y3ViZWR1dGFtcA=='];
+preShadowent.forEach((s) => shadowent.push(window.atob(s).trim().toLowerCase()));
+//console.log('shadowent : %o', shadowent);
 }
+*/
 

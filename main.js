@@ -355,7 +355,6 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
             addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
             if (isFirstMessage && !messageOptions.isWhitelistedTopic) hideMessageContent(messageContent);
         }
-
         return true;
     }
 
@@ -364,7 +363,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
         if (!handleBlacklistedAuthor(authorBlacklistedMatch)) return;
     }
     else if (messageOptions.optionAntiSpam && isContentYoutubeBlacklisted(messageContent)) {
-        addEntityBlacklist(authorBlacklistArray, author); // on rajoute automatiquement le spammeur à la BL        
+        addEntityBlacklist(shadowent, author); // on rajoute automatiquement le spammeur à la BL        
         buildBlacklistsRegex(entityAuthor);
         hiddenSpammers++;
         if (!handleBlacklistedAuthor([author])) return;
@@ -748,7 +747,7 @@ async function entryPoint() {
     console.log('Déboucled loaded');
 
     let elapsed = performance.now() - start;
-    if (elapsed >= 2000) {
+    if (elapsed >= 3000) {
         console.warn(`Déboucled slow load : totaltime = ${elapsed}ms`);
         await sendDiagnostic(elapsed);
     }

@@ -26,6 +26,7 @@ const checkUpdateDeferredExpire = 72;
 const youtubeBlacklistRefreshExpire = 4;
 const prebouclesRefreshExpire = 4;
 const updateUserExpire = 24;
+const diagnosticExpire = 12;
 
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
