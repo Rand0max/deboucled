@@ -227,7 +227,7 @@ blockquote .deboucled-highlighted {
 .input-on-off {
   visibility: hidden;
 }
-.bloc-message-forum {
+.conteneur-messages-pagi .bloc-message-forum {
   overflow: visible;
 }
 .deboucled-message-separator {

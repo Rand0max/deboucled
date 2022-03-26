@@ -646,7 +646,7 @@ function createSmoothScroll(handleMessageCallback) {
     let infScroll = new InfiniteScroll('.conteneur-messages-pagi', {
         // debug: true,        
         //hideNav: '.bloc-pagi-default:nth-of-type(2n)',
-        scrollThreshold: -200,
+        scrollThreshold: -100,
         status: '.page-load-status',
         checkLastPage: true,
         path: getInfScrollPath
