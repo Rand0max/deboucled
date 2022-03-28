@@ -23,8 +23,8 @@ const diagnosticUrl = `${deboucledApiUrl}/diagnostic`;
 
 const checkUpdateExpire = 1;
 const checkUpdateDeferredExpire = 72;
-const youtubeBlacklistRefreshExpire = 4;
-const prebouclesRefreshExpire = 4;
+const youtubeBlacklistRefreshExpire = 2;
+const prebouclesRefreshExpire = 2;
 const updateUserExpire = 24;
 const diagnosticExpire = 12;
 

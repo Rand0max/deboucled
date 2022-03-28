@@ -150,6 +150,9 @@ function buildSettingsPage(firstLaunch = false) {
         let quoteLogo = '<span class="deboucled-quote-logo"></span>'
         html += addToggleOption(`Améliorer les <i>citations</i> ${quoteLogo} des messages`, storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default, 'Améliore les citations avec plusieurs fonctionnalités :\n\n• Insère le pseudo du message cité\n• Citer une partie des messages en sélectionnant le texte\n• Citer et suggérer des pseudos en écrivant avec l\'arobase @ (conditions : connecté et minimum 3 lettres)\n• Mettre en couleur les pseudos lorsqu\'ils sont cités');
 
+        let scrollLogo = '<span class="deboucled-scroll-logo"></span>'
+        html += addToggleOption(`Activer le <i>défilement automatique</i> ${scrollLogo} des messages`, storage_optionSmoothScroll, storage_optionSmoothScroll_default, 'Activer le chargement automatique des messages du topic en faisant défiler la page vers le bas.');
+
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -179,9 +182,6 @@ function buildSettingsPage(firstLaunch = false) {
 
         let previewLogo = '<span><svg width="16px" viewBox="0 0 30 30" id="deboucled-preview-logo"><use href="#previewlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour avoir un <i>aperçu du topic</i> ${previewLogo}`, storage_optionPrevisualizeTopic, storage_optionPrevisualizeTopic_default, 'Afficher ou non l\'icone \'loupe\' à côté du sujet pour prévisualiser le topic au survol.');
-
-        let scrollLogo = '<span class="deboucled-scroll-logo"></span>'
-        html += addToggleOption(`Activer le <i>défilement automatique</i> ${scrollLogo} des messages (BETA)`, storage_optionSmoothScroll, storage_optionSmoothScroll_default, 'Activer le chargement automatique des messages du topic en faisant défiler la page vers le bas.');
 
         let blJvcLogo = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
         html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvcLogo} de JVC`, storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
@@ -524,7 +524,8 @@ function buildPrebouclesTable() {
 
     let html = '';
     preBoucleArray.forEach(b => {
-        const hint = `${getEntityTitle(b.type)} : ${b.entities.sort().join(', ')}`;
+        let hint = `${getEntityTitle(b.type)} : ${b.entities.sort().slice(0, 120).join(', ')}`;
+        if (b.entities.length > 120) hint += ' ...';
         let titleLogo = '';
         if (b.type === entitySubject) titleLogo = '<span class="deboucled-preboucle-subject-logo"></span>';
         else if (b.type === entityAuthor) titleLogo = '<span class="deboucled-preboucle-author-logo"></span>';
