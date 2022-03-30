@@ -17,6 +17,8 @@ function buildQuoteMessage(messageElement, selection) {
         textArea.value = `${currentContent}${getQuoteHeader(messageElement)}\n> ${quotedText}\n\n`;
         textArea.dispatchEvent(new Event('change'));
         textArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        textArea.focus({ preventScroll: true });
+        textArea.setSelectionRange(textArea.value.length, textArea.value.length);
     }
     else {
         setTimeout(() => {

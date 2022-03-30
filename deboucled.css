@@ -234,6 +234,10 @@ blockquote .deboucled-highlighted {
   margin: 15px 0;
   border: 1px solid var(--jv-bg-color-light);
 }
+.deboucled-message-quoted {
+  background-color: #1987540f !important;
+  border-color: #1987546e !important;
+}
 
 /* Button */
 .deboucled-button {

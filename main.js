@@ -379,7 +379,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
 
     if (messageOptions.optionEnhanceQuotations) {
         highlightSpecialAuthors(author, authorElement, isSelf);
-        highlightQuotedAuthor(messageContent);
+        highlightQuotedAuthor(messageContent, messageElement);
         enhanceBlockquotes(messageContent);
     }
 

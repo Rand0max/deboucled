@@ -185,7 +185,7 @@ function handleJvChatAndTopicLive(messageOptions) {
 
         if (messageOptions.optionEnhanceQuotations) {
             highlightSpecialAuthors(author, authorElement, isSelf);
-            highlightQuotedAuthor(messageContent);
+            highlightQuotedAuthor(messageContent, messageElement);
             if (topicLiveEvent) enhanceBlockquotes(messageContent);
         }
 
@@ -266,7 +266,7 @@ function fixMessageUrls(messageContent) {
         (m) => `<a class="xXx" href="${m}" title="${m}" target="_blank">${m}</a>`);
 }
 
-function highlightQuotedAuthor(messageContent) {
+function highlightQuotedAuthor(messageContent, messageElement) {
     if (!messageContent) return;
 
     let currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, storage_lastUsedPseudo_default);
@@ -279,9 +279,9 @@ function highlightQuotedAuthor(messageContent) {
         return `<a class="deboucled-highlighted${self}" href="/profil/${profilMatch.toLowerCase()}?mode=infos" target="_blank" title="Voir le profil de ${profilMatch}">${match}</a>`;
     }
 
-    function replaceAllTextQuotes(element, regex, replaceCallback, alternateCallback) {
+    function replaceAllTextQuotes(element, containerElement, regex, replaceCallback, alternateCallback) {
         getParagraphChildren(element, true).forEach(child => {
-            replaceAllTextQuotes(child, regex, replaceCallback, alternateCallback)
+            replaceAllTextQuotes(child, containerElement, regex, replaceCallback, alternateCallback)
         });
         const textChildren = getTextChildren(element);
         textChildren.forEach(textNode => {
@@ -290,6 +290,8 @@ function highlightQuotedAuthor(messageContent) {
 
             const newText = textNode.textContent?.replaceAll(regex, replaceCallback);
             if (textNode.textContent === newText) return;
+
+            containerElement?.classList.toggle('deboucled-message-quoted', true);
 
             let newNode = document.createElement('a');
             textNode.parentElement.insertBefore(newNode, textNode);
@@ -303,6 +305,7 @@ function highlightQuotedAuthor(messageContent) {
     const quotedAtAuthorsRegex = new RegExp(`\\B@${allowedPseudo}+`, 'gi');
     replaceAllTextQuotes(
         messageContent,
+        undefined,
         quotedAtAuthorsRegex,
         (match) => isSelf(match.toLowerCase()) ? match : buildProfilHighlightAnchor(match));
 
@@ -312,6 +315,7 @@ function highlightQuotedAuthor(messageContent) {
     const quotedAuthorsPartRegex = new RegExp(/le\s[0-9]{1,2}\s[a-zéù]{3,10}\s[0-9]{4}\sà\s[0-9]{2}:[0-9]{2}:[0-9]{2}\s(?!:)/, 'gi');
     replaceAllTextQuotes(
         messageContent,
+        undefined,
         quotedAuthorsFullRegex,
         (match) => isSelf(match.toLowerCase()) ? match : buildProfilHighlightAnchor(match),
         (n) => {
@@ -323,12 +327,14 @@ function highlightQuotedAuthor(messageContent) {
             }
         });
 
+    //deboucled-message-quoted
     if (currentUserPseudo?.length) {
         // On met en surbrillance verte les citations du compte de l'utilisateur avec ou sans @arobase
         const selfPseudo = currentUserPseudo.escapeRegexPatterns();
         const quotedSelfRegex = new RegExp(`\\B@${selfPseudo}\\b|(?<!\\w|@)${selfPseudo}\\b`, 'gi');
         replaceAllTextQuotes(
             messageContent,
+            messageElement,
             quotedSelfRegex,
             (match) => buildProfilHighlightAnchor(match, ' self'));
     }
