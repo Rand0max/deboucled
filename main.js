@@ -77,6 +77,43 @@ function getForumId() {
     return forumId;
 }
 
+function displaySecret() {
+    const dateNow = new Date();
+    const firstOfApril = new Date(dateNow.getFullYear(), 3, 1);
+    if (!dateIsToday(firstOfApril)) return;
+
+    let secretDisplayed = GM_getValue(storage_secret_displayed, storage_secret_displayed_default);
+    if (secretDisplayed) return;
+
+    const topics = document.querySelector('.conteneur-topic-pagi');
+    const wrapper = document.querySelector('#forum-main-col');
+    const blocFormulaire = document.querySelector('#bloc-formulaire-forum');
+    const prePagi = document.querySelector('.bloc-pre-pagi-forum');
+
+    if (!topics || !wrapper || !blocFormulaire || !prePagi) return;
+
+    const msg = 'POISSON D\'AVRIL :)\n\n- Déboucled';
+    topics.style.display = 'none';
+    blocFormulaire.style.display = 'none';
+    prePagi.style.display = 'none';
+
+    let forbidden = document.createElement('div');
+    forbidden.setAttribute('class', 'deboucled-forbidden deboucled-svg-forbidden-red');
+    forbidden.innerHTML = '<img class="img-erreur img-fluid text-center" src="/img/erreurs/e410.png" alt="ERREUR 410">';
+    forbidden.onclick = function () {
+        alert(msg);
+        topics.style.display = 'table';
+        blocFormulaire.style.display = 'block';
+        forbidden.style.display = 'none';
+        prePagi.style.display = 'block';
+        GM_setValue(storage_secret_displayed, true);
+    };
+    wrapper.appendChild(forbidden);
+    console.log(msg);
+
+    alert('Suite à des manquements répétés à la charte du site, vous avez été banni définitivement par la modération de jeuxvideo.com.\n\nPour toute réclamation, merci de vous adresser au support à l\'adresse suivante : paix@jeuxvideo.com.');
+}
+
 function getEntityTitle(entity) {
     switch (entity) {
         case entitySubject:
@@ -754,6 +791,8 @@ async function entryPoint() {
 
     await updateUser();
     await suggestUpdate();
+
+    displaySecret();
 }
 
 preInit(); // speedup loading

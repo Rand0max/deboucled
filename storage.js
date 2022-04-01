@@ -7,6 +7,7 @@ const localstorage_pocTopics = 'deboucled_pocTopics';
 const localstorage_topicAuthors = 'deboucled_topicAuthors';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
+const storage_secret_displayed = 'deboucled_secret_displayed', storage_secret_displayed_default = false;
 const storage_userId = 'deboucled_userId', storage_userId_default = '';
 const storage_lastUsedPseudo = 'deboucled_lastUsedPseudo', storage_lastUsedPseudo_default = '';
 const storage_preBoucles = 'deboucled_preBoucles', storage_preBoucles_default = '[]';

@@ -279,9 +279,9 @@ function highlightQuotedAuthor(messageContent, messageElement) {
         return `<a class="deboucled-highlighted${self}" href="/profil/${profilMatch.toLowerCase()}?mode=infos" target="_blank" title="Voir le profil de ${profilMatch}">${match}</a>`;
     }
 
-    function replaceAllTextQuotes(element, containerElement, regex, replaceCallback, alternateCallback) {
+    function replaceAllTextQuotes(element, containerElement, regex, replaceCallback, alternateCallback, depth = 0) {
         getParagraphChildren(element, true).forEach(child => {
-            replaceAllTextQuotes(child, containerElement, regex, replaceCallback, alternateCallback)
+            replaceAllTextQuotes(child, containerElement, regex, replaceCallback, alternateCallback, ++depth)
         });
         const textChildren = getTextChildren(element);
         textChildren.forEach(textNode => {
@@ -291,7 +291,7 @@ function highlightQuotedAuthor(messageContent, messageElement) {
             const newText = textNode.textContent?.replaceAll(regex, replaceCallback);
             if (textNode.textContent === newText) return;
 
-            containerElement?.classList.toggle('deboucled-message-quoted', true);
+            if (depth <= 2 && containerElement) containerElement.classList.toggle('deboucled-message-quoted', true);
 
             let newNode = document.createElement('a');
             textNode.parentElement.insertBefore(newNode, textNode);

@@ -1208,6 +1208,13 @@ input[type="search"] {
 }
 
 /* SVG */
+.deboucled-forbidden {
+  text-align: center;
+}
+.deboucled-forbidden .img-erreur {
+  width: 70%;
+  cursor: pointer;
+}
 .deboucled-svg-forbidden-red #deboucled-forbidden-logo {
   fill: none;
   stroke: red;

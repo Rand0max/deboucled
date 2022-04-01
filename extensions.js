@@ -412,3 +412,8 @@ function getUUIDv4() {
     }
 }
 
+function dateIsToday(date) {
+    const today = new Date();
+    return date.getMonth() === today.getMonth() && date.getDate() === today.getDate();
+}
+
