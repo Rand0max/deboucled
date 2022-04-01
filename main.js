@@ -106,12 +106,12 @@ function displaySecret() {
         blocFormulaire.style.display = 'block';
         forbidden.style.display = 'none';
         prePagi.style.display = 'block';
-        GM_setValue(storage_secret_displayed, true);
     };
     wrapper.appendChild(forbidden);
     console.log(msg);
 
     alert('Suite à des manquements répétés à la charte du site, vous avez été banni définitivement par la modération de jeuxvideo.com.\n\nPour toute réclamation, merci de vous adresser au support à l\'adresse suivante : paix@jeuxvideo.com.');
+    GM_setValue(storage_secret_displayed, true);
 }
 
 function getEntityTitle(entity) {
