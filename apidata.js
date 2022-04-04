@@ -30,6 +30,16 @@ async function queryPreboucles() {
     GM_setValue(storage_prebouclesLastUpdate, Date.now());
 }
 
+async function queryAiLoops() {
+    let newAiLoops = await fetchJson(aiLoopsDataUrl);
+    if (!newAiLoops?.length) return;
+
+    aiLoopArray = newAiLoops;
+
+    GM_setValue(storage_aiLoopsData, JSON.stringify(aiLoopArray));
+    GM_setValue(storage_aiLoopsLastUpdate, Date.now());
+}
+
 async function checkUpdate() {
     if (!mustRefresh(storage_lastUpdateCheck, checkUpdateExpire)) return;
 

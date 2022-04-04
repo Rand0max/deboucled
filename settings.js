@@ -17,7 +17,7 @@ function buildSettingsPage(firstLaunch = false) {
     document.querySelector('#deboucled-settings-bg-view').style.display = 'none';
     const collapsibleMaxHeight = 'style="max-height: max-content; overflow: visible;"';
 
-    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false, hintLocation = 'right') {
+    function addToggleOption(title, optionId, defaultValue, hint, enabled = true, isSubCell = false, hintLocation = 'right', toggleColor = 'blue') {
         let html = '';
         html += `<tr id="${optionId}-container"${enabled ? '' : 'class="deboucled-disabled"'}>`;
         html += `<td class="deboucled-td-left${isSubCell ? ' deboucled-option-table-subcell' : ''}">`;
@@ -27,7 +27,7 @@ function buildSettingsPage(firstLaunch = false) {
         html += '<label class="deboucled-switch">';
         let checkedStr = GM_getValue(optionId, defaultValue) ? 'checked' : '';
         html += `<input type="checkbox" id="${optionId}" ${checkedStr}></input>`;
-        html += '<span class="deboucled-toggle-slider round"></span>';
+        html += `<span class="deboucled-toggle-slider round ${toggleColor}"></span>`;
         html += '</label>';
         html += '</td>';
         html += '</tr>';
@@ -46,11 +46,11 @@ function buildSettingsPage(firstLaunch = false) {
         html += '</tr>';
         return html;
     }
-    function addDropdownOption(title, optionId, hint, defaultValue, values) {
+    function addDropdownOption(title, optionId, hint, defaultValue, values, className) {
         let html = '';
         html += '<tr>';
-        html += '<td class="deboucled-td-left" style="vertical-align: top;">';
-        html += `<span ${buildTooltip(hint)}>${title}</span>`;
+        html += '<td class="deboucled-td-left">'; // style="vertical-align: top;">';
+        html += `<span${className ? ` class="${className}"` : ''} ${buildTooltip(hint)}>${title}</span>`;
         html += '</td>';
         html += '<td class="deboucled-td-right">';
         html += '<span class="deboucled-dropdown select">';
@@ -121,6 +121,14 @@ function buildSettingsPage(firstLaunch = false) {
         html += `<span class="deboucled-about-version">v${getCurrentScriptVersion()}</span>`;
 
         html += '<table class="deboucled-option-table">';
+
+        let aiLogo = '<span class="deboucled-ai-logo"></span>'
+        html += addDropdownOption(`Intelligence artificielle ${aiLogo} Anti-Boucle`,
+            storage_optionAntiLoopAiMode,
+            'Intelligence artificielle de détection des &quot;boucles&quot; (topics répétitifs) développée spécialement pour Déboucled.\n• Désactivé : aucune vérification sur les boucles.\n• Mode informatif : affiche une balise rouge &quot;BOUCLE&quot; à côté du sujet.\n• Mode filtrage : filtre automatiquement les sujets boucles.',
+            storage_optionAntiLoopAiMode_default,
+            ['Désactivé', 'Mode informatif', 'Mode filtrage'],
+            'deboucled-td-main-option');
 
         html += addToggleOption('Cacher les messages des <span style="color: rgb(230, 0, 0)">pseudos blacklist</span>', storage_optionHideMessages, storage_optionHideMessages_default, 'Permet de masquer complètement les messages d\'un pseudo dans les topics.');
 
@@ -382,6 +390,7 @@ function addSettingEvents() {
     addToggleEvent(storage_optionEnableDeboucledDarkTheme, undefined, toggleDeboucledDarkTheme);
     addToggleEvent(storage_optionEnableJvcDarkTheme);
     addToggleEvent(storage_optionEnableJvRespawnRefinedTheme);
+    addSelectEvent(storage_optionAntiLoopAiMode);
     addToggleEvent(storage_optionHideMessages);
     addToggleEvent(storage_optionBlAuthorIgnoreMp);
     addToggleEvent(storage_optionBlSubjectIgnoreMessages);

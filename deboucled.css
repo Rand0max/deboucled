@@ -19,6 +19,7 @@ body {
   --deboucled-overylay-background-color: #fff;
   --deboucled-button-shadow: #00000025 0 3px 8px;
   --deboucled-td-border-color: #00000066;
+  --deboucled-td-option-shadow: 3px 2px 3px #0003;
 }
 body.deboucled-dark-theme {
   --deboucled-main-color: #035ebf;
@@ -41,6 +42,7 @@ body.deboucled-dark-theme {
   --deboucled-overylay-background-color: #000;
   --deboucled-button-shadow: #00000080 0 3px 8px;
   --deboucled-td-border-color: #ffffff66;
+  --deboucled-td-option-shadow: 3px 2px 3px #fff3;
 }
 
 .layout__adHeader {
@@ -410,6 +412,15 @@ blockquote .deboucled-highlighted {
 .form-harassment {
   display: none;
 }
+.topic-list .topic-subject {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+}
+.topic-list .topic-title {
+  display: inline;
+}
 
 /* Floating navbar */
 .deboucled-floating-container {
@@ -620,6 +631,17 @@ blockquote .deboucled-highlighted {
   background-size: 18px;
   display: inline-block;
   vertical-align: middle;
+  filter: invert(var(--deboucled-filter-invert));
+}
+.deboucled-ai-logo {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABmJLR0QA/wD/AP+gvaeTAAADaklEQVRIicXXW4ydUxQH8N+MMvXCYKpo5sxUU9EMEpkQQtInlxdNJkLckhJ6SiKifWjSJ5EQl0dhmJGIRKSoVpEQ1wQRDYPITIJ26pZQpVOqVa2I8bD2l9nzzff1nHrgn+ycc9Zee932uuzD/4SONvn6cQOWoYE9eCKdvwkLsRNv40nsayWws8V+F4axA1dgNzbhCzyPjen7BnyLW9LnpW06VIuNSemFFXvv470SrQM34wAG/o3CAYziNyyq4XkqrSoMYwJNHFvFUBXqWzEmwnw1vq8RfiCtKtwnwn9nMuDcVoovx0MiYVZiG65HT42COpyazp6HLXgTS+qYOxPzg+n3EuzHD5hMQgbRl/ZHsDnR8tXEIfyEFxPvM3i9TvFy/CFKA65JSgcwna2RTPF0zXotnd+beBv4C2flXha4GB9gV/r9hrjDifT9KJFwOUZFJudrEBeIO3408X2Hj3BJcXBeJuSUxFBgKnnbj+34O9EXJOEL8LO5+CR5eCK+zuiTSdYcj/fguJKQQ/gyUwpDIuuHKpQW2FtSCicleXMUT+LsEvNSXJsOwWozIc3D3puMmRLVUEYHzsFnVVb2JIuGRCgvMzuru0r8I2YS7X6RH+uT8jKWi3zpLgj5He/GW6JECuwUCTEh7m17lcWiP5+BFfimYr+JF/BrQchDvQgX4ToRmh5RXhOiBnfUKIXH8GySsaJif5fo990Ve9bjnRJtfvKkU4zEvFFsNhPqwquxGsM68THWFoQ81AvNLic4KLoZMRAGS/vluu4rGVPgXoxjcW5JgXERjqNrrKY+q+Fzs/OjQFPUfAM/VgmdL5LncRxTsT+WhBTIs/pwmMYa/Ckr19zjg+LlcH4yYHW214uTxXirey71igGzytyp9wDWiajWYp6o3Tsy2qeiTqfEvCa8fVdEoSmyf6soy1XZ2XFR57NQ9RA4QczTpzNaAy+LSPRl9GWZ4tPxkmg2izOeDSKKLdEtevOZGW2l8PZDM0+h8h3fKPp9zgP3JIPawpYkYOlheFolV5d4Eu/Hle0qPh7PieG9TSRGu4rXidL6XURpTbtKc5yG20TPLr82X8UrJVpDtMe1ov1WleURYVTc38O4XTxf94nn73CiPYJf0mdLtPsXBq4SI7NfdKC7RXO4S1TBV2ICbToCmf89/gEMPdGucbUfmQAAAABJRU5ErkJggg==)
+    0 no-repeat;
+  width: 16px;
+  height: 16px;
+  background-size: 16px;
+  display: inline-block;
+  vertical-align: baseline;
+  margin: 0 3px;
   filter: invert(var(--deboucled-filter-invert));
 }
 
@@ -1124,6 +1146,30 @@ input[type="search"] {
   color: #ff0000;
 }
 
+.deboucled-badge {
+  display: inline;
+  padding: 0.25rem 0.35rem;
+  font-size: 66%;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: 0.375rem;
+  transition: color 0.15s ease-in-out 0s, background-color 0.15s ease-in-out 0s,
+    border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+  margin-left: 5px;
+  user-select: none;
+  cursor: pointer;
+}
+.deboucled-badge-danger {
+  color: #f80031;
+  background-color: #fdd1da;
+}
+.deboucled-badge-danger.dark {
+  color: #ff1e4b;
+  background-color: #4c0312;
+}
+
 /* Tooltip */
 [deboucled-data-tooltip] {
   position: relative;
@@ -1330,6 +1376,9 @@ input[type="search"] {
 .deboucled-option-table-entities {
   width: 100%;
 }
+.deboucled-td-main-option {
+  text-shadow: var(--deboucled-td-option-shadow);
+}
 
 .deboucled-bg-img {
   background-image: url("https://image.noelshack.com/fichiers/2021/38/2/1632251209-1590510677-zinzinboucle.png");
@@ -1404,9 +1453,17 @@ input:checked + .deboucled-toggle-slider.red {
 input:focus + .deboucled-toggle-slider.red {
   box-shadow: 0 0 1px #df3a3a;
 }
+input:checked + .deboucled-toggle-slider.green {
+  background-color: #30c25c;
+}
+input:focus + .deboucled-toggle-slider.green {
+  box-shadow: 0 0 1px #30c25c;
+}
+input:checked + .deboucled-toggle-slider.blue,
 input:checked + .deboucled-toggle-slider {
   background-color: #2196f3;
 }
+input:focus + .deboucled-toggle-slider.blue,
 input:focus + .deboucled-toggle-slider {
   box-shadow: 0 0 1px #2196f3;
 }

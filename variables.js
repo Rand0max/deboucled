@@ -17,14 +17,16 @@ const deboucledBackendUrl = 'https://deboucled.jvflux.fr';
 const deboucledApiUrl = `${deboucledBackendUrl}/deboucledapi`;
 const youtubeBlacklistUrl = `${deboucledApiUrl}/youtubeblacklist`;
 const prebouclesDataUrl = `${deboucledApiUrl}/preboucles`;
+const aiLoopsDataUrl = `${deboucledApiUrl}/loops`;
 const checkUpdateUrl = `${deboucledApiUrl}/checkupdate`;
 const updateUserUrl = `${deboucledApiUrl}/user`;
 const diagnosticUrl = `${deboucledApiUrl}/diagnostic`;
 
 const checkUpdateExpire = 1;
 const checkUpdateDeferredExpire = 72;
-const youtubeBlacklistRefreshExpire = 2;
-const prebouclesRefreshExpire = 2;
+const youtubeBlacklistRefreshExpire = 1;
+const prebouclesRefreshExpire = 1;
+const aiLoopsRefreshExpire = 1;
 const updateUserExpire = 24;
 const diagnosticExpire = 12;
 
@@ -39,6 +41,10 @@ let shadowent = [];
 
 let youtubeBlacklistArray = [];
 let youtubeBlacklistReg;
+
+let aiLoopArray = [];
+let aiLoopSubjectReg;
+let aiLoopAuthorReg;
 
 let pocTopicMap = new Map();
 let topicAuthorMap = new Map();

@@ -9,7 +9,7 @@ function getAllTopics(doc) {
     return [...allTopics];
 }
 
-async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz) {
+async function fillTopics(topics, topicOptions) {
     let actualTopics = topics.length - hiddenTotalTopics - 1;
     let pageBrowse = 1;
     let filledTopics = [];
@@ -22,7 +22,7 @@ async function fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThre
         if (!nextPageTopics) break;
 
         for (let topic of nextPageTopics.slice(1)) {
-            const topicBlacklisted = await isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz);
+            const topicBlacklisted = await isTopicBlacklisted(topic, topicOptions);
             if (topicBlacklisted) {
                 hiddenTotalTopics++;
                 continue;
@@ -175,10 +175,10 @@ function getTopicMessageCount(element) {
     return parseInt(messageCountElement?.textContent.trim() ?? "0");
 }
 
-async function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz) {
-    if (!element.hasAttribute('data-id')) return true;
+async function isTopicBlacklisted(topicElement, topicOptions) {
+    if (!topicElement.hasAttribute('data-id')) return true;
 
-    let topicId = element.getAttribute('data-id');
+    const topicId = topicElement.getAttribute('data-id');
     if (topicIdBlacklistMap.has(topicId) && !deboucledTopics.includes(topicId)) {
         matchedTopics.set(topicIdBlacklistMap.get(topicId), 1);
         hiddenTopicsIds++;
@@ -186,13 +186,13 @@ async function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDi
     }
 
     // Seuil d'affichage valable uniquement pour les BL sujets et auteurs
-    if (optionAllowDisplayThreshold && getTopicMessageCount(element) >= optionDisplayThreshold) return false;
+    if (topicOptions.optionAllowDisplayThreshold && getTopicMessageCount(topicElement) >= topicOptions.optionDisplayThreshold) return false;
 
-    if (optionEnableTopicMsgCountThreshold && getTopicMessageCount(element) < optionTopicMsgCountThreshold) return true;
+    if (topicOptions.optionEnableTopicMsgCountThreshold && getTopicMessageCount(topicElement) < topicOptions.optionTopicMsgCountThreshold) return true;
 
-    let titleTag = element.querySelector('.lien-jv.topic-title');
-    if (titleTag) {
-        const title = titleTag.textContent.trim();
+    const titleTag = topicElement.querySelector('.lien-jv.topic-title');
+    const title = titleTag?.textContent.trim();
+    if (title?.length) {
         const subjectBlacklisted = getSubjectBlacklistMatches(title);
         if (subjectBlacklisted?.length) {
             matchedSubjects.addArrayIncrement(subjectBlacklisted);
@@ -201,9 +201,9 @@ async function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDi
         }
     }
 
-    let authorTag = element.querySelector('.topic-author');
-    if (authorTag) {
-        const author = authorTag.textContent.trim();
+    const authorTag = topicElement.querySelector('.topic-author');
+    const author = authorTag?.textContent.toLowerCase().trim();
+    if (author?.length) {
         const authorBlacklisted = getAuthorBlacklistMatches(author);
         if (authorBlacklisted?.length) {
             matchedAuthors.addArrayIncrement(authorBlacklisted);
@@ -212,14 +212,30 @@ async function isTopicBlacklisted(element, optionAllowDisplayThreshold, optionDi
         }
     }
 
-    if (optionAntiVinz) {
-        const title = titleTag.textContent.trim();
-        const author = authorTag.textContent.toLowerCase().trim();
+    if (topicOptions.optionAntiVinz && title?.length && author?.length) {
         const url = titleTag.getAttribute('href');
         const vinzTopic = await isVinzTopic(title, author, url);
         if (vinzTopic) {
             matchedSubjects.addArrayIncrement([title]);
             matchedAuthors.addArrayIncrement(['Vinz']);
+            hiddenSubjects++;
+            hiddenAuthors++;
+            return true;
+        }
+    }
+
+    if (topicOptions.optionAntiLoopAiMode !== 0) {
+        const subjectBlacklisted = getSubjectBlacklistMatches(title, aiLoopSubjectReg);
+        const authorBlacklisted = getAuthorBlacklistMatches(author, undefined, aiLoopAuthorReg);
+        if (!subjectBlacklisted?.length || !authorBlacklisted?.length) return false;
+
+        if (topicOptions.optionAntiLoopAiMode === 1) {
+            markTopicLoop(topicElement, subjectBlacklisted);
+            return false;
+        }
+        else if (topicOptions.optionAntiLoopAiMode === 2) {
+            matchedSubjects.addArrayIncrement(subjectBlacklisted);
+            matchedAuthors.addArrayIncrement(authorBlacklisted);
             hiddenSubjects++;
             hiddenAuthors++;
             return true;
@@ -239,19 +255,19 @@ function filterMatchResults(matches) {
     return matches.map(r => r.slice(1)).flat().filter(r => r);
 }
 
-function getSubjectBlacklistMatches(subject) {
-    if (!subjectsBlacklistReg) return null;
+function getSubjectBlacklistMatches(subject, regex = subjectsBlacklistReg) {
+    if (!regex) return null;
     const normSubject = subject.normalizeDiacritic();
-    let matches = [...normSubject.matchAll(subjectsBlacklistReg)];
+    let matches = [...normSubject.matchAll(regex)];
     let groupedMatches = filterMatchResults(matches);
     return groupedMatches;
 }
 
-function getAuthorBlacklistMatches(author, isSelf) {
-    if (!authorsBlacklistReg) return null;
+function getAuthorBlacklistMatches(author, isSelf, regex = authorsBlacklistReg) {
+    if (!regex) return null;
     const normAuthor = author.toLowerCase().normalizeDiacritic();
     if (deboucledPseudos.includes(normAuthor) || isSelf) return null;
-    return normAuthor.match(authorsBlacklistReg) ? [author] : null;
+    return normAuthor.match(regex) ? [author] : null;
 }
 
 function isContentYoutubeBlacklisted(messageContentElement) {
@@ -363,6 +379,15 @@ async function isTopicPoC(element, optionDetectPocMode) {
     return isPoc;
 }
 
+function buildBadge(content, hint, onclickCallback) {
+    const badge = document.createElement('span');
+    badge.className = `deboucled-badge deboucled-badge-danger${preferDarkTheme() ? ' dark' : ''}`;
+    badge.textContent = content;
+    badge.setAttribute('deboucled-data-tooltip', hint);
+    badge.onclick = onclickCallback;
+    return badge;
+}
+
 function markTopicPoc(element, hide = false) {
     if (hide) {
         removeTopic(element);
@@ -370,8 +395,17 @@ function markTopicPoc(element, hide = false) {
         updateTopicsHeader();
         return;
     }
-    let titleElem = element.querySelector('.lien-jv.topic-title');
-    titleElem.innerHTML = '<span class="deboucled-title-poc">[PoC] </span>' + titleElem.innerHTML;
+    const loopBadge = buildBadge('PoC', 'Détection d\'un "post ou cancer"', () => window.open('https://jvflux.fr/Post_ou_cancer', '_blank').focus());
+    const titleElem = element.querySelector('.lien-jv.topic-title');
+    titleElem.insertAdjacentElement('afterend', loopBadge);
+}
+
+function markTopicLoop(element, subjectBlacklisted) {
+    const titleElem = element.querySelector('.lien-jv.topic-title');
+    let subject = subjectBlacklisted[0] ?? titleElem.title;
+    const redirectUrl = `${jvarchiveUrl}/topic/recherche?searchType=titre_topic&search=${subject.trim()}`;
+    const loopBadge = buildBadge('BOUCLE', `Consulter cette boucle sur JvArchive`, () => window.open(redirectUrl, '_blank').focus());
+    titleElem.insertAdjacentElement('afterend', loopBadge);
 }
 
 function addIgnoreButtons(topics) {

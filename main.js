@@ -207,20 +207,14 @@ async function handleTopicList(canFillTopics) {
     let topics = getAllTopics(document);
     if (topics.length === 0) return;
 
-    let optionAllowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
-    let optionDisplayThreshold = GM_getValue(storage_optionDisplayThreshold, storage_optionDisplayThreshold_default);
-
-    let optionEnableTopicMsgCountThreshold = GM_getValue(storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default);
-    let optionTopicMsgCountThreshold = GM_getValue(storage_optionTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold_default);
-
-    let optionAntiVinz = GM_getValue(storage_optionAntiVinz, storage_optionAntiVinz_default);
+    const topicOptions = prepareTopicOptions();
 
     let topicsToRemove = [];
     let finalTopics = [];
     finalTopics.push(topics[0]); // header
 
     for (let topic of topics.slice(1)) {
-        const topicBlacklisted = await isTopicBlacklisted(topic, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz);
+        const topicBlacklisted = await isTopicBlacklisted(topic, topicOptions);
         if (topicBlacklisted) {
             topicsToRemove.push(topic);
             hiddenTotalTopics++;
@@ -228,7 +222,7 @@ async function handleTopicList(canFillTopics) {
         else finalTopics.push(topic);
     }
     if (canFillTopics) {
-        const filledTopics = await fillTopics(topics, optionAllowDisplayThreshold, optionDisplayThreshold, optionEnableTopicMsgCountThreshold, optionTopicMsgCountThreshold, optionAntiVinz);
+        const filledTopics = await fillTopics(topics, topicOptions);
         finalTopics = finalTopics.concat(filledTopics);
     }
     topicsToRemove.forEach(removeTopic);
@@ -273,7 +267,7 @@ async function handlePoc(finalTopics) {
     let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     if (optionDetectPocMode === 0) return;
 
-    // On gère les PoC à la fin pour pas figer la page pendant le traitement
+    // On gère les PoC à la fin pour ne pas figer la page pendant le traitement
     await Promise.all(finalTopics.slice(1).map(async function (topic) {
         let poc = await isTopicPoC(topic, optionDetectPocMode);
         const hideTopic = optionDetectPocMode === 3 || optionDetectPocMode === 4;
@@ -496,6 +490,25 @@ function displayTopicDeboucledMessage() {
     topicDeboucledDiv.className = 'bloc-message-forum deboucled-topic-deboucled-message';
     topicDeboucledDiv.textContent = 'Topic 100% déboucled !';
     insertAfter(topicDeboucledDiv, topBlocPagi);
+}
+
+function prepareTopicOptions() {
+    const optionAllowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
+    const optionDisplayThreshold = GM_getValue(storage_optionDisplayThreshold, storage_optionDisplayThreshold_default);
+    const optionEnableTopicMsgCountThreshold = GM_getValue(storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default);
+    const optionTopicMsgCountThreshold = GM_getValue(storage_optionTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold_default);
+    const optionAntiVinz = GM_getValue(storage_optionAntiVinz, storage_optionAntiVinz_default);
+    const optionAntiLoopAiMode = GM_getValue(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default);
+
+    const topicOptions = {
+        optionAllowDisplayThreshold: optionAllowDisplayThreshold,
+        optionDisplayThreshold: optionDisplayThreshold,
+        optionEnableTopicMsgCountThreshold: optionEnableTopicMsgCountThreshold,
+        optionTopicMsgCountThreshold: optionTopicMsgCountThreshold,
+        optionAntiVinz: optionAntiVinz,
+        optionAntiLoopAiMode: optionAntiLoopAiMode
+    };
+    return topicOptions;
 }
 
 function prepareMessageOptions() {

@@ -44,6 +44,7 @@ const storage_optionDisplayTopicIgnoredCount = 'deboucled_optionDisplayTopicIgno
 const storage_optionEnhanceQuotations = 'deboucled_optionEnhanceQuotations', storage_optionEnhanceQuotations_default = true;
 const storage_optionAntiSpam = 'deboucled_optionAntiSpam', storage_optionAntiSpam_default = true;
 const storage_optionSmoothScroll = 'deboucled_optionSmoothScroll', storage_optionSmoothScroll_default = false;
+const storage_optionAntiLoopAiMode = 'deboucled_optionAntiLoopAiMode', storage_optionAntiLoopAiMode_default = 1;
 
 const storage_disabledFilteringForums = 'deboucled_disabledFilteringForums', storage_disabledFilteringForums_default = '[]';
 
@@ -61,10 +62,12 @@ const storage_youtubeBlacklist = 'deboucled_youtubeBlacklist', storage_youtubeBl
 const storage_youtubeBlacklistLastUpdate = 'deboucled_youtubeBlacklistLastUpdate';
 const storage_preBouclesData = 'deboucled_preBouclesData', storage_preBouclesData_default = '[]';
 const storage_prebouclesLastUpdate = 'deboucled_prebouclesLastUpdate';
+const storage_aiLoopsData = 'deboucled_aiLoopsData', storage_aiLoopsData_default = '[]';
+const storage_aiLoopsLastUpdate = 'deboucled_aiLoopsLastUpdate';
 const storage_lastUpdateUser = 'deboucled_lastUpdateUser';
 const storage_DiagnosticLastUpdate = 'deboucled_DiagnosticLastUpdate';
 
-const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_blacklistedShadows, storage_whitelistedTopicIds, storage_optionEnableJvcDarkTheme, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_optionAntiSpam, storage_optionSmoothScroll, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_totalHiddenSpammers, storage_TopicStats];
+const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_blacklistedShadows, storage_whitelistedTopicIds, storage_optionEnableJvcDarkTheme, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_optionAntiSpam, storage_optionSmoothScroll, storage_optionAntiLoopAiMode, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_totalHiddenSpammers, storage_TopicStats];
 
 const storage_excluded_user_Keys = [storage_TopicStats];
 
@@ -184,6 +187,17 @@ async function refreshApiData(forceUpdate = false) {
         await queryPreboucles();
     }
     if (preBoucleArray?.length) loadPreBouclesStatuses();
+
+
+    aiLoopArray = JSON.parse(GM_getValue(storage_aiLoopsData, storage_aiLoopsData_default));
+    if (!aiLoopArray?.length || forceUpdate
+        || mustRefresh(storage_aiLoopsLastUpdate, aiLoopsRefreshExpire)) {
+        await queryAiLoops();
+    }
+    if (aiLoopArray?.length) {
+        aiLoopSubjectReg = buildEntityRegex(aiLoopArray.map(l => l.title), true);
+        aiLoopAuthorReg = buildEntityRegex(aiLoopArray.map(l => l.author), false);
+    }
 }
 
 function loadPreBouclesStatuses() {
