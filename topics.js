@@ -88,7 +88,7 @@ function getTopicId() {
     */
     const blocFormulaireElem = document.querySelector('#bloc-formulaire-forum');
     if (!blocFormulaireElem) return undefined;
-    return parseInt(blocFormulaireElem.getAttribute('data-topic-id'));
+    return blocFormulaireElem.getAttribute('data-topic-id');
 }
 
 function getTopicCurrentPageId(doc) {
@@ -230,7 +230,9 @@ async function isTopicBlacklisted(topicElement, topicOptions) {
         if (!subjectBlacklisted?.length || !authorBlacklisted?.length) return false;
 
         if (topicOptions.optionAntiLoopAiMode === 1) {
-            markTopicLoop(topicElement, subjectBlacklisted);
+            const subject = subjectBlacklisted[0] ?? title;
+            titleTag.style.width = 'auto';
+            markTopicLoop(subject, titleTag);
             return false;
         }
         else if (topicOptions.optionAntiLoopAiMode === 2) {
@@ -327,15 +329,18 @@ async function isVinzTopic(subject, author, topicUrl) {
     return false;
 }
 
+function getTopicPocStatus(topicId) {
+    return pocTopicMap.get(topicId);
+}
+
 async function isTopicPoC(element, optionDetectPocMode) {
     if (!element.hasAttribute('data-id')) return false;
     let topicId = element.getAttribute('data-id');
 
     if (deboucledTopics.includes(topicId)) return false;
 
-    if (pocTopicMap.has(topicId)) {
-        return pocTopicMap.get(topicId);
-    }
+    const existingStatus = getTopicPocStatus(topicId);
+    if (existingStatus) return existingStatus;
 
     let titleElem = element.querySelector('.lien-jv.topic-title');
     if (!titleElem) return false;
@@ -379,33 +384,27 @@ async function isTopicPoC(element, optionDetectPocMode) {
     return isPoc;
 }
 
-function buildBadge(content, hint, onclickCallback) {
+function buildBadge(content, hint, url) {
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.target = '_blank';
     const badge = document.createElement('span');
     badge.className = `deboucled-badge deboucled-badge-danger${preferDarkTheme() ? ' dark' : ''}`;
     badge.textContent = content;
-    badge.setAttribute('deboucled-data-tooltip', hint);
-    badge.onclick = onclickCallback;
-    return badge;
+    if (hint?.length) badge.setAttribute('deboucled-data-tooltip', hint);
+    anchor.appendChild(badge);
+    return anchor;
 }
 
-function markTopicPoc(element, hide = false) {
-    if (hide) {
-        removeTopic(element);
-        hiddenTotalTopics++;
-        updateTopicsHeader();
-        return;
-    }
-    const loopBadge = buildBadge('PoC', 'Détection d\'un "post ou cancer"', () => window.open('https://jvflux.fr/Post_ou_cancer', '_blank').focus());
-    const titleElem = element.querySelector('.lien-jv.topic-title');
-    titleElem.insertAdjacentElement('afterend', loopBadge);
+function markTopicPoc(nearElement, withHint = true) {
+    const pocBadge = buildBadge('PoC', withHint ? 'Détection d\'un "post ou cancer"' : undefined, 'https://jvflux.fr/Post_ou_cancer');
+    nearElement.insertAdjacentElement('afterend', pocBadge);
 }
 
-function markTopicLoop(element, subjectBlacklisted) {
-    const titleElem = element.querySelector('.lien-jv.topic-title');
-    let subject = subjectBlacklisted[0] ?? titleElem.title;
+function markTopicLoop(subject, nearElement, withHint = true) {
     const redirectUrl = `${jvarchiveUrl}/topic/recherche?searchType=titre_topic&search=${subject.trim()}`;
-    const loopBadge = buildBadge('BOUCLE', `Consulter cette boucle sur JvArchive`, () => window.open(redirectUrl, '_blank').focus());
-    titleElem.insertAdjacentElement('afterend', loopBadge);
+    const loopBadge = buildBadge('BOUCLE', withHint ? `Consulter cette boucle sur JvArchive` : undefined, redirectUrl);
+    nearElement.insertAdjacentElement('afterend', loopBadge);
 }
 
 function addIgnoreButtons(topics) {

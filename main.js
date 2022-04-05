@@ -248,15 +248,15 @@ async function handleTopicListOptions(topics) {
     let optionRemoveUselessTags = GM_getValue(storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default);
     if (optionRemoveUselessTags) removeUselessTags(topics);
 
-    handleTopicListAuthors(topics);
+    parseTopicListAuthors(topics);
     await handlePoc(topics);
     await saveLocalStorage();
 }
 
-function handleTopicListAuthors(topics) {
+function parseTopicListAuthors(topics) {
     topics.slice(1).forEach(function (topic) {
         const author = topic.querySelector('.topic-author')?.textContent.trim().toLowerCase();
-        const topicId = parseInt(topic.getAttribute('data-id'));
+        const topicId = topic.getAttribute('data-id');
         if (!author || !topicId) return;
         topicAuthorMap.set(topicId, author);
     });
@@ -269,9 +269,20 @@ async function handlePoc(finalTopics) {
 
     // On gère les PoC à la fin pour ne pas figer la page pendant le traitement
     await Promise.all(finalTopics.slice(1).map(async function (topic) {
-        let poc = await isTopicPoC(topic, optionDetectPocMode);
+        let isPoc = await isTopicPoC(topic, optionDetectPocMode);
+        if (!isPoc) return;
+
         const hideTopic = optionDetectPocMode === 3 || optionDetectPocMode === 4;
-        if (poc) markTopicPoc(topic, hideTopic);
+        if (hideTopic) {
+            removeTopic(topic);
+            hiddenTotalTopics++;
+            updateTopicsHeader();
+        }
+        else {
+            const titleElem = topic.querySelector('.lien-jv.topic-title');
+            titleElem.style.width = 'auto';
+            markTopicPoc(titleElem);
+        }
     }));
 }
 
@@ -405,7 +416,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
         addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
     }
 
-    handleMessageSetTopicAuthor(author, authorElement);
+    handleMessageAssignTopicAuthor(author, authorElement);
     fixMessageUrls(messageContent);
 
     if (messageOptions.optionEnhanceQuotations) {
@@ -418,8 +429,8 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     handleBlSubjectIgnoreMessages(messageElement);
 }
 
-async function setTopicAuthor(pageId) {
-    if (!currentTopicId || topicAuthorMap.has(currentTopicId)) return;
+async function parseTopicAuthor(pageId) {
+    if (!currentTopicId || topicAuthorMap.has(currentTopicId)) return topicAuthorMap.get(currentTopicId);
 
     if (!pageId) pageId = getTopicCurrentPageId();
     if (!pageId) return;
@@ -439,6 +450,8 @@ async function setTopicAuthor(pageId) {
     topicAuthorMap.set(currentTopicId, author);
 
     await saveLocalStorage();
+
+    return author;
 }
 
 function handleTopicWhitelist() {
@@ -478,8 +491,28 @@ function highlightTopicTitle() {
     highlightBlacklistMatches(titleElement, subjectMatches);
 }
 
+function buildTopicBadges() {
+    const titleElement = document.querySelector('#bloc-title-forum');
+    if (!titleElement || !currentTopicAuthor?.length || !currentTopicId) return;
+
+    if (getTopicPocStatus(currentTopicId)) {
+        markTopicPoc(titleElement, false);
+    }
+
+    const optionAntiLoopAiMode = GM_getValue(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default);
+    if (optionAntiLoopAiMode !== 0) {
+        const title = titleElement.textContent.trim();
+        const subjectBlacklisted = getSubjectBlacklistMatches(title, aiLoopSubjectReg);
+        const authorBlacklisted = getAuthorBlacklistMatches(currentTopicAuthor, undefined, aiLoopAuthorReg);
+        if (!subjectBlacklisted?.length || !authorBlacklisted?.length) return;
+        const subject = subjectBlacklisted[0] ?? title;
+        markTopicLoop(subject, titleElement, false);
+    }
+}
+
 function handleTopicHeader() {
     highlightTopicTitle();
+    buildTopicBadges();
     return handleTopicWhitelist();
 }
 
@@ -511,15 +544,14 @@ function prepareTopicOptions() {
     return topicOptions;
 }
 
-function prepareMessageOptions() {
-    currentTopicId = getTopicId();
-    const isWhitelistedTopic = handleTopicHeader();
+function prepareMessageOptions(isWhitelistedTopic) {
     const optionHideMessages = !isWhitelistedTopic && GM_getValue(storage_optionHideMessages, storage_optionHideMessages_default);
     const optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
     const optionBlSubjectIgnoreMessages = !isWhitelistedTopic && GM_getValue(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default);
     const optionEnhanceQuotations = GM_getValue(storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default);
     const optionAntiSpam = GM_getValue(storage_optionAntiSpam, storage_optionAntiSpam_default);
     const optionSmoothScroll = GM_getValue(storage_optionSmoothScroll, storage_optionSmoothScroll_default);
+
     const messageOptions = {
         optionHideMessages: optionHideMessages,
         optionBoucledUseJvarchive: optionBoucledUseJvarchive,
@@ -533,16 +565,19 @@ function prepareMessageOptions() {
 }
 
 async function handleTopicMessages() {
-    const messageOptions = prepareMessageOptions();
+    currentTopicId = getTopicId();
+    currentTopicPageId = getTopicCurrentPageId();
+    currentTopicAuthor = await parseTopicAuthor();
+
+    const isWhitelistedTopic = handleTopicHeader();
+
+    const messageOptions = prepareMessageOptions(isWhitelistedTopic);
 
     handleJvChatAndTopicLive(messageOptions);
 
     const allMessages = getAllMessages(document);
-    const currentPageId = getTopicCurrentPageId()
 
-    await setTopicAuthor(currentPageId);
-
-    const isFirstMessage = (index) => index === 0 && currentPageId === 1;
+    const isFirstMessage = (index) => index === 0 && currentTopicPageId === 1;
     allMessages.forEach((message, index) => handleMessage(message, messageOptions, isFirstMessage(index)));
 
     if (hiddenSpammers > 0) refreshAuthorKeys();

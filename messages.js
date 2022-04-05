@@ -181,7 +181,7 @@ function handleJvChatAndTopicLive(messageOptions) {
             }
         }
 
-        handleMessageSetTopicAuthor(author, authorElement);
+        handleMessageAssignTopicAuthor(author, authorElement);
 
         if (messageOptions.optionEnhanceQuotations) {
             highlightSpecialAuthors(author, authorElement, isSelf);
@@ -340,7 +340,7 @@ function highlightQuotedAuthor(messageContent, messageElement) {
     }
 }
 
-function handleMessageSetTopicAuthor(author, authorElement) {
+function handleMessageAssignTopicAuthor(author, authorElement) {
     if (currentTopicId && topicAuthorMap.has(currentTopicId) && author?.toLowerCase() === topicAuthorMap.get(currentTopicId)) {
         let crownElem = document.createElement('span');
         crownElem.className = 'deboucled-crown-logo';
