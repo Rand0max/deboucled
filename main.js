@@ -787,60 +787,66 @@ async function init(currentPageType) {
 
 async function entryPoint() {
     let start = performance.now();
-    const currentPageType = getCurrentPageType(`${window.location.pathname}${window.location.search}`);
-    if (currentPageType === 'unknown') return;
+    try {
+        const currentPageType = getCurrentPageType(`${window.location.pathname}${window.location.search}`);
+        if (currentPageType === 'unknown') return;
 
-    await init(currentPageType);
+        await init(currentPageType);
 
-    switch (currentPageType) {
-        case 'topiclist': {
-            if (forumFilteringIsDisabled) break;
-            createTopicListOverlay();
-            const finalTopics = await handleTopicList(true);
-            await handleTopicListOptions(finalTopics);
-            addRightBlocMatches();
-            addRightBlocStats();
-            toggleTopicOverlay(false);
-            handlePrivateMessageNotifs();
-            break;
+        switch (currentPageType) {
+            case 'topiclist': {
+                if (forumFilteringIsDisabled) break;
+                createTopicListOverlay();
+                const finalTopics = await handleTopicList(true);
+                await handleTopicListOptions(finalTopics);
+                addRightBlocMatches();
+                addRightBlocStats();
+                toggleTopicOverlay(false);
+                handlePrivateMessageNotifs();
+                break;
+            }
+            case 'topicmessages': {
+                if (forumFilteringIsDisabled) break;
+                await handleTopicMessages();
+                break;
+            }
+            case 'search': {
+                await handleSearch();
+                break;
+            }
+            case 'privatemessages': {
+                await handlePrivateMessages();
+                break;
+            }
+            case 'profil': {
+                handleProfil();
+                break;
+            }
+            case 'error': {
+                handleError();
+                break;
+            }
+            default:
+                break;
         }
-        case 'topicmessages': {
-            if (forumFilteringIsDisabled) break;
-            await handleTopicMessages();
-            break;
+
+        console.log('Déboucled loaded');
+
+        const elapsed = performance.now() - start;
+        if (elapsed >= 3000) {
+            console.warn(`Déboucled slow load : totaltime = ${elapsed}ms`);
+            await sendDiagnostic(elapsed);
         }
-        case 'search': {
-            await handleSearch();
-            break;
-        }
-        case 'privatemessages': {
-            await handlePrivateMessages();
-            break;
-        }
-        case 'profil': {
-            handleProfil();
-            break;
-        }
-        case 'error': {
-            handleError();
-            break;
-        }
-        default:
-            break;
+
+        await updateUser();
+        await suggestUpdate();
+
+        displaySecret();
+    } catch (error) {
+        const elapsed = performance.now() - start;
+        console.error(error);
+        await sendDiagnostic(elapsed, error);
     }
-
-    console.log('Déboucled loaded');
-
-    let elapsed = performance.now() - start;
-    if (elapsed >= 3000) {
-        console.warn(`Déboucled slow load : totaltime = ${elapsed}ms`);
-        await sendDiagnostic(elapsed);
-    }
-
-    await updateUser();
-    await suggestUpdate();
-
-    displaySecret();
 }
 
 preInit(); // speedup loading

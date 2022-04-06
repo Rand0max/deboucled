@@ -417,3 +417,7 @@ function dateIsToday(date) {
     return date.getMonth() === today.getMonth() && date.getDate() === today.getDate();
 }
 
+function stringifyError(error) {
+    return JSON.stringify(error, ['message', 'name', 'stack', 'fileName', 'arguments', 'type', 'columnNumber', 'lineNumber']);
+}
+

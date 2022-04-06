@@ -84,8 +84,8 @@ async function updateUser() {
     GM_setValue(storage_lastUpdateUser, Date.now());
 }
 
-async function sendDiagnostic(elapsed) {
-    if (!mustRefresh(storage_DiagnosticLastUpdate, diagnosticExpire)) return;
+async function sendDiagnostic(elapsed, exception) {
+    if (!exception && !mustRefresh(storage_DiagnosticLastUpdate, diagnosticExpire)) return;
 
     const currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, userId);
     const settings = getStorageJson(false, storage_excluded_user_Keys);
@@ -95,9 +95,12 @@ async function sendDiagnostic(elapsed) {
         username: currentUserPseudo?.toLowerCase() ?? 'anonymous',
         version: getCurrentScriptVersion(),
         elapsed: elapsed,
-        settings: settings
+        settings: settings,
+        ...(exception && { exception: stringifyError(exception) }),
     }
     const bodyJson = JSON.stringify(body);
+    if (!bodyJson || bodyJson === '{}') return;
+
     await GM.xmlHttpRequest({
         method: 'POST',
         url: diagnosticUrl,

@@ -544,7 +544,7 @@ function buildPrebouclesTable() {
 }
 
 function buildSettingEntities() {
-    const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u2018-\u201F\u00A1-\u02AF\u2700-\u27BF\u{1F300}-\u{1FAD6}]*$/iu;
+    const regexAllowedSubject = /^[A-z0-9\u0020-\u007E\u2018-\u201F\u00A1-\u02AF\u2700-\u27BF\u20A0-\u20CF\u{1F300}-\u{1FAD6}]*$/iu;
     // eslint-disable-next-line no-useless-escape
     const regexAllowedAuthor = /^[A-z\u00C0-\u02AF0-9-_\[\]\*]*$/iu;
     const regexAllowedTopicId = /^[0-9]+$/i;

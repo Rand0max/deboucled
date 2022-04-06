@@ -423,6 +423,9 @@ blockquote .deboucled-highlighted {
   width: 100%;
   position: relative;
 }
+.topic-list .message .topic-title {
+  position: static;
+}
 
 /* Floating navbar */
 .deboucled-floating-container {
