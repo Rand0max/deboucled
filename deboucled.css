@@ -1153,6 +1153,7 @@ input[type="search"] {
 
 .deboucled-badge {
   display: inline;
+  vertical-align: top;
   padding: 0.25rem 0.35rem 0.25rem 0.35rem;
   font-size: 66%;
   font-weight: 600;

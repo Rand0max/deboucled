@@ -221,6 +221,7 @@ function enableJvChatAndTopicLiveEvents(handleCallback) {
 }
 
 function getParagraphChildren(element, allowBlockQuote = false) {
+    if (!element?.children?.length) return [];
     const allowedTags = ['P', 'STRONG', 'U', 'I', 'EM', 'B'];
     if (allowBlockQuote) allowedTags.push('BLOCKQUOTE');
     return [...element.children].filter(c => allowedTags.includes(c.tagName) && c.textContent.trim() !== '');
@@ -321,9 +322,9 @@ function highlightQuotedAuthor(messageContent, messageElement) {
         (n) => {
             // S'il s'agit d'une citation où le pseudo est en html on vire le html et on fusionne le texte
             if (!n.textContent.match(quotedAuthorsFullRegex) && n.textContent.match(quotedAuthorsPartRegex)) {
-                n.textContent = `${n.textContent}${n.nextSibling.textContent}${n.nextSibling.nextSibling.textContent}`;
-                n.nextSibling.nextSibling.remove();
-                n.nextSibling.remove();
+                n.textContent = `${n.textContent}${n.nextSibling?.textContent}${n.nextSibling?.nextSibling?.textContent}`;
+                n.nextSibling?.nextSibling?.remove();
+                n.nextSibling?.remove();
             }
         });
 

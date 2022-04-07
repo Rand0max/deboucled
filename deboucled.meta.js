@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.24.2
+// @version     2.24.3
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -29,7 +29,7 @@
 // @resource    PEEPODARKJVCV2_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/peepodarkjvcv2.css
 // @resource    JVRESPAWNREFINED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/jv-respawn-refined.css
 // @resource    CHARTS_CSS https://unpkg.com/charts.css/dist/charts.min.css
-// @require     https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js
+// @require     https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js
 // @require     https://unpkg.com/infinite-scroll/dist/infinite-scroll.pkgd.min.js
 // @require     https://unpkg.com/@chocolateboy/uncommonjs
 // @require     https://unpkg.com/fastest-levenshtein

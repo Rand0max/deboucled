@@ -157,10 +157,21 @@ async function loadLocalStorage() {
     //let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     //if (optionDetectPocMode === 0) return;
 
-    const storagePocTopics = await localforage.getItem(localstorage_pocTopics); // eslint-disable-line no-undef
-    if (storagePocTopics) pocTopicMap = new Map([...JSON.parse(storagePocTopics)]);
+    let storagePocTopics;
+    let storageTopicAuthors;
 
-    const storageTopicAuthors = await localforage.getItem(localstorage_topicAuthors); // eslint-disable-line no-undef
+    /* eslint-disable no-undef */
+    if (localforage) {
+        storagePocTopics = await localforage.getItem(localstorage_pocTopics);
+        storageTopicAuthors = await localforage.getItem(localstorage_topicAuthors);
+    }
+    else {
+        storagePocTopics = GM_getValue(localstorage_pocTopics, '[]');
+        storageTopicAuthors = GM_getValue(localstorage_topicAuthors, '[]');
+    }
+    /* eslint-enable no-undef */
+
+    if (storagePocTopics) pocTopicMap = new Map([...JSON.parse(storagePocTopics)]);
     if (storageTopicAuthors) topicAuthorMap = new Map([...JSON.parse(storageTopicAuthors)]);
 }
 
@@ -168,8 +179,16 @@ async function saveLocalStorage() {
     //let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     //if (optionDetectPocMode === 0) return;
 
-    await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap])); // eslint-disable-line no-undef
-    await localforage.setItem(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap])); // eslint-disable-line no-undef
+    /* eslint-disable no-undef */
+    if (localforage) {
+        await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
+        await localforage.setItem(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
+    }
+    else {
+        GM_setValue(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
+        GM_setValue(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
+    }
+    /* eslint-enable no-undef */
 }
 
 async function refreshApiData(forceUpdate = false) {

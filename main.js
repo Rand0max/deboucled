@@ -205,7 +205,7 @@ async function getForumPageContent(page) {
 
 async function handleTopicList(canFillTopics) {
     let topics = getAllTopics(document);
-    if (topics.length === 0) return;
+    if (topics?.length === 0) return;
 
     const topicOptions = prepareTopicOptions();
 
@@ -605,7 +605,7 @@ async function handleSearch() {
     if (optionFilterResearch) await handleTopicList(false);
 
     let topics = getAllTopics(document);
-    if (topics.length === 0) return;
+    if (!topics?.length) return;
     await handleTopicListOptions(topics);
 }
 
@@ -798,6 +798,7 @@ async function entryPoint() {
                 if (forumFilteringIsDisabled) break;
                 createTopicListOverlay();
                 const finalTopics = await handleTopicList(true);
+                if (!finalTopics?.length) break;
                 await handleTopicListOptions(finalTopics);
                 addRightBlocMatches();
                 addRightBlocStats();
