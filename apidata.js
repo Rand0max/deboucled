@@ -139,17 +139,15 @@ async function parseAiLoopData(forceUpdate) {
         || mustRefresh(storage_aiLoopsLastUpdate, aiLoopsRefreshExpire)) {
         await queryAiLoops();
     }
-    if (aiLoopData) {
-        const dataVersion = aiLoopData.version ?? '1';
-        switch (dataVersion) {
-            case '1':
-                aiLoopSubjectReg = buildEntityRegex(aiLoopData.map(l => l.title), true);
-                aiLoopAuthorReg = buildEntityRegex(aiLoopData.map(l => l.author), false);
-                break;
-            case '2':
-                aiLoopSubjectReg = buildEntityRegex(aiLoopData.titles, true);
-                aiLoopAuthorReg = buildEntityRegex(aiLoopData.authors, false);
-                break;
-        }
+    if (!aiLoopData) return;
+
+    const dataVersion = parseInt(aiLoopData.version ?? '1');
+    if (dataVersion === 1 && Array.isArray(aiLoopData)) {
+        aiLoopSubjectReg = buildEntityRegex(aiLoopData.map(l => l.title), true);
+        aiLoopAuthorReg = buildEntityRegex(aiLoopData.map(l => l.author), false);
+    }
+    else if (dataVersion === 2) {
+        aiLoopSubjectReg = buildEntityRegex(aiLoopData.titles, true);
+        aiLoopAuthorReg = buildEntityRegex(aiLoopData.authors, false);
     }
 }
