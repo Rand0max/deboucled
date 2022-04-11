@@ -62,7 +62,7 @@ const storage_youtubeBlacklist = 'deboucled_youtubeBlacklist', storage_youtubeBl
 const storage_youtubeBlacklistLastUpdate = 'deboucled_youtubeBlacklistLastUpdate';
 const storage_preBouclesData = 'deboucled_preBouclesData', storage_preBouclesData_default = '[]';
 const storage_prebouclesLastUpdate = 'deboucled_prebouclesLastUpdate';
-const storage_aiLoopsData = 'deboucled_aiLoopsData', storage_aiLoopsData_default = '[]';
+const storage_aiLoopsData = 'deboucled_aiLoopsData', storage_aiLoopsData_default = '{}';
 const storage_aiLoopsLastUpdate = 'deboucled_aiLoopsLastUpdate';
 const storage_lastUpdateUser = 'deboucled_lastUpdateUser';
 const storage_DiagnosticLastUpdate = 'deboucled_DiagnosticLastUpdate';
@@ -192,31 +192,9 @@ async function saveLocalStorage() {
 }
 
 async function refreshApiData(forceUpdate = false) {
-    youtubeBlacklistArray = JSON.parse(GM_getValue(storage_youtubeBlacklist, storage_youtubeBlacklist_default));
-    if (!youtubeBlacklistArray?.length || forceUpdate
-        || mustRefresh(storage_youtubeBlacklistLastUpdate, youtubeBlacklistRefreshExpire)) {
-        await queryYoutubeBlacklist();
-    }
-    if (youtubeBlacklistArray?.length) youtubeBlacklistReg = buildArrayRegex(youtubeBlacklistArray);
-
-
-    preBoucleArray = JSON.parse(GM_getValue(storage_preBouclesData, storage_preBouclesData_default));
-    if (!preBoucleArray?.length || forceUpdate
-        || mustRefresh(storage_prebouclesLastUpdate, prebouclesRefreshExpire)) {
-        await queryPreboucles();
-    }
-    if (preBoucleArray?.length) loadPreBouclesStatuses();
-
-
-    aiLoopArray = JSON.parse(GM_getValue(storage_aiLoopsData, storage_aiLoopsData_default));
-    if (!aiLoopArray?.length || forceUpdate
-        || mustRefresh(storage_aiLoopsLastUpdate, aiLoopsRefreshExpire)) {
-        await queryAiLoops();
-    }
-    if (aiLoopArray?.length) {
-        aiLoopSubjectReg = buildEntityRegex(aiLoopArray.map(l => l.title), true);
-        aiLoopAuthorReg = buildEntityRegex(aiLoopArray.map(l => l.author), false);
-    }
+    await parsePreboucleData(forceUpdate);
+    await parseYoutubeBlacklistData(forceUpdate);
+    await parseAiLoopData(forceUpdate);
 }
 
 function loadPreBouclesStatuses() {

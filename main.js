@@ -605,7 +605,7 @@ async function handleSearch() {
     if (optionFilterResearch) await handleTopicList(false);
 
     let topics = getAllTopics(document);
-    if (!topics?.length) return;
+    if (topics?.length <= 1) return; // first is header
     await handleTopicListOptions(topics);
 }
 
@@ -680,6 +680,7 @@ function buildJvArchiveProfilButton(author) {
 
 function handleProfil() {
     const infosPseudoElement = document.querySelector('.infos-pseudo');
+    if (!infosPseudoElement) return;
     const author = infosPseudoElement.textContent.trim();
 
     let blocOptionProfil = document.querySelector('.bloc-option-profil');
@@ -798,7 +799,7 @@ async function entryPoint() {
                 if (forumFilteringIsDisabled) break;
                 createTopicListOverlay();
                 const finalTopics = await handleTopicList(true);
-                if (!finalTopics?.length) break;
+                if (finalTopics?.length <= 1) break; // first is header
                 await handleTopicListOptions(finalTopics);
                 addRightBlocMatches();
                 addRightBlocStats();
@@ -834,6 +835,8 @@ async function entryPoint() {
         console.log('Déboucled loaded');
 
         const elapsed = performance.now() - start;
+        //console.log(`Déboucled load : totaltime = ${elapsed}ms`);
+
         if (elapsed >= 3000) {
             console.warn(`Déboucled slow load : totaltime = ${elapsed}ms`);
             await sendDiagnostic(elapsed);

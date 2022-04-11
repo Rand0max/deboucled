@@ -225,9 +225,11 @@ async function isTopicBlacklisted(topicElement, topicOptions) {
     }
 
     if (topicOptions.optionAntiLoopAiMode !== 0) {
-        const subjectBlacklisted = getSubjectBlacklistMatches(title, aiLoopSubjectReg);
         const authorBlacklisted = getAuthorBlacklistMatches(author, undefined, aiLoopAuthorReg);
-        if (!subjectBlacklisted?.length || !authorBlacklisted?.length) return false;
+        if (!authorBlacklisted?.length) return false;
+
+        const subjectBlacklisted = getSubjectBlacklistMatches(title, aiLoopSubjectReg);
+        if (!subjectBlacklisted?.length) return false;
 
         if (topicOptions.optionAntiLoopAiMode === 1) {
             const subject = subjectBlacklisted[0] ?? title;
@@ -389,7 +391,7 @@ function buildBadge(content, hint, url) {
     anchor.href = url;
     anchor.target = '_blank';
     const badge = document.createElement('span');
-    badge.className = `deboucled-badge deboucled-badge-danger${preferDarkTheme() ? ' dark' : ''}`;
+    badge.className = `deboucled-badge deboucled-badge-danger${preferDarkTheme() ? ' dark' : ''}${hint ? '' : ' pill'}`;
     badge.textContent = content;
     if (hint?.length) badge.setAttribute('deboucled-data-tooltip', hint);
     anchor.appendChild(badge);

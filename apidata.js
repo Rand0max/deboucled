@@ -32,11 +32,11 @@ async function queryPreboucles() {
 
 async function queryAiLoops() {
     let newAiLoops = await fetchJson(aiLoopsDataUrl);
-    if (!newAiLoops?.length) return;
+    if (!newAiLoops) return;
 
-    aiLoopArray = newAiLoops;
+    aiLoopData = newAiLoops;
 
-    GM_setValue(storage_aiLoopsData, JSON.stringify(aiLoopArray));
+    GM_setValue(storage_aiLoopsData, JSON.stringify(aiLoopData));
     GM_setValue(storage_aiLoopsLastUpdate, Date.now());
 }
 
@@ -112,3 +112,44 @@ async function sendDiagnostic(elapsed, exception) {
     GM_setValue(storage_DiagnosticLastUpdate, Date.now());
 }
 
+async function parseYoutubeBlacklistData(forceUpdate) {
+    youtubeBlacklistArray = JSON.parse(GM_getValue(storage_youtubeBlacklist, storage_youtubeBlacklist_default));
+    if (!youtubeBlacklistArray?.length
+        || forceUpdate
+        || mustRefresh(storage_youtubeBlacklistLastUpdate, youtubeBlacklistRefreshExpire)) {
+        await queryYoutubeBlacklist();
+    }
+    if (youtubeBlacklistArray?.length) youtubeBlacklistReg = buildArrayRegex(youtubeBlacklistArray);
+}
+
+async function parsePreboucleData(forceUpdate) {
+    preBoucleArray = JSON.parse(GM_getValue(storage_preBouclesData, storage_preBouclesData_default));
+    if (!preBoucleArray?.length
+        || forceUpdate
+        || mustRefresh(storage_prebouclesLastUpdate, prebouclesRefreshExpire)) {
+        await queryPreboucles();
+    }
+    if (preBoucleArray?.length) loadPreBouclesStatuses();
+}
+
+async function parseAiLoopData(forceUpdate) {
+    aiLoopData = JSON.parse(GM_getValue(storage_aiLoopsData, storage_aiLoopsData_default));
+    if (!aiLoopData
+        || forceUpdate
+        || mustRefresh(storage_aiLoopsLastUpdate, aiLoopsRefreshExpire)) {
+        await queryAiLoops();
+    }
+    if (aiLoopData) {
+        const dataVersion = aiLoopData.version ?? '1';
+        switch (dataVersion) {
+            case '1':
+                aiLoopSubjectReg = buildEntityRegex(aiLoopData.map(l => l.title), true);
+                aiLoopAuthorReg = buildEntityRegex(aiLoopData.map(l => l.author), false);
+                break;
+            case '2':
+                aiLoopSubjectReg = buildEntityRegex(aiLoopData.titles, true);
+                aiLoopAuthorReg = buildEntityRegex(aiLoopData.authors, false);
+                break;
+        }
+    }
+}

@@ -107,7 +107,7 @@ function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklis
     let jvcBlacklistButton = messageElement.querySelector('span.picto-msg-tronche');
     let logged = (jvcBlacklistButton !== null);
     if (logged) insertAfter(dbcBlacklistButton, jvcBlacklistButton);
-    else messageElement.querySelector('div.bloc-options-msg').appendChild(dbcBlacklistButton);
+    else messageElement.querySelector('div.bloc-options-msg')?.appendChild(dbcBlacklistButton);
 
     if (!optionShowJvcBlacklistButton && logged) jvcBlacklistButton.style.display = 'none';
 }

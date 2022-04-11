@@ -1166,6 +1166,11 @@ input[type="search"] {
   user-select: none;
   cursor: pointer;
 }
+.deboucled-badge.pill {
+  padding-right: 0.7em;
+  padding-left: 0.7em;
+  border-radius: 10rem;
+}
 .deboucled-badge-danger {
   color: #f80031 !important;
   background-color: #fdd1da !important;

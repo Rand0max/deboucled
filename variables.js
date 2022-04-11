@@ -17,7 +17,7 @@ const deboucledBackendUrl = 'https://deboucled.jvflux.fr';
 const deboucledApiUrl = `${deboucledBackendUrl}/deboucledapi`;
 const youtubeBlacklistUrl = `${deboucledApiUrl}/youtubeblacklist`;
 const prebouclesDataUrl = `${deboucledApiUrl}/preboucles`;
-const aiLoopsDataUrl = `${deboucledApiUrl}/loops`;
+const aiLoopsDataUrl = `${deboucledApiUrl}/loops/v2`;
 const checkUpdateUrl = `${deboucledApiUrl}/checkupdate`;
 const updateUserUrl = `${deboucledApiUrl}/user`;
 const diagnosticUrl = `${deboucledApiUrl}/diagnostic`;
@@ -42,7 +42,7 @@ let shadowent = [];
 let youtubeBlacklistArray = [];
 let youtubeBlacklistReg;
 
-let aiLoopArray = [];
+let aiLoopData = undefined;
 let aiLoopSubjectReg;
 let aiLoopAuthorReg;
 
