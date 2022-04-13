@@ -11,7 +11,7 @@ function buildQuoteMessage(messageElement, selection) {
     const getDateFromCitationBtn = (e) => e.querySelector('.bloc-date-msg').textContent.trim();
     const getQuoteHeader = (e) => `> Le ${getDateFromCitationBtn(e)} '''${getAuthorFromCitationBtn(e)}''' a écrit : `;
 
-    if (selection?.length) {
+    if (!selection?.length) {
         const currentContent = textArea.value.length === 0 ? '' : `${textArea.value.trim()}\n\n`;
         const quotedText = selection.replaceAll('\n', '\n> ');
         textArea.value = `${currentContent}${getQuoteHeader(messageElement)}\n> ${quotedText}\n\n`;
@@ -67,7 +67,7 @@ function addMessageQuoteEvents(allMessages) {
     document.onselectionchange = async function () {
         await sleep(100);
         const selection = getTextSelection().toString();
-        if (selection?.length) clearAllQuoteButtons();
+        if (!selection?.length) clearAllQuoteButtons();
     };
 
     allMessages.forEach((message) => {
@@ -75,7 +75,7 @@ function addMessageQuoteEvents(allMessages) {
 
         async function partialQuoteEvent(pointerEvent) {
             const selection = getTextSelection().toString();
-            if (selection?.length) return;
+            if (!selection?.length) return;
 
             partialQuoteButton.onclick = () => buildQuoteMessage(message, selection);
 
