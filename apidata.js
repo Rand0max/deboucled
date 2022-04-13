@@ -6,7 +6,7 @@
 function mustRefresh(storageLastUpdateId, dataExpire) {
     let lastUpdate = new Date(GM_getValue(storageLastUpdateId, new Date(0)));
     let datenow = new Date();
-    let dateExpireRange = new Date(datenow.setHours(datenow.getHours() - dataExpire));
+    let dateExpireRange = new Date(datenow.setMinutes(datenow.getMinutes() - dataExpire.totalMinutes()));
     return lastUpdate <= dateExpireRange;
 }
 
