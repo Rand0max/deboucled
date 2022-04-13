@@ -11,7 +11,7 @@ function buildQuoteMessage(messageElement, selection) {
     const getDateFromCitationBtn = (e) => e.querySelector('.bloc-date-msg').textContent.trim();
     const getQuoteHeader = (e) => `> Le ${getDateFromCitationBtn(e)} '''${getAuthorFromCitationBtn(e)}''' a écrit : `;
 
-    if (!selection?.length) {
+    if (selection?.length) {
         const currentContent = textArea.value.length === 0 ? '' : `${textArea.value.trim()}\n\n`;
         const quotedText = selection.replaceAll('\n', '\n> ');
         textArea.value = `${currentContent}${getQuoteHeader(messageElement)}\n> ${quotedText}\n\n`;
