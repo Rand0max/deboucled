@@ -459,7 +459,6 @@ blockquote .deboucled-highlighted {
   opacity: 0.2;
   border: #ccc solid 2px;
 }
-.deboucled-floating-button:active,
 .deboucled-floating-button:hover {
   opacity: 1;
 }
@@ -1216,8 +1215,7 @@ input[type="search"] {
   white-space: pre-wrap;
   transform: translate(-50%, -5px) scale(0.5);
 }
-[deboucled-data-tooltip]:hover:before,
-[deboucled-data-tooltip]:active:before {
+[deboucled-data-tooltip]:hover:before {
   visibility: visible;
   opacity: 1 !important;
   transform: translate(-50%, -5px) scale(1);

@@ -611,9 +611,7 @@ function buildFloatingNavbar(infScroll) {
     buttonTop.className = 'deboucled-floating-button deboucled-arrow-up-logo';
     setTooltip(buttonTop, 'Retour en haut de page');
 
-    buttonTop.onclick = () => {
-        document.querySelector('#bloc-title-forum')?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    };
+    buttonTop.onclick = () => document.querySelector('#bloc-title-forum')?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     navbar.appendChild(buttonTop);
 
     const buttonAnswer = document.createElement('div');

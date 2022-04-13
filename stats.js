@@ -179,7 +179,7 @@ function buildStatsChart() {
         const iframeProcessed = document.querySelector('iframe#deboucled-iframe-chart').contentWindow.document.body;
         if (!iframeProcessed) return;
         const labels = iframeProcessed.querySelectorAll('tr:not(.hide-label) > th[scope="row"]');
-        if (labels.length <= 1) return;
+        if (!labels || labels.length <= 1) return;
         for (let i = 0; i < labels.length - 1; i++) {
             let label = labels[i];
             let nextLabel = labels[i + 1];

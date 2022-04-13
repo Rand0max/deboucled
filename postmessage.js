@@ -67,7 +67,7 @@ function addMessageQuoteEvents(allMessages) {
     document.onselectionchange = async function () {
         await sleep(100);
         const selection = getTextSelection().toString();
-        if (selection?.length === 0) clearAllQuoteButtons();
+        if (selection?.length) clearAllQuoteButtons();
     };
 
     allMessages.forEach((message) => {
@@ -75,7 +75,7 @@ function addMessageQuoteEvents(allMessages) {
 
         async function partialQuoteEvent(pointerEvent) {
             const selection = getTextSelection().toString();
-            if (selection?.length === 0) return;
+            if (selection?.length) return;
 
             partialQuoteButton.onclick = () => buildQuoteMessage(message, selection);
 
