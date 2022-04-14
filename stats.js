@@ -5,7 +5,7 @@
 
 
 function addRightBlocMatches() {
-    let optionDisplayTopicMatches = GM_getValue(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
+    let optionDisplayTopicMatches = store.get(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
     if (!optionDisplayTopicMatches || (!matchedTopics.hasAny() && !matchedSubjects.hasAny() && !matchedAuthors.hasAny())) return;
 
     function countMatchesOccurencies(matches) {
@@ -39,7 +39,7 @@ function addRightBlocMatches() {
         return matchesHtml;
     }
 
-    let optionClickToShowTopicMatches = GM_getValue(storage_optionClickToShowTopicMatches, storage_optionClickToShowTopicMatches_default);
+    let optionClickToShowTopicMatches = store.get(storage_optionClickToShowTopicMatches, storage_optionClickToShowTopicMatches_default);
 
     function addMatches(matches, entity, title, withHint) {
         let matchesHtml = '';
@@ -88,7 +88,7 @@ function addRightBlocMatches() {
 }
 
 function addRightBlocStats() {
-    let optionDisplayTopicCharts = GM_getValue(storage_optionDisplayTopicCharts, storage_optionDisplayTopicCharts_default);
+    let optionDisplayTopicCharts = store.get(storage_optionDisplayTopicCharts, storage_optionDisplayTopicCharts_default);
     if (!optionDisplayTopicCharts || !deboucledTopicStatsMap.hasAny() || !deboucledTopicStatsMap.anyValue((v) => v > 0)) return;
 
     const calcAverage = arr => arr.reduce((p, c) => p + c, 0) / arr.length;
@@ -213,6 +213,6 @@ function updateTopicHiddenAtDate() {
     if (deboucledTopicStatsMap.size > maxElem) {
         deboucledTopicStatsMap = new Map([...deboucledTopicStatsMap].slice(deboucledTopicStatsMap.size - maxElem));
     }
-    GM_setValue(storage_TopicStats, JSON.stringify([...deboucledTopicStatsMap]));
+    store.set(storage_TopicStats, JSON.stringify([...deboucledTopicStatsMap]));
 }
 

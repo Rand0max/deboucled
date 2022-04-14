@@ -79,6 +79,7 @@ let sortModeTopicId = 0;
 
 let disabledFilteringForumSet = new Set();
 
+let firstLaunch = false;
 let userId = undefined;
 let userPseudo = undefined;
 let currentTopicId = undefined;

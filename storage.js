@@ -3,6 +3,8 @@
 // STORAGE
 ///////////////////////////////////////////////////////////////////////////////////////
 
+const store = new GMStorage(); // eslint-disable-line no-undef
+
 const localstorage_pocTopics = 'deboucled_pocTopics';
 const localstorage_topicAuthors = 'deboucled_topicAuthors';
 
@@ -89,10 +91,10 @@ function getBlacklistWithKey(key) {
 }
 
 function initUserId() {
-    userId = GM_getValue(storage_userId, storage_userId_default);
+    userId = store.get(storage_userId, storage_userId_default);
     if (!userId?.length) {
         userId = getUUIDv4();
-        GM_setValue(storage_userId, userId);
+        store.set(storage_userId, userId);
     }
 }
 
@@ -101,50 +103,48 @@ async function initStorage() {
     initVinzBoucles();
     //initShadowent();
 
-    let isInit = GM_getValue(storage_init, storage_init_default);
-    if (isInit) {
-        await loadStorage();
-        return false;
-    }
-    else {
+    firstLaunch = !store.get(storage_init, storage_init_default);
+    if (firstLaunch) {
         await refreshApiData();
         await saveStorage();
-        GM_setValue(storage_init, true);
-        return true;
+        store.set(storage_init, true);
+    }
+    else {
+        await loadStorage();
     }
 }
 
 async function loadStorage() {
     await refreshApiData();
 
-    subjectBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedSubjects, storage_blacklistedSubjects_default)))];
-    authorBlacklistArray = [...new Set(JSON.parse(GM_getValue(storage_blacklistedAuthors, storage_blacklistedAuthors_default)))];
-    topicIdBlacklistMap = new Map([...JSON.parse(GM_getValue(storage_blacklistedTopicIds, storage_blacklistedTopicIds_default))]);
+    subjectBlacklistArray = [...new Set(JSON.parse(store.get(storage_blacklistedSubjects, storage_blacklistedSubjects_default)))];
+    authorBlacklistArray = [...new Set(JSON.parse(store.get(storage_blacklistedAuthors, storage_blacklistedAuthors_default)))];
+    topicIdBlacklistMap = new Map([...JSON.parse(store.get(storage_blacklistedTopicIds, storage_blacklistedTopicIds_default))]);
 
-    shadowent = [...new Set(JSON.parse(GM_getValue(storage_blacklistedShadows, storage_blacklistedShadows_default)))];
+    shadowent = [...new Set(JSON.parse(store.get(storage_blacklistedShadows, storage_blacklistedShadows_default)))];
 
     buildBlacklistsRegex();
 
-    let topicStats = GM_getValue(storage_TopicStats);
+    let topicStats = store.get(storage_TopicStats);
     if (topicStats) deboucledTopicStatsMap = new Map([...JSON.parse(topicStats)]);
 
-    topicIdWhitelistArray = [...new Set(JSON.parse(GM_getValue(storage_whitelistedTopicIds, storage_whitelistedTopicIds_default)))];
+    topicIdWhitelistArray = [...new Set(JSON.parse(store.get(storage_whitelistedTopicIds, storage_whitelistedTopicIds_default)))];
 
-    disabledFilteringForumSet = new Set(JSON.parse(GM_getValue(storage_disabledFilteringForums, storage_disabledFilteringForums_default)));
+    disabledFilteringForumSet = new Set(JSON.parse(store.get(storage_disabledFilteringForums, storage_disabledFilteringForums_default)));
 
     await loadLocalStorage();
 }
 
 async function saveStorage() {
-    GM_setValue(storage_blacklistedSubjects, JSON.stringify([...new Set(subjectBlacklistArray)]));
-    GM_setValue(storage_blacklistedAuthors, JSON.stringify([...new Set(authorBlacklistArray)]));
-    GM_setValue(storage_blacklistedTopicIds, JSON.stringify([...topicIdBlacklistMap]));
+    store.set(storage_blacklistedSubjects, JSON.stringify([...new Set(subjectBlacklistArray)]));
+    store.set(storage_blacklistedAuthors, JSON.stringify([...new Set(authorBlacklistArray)]));
+    store.set(storage_blacklistedTopicIds, JSON.stringify([...topicIdBlacklistMap]));
 
-    GM_setValue(storage_blacklistedShadows, JSON.stringify([...new Set(shadowent)]));
+    store.set(storage_blacklistedShadows, JSON.stringify([...new Set(shadowent)]));
 
-    GM_setValue(storage_whitelistedTopicIds, JSON.stringify([...new Set(topicIdWhitelistArray)]));
+    store.set(storage_whitelistedTopicIds, JSON.stringify([...new Set(topicIdWhitelistArray)]));
 
-    GM_setValue(storage_disabledFilteringForums, JSON.stringify([...disabledFilteringForumSet]));
+    store.set(storage_disabledFilteringForums, JSON.stringify([...disabledFilteringForumSet]));
 
     savePreBouclesStatuses();
 
@@ -154,7 +154,7 @@ async function saveStorage() {
 }
 
 async function loadLocalStorage() {
-    //let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
+    //let optionDetectPocMode = store.get(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     //if (optionDetectPocMode === 0) return;
 
     let storagePocTopics;
@@ -166,8 +166,8 @@ async function loadLocalStorage() {
         storageTopicAuthors = await localforage.getItem(localstorage_topicAuthors);
     }
     else {
-        storagePocTopics = GM_getValue(localstorage_pocTopics, '[]');
-        storageTopicAuthors = GM_getValue(localstorage_topicAuthors, '[]');
+        storagePocTopics = store.get(localstorage_pocTopics, '[]');
+        storageTopicAuthors = store.get(localstorage_topicAuthors, '[]');
     }
     /* eslint-enable no-undef */
 
@@ -176,7 +176,7 @@ async function loadLocalStorage() {
 }
 
 async function saveLocalStorage() {
-    //let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
+    //let optionDetectPocMode = store.get(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     //if (optionDetectPocMode === 0) return;
 
     /* eslint-disable no-undef */
@@ -185,8 +185,8 @@ async function saveLocalStorage() {
         await localforage.setItem(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
     }
     else {
-        GM_setValue(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
-        GM_setValue(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
+        store.set(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
+        store.set(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
     }
     /* eslint-enable no-undef */
 }
@@ -198,9 +198,9 @@ async function refreshApiData(forceUpdate = false) {
 }
 
 function loadPreBouclesStatuses() {
-    const gmPreBouclesStatus = GM_getValue(storage_preBoucles, storage_preBoucles_default);
+    const gmPreBouclesStatus = store.get(storage_preBoucles, storage_preBoucles_default);
     if (!gmPreBouclesStatus) return;
-    let preBouclesStatuses = [...JSON.parse(GM_getValue(storage_preBoucles, storage_preBoucles_default))];
+    let preBouclesStatuses = [...JSON.parse(store.get(storage_preBoucles, storage_preBoucles_default))];
     if (preBouclesStatuses.length === 0) return;
     preBouclesStatuses.forEach(pbs => {
         togglePreBoucleStatus(pbs[0], pbs[1]);
@@ -215,7 +215,7 @@ function togglePreBoucleStatus(id, enabled) {
 
 function savePreBouclesStatuses() {
     let preBouclesStatuses = preBoucleArray.map(pb => [pb.id, pb.enabled]);
-    GM_setValue(storage_preBoucles, JSON.stringify(preBouclesStatuses));
+    store.set(storage_preBoucles, JSON.stringify(preBouclesStatuses));
 }
 
 async function addEntityBlacklist(array, key) {
@@ -241,8 +241,8 @@ async function removeTopicIdBlacklist(topicId) {
 }
 
 function incrementTotalHidden(settingKey, value) {
-    let currentValue = parseInt(GM_getValue(settingKey, '0'));
-    GM_setValue(settingKey, currentValue + value);
+    let currentValue = parseInt(store.get(settingKey, '0'));
+    store.set(settingKey, currentValue + value);
 }
 
 function saveTotalHidden() {
@@ -256,11 +256,10 @@ function saveTotalHidden() {
 
 function getStorageJson(onlyBlacklists = false, excludedKeys = undefined) {
     let map = new Map();
-    GM_listValues().forEach(key => {
+    store.forEach((val, key) => {
         if (onlyBlacklists && !storage_Keys_Blacklists.includes(key)) return;
         if (!storage_Keys.includes(key)) return;
         if (excludedKeys?.includes(key)) return;
-        const val = GM_getValue(key);
         try {
             map.set(key, JSON.parse(val));
         } catch {
@@ -311,11 +310,11 @@ function restoreStorage(fileContent) {
                 let currentList = getBlacklistWithKey(key);
                 newValue = [...mergeArrays(currentList, value)];
             }
-            GM_setValue(key, JSON.stringify(newValue));
+            store.set(key, JSON.stringify(newValue));
         }
         else {
             // Valeur normale (boolean/string/int/etc)
-            GM_setValue(key, value);
+            store.set(key, value);
         }
     }
 

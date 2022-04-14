@@ -4,7 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function mustRefresh(storageLastUpdateId, dataExpire) {
-    let lastUpdate = new Date(GM_getValue(storageLastUpdateId, new Date(0)));
+    let lastUpdate = new Date(store.get(storageLastUpdateId, new Date(0)));
     let datenow = new Date();
     let dateExpireRange = new Date(datenow.setMinutes(datenow.getMinutes() - dataExpire.totalMinutes()));
     return lastUpdate <= dateExpireRange;
@@ -16,8 +16,8 @@ async function queryYoutubeBlacklist() {
 
     youtubeBlacklistArray = newYoutubeBlacklist.flatMap(yp => yp.videos);
 
-    GM_setValue(storage_youtubeBlacklist, JSON.stringify(youtubeBlacklistArray));
-    GM_setValue(storage_youtubeBlacklistLastUpdate, Date.now());
+    store.set(storage_youtubeBlacklist, JSON.stringify(youtubeBlacklistArray));
+    store.set(storage_youtubeBlacklistLastUpdate, Date.now());
 }
 
 async function queryPreboucles() {
@@ -26,8 +26,8 @@ async function queryPreboucles() {
 
     preBoucleArray = newPreboucles;
 
-    GM_setValue(storage_preBouclesData, JSON.stringify(preBoucleArray));
-    GM_setValue(storage_prebouclesLastUpdate, Date.now());
+    store.set(storage_preBouclesData, JSON.stringify(preBoucleArray));
+    store.set(storage_prebouclesLastUpdate, Date.now());
 }
 
 async function queryAiLoops() {
@@ -36,14 +36,14 @@ async function queryAiLoops() {
 
     aiLoopData = newAiLoops;
 
-    GM_setValue(storage_aiLoopsData, JSON.stringify(aiLoopData));
-    GM_setValue(storage_aiLoopsLastUpdate, Date.now());
+    store.set(storage_aiLoopsData, JSON.stringify(aiLoopData));
+    store.set(storage_aiLoopsLastUpdate, Date.now());
 }
 
 async function checkUpdate() {
     if (!mustRefresh(storage_lastUpdateCheck, checkUpdateExpire)) return;
 
-    const currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, userId);
+    const currentUserPseudo = userPseudo ?? store.get(storage_lastUsedPseudo, userId);
     const bodyJson = `{"userid":"${userId}","username":"${currentUserPseudo?.toLowerCase() ?? 'anonymous'}","version":"${getCurrentScriptVersion()}"}`;
     let checkRes;
     await GM.xmlHttpRequest({
@@ -55,7 +55,7 @@ async function checkUpdate() {
         onerror: (response) => { console.error("error : %o", response) }
     });
 
-    GM_setValue(storage_lastUpdateCheck, Date.now());
+    store.set(storage_lastUpdateCheck, Date.now());
 
     return checkRes;
 }
@@ -63,7 +63,7 @@ async function checkUpdate() {
 async function updateUser() {
     if (!mustRefresh(storage_lastUpdateUser, updateUserExpire)) return;
 
-    const currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, userId);
+    const currentUserPseudo = userPseudo ?? store.get(storage_lastUsedPseudo, userId);
     const settings = getStorageJson(false, storage_excluded_user_Keys);
     const body =
     {
@@ -81,13 +81,13 @@ async function updateUser() {
         onerror: (response) => { console.error("error : %o", response) }
     });
 
-    GM_setValue(storage_lastUpdateUser, Date.now());
+    store.set(storage_lastUpdateUser, Date.now());
 }
 
 async function sendDiagnostic(elapsed, exception) {
     if (!exception && !mustRefresh(storage_DiagnosticLastUpdate, diagnosticExpire)) return;
 
-    const currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, userId);
+    const currentUserPseudo = userPseudo ?? store.get(storage_lastUsedPseudo, userId);
     const settings = getStorageJson(false, storage_excluded_user_Keys);
     const body =
     {
@@ -109,11 +109,11 @@ async function sendDiagnostic(elapsed, exception) {
         onerror: (response) => { console.error("error : %o", response) }
     });
 
-    GM_setValue(storage_DiagnosticLastUpdate, Date.now());
+    store.set(storage_DiagnosticLastUpdate, Date.now());
 }
 
 async function parseYoutubeBlacklistData(forceUpdate) {
-    youtubeBlacklistArray = JSON.parse(GM_getValue(storage_youtubeBlacklist, storage_youtubeBlacklist_default));
+    youtubeBlacklistArray = JSON.parse(store.get(storage_youtubeBlacklist, storage_youtubeBlacklist_default));
     if (!youtubeBlacklistArray?.length
         || forceUpdate
         || mustRefresh(storage_youtubeBlacklistLastUpdate, youtubeBlacklistRefreshExpire)) {
@@ -123,7 +123,7 @@ async function parseYoutubeBlacklistData(forceUpdate) {
 }
 
 async function parsePreboucleData(forceUpdate) {
-    preBoucleArray = JSON.parse(GM_getValue(storage_preBouclesData, storage_preBouclesData_default));
+    preBoucleArray = JSON.parse(store.get(storage_preBouclesData, storage_preBouclesData_default));
     if (!preBoucleArray?.length
         || forceUpdate
         || mustRefresh(storage_prebouclesLastUpdate, prebouclesRefreshExpire)) {
@@ -133,7 +133,7 @@ async function parsePreboucleData(forceUpdate) {
 }
 
 async function parseAiLoopData(forceUpdate) {
-    aiLoopData = JSON.parse(GM_getValue(storage_aiLoopsData, storage_aiLoopsData_default));
+    aiLoopData = JSON.parse(store.get(storage_aiLoopsData, storage_aiLoopsData_default));
     if (!aiLoopData
         || forceUpdate
         || mustRefresh(storage_aiLoopsLastUpdate, aiLoopsRefreshExpire)) {

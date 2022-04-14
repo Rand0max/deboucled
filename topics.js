@@ -14,7 +14,7 @@ async function fillTopics(topics, topicOptions) {
     let pageBrowse = 1;
     let filledTopics = [];
     const maxPages = 15;
-    const maxTopicCount = parseInt(GM_getValue(storage_optionMaxTopicCount, storage_optionMaxTopicCount_default));
+    const maxTopicCount = parseInt(store.get(storage_optionMaxTopicCount, storage_optionMaxTopicCount_default));
 
     while (actualTopics < maxTopicCount && pageBrowse <= maxPages) {
         pageBrowse++;
@@ -117,13 +117,13 @@ function getTopicLastPageId(doc) {
 }
 
 function updateTopicsHeader() {
-    let optionDisplayTopicIgnoredCount = GM_getValue(storage_optionDisplayTopicIgnoredCount, storage_optionDisplayTopicIgnoredCount_default);
+    let optionDisplayTopicIgnoredCount = store.get(storage_optionDisplayTopicIgnoredCount, storage_optionDisplayTopicIgnoredCount_default);
     if (optionDisplayTopicIgnoredCount) {
         let subjectHeader = document.querySelector('.topic-head > span:nth-child(1)');
         subjectHeader.innerHTML = `SUJET<span class="deboucled-topic-subject">(${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)})</span>`;
     }
 
-    let optionDisplayBlacklistTopicButton = GM_getValue(storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default);
+    let optionDisplayBlacklistTopicButton = store.get(storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default);
     if (optionDisplayBlacklistTopicButton) {
         let lastMessageHeader = document.querySelector('.topic-head > span:nth-child(4)');
         lastMessageHeader.style.width = '5.3rem';

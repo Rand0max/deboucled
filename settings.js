@@ -8,7 +8,7 @@ function buildTooltip(hint, location = 'right') {
     return `deboucled-data-tooltip="${hint}"${tooltipLocation}`;
 }
 
-function buildSettingsPage(firstLaunch = false) {
+function buildSettingsPage() {
     let bgView = document.createElement('div');
     bgView.setAttribute('id', 'deboucled-settings-bg-view');
     bgView.setAttribute('class', 'deboucled-settings-bg-view');
@@ -25,7 +25,7 @@ function buildSettingsPage(firstLaunch = false) {
         html += '</td>';
         html += `<td class="deboucled-td-right">`;
         html += '<label class="deboucled-switch">';
-        let checkedStr = GM_getValue(optionId, defaultValue) ? 'checked' : '';
+        let checkedStr = store.get(optionId, defaultValue) ? 'checked' : '';
         html += `<input type="checkbox" id="${optionId}" ${checkedStr}></input>`;
         html += `<span class="deboucled-toggle-slider round ${toggleColor}"></span>`;
         html += '</label>';
@@ -40,7 +40,7 @@ function buildSettingsPage(firstLaunch = false) {
         html += `<span ${buildTooltip(hint)}>${title}</span>`;
         html += '</td>';
         html += '<td class="deboucled-td-right" style="padding-top: 7px;">';
-        let value = parseInt(GM_getValue(optionId, defaultValue));
+        let value = parseInt(store.get(optionId, defaultValue));
         html += `<input type="range" id="${optionId}" min="${minValue}" max="${maxValue}" value="${value}" step="${step}" class="deboucled-range-slider">`;
         html += `<span class="deboucled-range-title-value" id="${optionId}-value">${value}</span>`;
         html += '</tr>';
@@ -55,7 +55,7 @@ function buildSettingsPage(firstLaunch = false) {
         html += '<td class="deboucled-td-right">';
         html += '<span class="deboucled-dropdown select">';
         html += `<select class="deboucled-dropdown" id="${optionId}">`;
-        let selectedOption = GM_getValue(optionId, defaultValue);
+        let selectedOption = store.get(optionId, defaultValue);
         values.forEach(function (value, key) {
             let selected = selectedOption === key ? ' selected' : '';
             html += `<option class="deboucled-dropdown-option" value="${key}"${selected}>${value}</option>`;
@@ -143,7 +143,7 @@ function buildSettingsPage(firstLaunch = false) {
 
         html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default, 'Autoriser l\'affichage des topics même si le sujet est blacklist, à partir d\'un certain nombre de messages.');
 
-        let allowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
+        let allowDisplayThreshold = store.get(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
         html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, storage_optionDisplayThreshold_default, 10, 1000, 10, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.', allowDisplayThreshold, true);
 
         let pocLogo = '<span class="deboucled-poc-logo"></span>'
@@ -197,7 +197,7 @@ function buildSettingsPage(firstLaunch = false) {
         let matchesLogo = '<span class="deboucled-list-logo"></span>'
         html += addToggleOption(`Afficher les <i>détails du filtrage</i> ${matchesLogo} des topics`, storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default, 'Afficher ou non le tableau des détails de filtrage des topics sur la droite de la page.');
 
-        let optionDisplayTopicMatches = GM_getValue(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
+        let optionDisplayTopicMatches = store.get(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
         let eyeLogo = '<span class="deboucled-eye-logo"></span>'
         html += addToggleOption(`Cliquer sur l'oeil ${eyeLogo} pour <i>afficher les détails</i>`, storage_optionClickToShowTopicMatches, storage_optionClickToShowTopicMatches_default, 'Affiche par défaut l\'icone en oeil, nécéssite de cliquer pour afficher le détail du filtrage par catégorie.', optionDisplayTopicMatches, true);
 
@@ -222,7 +222,7 @@ function buildSettingsPage(firstLaunch = false) {
         const titleTooltip = buildTooltip('Cochez les catégories que vous souhaitez filtrer sur le forum.\nPassez la souris ou cliquez sur les intitulés de catégorie pour voir les mots-clés qui seront utilisés.', 'bottom');
         html += `<span class="deboucled-preboucle-title" ${titleTooltip}>Listes anti-boucle pré-enregistrées</span>`;
 
-        const lastUpdate = formatDateToFrenchFormat(new Date(GM_getValue(storage_prebouclesLastUpdate)));
+        const lastUpdate = formatDateToFrenchFormat(new Date(store.get(storage_prebouclesLastUpdate)));
         const refreshTooltip = buildTooltip(`Dernière mise à jour : ${lastUpdate}`, 'left');
         html += `<span class="deboucled-svg-refresh" ${refreshTooltip}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" id="deboucled-refresh-logo"><use href="#refreshlogo"/></svg></span>`;
 
@@ -283,7 +283,7 @@ function buildSettingsPage(firstLaunch = false) {
 
         html += addToggleOption('Filtrer les topics en dessous d\'un nombre de messages', storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default, 'Filtrer automatiquement les topics qui n\'ont pas le nombre minimum de messages voulu.');
 
-        let enableTopicMsgCountThreshold = GM_getValue(storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default);
+        let enableTopicMsgCountThreshold = store.get(storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default);
         html += addRangeOption('Nombre de messages minimum', storage_optionTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold_default, 1, 30, 1, 'Nombre de messages minimum dans le topic pour autoriser l\'affichage.', enableTopicMsgCountThreshold, true);
 
         html += addImportExportButtons();
@@ -311,12 +311,12 @@ function buildSettingsPage(firstLaunch = false) {
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
         html += '<table class="deboucled-option-table">';
-        let totalHiddenSubjects = GM_getValue(storage_totalHiddenSubjects, '0');
-        let totalHiddenAuthors = GM_getValue(storage_totalHiddenAuthors, '0');
-        let totalHiddenTopicIds = GM_getValue(storage_totalHiddenTopicIds, '0');
-        let totalHiddenMessages = GM_getValue(storage_totalHiddenMessages, '0');
-        let totalHiddenPrivateMessages = GM_getValue(storage_totalHiddenPrivateMessages, '0');
-        let totalHiddenSpammers = GM_getValue(storage_totalHiddenSpammers, '0');
+        let totalHiddenSubjects = store.get(storage_totalHiddenSubjects, '0');
+        let totalHiddenAuthors = store.get(storage_totalHiddenAuthors, '0');
+        let totalHiddenTopicIds = store.get(storage_totalHiddenTopicIds, '0');
+        let totalHiddenMessages = store.get(storage_totalHiddenMessages, '0');
+        let totalHiddenPrivateMessages = store.get(storage_totalHiddenPrivateMessages, '0');
+        let totalHiddenSpammers = store.get(storage_totalHiddenSpammers, '0');
         let totalHidden = parseInt(totalHiddenSubjects + totalHiddenAuthors + totalHiddenTopicIds + totalHiddenMessages + totalHiddenPrivateMessages + totalHiddenSpammers);
         html += addStat('Sujets ignorés', totalHiddenSubjects);
         html += addStat('Pseudos ignorés', totalHiddenAuthors);
@@ -360,7 +360,7 @@ function addToggleEvent(id, setValue = true, callback = undefined) {
     const toggleSlider = document.querySelector('#' + id);
     toggleSlider.oninput = (e) => {
         const checked = e.currentTarget.checked;
-        if (setValue) GM_setValue(id, checked);
+        if (setValue) store.set(id, checked);
         if (callback) callback(checked);
     };
 }
@@ -368,7 +368,7 @@ function addToggleEvent(id, setValue = true, callback = undefined) {
 function addRangeEvent(id) {
     const rangeSlider = document.querySelector('#' + id);
     rangeSlider.oninput = function () {
-        GM_setValue(id, parseInt(this.value));
+        store.set(id, parseInt(this.value));
         document.querySelector(`#${id}-value`).innerHTML = this.value;
     };
 }
@@ -376,7 +376,7 @@ function addRangeEvent(id) {
 function addSelectEvent(id) {
     const select = document.querySelector('#' + id);
     select.oninput = (e) => {
-        GM_setValue(id, parseInt(e.currentTarget.value));
+        store.set(id, parseInt(e.currentTarget.value));
     };
 }
 
@@ -522,7 +522,7 @@ function buildPrebouclesTable() {
         html += '</td>';
         html += `<td class="deboucled-td-right deboucled-td-right-padding">`;
         html += '<label class="deboucled-switch">';
-        let checkedStr = GM_getValue(optionId, defaultValue) ? 'checked' : '';
+        let checkedStr = store.get(optionId, defaultValue) ? 'checked' : '';
         html += `<input type="checkbox" id="${optionId}-input" ${checkedStr}></input>`;
         html += '<span class="deboucled-toggle-slider round"></span>';
         html += '</label>';
@@ -742,7 +742,7 @@ function refreshCollapsibleContentHeight(entity) {
     if (content) content.style.maxHeight = content.scrollHeight + 'px';
 }
 
-function addSettingButton(firstLaunch) {
+function addSettingButton() {
     function createDeboucledButton() {
         let button = document.createElement('button');
         button.setAttribute('id', 'deboucled-option-button');
@@ -773,7 +773,7 @@ function addSettingButton(firstLaunch) {
 }
 
 function addSearchFilterToggle() {
-    let optionFilterResearch = GM_getValue(storage_optionFilterResearch, storage_optionFilterResearch_default);
+    let optionFilterResearch = store.get(storage_optionFilterResearch, storage_optionFilterResearch_default);
 
     const formRechForum = document.querySelector('.form-rech-forum');
     if (!formRechForum) return optionFilterResearch;
@@ -785,7 +785,7 @@ function addSearchFilterToggle() {
     formRechForum.appendChild(toggleElem);
 
     document.querySelector('#deboucled-search-filter-toggle').oninput = (e) => {
-        GM_setValue(storage_optionFilterResearch, e.currentTarget.checked);
+        store.set(storage_optionFilterResearch, e.currentTarget.checked);
         location.reload();
     };
 
@@ -813,7 +813,7 @@ function addDisableFilteringButton() {
         if (checked) disabledFilteringForumSet.delete(forumId);
         else disabledFilteringForumSet.add(forumId);
 
-        GM_setValue(storage_disabledFilteringForums, JSON.stringify([...disabledFilteringForumSet]));
+        store.set(storage_disabledFilteringForums, JSON.stringify([...disabledFilteringForumSet]));
     };
 }
 
@@ -923,7 +923,7 @@ async function forcePrebouclesRefresh() {
 
     await refreshApiData(true);
 
-    const lastUpdate = formatDateToFrenchFormat(new Date(GM_getValue(storage_prebouclesLastUpdate)));
+    const lastUpdate = formatDateToFrenchFormat(new Date(store.get(storage_prebouclesLastUpdate)));
     this.setAttribute('deboucled-data-tooltip', `Dernière mise à jour : ${lastUpdate}`);
 
     const prebouclesTable = document.querySelector('#deboucled-preboucles-table');

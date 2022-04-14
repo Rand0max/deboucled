@@ -171,7 +171,7 @@ function handleJvChatAndTopicLive(messageOptions) {
         }
         else {
             if (topicLiveEvent) {
-                let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
+                let optionShowJvcBlacklistButton = store.get(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
                 upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton);
                 let mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
                 addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
@@ -270,7 +270,7 @@ function fixMessageUrls(messageContent) {
 function highlightQuotedAuthor(messageContent, messageElement) {
     if (!messageContent) return;
 
-    let currentUserPseudo = userPseudo ?? GM_getValue(storage_lastUsedPseudo, storage_lastUsedPseudo_default);
+    let currentUserPseudo = userPseudo ?? store.get(storage_lastUsedPseudo, storage_lastUsedPseudo_default);
     currentUserPseudo = currentUserPseudo?.toLowerCase();
 
     const isSelf = (match) => (currentUserPseudo?.length && (match === currentUserPseudo || match === `@${currentUserPseudo}`));

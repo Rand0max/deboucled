@@ -17,8 +17,8 @@ function getCurrentScriptVersion() {
 
 async function suggestUpdate() {
     function toggleDeferUpdate(defer) {
-        if (defer) GM_setValue(storage_lastUpdateDeferredCheck, Date.now());
-        else GM_deleteValue(storage_lastUpdateDeferredCheck);
+        if (defer) store.set(storage_lastUpdateDeferredCheck, Date.now());
+        else store.delete(storage_lastUpdateDeferredCheck);
     }
 
     const updateRes = await checkUpdate();
@@ -82,7 +82,7 @@ function displaySecret() {
     const firstOfApril = new Date(dateNow.getFullYear(), 3, 1);
     if (!dateIsToday(firstOfApril)) return;
 
-    let secretDisplayed = GM_getValue(storage_secret_displayed, storage_secret_displayed_default);
+    let secretDisplayed = store.get(storage_secret_displayed, storage_secret_displayed_default);
     if (secretDisplayed) return;
 
     const topics = document.querySelector('.conteneur-topic-pagi');
@@ -111,7 +111,7 @@ function displaySecret() {
     console.log(msg);
 
     alert('Suite à des manquements répétés à la charte du site, vous avez été banni définitivement par la modération de jeuxvideo.com.\n\nPour toute réclamation, merci de vous adresser au support à l\'adresse suivante : paix@jeuxvideo.com.');
-    GM_setValue(storage_secret_displayed, true);
+    store.set(storage_secret_displayed, true);
 }
 
 function getEntityTitle(entity) {
@@ -235,17 +235,17 @@ async function handleTopicList(canFillTopics) {
 }
 
 async function handleTopicListOptions(topics) {
-    let optionDisplayBlacklistTopicButton = GM_getValue(storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default);
+    let optionDisplayBlacklistTopicButton = store.get(storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default);
     if (optionDisplayBlacklistTopicButton) addIgnoreButtons(topics);
 
-    let optionPrevisualizeTopic = GM_getValue(storage_optionPrevisualizeTopic, storage_optionPrevisualizeTopic_default);
+    let optionPrevisualizeTopic = store.get(storage_optionPrevisualizeTopic, storage_optionPrevisualizeTopic_default);
     if (optionPrevisualizeTopic) addPrevisualizeTopicEvent(topics);
 
-    let optionDisplayBlackTopic = GM_getValue(storage_optionDisplayBlackTopic, storage_optionDisplayBlackTopic_default);
-    let optionReplaceResolvedPicto = GM_getValue(storage_optionReplaceResolvedPicto, storage_optionReplaceResolvedPicto_default);
+    let optionDisplayBlackTopic = store.get(storage_optionDisplayBlackTopic, storage_optionDisplayBlackTopic_default);
+    let optionReplaceResolvedPicto = store.get(storage_optionReplaceResolvedPicto, storage_optionReplaceResolvedPicto_default);
     if (optionDisplayBlackTopic || optionReplaceResolvedPicto) handleTopicPictos(topics, optionDisplayBlackTopic, optionReplaceResolvedPicto);
 
-    let optionRemoveUselessTags = GM_getValue(storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default);
+    let optionRemoveUselessTags = store.get(storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default);
     if (optionRemoveUselessTags) removeUselessTags(topics);
 
     parseTopicListAuthors(topics);
@@ -264,7 +264,7 @@ function parseTopicListAuthors(topics) {
 
 async function handlePoc(finalTopics) {
     // 0 = désactivé ; 1 = recherche simple ; 2 = recherche approfondie ; 3 = recherche simple automatique ; 4 = recherche approfondie automatique
-    let optionDetectPocMode = GM_getValue(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
+    let optionDetectPocMode = store.get(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     if (optionDetectPocMode === 0) return;
 
     // On gère les PoC à la fin pour ne pas figer la page pendant le traitement
@@ -411,7 +411,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
         if (!handleBlacklistedAuthor([author])) return;
     }
     else {
-        let optionShowJvcBlacklistButton = GM_getValue(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
+        let optionShowJvcBlacklistButton = store.get(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
         upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton);
         addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
     }
@@ -499,7 +499,7 @@ function buildTopicBadges() {
         markTopicPoc(titleElement, false);
     }
 
-    const optionAntiLoopAiMode = GM_getValue(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default);
+    const optionAntiLoopAiMode = store.get(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default);
     if (optionAntiLoopAiMode !== 0) {
         const title = titleElement.textContent.trim();
         const subjectBlacklisted = getSubjectBlacklistMatches(title, aiLoopSubjectReg);
@@ -526,12 +526,12 @@ function displayTopicDeboucledMessage() {
 }
 
 function prepareTopicOptions() {
-    const optionAllowDisplayThreshold = GM_getValue(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
-    const optionDisplayThreshold = GM_getValue(storage_optionDisplayThreshold, storage_optionDisplayThreshold_default);
-    const optionEnableTopicMsgCountThreshold = GM_getValue(storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default);
-    const optionTopicMsgCountThreshold = GM_getValue(storage_optionTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold_default);
-    const optionAntiVinz = GM_getValue(storage_optionAntiVinz, storage_optionAntiVinz_default);
-    const optionAntiLoopAiMode = GM_getValue(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default);
+    const optionAllowDisplayThreshold = store.get(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
+    const optionDisplayThreshold = store.get(storage_optionDisplayThreshold, storage_optionDisplayThreshold_default);
+    const optionEnableTopicMsgCountThreshold = store.get(storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default);
+    const optionTopicMsgCountThreshold = store.get(storage_optionTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold_default);
+    const optionAntiVinz = store.get(storage_optionAntiVinz, storage_optionAntiVinz_default);
+    const optionAntiLoopAiMode = store.get(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default);
 
     const topicOptions = {
         optionAllowDisplayThreshold: optionAllowDisplayThreshold,
@@ -545,12 +545,12 @@ function prepareTopicOptions() {
 }
 
 function prepareMessageOptions(isWhitelistedTopic) {
-    const optionHideMessages = !isWhitelistedTopic && GM_getValue(storage_optionHideMessages, storage_optionHideMessages_default);
-    const optionBoucledUseJvarchive = GM_getValue(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
-    const optionBlSubjectIgnoreMessages = !isWhitelistedTopic && GM_getValue(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default);
-    const optionEnhanceQuotations = GM_getValue(storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default);
-    const optionAntiSpam = GM_getValue(storage_optionAntiSpam, storage_optionAntiSpam_default);
-    const optionSmoothScroll = GM_getValue(storage_optionSmoothScroll, storage_optionSmoothScroll_default);
+    const optionHideMessages = !isWhitelistedTopic && store.get(storage_optionHideMessages, storage_optionHideMessages_default);
+    const optionBoucledUseJvarchive = store.get(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
+    const optionBlSubjectIgnoreMessages = !isWhitelistedTopic && store.get(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default);
+    const optionEnhanceQuotations = store.get(storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default);
+    const optionAntiSpam = store.get(storage_optionAntiSpam, storage_optionAntiSpam_default);
+    const optionSmoothScroll = store.get(storage_optionSmoothScroll, storage_optionSmoothScroll_default);
 
     const messageOptions = {
         optionHideMessages: optionHideMessages,
@@ -619,7 +619,7 @@ function handlePrivateMessage(privateMessageElement, author) {
 }
 
 async function handlePrivateMessages() {
-    let optionBlAuthorIgnoreMp = GM_getValue(storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default);
+    let optionBlAuthorIgnoreMp = store.get(storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default);
     if (!optionBlAuthorIgnoreMp) return;
 
     const privateMessageElements = document.querySelectorAll('.list-msg > .row-mp:not(.row-head)');
@@ -707,7 +707,7 @@ function handleProfil() {
 }
 
 async function handlePrivateMessageNotifs() {
-    let optionBlAuthorIgnoreMp = GM_getValue(storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default);
+    let optionBlAuthorIgnoreMp = store.get(storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default);
     if (!optionBlAuthorIgnoreMp) return;
 
     const mpElem = document.querySelector('.jv-nav-account-mp > div > .jv-nav-dropdown-container-content');
@@ -762,28 +762,28 @@ function handleError() {
     }
 }
 
-function preInit() {
-    const enablePeepoTheme = GM_getValue(storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default);
-    const enableJvRespawnRefinedTheme = GM_getValue(storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableJvRespawnRefinedTheme_default);
+async function preInit() {
+    const enablePeepoTheme = store.get(storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default);
+    const enableJvRespawnRefinedTheme = store.get(storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableJvRespawnRefinedTheme_default);
     addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme);
 }
 
 async function init(currentPageType) {
-    let firstLaunch = await initStorage();
+    await initStorage();
 
     if (currentPageType === 'sso' || currentPageType === 'error') return;
 
     addSvgs();
 
-    const enableDeboucledDarkTheme = GM_getValue(storage_optionEnableDeboucledDarkTheme, storage_optionEnableDeboucledDarkTheme_default);
+    const enableDeboucledDarkTheme = store.get(storage_optionEnableDeboucledDarkTheme, storage_optionEnableDeboucledDarkTheme_default);
     toggleDeboucledDarkTheme(enableDeboucledDarkTheme);
 
-    buildSettingsPage(firstLaunch);
-    addSettingButton(firstLaunch);
+    buildSettingsPage();
+    addSettingButton();
     addDisableFilteringButton();
 
     userPseudo = getUserPseudo();
-    if (userPseudo?.length) GM_setValue(storage_lastUsedPseudo, userPseudo);
+    if (userPseudo?.length) store.set(storage_lastUsedPseudo, userPseudo);
 }
 
 async function entryPoint() {
@@ -853,5 +853,10 @@ async function entryPoint() {
     }
 }
 
-preInit(); // speedup loading
-window.addEventListener('DOMContentLoaded', () => entryPoint());
+preInit();
+
+if (document.readyState == 'loading') {
+    window.addEventListener('DOMContentLoaded', entryPoint);
+} else {
+    entryPoint();
+}

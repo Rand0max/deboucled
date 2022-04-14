@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.24.8
+// @version     2.25.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -24,6 +24,12 @@
 // @grant       GM_deleteValue
 // @grant       GM_listValues
 // @grant       GM_getResourceText
+// @grant       GM.getValue
+// @grant       GM.setValue
+// @grant       GM.addStyle
+// @grant       GM.deleteValue
+// @grant       GM.listValues
+// @grant       GM.getResourceText
 // @grant       GM.xmlHttpRequest
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
 // @resource    PEEPODARKJVCV2_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/peepodarkjvcv2.css
@@ -32,6 +38,7 @@
 // @require     https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js
 // @require     https://unpkg.com/infinite-scroll/dist/infinite-scroll.pkgd.min.js
 // @require     https://unpkg.com/timespan@2.3.0/browser/TimeSpan-1.2.min.js
+// @require     https://unpkg.com/gm-storage@1.1.0/dist/index.umd.min.js
 // @require     https://unpkg.com/@chocolateboy/uncommonjs
 // @require     https://unpkg.com/fastest-levenshtein
 // @require     variables.js
@@ -46,5 +53,5 @@
 // @require     settings.js
 // @require     privatemessages.js
 // @require     main.js
-// @run-at      document-body
+// @run-at      document-start
 // ==/UserScript==
