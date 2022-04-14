@@ -769,6 +769,8 @@ async function preInit() {
 }
 
 async function init(currentPageType) {
+    await preInit();
+
     await initStorage();
 
     if (currentPageType === 'sso' || currentPageType === 'error') return;
@@ -852,8 +854,6 @@ async function entryPoint() {
         await sendDiagnostic(elapsed, error);
     }
 }
-
-preInit();
 
 if (document.readyState == 'loading') {
     window.addEventListener('DOMContentLoaded', entryPoint);
