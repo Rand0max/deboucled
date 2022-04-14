@@ -417,10 +417,13 @@ function addIgnoreButtons(topics) {
     header.appendChild(spanHead);
 
     topics.slice(1).forEach(function (topic) {
+        const topicSubjectElem = topic.querySelector('span:nth-child(1) > a:nth-child(2)');
+        if (!topicSubjectElem) return;
+        let topicSubject = topicSubjectElem.textContent.trim();
+        let topicId = topic.getAttribute('data-id');
+
         let span = document.createElement('span');
         span.setAttribute('class', 'deboucled-topic-blacklist');
-        let topicId = topic.getAttribute('data-id');
-        let topicSubject = topic.querySelector('span:nth-child(1) > a:nth-child(2)').textContent.trim();
         let anchor = document.createElement('a');
         anchor.setAttribute('role', 'button');
         anchor.setAttribute('title', 'Blacklist le topic');

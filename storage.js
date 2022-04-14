@@ -161,7 +161,7 @@ async function loadLocalStorage() {
     let storageTopicAuthors;
 
     /* eslint-disable no-undef */
-    if (localforage) {
+    if (typeof localforage !== 'undefined') {
         storagePocTopics = await localforage.getItem(localstorage_pocTopics);
         storageTopicAuthors = await localforage.getItem(localstorage_topicAuthors);
     }
@@ -180,7 +180,7 @@ async function saveLocalStorage() {
     //if (optionDetectPocMode === 0) return;
 
     /* eslint-disable no-undef */
-    if (localforage) {
+    if (typeof localforage !== 'undefined') {
         await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
         await localforage.setItem(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
     }

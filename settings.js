@@ -593,10 +593,10 @@ function refreshSubjectKeys(filter = null) {
     let sortCallback = null;
     switch (sortModeSubject) {
         case 1:
-            sortCallback = (array) => array.sort();
+            sortCallback = (array) => array.sortNormalize();
             break;
         case 2:
-            sortCallback = (array) => array.sort().reverse();
+            sortCallback = (array) => array.sortNormalize().reverse();
             break;
     }
 
@@ -775,11 +775,14 @@ function addSettingButton(firstLaunch) {
 function addSearchFilterToggle() {
     let optionFilterResearch = GM_getValue(storage_optionFilterResearch, storage_optionFilterResearch_default);
 
+    const formRechForum = document.querySelector('.form-rech-forum');
+    if (!formRechForum) return optionFilterResearch;
+
     let toggleElem = document.createElement('label');
     toggleElem.className = 'deboucled-switch';
     toggleElem.title = 'Filtrer les résultats avec Déboucled';
     toggleElem.innerHTML = `<input type="checkbox" id="deboucled-search-filter-toggle" ${optionFilterResearch ? 'checked' : ''}><span class="deboucled-toggle-slider round red"></span>`;
-    document.querySelector('.form-rech-forum').appendChild(toggleElem);
+    formRechForum.appendChild(toggleElem);
 
     document.querySelector('#deboucled-search-filter-toggle').oninput = (e) => {
         GM_setValue(storage_optionFilterResearch, e.currentTarget.checked);
