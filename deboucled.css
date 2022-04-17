@@ -769,6 +769,7 @@ blockquote .deboucled-highlighted {
   width: 16px;
   height: 16px;
   background-size: 16px;
+  opacity: 0.9;
   display: inline-block !important;
 }
 .deboucled-fire-logo.big {
