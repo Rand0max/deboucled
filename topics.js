@@ -386,12 +386,14 @@ async function isTopicPoC(element, optionDetectPocMode) {
     return isPoc;
 }
 
-function buildBadge(content, hint, url) {
+function buildBadge(content, hint, url, level, iconClass) {
     const anchor = document.createElement('a');
     anchor.href = url;
     anchor.target = '_blank';
     const badge = document.createElement('span');
-    badge.className = `deboucled-badge deboucled-badge-danger${preferDarkTheme() ? ' dark' : ''}${hint ? '' : ' pill'}`;
+    let badgeClass = 'deboucled-badge';
+    if (level) badgeClass = `${badgeClass}-${level}${preferDarkTheme() ? ' dark' : ''}`;
+    badge.className = `deboucled-badge ${badgeClass} ${hint ? '' : 'pill'} ${iconClass}`.trim();
     badge.textContent = content;
     if (hint?.length) badge.setAttribute('deboucled-data-tooltip', hint);
     anchor.appendChild(badge);
@@ -399,13 +401,18 @@ function buildBadge(content, hint, url) {
 }
 
 function markTopicPoc(nearElement, withHint = true) {
-    const pocBadge = buildBadge('PoC', withHint ? 'Détection d\'un "post ou cancer"' : undefined, 'https://jvflux.fr/Post_ou_cancer');
+    const pocBadge = buildBadge('PoC', withHint ? 'Détection d\'un "post ou cancer"' : undefined, 'https://jvflux.fr/Post_ou_cancer', 'warning');
     nearElement.insertAdjacentElement('afterend', pocBadge);
 }
 
 function markTopicLoop(subject, nearElement, withHint = true) {
     const redirectUrl = `${jvarchiveUrl}/topic/recherche?searchType=titre_topic&search=${subject.trim()}`;
-    const loopBadge = buildBadge('BOUCLE', withHint ? `Consulter cette boucle sur JvArchive` : undefined, redirectUrl);
+    const loopBadge = buildBadge('BOUCLE', withHint ? `Consulter cette boucle sur JvArchive` : undefined, redirectUrl, 'danger');
+    nearElement.insertAdjacentElement('afterend', loopBadge);
+}
+
+function markTopicHot(topicUrl, nearElement, withHint = true) {
+    const loopBadge = buildBadge('', withHint ? 'Topic tendance' : undefined, topicUrl, undefined, `deboucled-fire-logo${withHint ? '' : ' big'}`);
     nearElement.insertAdjacentElement('afterend', loopBadge);
 }
 
@@ -725,5 +732,11 @@ function buildEnableSmoothScrollButton(smoothScrollCallback) {
         buttonEnableSC.style.display = 'none';
     }
     bottomMenu.appendChild(buttonEnableSC);
+}
+
+async function buildHotTopics() {
+    const topTopicResults = await getJvArchiveHotTopics(5);
+    const topTopics = parseJvArchiveHotTopicResults(topTopicResults);
+    return topTopics;
 }
 

@@ -27,8 +27,8 @@ const checkUpdateExpire = TimeSpan.FromHours(1);
 const checkUpdateDeferredExpire = TimeSpan.FromDays(3);
 const youtubeBlacklistRefreshExpire = TimeSpan.FromHours(1);
 const prebouclesRefreshExpire = TimeSpan.FromHours(1);
-const aiLoopsRefreshExpire = TimeSpan.FromMinutes(15);
-const updateUserExpire = TimeSpan.FromDays(1);
+const aiLoopsRefreshExpire = TimeSpan.FromMinutes(10);
+const updateUserExpire = TimeSpan.FromHours(12);
 const diagnosticExpire = TimeSpan.FromHours(12);
 /* eslint-enable no-undef */
 
@@ -89,6 +89,6 @@ let forumFilteringIsDisabled = false;
 
 const domParser = new DOMParser();
 
-const deboucledPseudos = ['rand0max', 'deboucled'];
+const deboucledPseudos = ['rand0max', 'rand0max2', 'deboucled'];
 const deboucledTopics = ['67697509', '68410257', '68982055'];
 

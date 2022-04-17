@@ -248,6 +248,9 @@ async function handleTopicListOptions(topics) {
     let optionRemoveUselessTags = store.get(storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default);
     if (optionRemoveUselessTags) removeUselessTags(topics);
 
+    let optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
+    if (optionDisplayHotTopics) await handleHotTopics(topics);
+
     parseTopicListAuthors(topics);
     await handlePoc(topics);
     await saveLocalStorage();
@@ -259,6 +262,20 @@ function parseTopicListAuthors(topics) {
         const topicId = topic.getAttribute('data-id');
         if (!author || !topicId) return;
         topicAuthorMap.set(topicId, author);
+    });
+}
+
+async function handleHotTopics(finalTopics) {
+    const hotTopics = await buildHotTopics();
+    if (!hotTopics?.length) return;
+    finalTopics.slice(1).forEach(topic => {
+        const topicId = topic.getAttribute('data-id');
+        if (!topicId) return;
+        const hotTopic = hotTopics.find(ht => ht.id === parseInt(topicId));
+        if (!hotTopic) return;
+        const titleElem = topic.querySelector('.lien-jv.topic-title');
+        titleElem.style.width = 'auto';
+        markTopicHot(hotTopic.url, titleElem);
     });
 }
 
@@ -532,6 +549,7 @@ function prepareTopicOptions() {
     const optionTopicMsgCountThreshold = store.get(storage_optionTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold_default);
     const optionAntiVinz = store.get(storage_optionAntiVinz, storage_optionAntiVinz_default);
     const optionAntiLoopAiMode = store.get(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default);
+    const optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
 
     const topicOptions = {
         optionAllowDisplayThreshold: optionAllowDisplayThreshold,
@@ -539,7 +557,8 @@ function prepareTopicOptions() {
         optionEnableTopicMsgCountThreshold: optionEnableTopicMsgCountThreshold,
         optionTopicMsgCountThreshold: optionTopicMsgCountThreshold,
         optionAntiVinz: optionAntiVinz,
-        optionAntiLoopAiMode: optionAntiLoopAiMode
+        optionAntiLoopAiMode: optionAntiLoopAiMode,
+        optionDisplayHotTopics: optionDisplayHotTopics
     };
     return topicOptions;
 }

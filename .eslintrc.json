@@ -17,6 +17,7 @@
     "extensions.js",
     "preboucles.js",
     "apidata.js",
+    "jvarchiveapi.js",
     "stats.js",
     "topics.js",
     "messages.js",

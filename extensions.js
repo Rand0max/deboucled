@@ -374,8 +374,8 @@ async function fetchHtml(url) {
         });
 }
 
-async function fetchJson(url) {
-    return fetch(url)
+async function fetchJson(url, timeout = 90000) {
+    return fetchWithTimeout(url, { timeout: timeout })
         .then(function (response) {
             if (!response.ok) throw Error(response.statusText);
             return response.text();
@@ -387,6 +387,18 @@ async function fetchJson(url) {
             console.warn(err);
             return undefined;
         });
+}
+
+async function fetchWithTimeout(resource, options = {}) {
+    const { timeout = 8000 } = options;
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    const response = await fetch(resource, {
+        ...options,
+        signal: controller.signal
+    });
+    clearTimeout(id);
+    return response;
 }
 
 function formatDateToFrenchFormat(date) {

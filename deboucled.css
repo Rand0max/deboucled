@@ -763,6 +763,19 @@ blockquote .deboucled-highlighted {
   background-size: 25px;
   background-position: center;
 }
+.deboucled-fire-logo {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAApwAAAKcBDzod3AAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAMESURBVEiJrZVPaBR3FMc/77ezM8lGJSZoQlMTQ6QWo6J4ULCl0BLQGTTm4J/aYqGH9qCnChUEQcSDZy/eWi9etpQekmCVHipF6KHYVultq5uNKFFUiFl3nZ2Z14O7m93MbFyLD37M7/d7f77v++bNG1SVdtaM563Ou+7xdu1ry9CG5D2vH7ghIhvasW+U1wLkXNcxIr8AWxT63jqALXIOGAUQ8PJ7965/EwBR1ZbKgutuwpjbQKrh+uZgJvMR2WzYDsDyDFKpr5cEB9g9WyqdBSjs2/fJPc8b+v8Aqp8lX+vp++PjGxT6LWMutQ8gIrVttXN6W/mFUbRFVMdUdSw/MdHdFkDBdQ/WszRm+Y5R/Qr4HLBMpTIGwKFDS8sZY3BqxvOOAkS+/3C5+AJ7WHw/mwEKpdLJnOuuSgSo0twmIt/PuO7HI9evPwb8WOB0Ytetrj4HHGPOJAIY3/+gerbFmJ8Lnvetwp9NxiuUlR/GMAF6agAKX+Zc16kprMXUZLjBIQ1cECg3Rsls9RErmcHs/v0HUD0ApNKWNQrcamKASGeCYwdAem0IAl07Ks3aes+xR6PoJ2rvJAzfjzNQXTRfIj1HSmgZnPUBVnfE/A0HAsEZDijnrOZEX8lADEBF7kiLsRE+NWS2v6p9qjui78QCWhbmf3US7TEmV9/WNoHv/9GKwcuZ5va23wmxhwJe/msl2pswvB0DGLl27RGqs0kOlQex7wc/bxGVE6taXHf16t0YAICIXG46V+N2vBfEooTzLcfYFRpGdBPH55nM+a5icVxEtgL0Hi1i9UTY78YnszMSYA+EpPtCirfs2vW9zkzmZKNdUxqbslk/MuYYUAHw71vYg2HizE2tiuj/5jkdG+vsIoEv1mSzCy0BAIYnJ/9WmADmXvyVblXnury4kwZ4guqn66amfluqTyzk0NTUdMq2R4Nn5ofH33WhQTLIwu82pX+syUh18+D0dDbJZtlfJkDBdXd37aocXrGzMmH1hv3GUePPpeYqs9bNZz92XkzKulH+A6XBP0Rc7NmsAAAAAElFTkSuQmCC)
+    0 no-repeat;
+  width: 16px;
+  height: 16px;
+  background-size: 16px;
+  display: inline-block !important;
+}
+.deboucled-fire-logo.big {
+  width: 24px;
+  height: 24px;
+  background-size: 24px;
+}
 
 /* Quotes */
 .deboucled-quote {
@@ -1170,9 +1183,27 @@ input[type="search"] {
   padding-left: 0.7em;
   border-radius: 10rem;
 }
+
+.deboucled-badge-info {
+  color: #2643e9 !important;
+  background-color: #eaecfb !important;
+}
+.deboucled-badge-warning {
+  color: #f89100 !important;
+  background-color: #ffd9ae !important;
+}
 .deboucled-badge-danger {
   color: #f80031 !important;
   background-color: #fdd1da !important;
+}
+
+.deboucled-badge-info.dark {
+  color: #e8e6e3 !important;
+  background-color: #004daa !important;
+}
+.deboucled-badge-warning.dark {
+  color: #eca94d !important;
+  background-color: #b16b1b !important;
 }
 .deboucled-badge-danger.dark {
   color: #ff1e4b !important;
