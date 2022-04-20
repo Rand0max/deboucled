@@ -6,9 +6,9 @@
 const jvarchiveApiUrl = `${jvarchiveUrl}/api`;
 const jvarchiveApiTopicsUrl = `${jvarchiveApiUrl}/topics`;
 
-const jvarchiveApiGetHotTopicsUrl = (itemsPerPage) => `${jvarchiveApiTopicsUrl}?page=1&itemsPerPage=${itemsPerPage}&orderBy=nb_messages&timeInterval=hour&topicState=created`;
+const jvarchiveApiGetHotTopicsUrl = (itemsPerPage, timeInterval) => `${jvarchiveApiTopicsUrl}?page=1&itemsPerPage=${itemsPerPage}&orderBy=nb_messages&timeInterval=${timeInterval}&topicState=created`;
 
-const getJvArchiveHotTopics = async (nb = 10) => await fetchJson(jvarchiveApiGetHotTopicsUrl(nb), 3000);
+const getJvArchiveHotTopics = async (itemsPerPage = 20, timeInterval = 'day') => await fetchJson(jvarchiveApiGetHotTopicsUrl(itemsPerPage, timeInterval), 3000);
 
 function parseJvArchiveHotTopicResults(results) {
     if (!results?.items?.length) return null;

@@ -874,8 +874,8 @@ async function entryPoint() {
     }
 }
 
-if (document.readyState == 'loading') {
-    window.addEventListener('DOMContentLoaded', entryPoint);
-} else {
+if (document.readyState === 'interactive' || document.readyState === 'complete') {
     entryPoint();
+} else {
+    addEventListener('DOMContentLoaded', entryPoint);
 }

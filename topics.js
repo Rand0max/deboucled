@@ -735,8 +735,17 @@ function buildEnableSmoothScrollButton(smoothScrollCallback) {
 }
 
 async function buildHotTopics() {
-    const topTopicResults = await getJvArchiveHotTopics(5);
-    const topTopics = parseJvArchiveHotTopicResults(topTopicResults);
+    const topTopicResults = await getJvArchiveHotTopics(100);
+    let topTopics = parseJvArchiveHotTopicResults(topTopicResults);
+
+    let minDate = new Date();
+    minDate.setHours(minDate.getHours() - 1);
+
+    topTopics = topTopics
+        .filter(t => t.lastMessageDate >= minDate) // dernier message il y a moins d'une heure
+        .sort((a, b) => (a.nbMessages > b.nbMessages) ? -1 : 1) // tri décroissant par nb messages
+        .slice(0, 5); // sélection des 5 premiers
+
     return topTopics;
 }
 

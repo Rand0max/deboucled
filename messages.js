@@ -241,7 +241,7 @@ function fixMessageUrls(messageContent) {
 
         const textChildren = getTextChildren(element);
         textChildren.forEach(textNode => {
-            if (!textNode.textContent?.length) return;
+            if (!textNode.textContent?.length || !textNode.parentElement) return;
             const newText = textNode.textContent?.replaceAll(regex, replaceCallback);
             if (textNode.textContent === newText) return;
 
@@ -286,7 +286,7 @@ function highlightQuotedAuthor(messageContent, messageElement) {
         });
         const textChildren = getTextChildren(element);
         textChildren.forEach(textNode => {
-            if (!textNode.textContent?.length) return;
+            if (!textNode.textContent?.length || !textNode.parentElement) return;
             if (alternateCallback) alternateCallback(textNode);
 
             const newText = textNode.textContent?.replaceAll(regex, replaceCallback);
