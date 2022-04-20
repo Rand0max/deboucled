@@ -401,7 +401,7 @@ function buildBadge(content, hint, url, level, iconClass) {
 }
 
 function markTopicPoc(nearElement, withHint = true) {
-    const pocBadge = buildBadge('PoC', withHint ? 'Détection d\'un "post ou cancer"' : undefined, 'https://jvflux.fr/Post_ou_cancer', 'warning');
+    const pocBadge = buildBadge('PoC', withHint ? 'Détection d\'un "post ou cancer"' : undefined, 'https://jvflux.fr/Post_ou_cancer', 'danger');
     nearElement.insertAdjacentElement('afterend', pocBadge);
 }
 
@@ -739,12 +739,12 @@ async function buildHotTopics() {
     let topTopics = parseJvArchiveHotTopicResults(topTopicResults);
 
     let minDate = new Date();
-    minDate.setHours(minDate.getHours() - 1);
+    minDate.setMinutes(minDate.getMinutes() - 15);
 
     topTopics = topTopics
-        .filter(t => t.lastMessageDate >= minDate) // dernier message il y a moins d'une heure
+        .filter(t => t.lastMessageDate >= minDate) // dernier message il y a moins de 15 minutes
         .sort((a, b) => (a.nbMessages > b.nbMessages) ? -1 : 1) // tri décroissant par nb messages
-        .slice(0, 5); // sélection des 5 premiers
+        .slice(0, 10); // sélection des 10 premiers
 
     return topTopics;
 }
