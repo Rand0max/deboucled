@@ -737,6 +737,7 @@ function buildEnableSmoothScrollButton(smoothScrollCallback) {
 async function buildHotTopics() {
     const topTopicResults = await getJvArchiveHotTopics(100);
     let topTopics = parseJvArchiveHotTopicResults(topTopicResults);
+    if (!topTopics?.length) return;
 
     let minDate = new Date();
     minDate.setMinutes(minDate.getMinutes() - 15);
