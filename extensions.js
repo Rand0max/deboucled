@@ -129,7 +129,7 @@ function buildEntityRegex(array, withBoundaries) {
     let bStart = withBoundaries ? '(?<=\\W|^)' : '';
     let bEnd = withBoundaries ? '(?=\\W|$)' : '';
 
-    let regexMap = array.map((e) => {
+    let regexMap = array.filter(e => e?.length).map((e) => {
         let word = e.escapeRegexPatterns().normalizeDiacritic();
         word = transformGenericChars(word);
         return `${bStart}${word}${bEnd}`;
