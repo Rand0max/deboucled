@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.27.0] (23/04/2022)
+- Smileys JVC intégrés directement aux titres des topics
+- Modification de l'option pour masquer les messages : si l'auteur est blacklist et que l'option "Masquer totalement les messages des pseudos blacklist" est désactivée, le message sera visible en cliquant sur l'icone de "oeil"
+- Corrections mineures
+
 ## [2.26.0] (18/04/2022)
 
 - Affichage des topics tendance : vous trouverez un pictogramme "flamme" à côté des topics les plus actifs du forum
