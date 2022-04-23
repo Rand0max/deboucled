@@ -245,10 +245,7 @@ async function awaitElements(target, selector) {
                 observer.disconnect();
             }
         });
-        observer.observe(target, {
-            childList: true,
-            subtree: true,
-        });
+        observer.observe(target, { childList: true, subtree: true });
     });
 }
 

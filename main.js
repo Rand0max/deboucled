@@ -251,6 +251,8 @@ async function handleTopicListOptions(topics) {
     let optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
     if (optionDisplayHotTopics) await handleHotTopics(topics);
 
+    createTitleSmileys(topics);
+
     parseTopicListAuthors(topics);
     await handlePoc(topics);
     await saveLocalStorage();
@@ -412,7 +414,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
         else {
             highlightBlacklistedAuthor(messageElement, authorElement);
             addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
-            if (isFirstMessage && !messageOptions.isWhitelistedTopic) hideMessageContent(messageContent);
+            if (!messageOptions.isWhitelistedTopic) hideMessageContent(messageContent);
         }
         return true;
     }
@@ -808,6 +810,8 @@ async function init(currentPageType) {
 }
 
 async function entryPoint() {
+    if (!document.body) await sleep(200);
+
     let start = performance.now();
     try {
         const currentPageType = getCurrentPageType(`${window.location.pathname}${window.location.search}`);

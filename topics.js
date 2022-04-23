@@ -406,7 +406,8 @@ function markTopicPoc(nearElement, withHint = true) {
 }
 
 function markTopicLoop(subject, nearElement, withHint = true) {
-    const redirectUrl = `${jvarchiveUrl}/topic/recherche?searchType=titre_topic&search=${subject.trim()}`;
+    const cleanSubject = subject.replaceAll('%', '').trim();
+    const redirectUrl = `${jvarchiveUrl}/topic/recherche?searchType=titre_topic&search=${cleanSubject}`;
     const loopBadge = buildBadge('BOUCLE', withHint ? `Consulter cette boucle sur JvArchive` : undefined, redirectUrl, 'danger');
     nearElement.insertAdjacentElement('afterend', loopBadge);
 }
@@ -589,6 +590,13 @@ function removeUselessTags(topics) {
     });
 }
 
+function createTitleSmileys(topics) {
+    topics.slice(1).forEach(function (topic) {
+        const titleElem = topic.querySelector('.lien-jv.topic-title');
+        titleElem.innerHTML = titleElem.textContent.replace(smileyGifRegex, getSmileyImgHtml);
+    });
+}
+
 function buildLoaderStatus() {
     const loaderRequest = `
     <div class="loader-ellips infinite-scroll-request">
@@ -745,8 +753,72 @@ async function buildHotTopics() {
     topTopics = topTopics
         .filter(t => t.lastMessageDate >= minDate) // dernier message il y a moins de 15 minutes
         .sort((a, b) => (a.nbMessages > b.nbMessages) ? -1 : 1) // tri décroissant par nb messages
-        .slice(0, 10); // sélection des 10 premiers
+        .slice(0, 5); // sélection des 5 premiers
 
     return topTopics;
+}
+
+function initSmileyGifMap() {
+    console.log(smileyGifMap);
+    smileyGifMap = new Map([
+        [':)', '1'],
+        [':snif:', '20'],
+        [':gba:', '17'],
+        [':g)', '3'],
+        [':-)', '46'],
+        [':snif2:', '13'],
+        [':bravo:', '69'],
+        [':d)', '4'],
+        [':hap:', '18'],
+        [':ouch:', '22'],
+        [':pacg:', '9'],
+        [':cd:', '5'],
+        [':-)))', '23'],
+        [':ouch2:', '57'],
+        [':pacd:', '10'],
+        [':cute:', 'nyu'],
+        [':content:', '24'],
+        [':p)', '7'],
+        [':-p', '31'],
+        [':noel:', '11'],
+        [':oui:', '37'],
+        [':(', '45'],
+        [':peur:', '47'],
+        [':cool:', '26'],
+        [':-(', '14'],
+        [':mort:', '21'],
+        [':rire:', '39'],
+        [':-((', '15'],
+        [':fou:', '50'],
+        [':-D', '40'],
+        [':nonnon:', '25'],
+        [':fier:', '53'],
+        [':honte:', '30'],
+        [':rire2:', '41'],
+        [':non2:', '33'],
+        [':sarcastic:', '43'],
+        [':monoeil:', '34'],
+        [':o))', '12'],
+        [':nah:', '19'],
+        [':doute:', '28'],
+        [':rouge:', '55'],
+        [':ok:', '36'],
+        [':non:', '35'],
+        [':malade:', '8'],
+        [':sournois:', '67'],
+        [':hum:', '68'],
+        [':bave:', '71'],
+        [':pf:', 'pf'],
+        [':siffle:', 'siffle']
+    ]);
+    let regexMap = [...smileyGifMap.keys()].map((e) => e.escapeRegexPatterns());
+    smileyGifRegex = new RegExp(`(${regexMap.join('|')})`, 'g');
+}
+
+function getSmileyImgHtml(smiley) {
+    if (!smiley?.length) return smiley;
+    const gifCode = smileyGifMap.get(smiley);
+    if (!gifCode?.length) return smiley;
+    return `<img data-code="${smiley}" src="https://image.jeuxvideo.com/smileys_img/${gifCode}.gif" alt="" width="16" height="16">`;
 }
 
