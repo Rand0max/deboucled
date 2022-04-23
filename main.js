@@ -251,7 +251,7 @@ async function handleTopicListOptions(topics) {
     let optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
     if (optionDisplayHotTopics) await handleHotTopics(topics);
 
-    createTitleSmileys(topics);
+    createTopicTitleSmileys(topics);
 
     parseTopicListAuthors(topics);
     await handlePoc(topics);
@@ -497,7 +497,7 @@ function handleTopicWhitelist() {
     return isWhitelisted;
 }
 
-function highlightTopicTitle() {
+function highlightTopicHeaderTitle() {
     let titleElement = document.querySelector('#bloc-title-forum');
     if (!titleElement) return;
 
@@ -510,7 +510,13 @@ function highlightTopicTitle() {
     highlightBlacklistMatches(titleElement, subjectMatches);
 }
 
-function buildTopicBadges() {
+function createTopicHeaderSmileys() {
+    const titleElement = document.querySelector('#bloc-title-forum');
+    if (!titleElement) return;
+    titleElement.innerHTML = titleElement.innerHTML.replace(smileyGifRegex, (e) => getSmileyImgHtml(e, true));
+}
+
+function buildTopicHeaderBadges() {
     const titleElement = document.querySelector('#bloc-title-forum');
     if (!titleElement || !currentTopicAuthor?.length || !currentTopicId) return;
 
@@ -530,8 +536,9 @@ function buildTopicBadges() {
 }
 
 function handleTopicHeader() {
-    highlightTopicTitle();
-    buildTopicBadges();
+    highlightTopicHeaderTitle();
+    createTopicHeaderSmileys();
+    buildTopicHeaderBadges();
     return handleTopicWhitelist();
 }
 

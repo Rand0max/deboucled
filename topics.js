@@ -590,10 +590,10 @@ function removeUselessTags(topics) {
     });
 }
 
-function createTitleSmileys(topics) {
+function createTopicTitleSmileys(topics) {
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
-        titleElem.innerHTML = titleElem.textContent.replace(smileyGifRegex, getSmileyImgHtml);
+        titleElem.innerHTML = titleElem.textContent.replace(smileyGifRegex, (e) => getSmileyImgHtml(e, false));
     });
 }
 
@@ -759,7 +759,6 @@ async function buildHotTopics() {
 }
 
 function initSmileyGifMap() {
-    console.log(smileyGifMap);
     smileyGifMap = new Map([
         [':)', '1'],
         [':snif:', '20'],
@@ -815,10 +814,10 @@ function initSmileyGifMap() {
     smileyGifRegex = new RegExp(`(${regexMap.join('|')})`, 'g');
 }
 
-function getSmileyImgHtml(smiley) {
+function getSmileyImgHtml(smiley, big = false) {
     if (!smiley?.length) return smiley;
     const gifCode = smileyGifMap.get(smiley);
     if (!gifCode?.length) return smiley;
-    return `<img data-code="${smiley}" src="https://image.jeuxvideo.com/smileys_img/${gifCode}.gif" alt="" width="16" height="16">`;
+    return `<img data-code="${smiley}" title="${smiley}" src="https://image.jeuxvideo.com/smileys_img/${gifCode}.gif" class="deboucled-smiley${big ? ' big' : ''}">`;
 }
 

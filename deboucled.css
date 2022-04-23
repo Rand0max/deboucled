@@ -777,6 +777,15 @@ blockquote .deboucled-highlighted {
   height: 24px;
   background-size: 24px;
 }
+.deboucled-smiley {
+  vertical-align: text-bottom;
+  width: 15px;
+  height: 15px;
+}
+.deboucled-smiley.big {
+  width: 20px;
+  height: 20px;
+}
 
 /* Quotes */
 .deboucled-quote {
