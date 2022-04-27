@@ -363,7 +363,8 @@ function handleMessageBlacklistMatches(messageElement) {
 }
 
 function hideMessageContent(contentElement) {
-    const blocContenu = contentElement.parentElement;
+    const blocContenu = contentElement?.parentElement;
+    if (!blocContenu) return;
     blocContenu.style.display = 'none';
 
     let divWrapper = document.createElement('div');
@@ -444,8 +445,9 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
         enhanceBlockquotes(messageContent);
     }
 
-    if (!messageOptions.optionBlSubjectIgnoreMessages || isSelf) return;
-    handleBlSubjectIgnoreMessages(messageElement);
+    if (messageOptions.optionBlSubjectIgnoreMessages && !isSelf) {
+        handleBlSubjectIgnoreMessages(messageElement);
+    }
 }
 
 async function parseTopicAuthor(pageId) {
@@ -579,6 +581,7 @@ function prepareMessageOptions(isWhitelistedTopic) {
     const optionEnhanceQuotations = store.get(storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default);
     const optionAntiSpam = store.get(storage_optionAntiSpam, storage_optionAntiSpam_default);
     const optionSmoothScroll = store.get(storage_optionSmoothScroll, storage_optionSmoothScroll_default);
+    const optionHideLongMessages = store.get(storage_optionHideLongMessages, storage_optionHideLongMessages_default);
 
     const messageOptions = {
         optionHideMessages: optionHideMessages,
@@ -587,7 +590,8 @@ function prepareMessageOptions(isWhitelistedTopic) {
         optionEnhanceQuotations: optionEnhanceQuotations,
         optionAntiSpam: optionAntiSpam,
         optionSmoothScroll: optionSmoothScroll,
-        isWhitelistedTopic: isWhitelistedTopic
+        isWhitelistedTopic: isWhitelistedTopic,
+        optionHideLongMessages: optionHideLongMessages
     };
     return messageOptions;
 }
@@ -626,6 +630,8 @@ async function handleTopicMessages() {
     else {
         buildEnableSmoothScrollButton(smoothScrollCallback);
     }
+
+    if (messageOptions.optionHideLongMessages) handleLongMessages();
 }
 
 async function handleSearch() {
@@ -817,7 +823,7 @@ async function init(currentPageType) {
 }
 
 async function entryPoint() {
-    if (!document.body) await sleep(200);
+    if (!document.body) await sleep(300);
 
     let start = performance.now();
     try {

@@ -267,6 +267,18 @@ function fixMessageUrls(messageContent) {
         (m) => `<a class="xXx" href="${m}" title="${m}" target="_blank">${m}</a>`);
 }
 
+function handleLongMessages() {
+    // eslint-disable-next-line no-undef
+    new ShowMore('.txt-msg.text-enrichi-forum', {
+        config: {
+            type: 'text',
+            limit: 3000,
+            more: '→ lire la suite',
+            less: '← réduire'
+        }
+    });
+}
+
 function highlightQuotedAuthor(messageContent, messageElement) {
     if (!messageContent) return;
 

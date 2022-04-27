@@ -8,6 +8,9 @@ function addRightBlocMatches() {
     let optionDisplayTopicMatches = store.get(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
     if (!optionDisplayTopicMatches || (!matchedTopics.hasAny() && !matchedSubjects.hasAny() && !matchedAuthors.hasAny())) return;
 
+    const forumRightCol = document.querySelector('#forum-right-col');
+    if (!forumRightCol) return;
+
     function countMatchesOccurencies(matches) {
         let res = 0;
         matches.forEach((occ) => res += occ);
@@ -68,7 +71,7 @@ function addRightBlocMatches() {
     html += '</div>';
 
     let matches = document.createElement('div');
-    document.querySelector('#forum-right-col').append(matches);
+    forumRightCol.append(matches);
     matches.outerHTML = html;
 
     if (!optionClickToShowTopicMatches) return;
@@ -91,6 +94,9 @@ function addRightBlocStats() {
     let optionDisplayTopicCharts = store.get(storage_optionDisplayTopicCharts, storage_optionDisplayTopicCharts_default);
     if (!optionDisplayTopicCharts || !deboucledTopicStatsMap.hasAny() || !deboucledTopicStatsMap.anyValue((v) => v > 0)) return;
 
+    const forumRightCol = document.querySelector('#forum-right-col');
+    if (!forumRightCol) return;
+
     const calcAverage = arr => arr.reduce((p, c) => p + c, 0) / arr.length;
     const average = Math.round(calcAverage([...deboucledTopicStatsMap.values()]));
 
@@ -107,7 +113,7 @@ function addRightBlocStats() {
     html += '</div>';
     html += '</div>';
     let chart = document.createElement('div');
-    document.querySelector('#forum-right-col').append(chart);
+    forumRightCol.append(chart);
     chart.outerHTML = html;
 
     buildStatsChart();

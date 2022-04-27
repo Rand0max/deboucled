@@ -282,6 +282,8 @@ function isContentYoutubeBlacklisted(messageContentElement) {
 
 async function isVinzTopic(subject, author, topicUrl) {
     // TODO : implémenter du cache comme pour les poc
+    
+    if (typeof distance === 'undefined') return; // eslint-disable-line no-undef
 
     let topicContent = undefined;
 
@@ -447,7 +449,13 @@ function addPrevisualizeTopicEvent(topics) {
 
     function prepareMessagePreview(page) {
         if (!page) return;
-        let messagePreview = page.querySelector('.bloc-message-forum');
+
+        const imgErreur = page.querySelector('.img-erreur');
+        if (imgErreur) return imgErreur;
+
+        const messagePreview = page.querySelector('.bloc-message-forum');
+        if (!messagePreview) return;
+
         messagePreview.querySelector('.bloc-options-msg').remove(); // remove buttons
 
         // JvCare
@@ -481,7 +489,7 @@ function addPrevisualizeTopicEvent(topics) {
     async function onPreviewHover(anchor, topicUrl, previewDiv) {
         anchor.classList.toggle('active', true);
         if (previewDiv.querySelector('.bloc-message-forum')) return; // already loaded
-        const topicContent = await fetchHtml(topicUrl).then((html) => prepareMessagePreview(html));
+        const topicContent = await fetchHtml(topicUrl, true).then((html) => prepareMessagePreview(html));
         if (!topicContent) return;
         previewDiv.firstChild.remove();
         previewDiv.appendChild(topicContent);
@@ -491,7 +499,7 @@ function addPrevisualizeTopicEvent(topics) {
         let topicTitle = topic.querySelector('.topic-title');
         topicTitle.classList.add('deboucled-topic-title');
 
-        let topicUrl = topicTitle.getAttribute('href');
+        const topicUrl = topicTitle.getAttribute('href');
 
         let anchor = document.createElement('a');
         anchor.setAttribute('href', topicUrl);
@@ -808,7 +816,9 @@ function initSmileyGifMap() {
         [':hum:', '68'],
         [':bave:', '71'],
         [':pf:', 'pf'],
-        [':siffle:', 'siffle']
+        [':siffle:', 'siffle'],
+        [':globe:', '6'],
+        [':mac:', '16']
     ]);
     let regexMap = [...smileyGifMap.keys()].map((e) => e.escapeRegexPatterns());
     smileyGifRegex = new RegExp(`(${regexMap.join('|')})`, 'g');

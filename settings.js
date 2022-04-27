@@ -209,6 +209,8 @@ function buildSettingsPage() {
 
         html += addToggleOption(`Afficher le nombre de <i>topics ignorés</i> dans l'entête`, storage_optionDisplayTopicIgnoredCount, storage_optionDisplayTopicIgnoredCount_default, 'Afficher ou non le nombre de topics ignorés dans l\'entête de la liste des sujets : &quot;SUJETS (X IGNORÉS)&quot; .');
 
+        html += addToggleOption(`Masquer une partie des <i>messages trop longs</i>`, storage_optionHideLongMessages, storage_optionHideLongMessages_default, 'Si cette option est activée, le contenu des longs messages sera masqué et un bouton &quot;lire la suite&quot; apparaitra.');
+
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -433,6 +435,7 @@ function addSettingEvents() {
     });
     addRangeEvent(storage_optionTopicMsgCountThreshold);
     addToggleEvent(storage_optionDisplayTopicIgnoredCount);
+    addToggleEvent(storage_optionHideLongMessages);
 
     addPrebouclesEvents();
 }

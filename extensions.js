@@ -358,11 +358,12 @@ function getTextChildren(contentElement) {
     return [...contentElement.childNodes].filter(c => c.nodeType === Node.TEXT_NODE && c.textContent.trim() !== '');
 }
 
-async function fetchHtml(url) {
+async function fetchHtml(url, handle410 = false) {
     return fetch(url)
         .then(function (response) {
-            if (!response.ok) throw Error(response.statusText);
-            return response.text();
+            if (response.ok) return response.text();
+            if (handle410 && (response.status === 410 || response.status === 404)) return response.text();
+            throw Error(response.statusText);
         }).then(function (res) {
             return domParser.parseFromString(res, 'text/html');
         }).catch(function (err) {

@@ -779,11 +779,11 @@ blockquote .deboucled-highlighted {
 }
 .deboucled-smiley {
   vertical-align: text-bottom;
-  width: 15px;
+  min-width: 15px;
   height: 15px;
 }
 .deboucled-smiley.big {
-  width: 20px;
+  min-width: 20px;
   height: 20px;
 }
 
@@ -1717,6 +1717,21 @@ select.deboucled-dropdown::-ms-expand {
 .loader-ellips__dot:nth-child(4) {
   animation-name: reveal;
   animation-direction: reverse;
+}
+
+/* Show more */
+.show-more-btn {
+  background: #0000;
+  border: 0;
+  color: #0095e5;
+  cursor: pointer;
+  font-size: 0.85em;
+  margin: auto;
+  transition: color 0.3s ease-in-out;
+  white-space: nowrap;
+}
+.show-more-btn:hover {
+  color: red;
 }
 
 /* Media queries */
