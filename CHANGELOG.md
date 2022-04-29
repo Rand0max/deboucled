@@ -1,11 +1,19 @@
 # Changelog Déboucled
 
+## [2.27.7] (29/04/2022)
+
+- Option pour intégrer ou non les smileys JVC
+- Correction sur le tri des listes
+- Corrections mineures
+
 ## [2.27.5] (27/04/2022)
+
 - Ajout des smileys manquants
 - Option pour masquer le contenu des messages trop longs
 - Correction sur l'aperçu d'un topic 410
 
 ## [2.27.0] (23/04/2022)
+
 - Smileys JVC intégrés directement aux titres des topics
 - Modification de l'option pour masquer les messages : si l'auteur est blacklist et que l'option "Masquer totalement les messages des pseudos blacklist" est désactivée, le message sera visible en cliquant sur l'icone de "oeil"
 - Corrections mineures

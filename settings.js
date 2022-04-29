@@ -211,6 +211,9 @@ function buildSettingsPage() {
 
         html += addToggleOption(`Masquer une partie des <i>messages trop longs</i>`, storage_optionHideLongMessages, storage_optionHideLongMessages_default, 'Si cette option est activée, le contenu des longs messages sera masqué et un bouton &quot;lire la suite&quot; apparaitra.');
 
+        let smileyLogo = '<img src="https://image.jeuxvideo.com/smileys_img/26.gif" style="vertical-align: bottom;"></img>'
+        html += addToggleOption(`Intégrer les <i>smileys JVC</i> ${smileyLogo} dans les titres`, storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default, 'Permet d\'intégrer les smileys JVC dans les titres des topics.');
+
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -436,6 +439,7 @@ function addSettingEvents() {
     addRangeEvent(storage_optionTopicMsgCountThreshold);
     addToggleEvent(storage_optionDisplayTopicIgnoredCount);
     addToggleEvent(storage_optionHideLongMessages);
+    addToggleEvent(storage_optionDisplayTitleSmileys);
 
     addPrebouclesEvents();
 }
@@ -629,10 +633,10 @@ function refreshAuthorKeys(filter = null) {
     let sortCallback = null;
     switch (sortModeAuthor) {
         case 1:
-            sortCallback = (array) => array.sort();
+            sortCallback = (array) => array.sortNormalize();
             break;
         case 2:
-            sortCallback = (array) => array.sort().reverse();
+            sortCallback = (array) => array.sortNormalize().reverse();
             break;
     }
 

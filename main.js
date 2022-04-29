@@ -251,7 +251,8 @@ async function handleTopicListOptions(topics) {
     let optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
     if (optionDisplayHotTopics) await handleHotTopics(topics);
 
-    createTopicTitleSmileys(topics);
+    let optionDisplayTitleSmileys = store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default);
+    if (optionDisplayTitleSmileys) createTopicTitleSmileys(topics);
 
     parseTopicListAuthors(topics);
     await handlePoc(topics);
@@ -537,11 +538,10 @@ function buildTopicHeaderBadges() {
     }
 }
 
-function handleTopicHeader() {
+function handleTopicHeader(messageOptions) {
     highlightTopicHeaderTitle();
-    createTopicHeaderSmileys();
+    if (messageOptions.optionDisplayTitleSmileys) createTopicHeaderSmileys();
     buildTopicHeaderBadges();
-    return handleTopicWhitelist();
 }
 
 function displayTopicDeboucledMessage() {
@@ -582,6 +582,7 @@ function prepareMessageOptions(isWhitelistedTopic) {
     const optionAntiSpam = store.get(storage_optionAntiSpam, storage_optionAntiSpam_default);
     const optionSmoothScroll = store.get(storage_optionSmoothScroll, storage_optionSmoothScroll_default);
     const optionHideLongMessages = store.get(storage_optionHideLongMessages, storage_optionHideLongMessages_default);
+    const optionDisplayTitleSmileys = store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default);
 
     const messageOptions = {
         optionHideMessages: optionHideMessages,
@@ -591,7 +592,8 @@ function prepareMessageOptions(isWhitelistedTopic) {
         optionAntiSpam: optionAntiSpam,
         optionSmoothScroll: optionSmoothScroll,
         isWhitelistedTopic: isWhitelistedTopic,
-        optionHideLongMessages: optionHideLongMessages
+        optionHideLongMessages: optionHideLongMessages,
+        optionDisplayTitleSmileys: optionDisplayTitleSmileys
     };
     return messageOptions;
 }
@@ -601,9 +603,11 @@ async function handleTopicMessages() {
     currentTopicPageId = getTopicCurrentPageId();
     currentTopicAuthor = await parseTopicAuthor();
 
-    const isWhitelistedTopic = handleTopicHeader();
+    const isWhitelistedTopic = handleTopicWhitelist();
 
     const messageOptions = prepareMessageOptions(isWhitelistedTopic);
+
+    handleTopicHeader(messageOptions);
 
     handleJvChatAndTopicLive(messageOptions);
 

@@ -416,7 +416,7 @@ async function enhanceBlockquotes(messageContent) {
         let numberNestedBq = bq.querySelectorAll('blockquote').length;
         const blockquoteButton = createBlockquoteButton(numberNestedBq + 1);
         if (!bq.previousElementSibling) bq.parentElement.prepend(document.createElement('p'));
-        bq.previousElementSibling.append(blockquoteButton);
+        if (bq.previousElementSibling) bq.previousElementSibling.append(blockquoteButton);
     });
 
 
