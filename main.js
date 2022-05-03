@@ -248,11 +248,11 @@ async function handleTopicListOptions(topics) {
     let optionRemoveUselessTags = store.get(storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default);
     if (optionRemoveUselessTags) removeUselessTags(topics);
 
-    let optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
-    if (optionDisplayHotTopics) await handleHotTopics(topics);
-
     let optionDisplayTitleSmileys = store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default);
     if (optionDisplayTitleSmileys) createTopicTitleSmileys(topics);
+
+    let optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
+    if (optionDisplayHotTopics) await handleHotTopics(topics);
 
     parseTopicListAuthors(topics);
     await handlePoc(topics);
@@ -277,8 +277,8 @@ async function handleHotTopics(finalTopics) {
         const hotTopic = hotTopics.find(ht => ht.id === parseInt(topicId));
         if (!hotTopic) return;
         const titleElem = topic.querySelector('.lien-jv.topic-title');
-        titleElem.style.width = 'auto';
-        markTopicHot(hotTopic.url, titleElem);
+        titleElem.style.overflow = 'visible';
+        markTopicHot(titleElem);
     });
 }
 
@@ -363,14 +363,16 @@ function handleMessageBlacklistMatches(messageElement) {
     return highlightChildren(messageElement);
 }
 
-function hideMessageContent(contentElement) {
+function hideMessageContent(contentElement, wrapperAltClass = '') {
     const blocContenu = contentElement?.parentElement;
     if (!blocContenu) return;
     blocContenu.style.display = 'none';
 
     let divWrapper = document.createElement('div');
-    divWrapper.className = 'deboucled-matches-wrapper deboucled-message-wrapper';
-    blocContenu.parentElement.appendChild(divWrapper);
+    divWrapper.className = `deboucled-matches-wrapper deboucled-message-wrapper ${wrapperAltClass}`.trim();
+    //blocContenu.parentElement.appendChild(divWrapper);
+    blocContenu.insertAdjacentElement('afterend', divWrapper);
+
     let spanEye = document.createElement('span');
     const whiteEyeClass = preferDarkTheme() ? '-white' : '';
     spanEye.className = `deboucled-eye${whiteEyeClass}-logo deboucled-display-matches`;
@@ -411,25 +413,25 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
             hiddenAuthorArray.add(author);
             matchedAuthors.addArrayIncrement(authorMatch);
             hiddenAuthors++;
-            return false; // si on a supprimé le message on se casse, plus rien à faire
+            return true; // si on a supprimé le message on se casse, plus rien à faire
         }
         else {
             highlightBlacklistedAuthor(messageElement, authorElement);
             addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
             if (!messageOptions.isWhitelistedTopic) hideMessageContent(messageContent);
+            return false;
         }
-        return true;
     }
 
     const authorBlacklistedMatch = getAuthorBlacklistMatches(author, isSelf);
     if (authorBlacklistedMatch?.length) {
-        if (!handleBlacklistedAuthor(authorBlacklistedMatch)) return;
+        if (handleBlacklistedAuthor(authorBlacklistedMatch)) return;
     }
     else if (messageOptions.optionAntiSpam && isContentYoutubeBlacklisted(messageContent)) {
         addEntityBlacklist(shadowent, author); // on rajoute automatiquement le spammeur à la BL        
         buildBlacklistsRegex(entityAuthor);
         hiddenSpammers++;
-        if (!handleBlacklistedAuthor([author])) return;
+        if (handleBlacklistedAuthor([author])) return;
     }
     else {
         let optionShowJvcBlacklistButton = store.get(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
@@ -444,6 +446,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
         highlightSpecialAuthors(author, authorElement, isSelf);
         highlightQuotedAuthor(messageContent, messageElement);
         enhanceBlockquotes(messageContent);
+        handleQuotedAuthorBlacklist(messageContent);
     }
 
     if (messageOptions.optionBlSubjectIgnoreMessages && !isSelf) {
@@ -738,7 +741,7 @@ function handleProfil() {
     if (authorBlacklistMatches?.length) {
         highlightBlacklistedAuthor(undefined, infosPseudoElement.firstElementChild ?? infosPseudoElement);
     }
-    else if (!userPseudo || userPseudo.toLocaleLowerCase() !== author.toLocaleLowerCase()) {
+    else if (!userPseudo || userPseudo.toLowerCase() !== author.toLowerCase()) {
         let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload() }, 'deboucled-blacklist-profil-button');
         blocOptionProfil.append(dbcBlacklistButton);
     }

@@ -180,7 +180,7 @@ async function isTopicBlacklisted(topicElement, topicOptions) {
 
     const topicId = topicElement.getAttribute('data-id');
     if (topicIdBlacklistMap.has(topicId) && !deboucledTopics.includes(topicId)) {
-        matchedTopics.set(topicIdBlacklistMap.get(topicId), 1);
+        matchedTopics.set(topicId, topicIdBlacklistMap.get(topicId));
         hiddenTopicsIds++;
         return true;
     }
@@ -282,7 +282,7 @@ function isContentYoutubeBlacklisted(messageContentElement) {
 
 async function isVinzTopic(subject, author, topicUrl) {
     // TODO : implémenter du cache comme pour les poc
-    
+
     if (typeof distance === 'undefined') return; // eslint-disable-line no-undef
 
     let topicContent = undefined;
@@ -394,8 +394,8 @@ function buildBadge(content, hint, url, level, iconClass) {
     anchor.target = '_blank';
     const badge = document.createElement('span');
     let badgeClass = 'deboucled-badge';
-    if (level) badgeClass = `${badgeClass}-${level}${preferDarkTheme() ? ' dark' : ''}`;
-    badge.className = `deboucled-badge ${badgeClass} ${hint ? '' : 'pill'} ${iconClass}`.trim();
+    if (level) badgeClass = `${badgeClass} ${badgeClass}-${level}${preferDarkTheme() ? ' dark' : ''}`;
+    badge.className = `${badgeClass} ${hint ? '' : 'pill'} ${iconClass ? iconClass : ''}`.trim();
     badge.textContent = content;
     if (hint?.length) badge.setAttribute('deboucled-data-tooltip', hint);
     anchor.appendChild(badge);
@@ -414,9 +414,16 @@ function markTopicLoop(subject, nearElement, withHint = true) {
     nearElement.insertAdjacentElement('afterend', loopBadge);
 }
 
-function markTopicHot(topicUrl, nearElement, withHint = true) {
-    const loopBadge = buildBadge('', withHint ? 'Topic tendance' : undefined, topicUrl, undefined, `deboucled-fire-logo${withHint ? '' : ' big'}`);
-    nearElement.insertAdjacentElement('afterend', loopBadge);
+function markTopicHot(titleElem, withHint = true) {
+    const loopBadge = document.createElement('span');
+    if (withHint) {
+        loopBadge.className = 'deboucled-badge deboucled-fire-logo';
+        loopBadge.setAttribute('deboucled-data-tooltip', 'Topic tendance');
+    }
+    else {
+        loopBadge.className = 'deboucled-badge deboucled-fire-logo big';
+    }
+    titleElem.appendChild(loopBadge);
 }
 
 function addIgnoreButtons(topics) {
@@ -586,14 +593,13 @@ async function topicIsModerated(topicId) {
 
 function removeUselessTags(topics) {
     // eslint-disable-next-line no-useless-escape
-    const regex = /(\[?\ba+y+a+o*\b\]?|[\{[(🛑🔴🚨 ]+(alerte.*?)[\}\])🛑🔴🚨]+|^\balerte\b)\s?:?-?,?!?/giu;
+    const regex = /(\[?\ba+y+a+o*\b\]?|[\{[(🛑🔴🚨 ]+(alerte.*?)[\}\])🛑🔴🚨]+|^\balerte\s?(rouge|noire|nucleaire|ecarlate)?\b)\s?:?-?,?!?/giu;
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
         let newTitle = titleElem.textContent.replace(regex, '');
         newTitle = newTitle.removeSurrogatePairs();
         newTitle = newTitle.replace(/\(\)|\[\]|{}/g, '');
-        newTitle = newTitle.removeDoubleSpaces();
-        newTitle = newTitle.trim().toLowerCase().capitalize();
+        newTitle = newTitle.removeDoubleSpaces().trim().toLowerCase().capitalize();
         if (newTitle.length > 0) titleElem.textContent = newTitle;
     });
 }

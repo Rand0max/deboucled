@@ -279,6 +279,27 @@ function handleLongMessages() {
     });
 }
 
+function handleQuotedAuthorBlacklist(messageContent) {
+    if (!messageContent) return;
+
+    const authorElements = [...messageContent.querySelectorAll('a.deboucled-highlighted:not(.self)')];
+    if (!authorElements?.length) return;
+
+    authorElements.forEach(e => {
+        const containerBlockquote = e.parentElement.parentElement;
+        if (!containerBlockquote || containerBlockquote.classList.contains('deboucled-blockquote-container')) return;
+
+        const author = e.textContent.trim().toLowerCase();
+        if (!author?.length) return;
+
+        const isSelf = userPseudo?.toLowerCase() === author.toLowerCase();
+        const authorBlacklistedMatch = getAuthorBlacklistMatches(author, isSelf);
+        if (!authorBlacklistedMatch?.length) return;
+
+        hideMessageContent(e.parentElement, 'deboucled-blacklisted-blockquote');
+    });
+}
+
 function highlightQuotedAuthor(messageContent, messageElement) {
     if (!messageContent) return;
 
@@ -301,15 +322,15 @@ function highlightQuotedAuthor(messageContent, messageElement) {
             if (!textNode.textContent?.length || !textNode.parentElement) return;
             if (alternateCallback) alternateCallback(textNode);
 
-            const newText = textNode.textContent?.replaceAll(regex, replaceCallback);
-            if (textNode.textContent === newText) return;
+            const newContent = textNode.textContent?.replaceAll(regex, replaceCallback);
+            if (textNode.textContent === newContent) return;
 
             if (depth <= 2 && containerElement) containerElement.classList.toggle('deboucled-message-quoted', true);
 
             let newNode = document.createElement('a');
             textNode.parentElement.insertBefore(newNode, textNode);
             textNode.remove(); // Toujours remove avant de changer l'outerHTML pour éviter le bug avec Chrome
-            newNode.outerHTML = newText;
+            newNode.outerHTML = newContent;
         });
     }
 

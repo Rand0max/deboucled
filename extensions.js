@@ -431,3 +431,7 @@ function stringifyError(error) {
     return JSON.stringify(error, ['message', 'name', 'stack', 'fileName', 'arguments', 'type', 'columnNumber', 'lineNumber']);
 }
 
+function buildRandomStr(maxLength) {
+    return (Math.random() + 1).toString(36).substring(maxLength);
+}
+

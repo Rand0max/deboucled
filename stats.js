@@ -17,7 +17,7 @@ function addRightBlocMatches() {
         return res;
     }
 
-    const totalMatchesHidden = countMatchesOccurencies(matchedTopics) + countMatchesOccurencies(matchedSubjects) + countMatchesOccurencies(matchedAuthors); // hiddenTotalTopics
+    const totalMatchesHidden = countMatchesOccurencies(matchedSubjects) + countMatchesOccurencies(matchedAuthors) + matchedTopics.size; // hiddenTotalTopics
 
     let html = '';
     html += '<div class="card card-jv-forum card-forum-margin">';
@@ -29,14 +29,15 @@ function addRightBlocMatches() {
 
     const formatMatch = (str) => str.replaceAll(',', '').removeDoubleSpaces().trim().capitalize();
 
-    function formatMatches(matches, withHint) {
+    function formatMatches(matches, withHint, formatCallback, urlCallback) {
         let matchesSorted = matches.sortByValueThenKey(true);
         let matchesHtml = '';
         let index = 0;
         matchesSorted.forEach((occ, match) => {
             const className = `deboucled-match${index < matchesSorted.size - 1 ? ' match-after' : ''}`;
             const hint = withHint ? ` deboucled-data-tooltip="${occ} fois"` : '';
-            matchesHtml += `<span class="${className}"${hint}>${formatMatch(match)}</span>`;
+            if (urlCallback) matchesHtml += `<a class="${className}"${hint} href="${urlCallback(match, occ)}" target="_blank">${formatCallback(match, occ)}</a>`;
+            else matchesHtml += `<span class="${className}"${hint}>${formatCallback(match, occ)}</span>`;
             index++;
         });
         return matchesHtml;
@@ -44,25 +45,25 @@ function addRightBlocMatches() {
 
     let optionClickToShowTopicMatches = store.get(storage_optionClickToShowTopicMatches, storage_optionClickToShowTopicMatches_default);
 
-    function addMatches(matches, entity, title, withHint) {
+    function addMatches(matches, entity, title, withHint, formatCallback, urlCallback) {
         let matchesHtml = '';
         matchesHtml += `<h4 class="titre-info-fofo">${title}</h4>`;
         if (optionClickToShowTopicMatches) {
             matchesHtml += `<div id="deboucled-matches-${entity}-wrapper" class="deboucled-hide-wrapper">`;
             matchesHtml += `<span class="deboucled-eye-logo deboucled-display-matches"></span>`;
-            matchesHtml += `<div id="deboucled-matched-${entity}" style="display:none;">${formatMatches(matches, withHint)}</div>`;
+            matchesHtml += `<div id="deboucled-matched-${entity}" style="display:none;">${formatMatches(matches, withHint, formatCallback, urlCallback)}</div>`;
         }
         else {
             matchesHtml += `<div id="deboucled-matches-${entity}-wrapper">`;
-            matchesHtml += `<div id="deboucled-matched-${entity}">${formatMatches(matches, withHint)}</div>`;
+            matchesHtml += `<div id="deboucled-matched-${entity}">${formatMatches(matches, withHint, formatCallback, urlCallback)}</div>`;
         }
         matchesHtml += '</div>';
         return matchesHtml;
     }
 
-    if (matchedSubjects.hasAny()) html += addMatches(matchedSubjects, entitySubject, 'Sujets', true);
-    if (matchedAuthors.hasAny()) html += addMatches(matchedAuthors, entityAuthor, 'Auteurs', true);
-    if (matchedTopics.hasAny()) html += addMatches(matchedTopics, entityTopicId, 'Topics', false);
+    if (matchedSubjects.hasAny()) html += addMatches(matchedSubjects, entitySubject, 'Sujets', true, (m) => formatMatch(m));
+    if (matchedAuthors.hasAny()) html += addMatches(matchedAuthors, entityAuthor, 'Auteurs', true, (m) => formatMatch(m), (m) => `/profil/${m.toLowerCase()}?mode=infos`);
+    if (matchedTopics.hasAny()) html += addMatches(matchedTopics, entityTopicId, 'Topics', false, (_, o) => formatMatch(o), (m) => `/forums/42-51-${m}-1-0-1-0-${buildRandomStr(6)}.htm`);
 
     html += '</div>';
     html += '</div>';

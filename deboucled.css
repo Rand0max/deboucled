@@ -1050,6 +1050,7 @@ input[type="search"] {
   margin-right: 5px;
   cursor: pointer;
   user-select: text;
+  color: var(--jv-blue-gray-color);
 }
 .deboucled-match.match-after::after {
   content: ",";
@@ -1084,6 +1085,13 @@ input[type="search"] {
 }
 .deboucled-settings-view.active {
   opacity: 1;
+}
+.deboucled-blacklisted-blockquote {
+  margin-bottom: 0.9375rem;
+  border-left: 0.3125rem solid rgba(0, 0, 0, 0.2);
+  margin-left: 0.9375rem;
+  padding: 0.625rem;
+  background: none;
 }
 
 .deboucled-about-version {

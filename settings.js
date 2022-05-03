@@ -194,9 +194,6 @@ function buildSettingsPage() {
         let hotTopicLogo = '<span class="deboucled-fire-logo"></span>'
         html += addToggleOption(`Mettre en avant les <i>topics tendance</i> ${hotTopicLogo}`, storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default, 'Afficher un pictogramme de flamme à côté des topics très actifs.');
 
-        let blJvcLogo = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
-        html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvcLogo} de JVC`, storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
-
         let matchesLogo = '<span class="deboucled-list-logo"></span>'
         html += addToggleOption(`Afficher les <i>détails du filtrage</i> ${matchesLogo} des topics`, storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default, 'Afficher ou non le tableau des détails de filtrage des topics sur la droite de la page.');
 
@@ -286,6 +283,9 @@ function buildSettingsPage() {
 
         let resolvedLogo = '<span class="deboucled-topic-resolved-logo"></span>';
         html += addToggleOption(`Remplacer le pictogramme ${resolvedLogo} <i>résolu</i> des topics`, storage_optionReplaceResolvedPicto, storage_optionReplaceResolvedPicto_default, 'Remplacer le pictogramme résolu sur la gauche des topics par le picto normal (jaune, rouge, verrouillé, etc).');
+        
+        let blJvcLogo = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
+        html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvcLogo} de JVC`, storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
 
         html += addRangeOption('Nombre de topics à afficher sur la page', storage_optionMaxTopicCount, storage_optionMaxTopicCount_default, defaultTopicCount, 50, 1, 'Nombre de topics à afficher sur la page (25 par défaut).', true, false);
 
