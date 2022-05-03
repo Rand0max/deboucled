@@ -296,6 +296,7 @@ function handleQuotedAuthorBlacklist(messageContent) {
         const authorBlacklistedMatch = getAuthorBlacklistMatches(author, isSelf);
         if (!authorBlacklistedMatch?.length) return;
 
+        e.classList.toggle('deboucled-blacklisted', true);
         hideMessageContent(e.parentElement, 'deboucled-blacklisted-blockquote');
     });
 }
