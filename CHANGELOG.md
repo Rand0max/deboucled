@@ -1,8 +1,13 @@
 # Changelog Déboucled
 
+## [2.28.1] (06/05/2022)
+
+- Optimisation du chargement
+- Afficher les citations blacklist dans certains cas
+
 ## [2.28.0] (03/05/2022)
 
-- Les citations d'auteurs blacklist sont désormais masquées 
+- Les citations d'auteurs blacklist sont désormais masquées
 - Les correspondances auteurs redirigent vers la page du profil
 - Les correspondances topics redirigent vers la page du topic
 - Correction mineure sur le nettoyage des balises

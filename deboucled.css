@@ -777,6 +777,9 @@ blockquote .deboucled-highlighted {
   height: 24px;
   background-size: 24px;
 }
+.deboucled-fire-logo:hover {
+  opacity: 1;
+}
 .deboucled-smiley {
   vertical-align: text-bottom;
   min-width: 15px;

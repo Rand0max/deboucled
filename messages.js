@@ -283,7 +283,7 @@ function handleQuotedAuthorBlacklist(messageContent) {
     if (!messageContent) return;
 
     const authorElements = [...messageContent.querySelectorAll('a.deboucled-highlighted:not(.self)')];
-    if (!authorElements?.length) return;
+    if (!authorElements.length) return;
 
     authorElements.forEach(e => {
         const containerBlockquote = e.parentElement.parentElement;

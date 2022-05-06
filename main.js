@@ -446,7 +446,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
         highlightSpecialAuthors(author, authorElement, isSelf);
         highlightQuotedAuthor(messageContent, messageElement);
         enhanceBlockquotes(messageContent);
-        handleQuotedAuthorBlacklist(messageContent);
+        if (messageOptions.optionHideMessages) handleQuotedAuthorBlacklist(messageContent);
     }
 
     if (messageOptions.optionBlSubjectIgnoreMessages && !isSelf) {
@@ -807,13 +807,11 @@ async function preInit() {
     const enablePeepoTheme = store.get(storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default);
     const enableJvRespawnRefinedTheme = store.get(storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableJvRespawnRefinedTheme_default);
     addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme);
+    await initStorage();
+    preInitFinished = true;
 }
 
 async function init(currentPageType) {
-    await preInit();
-
-    await initStorage();
-
     if (currentPageType === 'sso' || currentPageType === 'error') return;
 
     addSvgs();
@@ -830,7 +828,7 @@ async function init(currentPageType) {
 }
 
 async function entryPoint() {
-    if (!document.body) await sleep(300);
+    while (!document.body || !preInitFinished) await sleep(100);
 
     let start = performance.now();
     try {
@@ -897,6 +895,9 @@ async function entryPoint() {
         await sendDiagnostic(elapsed, error);
     }
 }
+
+
+preInit();
 
 if (document.readyState === 'interactive' || document.readyState === 'complete') {
     entryPoint();
