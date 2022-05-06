@@ -804,14 +804,19 @@ function handleError() {
 }
 
 async function preInit() {
-    const enablePeepoTheme = store.get(storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default);
-    const enableJvRespawnRefinedTheme = store.get(storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableJvRespawnRefinedTheme_default);
-    addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme);
     await initStorage();
     preInitFinished = true;
 }
 
+function loadStyles() {
+    const enablePeepoTheme = store.get(storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default);
+    const enableJvRespawnRefinedTheme = store.get(storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableJvRespawnRefinedTheme_default);
+    addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme);
+}
+
 async function init(currentPageType) {
+    loadStyles();
+
     if (currentPageType === 'sso' || currentPageType === 'error') return;
 
     addSvgs();
