@@ -833,7 +833,7 @@ async function init(currentPageType) {
 }
 
 async function entryPoint() {
-    while (!document.body || !preInitFinished) await sleep(200);
+    while (!document.body) await sleep(100);
 
     let start = performance.now();
     try {
@@ -841,6 +841,8 @@ async function entryPoint() {
         if (currentPageType === 'unknown') return;
 
         await init(currentPageType);
+
+        while (!preInitFinished) await sleep(100);
 
         switch (currentPageType) {
             case 'topiclist': {
