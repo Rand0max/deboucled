@@ -833,7 +833,7 @@ async function init(currentPageType) {
 }
 
 async function entryPoint() {
-    while (!document.body || !preInitFinished) await sleep(50);
+    while (!document.body || !preInitFinished) await sleep(200);
 
     let start = performance.now();
     try {
