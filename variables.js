@@ -5,8 +5,6 @@
 // VARIABLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
-let preInitFinished = false;
-
 const defaultTopicCount = 25;
 
 const entitySubject = 'subject';

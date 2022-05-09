@@ -803,11 +803,6 @@ function handleError() {
     }
 }
 
-async function preInit() {
-    await initStorage();
-    preInitFinished = true;
-}
-
 function loadStyles() {
     const enablePeepoTheme = store.get(storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default);
     const enableJvRespawnRefinedTheme = store.get(storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableJvRespawnRefinedTheme_default);
@@ -816,6 +811,8 @@ function loadStyles() {
 
 async function init(currentPageType) {
     loadStyles();
+
+    await initStorage();
 
     if (currentPageType === 'sso' || currentPageType === 'error') return;
 
@@ -841,8 +838,6 @@ async function entryPoint() {
         if (currentPageType === 'unknown') return;
 
         await init(currentPageType);
-
-        while (!preInitFinished) await sleep(100);
 
         switch (currentPageType) {
             case 'topiclist': {
@@ -902,9 +897,6 @@ async function entryPoint() {
         await sendDiagnostic(elapsed, error);
     }
 }
-
-
-preInit();
 
 if (document.readyState === 'interactive' || document.readyState === 'complete') {
     entryPoint();
