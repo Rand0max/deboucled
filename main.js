@@ -271,14 +271,23 @@ function parseTopicListAuthors(topics) {
 async function handleHotTopics(finalTopics) {
     const hotTopics = await buildHotTopics();
     if (!hotTopics?.length) return;
+
+    const matchMediaMediumWidth = window.matchMedia('(min-width: 1000px) and (max-width: 1479px)')?.matches;
+
     finalTopics.slice(1).forEach(topic => {
         const topicId = topic.getAttribute('data-id');
         if (!topicId) return;
         const hotTopic = hotTopics.find(ht => ht.id === parseInt(topicId));
         if (!hotTopic) return;
         const titleElem = topic.querySelector('.lien-jv.topic-title');
-        titleElem.style.overflow = 'visible';
-        markTopicHot(titleElem);
+
+        if (matchMediaMediumWidth) {
+            markTopicHot(titleElem, true, false);
+        }
+        else {
+            titleElem.style.overflow = 'visible';
+            markTopicHot(titleElem, true, true);
+        }
     });
 }
 

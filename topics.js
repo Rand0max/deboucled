@@ -414,7 +414,7 @@ function markTopicLoop(subject, nearElement, withHint = true) {
     nearElement.insertAdjacentElement('afterend', loopBadge);
 }
 
-function markTopicHot(titleElem, withHint = true) {
+function markTopicHot(titleElem, withHint = true, append = true) {
     const loopBadge = document.createElement('span');
     if (withHint) {
         loopBadge.className = 'deboucled-badge deboucled-fire-logo';
@@ -423,7 +423,13 @@ function markTopicHot(titleElem, withHint = true) {
     else {
         loopBadge.className = 'deboucled-badge deboucled-fire-logo big';
     }
-    titleElem.appendChild(loopBadge);
+    if (append) {
+        titleElem.appendChild(loopBadge);
+    }
+    else {
+        loopBadge.style.marginLeft = '0';
+        titleElem.prepend(loopBadge);
+    }
 }
 
 function addIgnoreButtons(topics) {

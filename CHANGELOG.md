@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.28.5] (10/05/2022)
+
+- Correction visuelle des topics tendances sur les plus petits écrans
+
 ## [2.28.1] (06/05/2022)
 
 - Optimisation du chargement
