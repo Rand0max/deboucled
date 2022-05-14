@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.28.6] (10/05/2022)
+
+- Amélioration du nettoyage des titres
+- Optimisation des performances
+
 ## [2.28.5] (10/05/2022)
 
 - Correction visuelle des topics tendances sur les plus petits écrans

@@ -598,15 +598,20 @@ async function topicIsModerated(topicId) {
 }
 
 function removeUselessTags(topics) {
-    // eslint-disable-next-line no-useless-escape
-    const regex = /(\[?\ba+y+a+o*\b\]?|[\{[(🛑🔴🚨 ]+(alerte.*?)[\}\])🛑🔴🚨]+|^\balerte\s?(rouge|noire|nucleaire|ecarlate)?\b)\s?:?-?,?!?/giu;
+    // eslint-disable-next-line no-misleading-character-class
+    const regexAlert = /^[{[(🛑🔴🚨🔕☢️\s]*alerte\s?(rouge|noire|nucl[eé]aire|[eé]carlate|g[eé]n[eé]rale|ovni|prolo|info)?[}\])🛑🔴🚨🔕☢️!,-:\s]*/giu;
+    const regexAyao = /a+y+a+o*/gi;
+
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
-        let newTitle = titleElem.textContent.replace(regex, '');
+        let newTitle = titleElem.textContent;
+        newTitle = newTitle.replace(regexAlert, '');
+        newTitle = newTitle.replace(regexAyao, '');
         newTitle = newTitle.removeSurrogatePairs();
         newTitle = newTitle.replace(/\(\)|\[\]|{}/g, '');
         newTitle = newTitle.removeDoubleSpaces().trim().toLowerCase().capitalize();
         if (newTitle.length > 0) titleElem.textContent = newTitle;
+        else titleElem.textContent = titleElem.textContent.toLowerCase().capitalize();
     });
 }
 

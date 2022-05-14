@@ -251,12 +251,12 @@ async function handleTopicListOptions(topics) {
     let optionDisplayTitleSmileys = store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default);
     if (optionDisplayTitleSmileys) createTopicTitleSmileys(topics);
 
-    let optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
-    if (optionDisplayHotTopics) await handleHotTopics(topics);
-
     parseTopicListAuthors(topics);
     await handlePoc(topics);
     await saveLocalStorage();
+
+    let optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
+    if (optionDisplayHotTopics) handleHotTopics(topics);
 }
 
 function parseTopicListAuthors(topics) {
