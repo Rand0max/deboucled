@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.0.5
+@version        1.0.6
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -126,7 +126,7 @@
     font-size: 1.25rem;
     line-height: 1em;
     font-family: "Roboto", Arial, Helvetica, sans-serif;
-    font-weight: 500;
+    font-weight: 600;
   }
   .titre-bloc-forum {
     font-size: 1.125rem;
