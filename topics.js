@@ -599,7 +599,7 @@ async function topicIsModerated(topicId) {
 
 function removeUselessTags(topics) {
     // eslint-disable-next-line no-misleading-character-class
-    const regexAlert = /^[{[(🛑🔴🚨🔕☢️\s]*alerte\s?(rouge|noire|nucl[eé]aire|[eé]carlate|g[eé]n[eé]rale|ovni|prolo|info)?[}\])🛑🔴🚨🔕☢️!,-:\s]*/giu;
+    const regexAlert = /^[{[(🛑🔴🚨🔕☢️\s]*alerte\s?(rouge|noire|nucl[eé]aire|[eé]carlate|g[eé]n[eé]rale|ovni|prolo|info)?[\s}\])🛑🔴🚨🔕☢️!,:-]*/giu;
     const regexAyao = /a+y+a+o*/gi;
 
     topics.slice(1).forEach(function (topic) {
