@@ -510,7 +510,6 @@ function addPrevisualizeTopicEvent(topics) {
 
     topics.slice(1).forEach(function (topic) {
         let topicTitle = topic.querySelector('.topic-title');
-        topicTitle.classList.add('deboucled-topic-title');
 
         const topicUrl = topicTitle.getAttribute('href');
 

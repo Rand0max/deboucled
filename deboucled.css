@@ -176,9 +176,6 @@ blockquote .deboucled-highlighted {
 .deboucled-topic-preview-col {
   display: block;
   cursor: pointer;
-  position: absolute;
-  left: 1.3rem;
-  top: 0.25rem;
 }
 .deboucled-preview-content {
   position: absolute;
@@ -203,9 +200,6 @@ blockquote .deboucled-highlighted {
 }
 .deboucled-topic-preview-col.active .deboucled-preview-content {
   display: block;
-}
-.deboucled-topic-title {
-  margin-left: 2.4rem !important;
 }
 .deboucled-topic-blacklist {
   text-align: center;
@@ -426,6 +420,7 @@ blockquote .deboucled-highlighted {
   display: inline;
   width: 100%;
   position: relative;
+  margin-left: 0.4rem;
 }
 .topic-list .message .topic-title {
   position: static;
@@ -475,9 +470,9 @@ blockquote .deboucled-highlighted {
   width: 14px;
 }
 .deboucled-logo-preview {
-  width: 14px;
-  vertical-align: unset;
+  width: 17px;
   opacity: 0.7;
+  margin-left: 4px;
 }
 .deboucled-chart-logo {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAACxEAAAsRAX9kX5EAAAGOSURBVEhL7ZY9S8NAGIAvVtvgoiniIOqiOMghztVJBauD/os6iaPuurk4Cn7hJCKKg79BdO8v0B8QFyGL6HO5a+zR9ENMT5A+cLwfyfXJS3sloocrckEQrPi+PxZF0YvpuaFYLH4idyuFPhNbciqldy7lnCkzoSMxN217QjxfSLluWr+mrZhJS0gPSX3WbVbylmKko0ivSfO6k528qfhEyhzSK9Jx3UnoWM6Dj7DKprRoKu4XYp+wpKsGlPyulRzhLA/+xNo1LYtUMZs2CHu6akqBlSpXUyJ8JJ1ilc6kHIov1NEgZtM0my5JCW2x5ES1f4eND5Q1WZ562eQJlpgnG+SmG9Jh3emIWI5wk3jM/iNiTl2oQW/NpAmWmGKRMK+rH1Hgw++JW7psYJWhuOWb1O+4C0xglSaPcSVWWD9CZ2Imts6zy4kX6o+VS/EAUyfHyqXYOlZOxVDmvMfHylNvIPAahuEk38EMvYq60C0+hDioVKtvf/bqE09MfGepfx5n1MTO8dTrrcl7/EeE+AKQYkzfvs/NTAAAAABJRU5ErkJggg==)
@@ -1799,12 +1794,8 @@ select.deboucled-dropdown::-ms-expand {
   .deboucled-topic-title {
     margin-left: 1.4rem !important;
   }
-  .deboucled-topic-preview-col {
-    left: 1.7rem;
-    top: 0.7rem;
-  }
   .deboucled-logo-preview {
-    width: 17px;
+    width: 22px;
   }
   .deboucled-overlay-spinner {
     left: 45%;
@@ -1813,6 +1804,12 @@ select.deboucled-dropdown::-ms-expand {
   .deboucled-overlay {
     left: -12px;
     width: 104%;
+  }
+  .topic-list .topic-img {
+    padding-right: 0;
+  }
+  .topic-list .topic-title {
+    padding-left: 0.625rem;
   }
 }
 @media (min-width: 612px) and (max-width: 807.98px) {
