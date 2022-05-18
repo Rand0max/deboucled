@@ -617,7 +617,7 @@ function removeUselessTags(topics) {
 function createTopicTitleSmileys(topics) {
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
-        titleElem.innerHTML = titleElem.textContent.replace(smileyGifRegex, (e) => getSmileyImgHtml(e, false));
+        titleElem.innerHTML = titleElem.innerHTML.replace(smileyGifRegex, (e) => getSmileyImgHtml(e, false));
     });
 }
 
