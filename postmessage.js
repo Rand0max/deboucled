@@ -55,10 +55,12 @@ function getSelectionOffset(container, pointerEvent) {
 
 function addMessageQuoteEvents(allMessages) {
     function buildPartialQuoteButton(message) {
+        const blocContenu = message.querySelector('.bloc-contenu');
+        if (!blocContenu) return;
         const partialQuoteButton = document.createElement('div');
         partialQuoteButton.className = 'deboucled-quote';
         partialQuoteButton.innerHTML = '<a class="deboucled-partial-quote-logo"></a>';
-        message.appendChild(partialQuoteButton);
+        blocContenu.appendChild(partialQuoteButton);
         return partialQuoteButton;
     }
 

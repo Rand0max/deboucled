@@ -178,7 +178,7 @@ blockquote .deboucled-highlighted {
   cursor: pointer;
 }
 .deboucled-preview-content {
-  position: absolute;
+  position: absolute !important;
   opacity: 0.98;
   left: 25px;
   top: 5px;
@@ -286,7 +286,27 @@ blockquote .deboucled-highlighted {
   margin-right: auto;
 }
 .bloc-message-forum .bloc-header {
+  display: grid;
   grid-template-areas: "pseudo mp boucled options" "date date date date";
+  grid-template-columns: auto auto auto 1fr !important;
+  grid-template-rows: auto;
+}
+.bloc-message-forum .bloc-pseudo-msg {
+  position: relative;
+  grid-area: pseudo;
+  align-self: end;
+  top: 0;
+  line-height: 1.375rem;
+}
+.bloc-message-forum .bloc-mp-pseudo {
+  grid-area: mp;
+  align-self: end;
+  line-height: 1.375rem;
+}
+.bloc-message-forum .bloc-mp-pseudo > a,
+.bloc-message-forum .bloc-mp-pseudo > span {
+  position: relative;
+  top: 0;
 }
 .bloc-header .deboucled-author-boucled-button {
   display: inline-block;
@@ -294,7 +314,18 @@ blockquote .deboucled-highlighted {
   width: 16px;
   grid-area: boucled;
   align-self: end;
-  margin: 0 0 1px 5px;
+  margin: 0 0 0 5px;
+}
+.bloc-message-forum .bloc-options-msg {
+  align-self: end;
+  line-height: 1.1rem;
+  grid-area: options;
+  justify-self: end;
+}
+.bloc-message-forum .bloc-date-msg {
+  grid-area: date;
+  align-self: flex-start;
+  margin-top: 5px;
 }
 .bloc-option-profil {
   margin-right: 2.1875rem;
@@ -411,19 +442,24 @@ blockquote .deboucled-highlighted {
   display: none;
 }
 .topic-list .topic-subject {
-  display: flex;
+  display: flex !important;
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center;
 }
 .topic-list .topic-title {
-  display: inline;
+  display: inline !important;
   width: 100%;
   position: relative;
-  margin-left: 0.4rem;
+  margin-left: 0.4rem !important;
 }
 .topic-list .message .topic-title {
   position: static;
+}
+.topic-list .topic-img {
+  position: relative !important;
+  left: 0 !important;
+  top: 0 !important;
 }
 
 /* Floating navbar */

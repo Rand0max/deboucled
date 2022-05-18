@@ -88,7 +88,7 @@
     font-weight: bold;
     font-size: 1.0625rem;
     line-height: 1em;
-    height: 1.375rem;
+    height: auto;
   }
   .bloc-message-forum .bloc-date-msg {
     font-size: 0.69rem;
