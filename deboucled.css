@@ -285,6 +285,37 @@ blockquote .deboucled-highlighted {
 .deboucled-add-button {
   margin-right: auto;
 }
+.deboucled-sort-button {
+  display: inline-block;
+  background-size: 18px 18px !important;
+  width: 18px;
+  height: 18px;
+  margin: 0 8px 0 0;
+  opacity: 0.6;
+  vertical-align: middle;
+  filter: invert(var(--deboucled-filter-invert));
+}
+.deboucled-sort-button:hover {
+  opacity: 1;
+}
+.deboucled-entity-message-hint {
+  margin-right: auto;
+  opacity: 0.3;
+  font: 10px/14px sans-serif;
+  font-style: normal;
+  font-style: italic;
+  user-select: none;
+  max-width: 180px;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+}
+.deboucled-entity-message-hint:active,
+.deboucled-entity-message-hint:hover {
+  opacity: 0.6;
+}
+
+/* JVC fix */
 .bloc-message-forum .bloc-header {
   display: grid;
   grid-template-areas: "pseudo mp boucled options" "date date date date";
@@ -335,34 +366,8 @@ blockquote .deboucled-highlighted {
   position: relative;
   width: 40px;
 }
-.deboucled-sort-button {
-  display: inline-block;
-  background-size: 18px 18px !important;
-  width: 18px;
-  height: 18px;
-  margin: 0 8px 0 0;
-  opacity: 0.6;
-  vertical-align: middle;
-  filter: invert(var(--deboucled-filter-invert));
-}
-.deboucled-sort-button:hover {
-  opacity: 1;
-}
-.deboucled-entity-message-hint {
-  margin-right: auto;
-  opacity: 0.3;
-  font: 10px/14px sans-serif;
-  font-style: normal;
-  font-style: italic;
-  user-select: none;
-  max-width: 180px;
-  display: inline-block;
-  text-align: center;
-  vertical-align: middle;
-}
-.deboucled-entity-message-hint:active,
-.deboucled-entity-message-hint:hover {
-  opacity: 0.6;
+.topic-list .message .topic-title::before {
+  position: static;
 }
 #discussion.mp-page div.action-bar div.action-right form {
   display: inline-block;
