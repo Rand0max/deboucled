@@ -28,7 +28,7 @@ const checkUpdateDeferredExpire = TimeSpan.FromDays(5);
 const youtubeBlacklistRefreshExpire = TimeSpan.FromHours(1);
 const prebouclesRefreshExpire = TimeSpan.FromHours(1);
 const aiLoopsRefreshExpire = TimeSpan.FromMinutes(10);
-const updateUserExpire = TimeSpan.FromHours(12);
+const updateUserExpire = TimeSpan.FromHours(6);
 const diagnosticExpire = TimeSpan.FromHours(12);
 /* eslint-enable no-undef */
 
