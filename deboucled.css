@@ -1231,7 +1231,7 @@ input[type="search"] {
   display: inline;
   vertical-align: top;
   padding: 0.25rem 0.35rem 0.25rem 0.35rem;
-  font-size: 66%;
+  font-size: 50% !important;
   font-weight: 600;
   text-align: center;
   white-space: nowrap;
@@ -1246,6 +1246,7 @@ input[type="search"] {
   padding-right: 0.7em;
   padding-left: 0.7em;
   border-radius: 10rem;
+  font-size: 66% !important;
 }
 
 .deboucled-badge-info {
