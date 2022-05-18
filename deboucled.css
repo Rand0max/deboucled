@@ -366,6 +366,9 @@ blockquote .deboucled-highlighted {
   position: relative;
   width: 40px;
 }
+.titre-bloc-forum span:first-child {
+  font-size: unset;
+}
 .topic-list .message .topic-title::before {
   position: static;
 }
