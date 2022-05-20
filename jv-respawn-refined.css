@@ -140,14 +140,16 @@ body.didomi-popup-open {
   font-weight: 600;
 }
 
+/* Media */
+@media (max-width: 807.98px) {
+  .topic-list .topic-subject {
+    font-size: 0.9375rem;
+  }
+}
 @media (min-width: 807.99px) {
   .topic-list .topic-title {
     font-size: 0.72rem;
   }
-}
-
-/* Media */
-@media (min-width: 807.99px) {
   .topic-list .topic-img {
     top: 0.1rem;
     font-size: 1rem;
