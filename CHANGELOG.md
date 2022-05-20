@@ -4,6 +4,7 @@
 
 - Correction d'un conflit sur les titres de topic entre smiley et balise
 - Corrections CSS mineures sur mobile
+- Corrections de l'icone dossier des topics
 
 ## [2.29.2] (18/05/2022)
 
