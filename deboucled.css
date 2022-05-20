@@ -368,12 +368,17 @@ blockquote .deboucled-highlighted {
 }
 .titre-bloc-forum span:first-child {
   font-size: unset;
+  color: unset;
 }
 .topic-list .message .topic-title::before {
   position: static;
 }
 #discussion.mp-page div.action-bar div.action-right form {
   display: inline-block;
+}
+.topic-list .topic-author {
+  width: 6.4rem;
+  text-overflow: clip;
 }
 
 /* Bloc tool bar */
@@ -1229,9 +1234,9 @@ input[type="search"] {
 
 .deboucled-badge {
   display: inline;
-  vertical-align: top;
+  vertical-align: middle;
   padding: 0.25rem 0.35rem 0.25rem 0.35rem;
-  font-size: 50% !important;
+  font-size: 66% !important;
   font-weight: 600;
   text-align: center;
   white-space: nowrap;
@@ -1246,7 +1251,6 @@ input[type="search"] {
   padding-right: 0.7em;
   padding-left: 0.7em;
   border-radius: 10rem;
-  font-size: 66% !important;
 }
 
 .deboucled-badge-info {

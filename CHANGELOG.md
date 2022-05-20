@@ -1,5 +1,18 @@
 # Changelog Déboucled
 
+## [2.29.3] (20/05/2022)
+
+- Correction d'un conflit sur les titres de topic entre smiley et balise
+- Corrections CSS mineures sur mobile
+
+## [2.29.2] (18/05/2022)
+
+- Correction bug sur les titres avec du HTML
+
+## [2.29.0] (17/05/2022)
+
+- Corrections multiples suite aux changements JVC
+
 ## [2.28.6] (10/05/2022)
 
 - Amélioration du nettoyage des titres

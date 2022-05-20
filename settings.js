@@ -174,13 +174,13 @@ function buildSettingsPage() {
 
         html += '<table class="deboucled-option-table">';
 
-        let darkLogo = '<span class="deboucled-dark-logo"></span>'
-        html += addToggleOption(`Utiliser le nouveau <i>thème sombre</i> ${darkLogo} pour <b>JVC</b> (par Peepo)`, storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default, 'Basculer entre le thème JVC normal, et le nouveau thème sombre créé par Peepo. (pensez à rafraichir la page pour voir les changements)');
-
         let themeLogo = '<span class="deboucled-stylish-logo deboucled-theme-logo"></span>'
         html += addToggleOption(`Utiliser le <i>thème Déboucled Officiel</i> ${themeLogo} pour <b>JVC</b>`, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableJvRespawnRefinedTheme_default, 'Basculer entre le thème JVC normal, et le thème officiel Déboucled. (pensez à rafraichir la page pour voir les changements)');
 
         html += addToggleOption(`Utiliser le <i>thème sombre</i> pour <b>Déboucled</b>`, storage_optionEnableDeboucledDarkTheme, storage_optionEnableDeboucledDarkTheme_default, 'Permet de basculer entre le thème normal et le thème sombre pour le script Déboucled.', undefined, true);
+
+        let darkLogo = '<span class="deboucled-dark-logo"></span>'
+        html += addToggleOption(`Utiliser le nouveau <i>thème sombre</i> ${darkLogo} pour <b>JVC</b> (par Peepo)`, storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default, 'Basculer entre le thème JVC normal, et le nouveau thème sombre créé par Peepo. (pensez à rafraichir la page pour voir les changements)');
 
         let forbiddenLogo = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbiddenLogo}`, storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics souhaités.');
@@ -283,7 +283,7 @@ function buildSettingsPage() {
 
         let resolvedLogo = '<span class="deboucled-topic-resolved-logo"></span>';
         html += addToggleOption(`Remplacer le pictogramme ${resolvedLogo} <i>résolu</i> des topics`, storage_optionReplaceResolvedPicto, storage_optionReplaceResolvedPicto_default, 'Remplacer le pictogramme résolu sur la gauche des topics par le picto normal (jaune, rouge, verrouillé, etc).');
-        
+
         let blJvcLogo = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>'
         html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvcLogo} de JVC`, storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
 

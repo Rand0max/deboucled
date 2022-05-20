@@ -17,6 +17,7 @@
 }
 .topic-list .topic-subject {
   font-weight: 700;
+  font-size: 0.9375em;
 }
 .topic-list .topic-head .topic-subject {
   font-size: 0.69rem;
@@ -54,7 +55,7 @@ body.didomi-popup-open {
   display: none;
 }
 .icon-topic-folder::before {
-  content: "\1F5BF";
+  content: "";
 }
 .layout__videoFooter {
   display: none;

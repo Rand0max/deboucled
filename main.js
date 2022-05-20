@@ -525,12 +525,6 @@ function highlightTopicHeaderTitle() {
     highlightBlacklistMatches(titleElement, subjectMatches);
 }
 
-function createTopicHeaderSmileys() {
-    const titleElement = document.querySelector('#bloc-title-forum');
-    if (!titleElement) return;
-    titleElement.innerHTML = titleElement.innerHTML.replace(smileyGifRegex, (e) => getSmileyImgHtml(e, true));
-}
-
 function buildTopicHeaderBadges() {
     const titleElement = document.querySelector('#bloc-title-forum');
     if (!titleElement || !currentTopicAuthor?.length || !currentTopicId) return;
@@ -550,10 +544,16 @@ function buildTopicHeaderBadges() {
     }
 }
 
+function createTopicHeaderSmileys() {
+    const titleElement = document.querySelector('#bloc-title-forum');
+    if (!titleElement) return;
+    titleElement.innerHTML = titleElement.innerHTML.replace(smileyGifRegex, (e) => getSmileyImgHtml(e, true));
+}
+
 function handleTopicHeader(messageOptions) {
     highlightTopicHeaderTitle();
-    if (messageOptions.optionDisplayTitleSmileys) createTopicHeaderSmileys();
     buildTopicHeaderBadges();
+    if (messageOptions.optionDisplayTitleSmileys) createTopicHeaderSmileys();
 }
 
 function displayTopicDeboucledMessage() {
