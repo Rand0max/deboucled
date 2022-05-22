@@ -728,7 +728,7 @@ function buildJvArchiveProfilButton(author) {
     return profilAnchor;
 }
 
-function handleProfil() {
+async function handleProfile(profileTab) {
     const infosPseudoElement = document.querySelector('.infos-pseudo');
     if (!infosPseudoElement) return;
     const author = infosPseudoElement.textContent.trim();
@@ -754,6 +754,8 @@ function handleProfil() {
         let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload() }, 'deboucled-blacklist-profil-button');
         blocOptionProfil.append(dbcBlacklistButton);
     }
+
+    if (profileTab.match(/^\?mode=infos$/i)) await buildProfileHistory(author);
 }
 
 async function handlePrivateMessageNotifs() {
@@ -875,7 +877,7 @@ async function entryPoint() {
                 break;
             }
             case 'profil': {
-                handleProfil();
+                await handleProfile(window.location.search);
                 break;
             }
             case 'error': {

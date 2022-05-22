@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.30.0] (22/05/2022)
+
+- Intégration de l'historique des topics et messages sur tous les profils
+
 ## [2.29.3] (20/05/2022)
 
 - Correction d'un conflit sur les titres de topic entre smiley et balise

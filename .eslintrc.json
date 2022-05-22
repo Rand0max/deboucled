@@ -24,6 +24,7 @@
     "postmessage.js",
     "settings.js",
     "privatemessages.js",
+    "profile.js",
     "main.js"
   ],
   "rules": {

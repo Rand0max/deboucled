@@ -63,6 +63,9 @@ body.didomi-popup-open {
 .form-harassment {
   display: none;
 }
+.footer--bottom.footer {
+  display: none;
+}
 
 /* Fix for JVC zoomed update */
 .topic-list .topic-subject,
