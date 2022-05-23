@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.30.2] (23/05/2022)
+
+- Correction d'un bug sur la mise en avant des citations
+
 ## [2.30.1] (23/05/2022)
 
 - Correction de la balise "tendance" si le titre est trop long

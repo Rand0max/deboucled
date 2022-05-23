@@ -301,6 +301,7 @@ function handleQuotedAuthorBlacklist(messageContent) {
     });
 }
 
+// TODO : Refacto cette satanerie
 function highlightQuotedAuthor(messageContent, messageElement) {
     if (!messageContent) return;
 
@@ -314,17 +315,18 @@ function highlightQuotedAuthor(messageContent, messageElement) {
         return `<a class="deboucled-highlighted${self}" href="/profil/${profilMatch.toLowerCase()}?mode=infos" target="_blank" title="Voir le profil de ${profilMatch}">${match}</a>`;
     }
 
-    function replaceAllTextQuotes(element, containerElement, regex, replaceCallback, alternateCallback, depth = 0) {
+    function replaceAllTextQuotes(element, containerElement, regex, replaceCallback, prepareCallback, depth = 0) {
         getParagraphChildren(element, true).forEach(child => {
-            replaceAllTextQuotes(child, containerElement, regex, replaceCallback, alternateCallback, ++depth)
+            if (['P', 'BLOCKQUOTE'].includes(child.tagName)) depth++;
+            replaceAllTextQuotes(child, containerElement, regex, replaceCallback, prepareCallback, depth)
         });
         const textChildren = getTextChildren(element);
         textChildren.forEach(textNode => {
             if (!textNode.textContent?.length || !textNode.parentElement) return;
-            if (alternateCallback) alternateCallback(textNode);
+            if (prepareCallback) prepareCallback(textNode);
 
             const newContent = textNode.textContent?.replaceAll(regex, replaceCallback);
-            if (textNode.textContent === newContent) return;
+            if (textNode.textContent === newContent) return; // si on a rien à modifier on se casse
 
             if (depth <= 2 && containerElement) containerElement.classList.toggle('deboucled-message-quoted', true);
 
@@ -344,7 +346,6 @@ function highlightQuotedAuthor(messageContent, messageElement) {
         quotedAtAuthorsRegex,
         (match) => isSelf(match.toLowerCase()) ? match : buildProfilHighlightAnchor(match));
 
-
     // On met en surbrillance grise tous les pseudos cités avec le bouton "standard" (sauf le compte de l'utilisateur)
     const quotedAuthorsFullRegex = new RegExp(`(?!le\\s[0-9]{1,2}\\s[a-zéù]{3,10}\\s[0-9]{4}\\sà\\s[0-9]{2}:[0-9]{2}:[0-9]{2}\\s:)(?<author>${allowedPseudo}+)(?=\\sa\\sécrit\\s:)`, 'gi');
     const quotedAuthorsPartRegex = new RegExp(/le\s[0-9]{1,2}\s[a-zéù]{3,10}\s[0-9]{4}\sà\s[0-9]{2}:[0-9]{2}:[0-9]{2}\s(?!:)/, 'gi');
@@ -355,14 +356,14 @@ function highlightQuotedAuthor(messageContent, messageElement) {
         (match) => isSelf(match.toLowerCase()) ? match : buildProfilHighlightAnchor(match),
         (n) => {
             // S'il s'agit d'une citation où le pseudo est en html on vire le html et on fusionne le texte
-            if (!n.textContent.match(quotedAuthorsFullRegex) && n.textContent.match(quotedAuthorsPartRegex)) {
+            if (!n.textContent.match(quotedAuthorsFullRegex)
+                && n.textContent.match(quotedAuthorsPartRegex)) {
                 n.textContent = `${n.textContent}${n.nextSibling?.textContent}${n.nextSibling?.nextSibling?.textContent}`;
                 n.nextSibling?.nextSibling?.remove();
                 n.nextSibling?.remove();
             }
         });
 
-    //deboucled-message-quoted
     if (currentUserPseudo?.length) {
         // On met en surbrillance verte les citations du compte de l'utilisateur avec ou sans @arobase
         const selfPseudo = currentUserPseudo.escapeRegexPatterns();
@@ -371,7 +372,13 @@ function highlightQuotedAuthor(messageContent, messageElement) {
             messageContent,
             messageElement,
             quotedSelfRegex,
-            (match) => buildProfilHighlightAnchor(match, ' self'));
+            (match) => buildProfilHighlightAnchor(match, ' self'),
+            (n) => {
+                if (['STRONG', 'B', 'I', 'EM', 'U'].includes(n.parentElement?.tagName)
+                    && n.parentElement.textContent.match(quotedSelfRegex)) {
+                    n.parentElement.outerHTML = n.parentElement.textContent;
+                }
+            });
     }
 }
 
