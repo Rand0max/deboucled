@@ -56,14 +56,14 @@ function createNewColMd6(parentElement) {
 
 async function buildProfileHistory(author) {
     let columnBlocs = [...document.querySelectorAll('.col-md-6')];
-    if (!columnBlocs?.length) {
+    if (!columnBlocs.length) {
         const rowElem = document.querySelector('div.row:not(.flex-column)');
         if (!rowElem) return;
         columnBlocs.push(createNewColMd6(rowElem));
         columnBlocs.push(createNewColMd6(rowElem));
     }
 
-    if (columnBlocs?.length < 2) return;
+    if (columnBlocs.length < 2) return;
 
     function getTopicClass(topic) {
         if (!topic) return null;

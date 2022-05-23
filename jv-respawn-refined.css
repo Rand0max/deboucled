@@ -35,6 +35,7 @@
 }
 body.didomi-popup-open {
   overflow: scroll !important;
+  position: static !important;
 }
 .titre-head-bloc {
   margin-bottom: 0.45rem;
@@ -163,7 +164,7 @@ body.didomi-popup-open {
 }
 @media (min-width: 1480px) {
   .layout {
-    --grid-template-columns: 1fr 52rem 24.5rem 1fr;
+    --grid-template-columns: 1fr 53rem 24.5rem 1fr;
     --ad-placeholder-w: 0;
   }
 }

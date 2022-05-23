@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.0.9
+@version        1.1.0
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -42,6 +42,7 @@
   }
   body.didomi-popup-open {
     overflow: scroll !important;
+    position: static !important;
   }
   .titre-head-bloc {
     margin-bottom: 0.45rem;
@@ -170,7 +171,7 @@
   }
   @media (min-width: 1480px) {
     .layout {
-      --grid-template-columns: 1fr 52rem 24.5rem 1fr;
+      --grid-template-columns: 1fr 53rem 24.5rem 1fr;
       --ad-placeholder-w: 0;
     }
   }

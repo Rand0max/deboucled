@@ -1,5 +1,12 @@
 # Changelog Déboucled
 
+## [2.30.1] (23/05/2022)
+
+- Correction de la balise "tendance" si le titre est trop long
+- Affichage de deux lignes au lieu d'une si le titre est trop long
+- Correction du chevauchement du bouton de citation partielle
+- Correction du défilement avec le thème quand la fenêtre des cookies n'a pas été fermée manuellement
+
 ## [2.30.0] (22/05/2022)
 
 - Intégration de l'historique des topics et messages sur tous les profils
