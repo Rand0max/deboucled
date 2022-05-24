@@ -9,7 +9,7 @@ function buildBlocProfileElements(elements) {
     elements.forEach(element => {
         blocProfileElementsHtml += '<tr>';
         blocProfileElementsHtml += '<td class="text-cell line-ellipsis">';
-        blocProfileElementsHtml += `<a href="${element.url}" class="xXx">`;
+        blocProfileElementsHtml += `<a href="${element.url}" class="xXx" target="_blank">`;
         if (element.class) blocProfileElementsHtml += `<span class="${element.class}"></span>`;
         blocProfileElementsHtml += element.text;
         blocProfileElementsHtml += '</a>';
@@ -77,7 +77,7 @@ async function buildProfileHistory(author) {
         let authorLastMessages = parseJvArchiveAuthorLastMessageResults(authorLastMessageResults);
         if (authorLastMessages?.length) {
             const elements = authorLastMessages.map(m => ({
-                url: m.jvcUrl,
+                url: userPseudo ? m.jvcUrl : m.jvArchiveUrl,
                 text: m.topicTitle,
                 date: formatDateToFrenchFormat(m.datePost)
             }));

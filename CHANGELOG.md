@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.30.3] (23/05/2022)
+
+- Liens JvArchive au lieu de JVC pour l'historique des messages si l'utilisateur n'est pas connecté
+
 ## [2.30.2] (23/05/2022)
 
 - Correction d'un bug sur la mise en avant des citations
