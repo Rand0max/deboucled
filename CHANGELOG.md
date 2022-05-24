@@ -2,7 +2,7 @@
 
 ## [2.30.4] (24/05/2022)
 
-- Amélioration de la fonctionnalité pour réduire les longs messages : les citations désormais seront ignorées
+- Amélioration de la fonctionnalité pour réduire les longs messages : les citations seront désormais ignorées
 
 ## [2.30.3] (24/05/2022)
 
