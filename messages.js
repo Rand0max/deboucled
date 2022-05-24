@@ -267,16 +267,58 @@ function fixMessageUrls(messageContent) {
         (m) => `<a class="xXx" href="${m}" title="${m}" target="_blank">${m}</a>`);
 }
 
-function handleLongMessages() {
+function handleLongMessages(allMessages) {
+    allMessages.forEach(m => {
+        const txtMsg = m.querySelector('.txt-msg.text-enrichi-forum');
+        if (!txtMsg) return;
+
+        const blockquote = m.querySelector('blockquote.blockquote-jv');
+        if (blockquote) txtMsg.removeChild(blockquote); // on vire les citations le temps de créer le wrapper
+
+        const messageWrapper = document.createElement('span'); // wrapper pour le contenu du message
+        messageWrapper.className = 'deboucled-message-content-wrapper';
+        while (txtMsg.childNodes.length > 0) messageWrapper.appendChild(txtMsg.childNodes[0]);
+
+        txtMsg.appendChild(messageWrapper);
+
+        if (blockquote) messageWrapper.insertAdjacentElement('beforebegin', blockquote); // on réinsère les citations au début
+    });
+
+    const saveconsolelog = console.log;
+    console.log = function () { };
+
     // eslint-disable-next-line no-undef
-    new ShowMore('.txt-msg.text-enrichi-forum', {
+    new ShowMore('.deboucled-message-content-wrapper', {
+        /*
+        regex: {
+            newLine: {
+                match: null, // /(\r\n|\n|\r)/gm,
+                replace: ""
+            },
+            space: {
+                match: null, // /\s\s+/gm,
+                replace: " "
+            },
+            br: {
+                match: null, // /<br\s*\/?>/gim,
+                replace: ""
+            },
+            html: {
+                match: null, // /(<((?!b|\/b|!strong|\/strong)[^>]+)>)/gi,
+                replace: ""
+            }
+        },
+        */
         config: {
             type: 'text',
-            limit: 3000,
+            element: 'div',
+            limit: 1000,
             more: '→ lire la suite',
             less: '← réduire'
         }
     });
+
+    console.log = saveconsolelog;
 }
 
 function handleQuotedAuthorBlacklist(messageContent) {

@@ -1,6 +1,10 @@
 # Changelog Déboucled
 
-## [2.30.3] (23/05/2022)
+## [2.30.4] (24/05/2022)
+
+- Amélioration de la fonctionnalité pour réduire les longs messages : les citations désormais seront ignorées
+
+## [2.30.3] (24/05/2022)
 
 - Liens JvArchive au lieu de JVC pour l'historique des messages si l'utilisateur n'est pas connecté
 

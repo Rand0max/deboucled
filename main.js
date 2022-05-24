@@ -647,7 +647,7 @@ async function handleTopicMessages() {
         buildEnableSmoothScrollButton(smoothScrollCallback);
     }
 
-    if (messageOptions.optionHideLongMessages) handleLongMessages();
+    if (messageOptions.optionHideLongMessages) handleLongMessages(allMessages);
 }
 
 async function handleSearch() {
