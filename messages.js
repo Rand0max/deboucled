@@ -272,8 +272,9 @@ function handleLongMessages(allMessages) {
         const txtMsg = m.querySelector('.txt-msg.text-enrichi-forum');
         if (!txtMsg) return;
 
-        const blockquote = m.querySelector('blockquote.blockquote-jv');
-        if (blockquote) txtMsg.removeChild(blockquote); // on vire les citations le temps de créer le wrapper
+        const blockquote = txtMsg.querySelector('blockquote.blockquote-jv');
+        if (blockquote && txtMsg.contains(blockquote)) txtMsg.removeChild(blockquote); // on vire les citations le temps de créer le wrapper
+        else { blockquote = null; }
 
         const messageWrapper = document.createElement('span'); // wrapper pour le contenu du message
         messageWrapper.className = 'deboucled-message-content-wrapper';
