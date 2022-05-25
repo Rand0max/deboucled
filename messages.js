@@ -272,7 +272,7 @@ function handleLongMessages(allMessages) {
         const txtMsg = m.querySelector('.txt-msg.text-enrichi-forum');
         if (!txtMsg) return;
 
-        const blockquote = txtMsg.querySelector('blockquote.blockquote-jv');
+        let blockquote = txtMsg.querySelector('blockquote.blockquote-jv');
         if (blockquote && txtMsg.contains(blockquote)) txtMsg.removeChild(blockquote); // on vire les citations le temps de créer le wrapper
         else { blockquote = null; }
 
