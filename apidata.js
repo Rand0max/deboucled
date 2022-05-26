@@ -95,7 +95,7 @@ async function sendDiagnostic(elapsed, exception) {
         username: currentUserPseudo?.toLowerCase() ?? 'anonymous',
         version: getCurrentScriptVersion(),
         elapsed: elapsed,
-        url: window.location.href,
+        location: window.location.href,
         settings: settings,
         ...(exception && { exception: stringifyError(exception) }),
     }

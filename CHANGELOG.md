@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.30.6] (26/05/2022)
+
+- Correction mineure sur les longs messages
+
 ## [2.30.4] (24/05/2022)
 
 - Amélioration de la fonctionnalité pour réduire les longs messages : les citations seront désormais ignorées
