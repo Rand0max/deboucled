@@ -363,6 +363,7 @@ async function isTopicPoC(element, optionDetectPocMode) {
 
         const firstMessageElem = doc.querySelector('.txt-msg');
         const firstMessage = firstMessageElem?.textContent.trim().toLowerCase().normalizeDiacritic();
+        if (!firstMessage.length) return false;
 
         const isMessagePocRegex = /pos(t|te|tez) ou/i;
         const maladies = ['cancer', 'ancer', 'cer', 'en serre', 'necrose', 'torsion', 'testiculaire', 'tumeur', 'cholera', 'sida', 'corona', 'coronavirus', 'covid', 'covid19', 'cerf', 'serf', 'phimosis', 'trisomie', 'diarrhee', 'charcot', 'lyme', 'avc', 'cirrhose', 'diabete', 'parkinson', 'alzheimer', 'mucoviscidose', 'lepre', 'tuberculose', 'variole'];
