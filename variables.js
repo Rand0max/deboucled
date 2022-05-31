@@ -50,6 +50,7 @@ let aiLoopAuthorReg;
 
 let pocTopicMap = new Map();
 let topicAuthorMap = new Map();
+let authorAvatarMap = new Map();
 
 let hiddenTotalTopics = 0;
 let hiddenSubjects = 0;

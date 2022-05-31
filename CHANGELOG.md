@@ -1,5 +1,11 @@
 # Changelog Déboucled
 
+## [2.31.0] (31/05/2022)
+
+- Nouvelle option : ajout des avatars à côté des pseudos dans la liste des topics
+- Amélioration des performances
+- Améliorations mineures sur les profils
+
 ## [2.30.6] (26/05/2022)
 
 - Correction mineure sur les longs messages

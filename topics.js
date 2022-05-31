@@ -362,10 +362,10 @@ async function isTopicPoC(element, optionDetectPocMode) {
         const doc = domParser.parseFromString(r, 'text/html');
 
         const firstMessageElem = doc.querySelector('.txt-msg');
-        const firstMessage = firstMessageElem.textContent.trim().toLowerCase().normalizeDiacritic();
+        const firstMessage = firstMessageElem?.textContent.trim().toLowerCase().normalizeDiacritic();
 
         const isMessagePocRegex = /pos(t|te|tez) ou/i;
-        const maladies = ['cancer', 'ancer', 'cer', 'en serre', 'necrose', 'torsion', 'testiculaire', 'tumeur', 'cholera', 'sida', 'corona', 'coronavirus', 'covid', 'covid19', 'cerf', 'serf', 'phimosis', 'trisomie', 'diarrhee', 'charcot', 'lyme', 'avc', 'cirrhose', 'diabete', 'parkinson', 'alzheimer', 'mucoviscidose', 'lepre', 'tuberculose'];
+        const maladies = ['cancer', 'ancer', 'cer', 'en serre', 'necrose', 'torsion', 'testiculaire', 'tumeur', 'cholera', 'sida', 'corona', 'coronavirus', 'covid', 'covid19', 'cerf', 'serf', 'phimosis', 'trisomie', 'diarrhee', 'charcot', 'lyme', 'avc', 'cirrhose', 'diabete', 'parkinson', 'alzheimer', 'mucoviscidose', 'lepre', 'tuberculose', 'variole'];
         const isMessagePoc = firstMessage.isMatch(isMessagePocRegex) || (isTitlePoc && maladies.some(s => firstMessage.includes(s)));
 
         pocTopicMap.set(topicId, isMessagePoc);
@@ -603,6 +603,7 @@ function removeUselessTags(topics) {
 
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
+        if (!titleElem) return;
         let newTitle = titleElem.textContent;
         newTitle = newTitle.replace(regexAlert, '');
         newTitle = newTitle.replace(regexAyao, '');
@@ -612,6 +613,62 @@ function removeUselessTags(topics) {
         if (newTitle.length > 0) titleElem.textContent = newTitle;
         else titleElem.textContent = titleElem.textContent.toLowerCase().capitalize();
     });
+}
+
+async function handleTopicAvatars(topics) {
+    GM_addStyle('.topic-list .topic-author { width: 7.4rem; }');
+
+    const imagePrefix = 'https://image.jeuxvideo.com/avatar-sm';
+    const defaultImage = `${imagePrefix}/default.jpg`;
+
+    async function getAuthorAvatarUrl(topicAuthorElem) {
+        if (!topicAuthorElem) return;
+
+        const author = topicAuthorElem.textContent.trim().toLowerCase();
+        if (!author?.length) return;
+
+        if (authorAvatarMap.has(author)) {
+            let url = authorAvatarMap.get(author);
+            if (url === 'def') return defaultImage;
+            return `${imagePrefix}${url}`;
+        }
+
+        const authorProfileUrl = topicAuthorElem.href;
+        if (!authorProfileUrl?.length) return;
+
+        const resHtml = await fetchHtml(authorProfileUrl);
+        if (!resHtml) return;
+
+        let avatarUrl = resHtml.querySelector('.content-img-avatar')?.firstElementChild?.src;
+        if (avatarUrl?.length) {
+            avatarUrl = avatarUrl.replace('avatar-md', 'avatar-sm');
+            if (avatarUrl === defaultImage) authorAvatarMap.set(author, 'def');
+            else authorAvatarMap.set(author, avatarUrl.replace(imagePrefix, ''));
+            return avatarUrl;
+        }
+    }
+
+    await Promise.all(topics.slice(1).map(async function (topic) {
+        const topicAuthorElem = topic.querySelector('.topic-author');
+        if (!topicAuthorElem) return;
+
+        const topicAuthorWrapper = document.createElement('span');
+        topicAuthorWrapper.className = 'topic-author';
+        topicAuthorElem.insertAdjacentElement('beforebegin', topicAuthorWrapper);
+
+        topicAuthorElem.classList.remove('topic-author');
+        topicAuthorWrapper.appendChild(topicAuthorElem);
+
+        const authorAvatar = document.createElement('img');
+        authorAvatar.className = 'deboucled-topic-avatar';
+        authorAvatar.src = defaultImage;
+        topicAuthorElem.prepend(authorAvatar);
+
+        const avatarUrl = await getAuthorAvatarUrl(topicAuthorElem);
+        if (avatarUrl?.length) authorAvatar.src = avatarUrl;
+    }));
+
+    await saveLocalStorage();
 }
 
 function createTopicTitleSmileys(topics) {

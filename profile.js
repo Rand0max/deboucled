@@ -67,7 +67,7 @@ async function buildProfileHistory(author) {
 
     function getTopicClass(topic) {
         if (!topic) return null;
-        if (topic.deleteByModeration !== null) return 'deboucled-410-logo';
+        if (topic.is410) return 'deboucled-410-logo';
         if (topic.isRedTopic) return 'icon-topic-folder deboucled-topic-profile-folder deboucled-topic-folder2';
         return 'icon-topic-folder deboucled-topic-profile-folder deboucled-topic-folder1';
     }
@@ -90,7 +90,7 @@ async function buildProfileHistory(author) {
     let authorLastTopics = parseJvArchiveTopicsResults(authorLastTopicResults);
     if (authorLastTopics?.length) {
         const elements = authorLastTopics.map(t => ({
-            url: t.url,
+            url: t.is410 ? t.jvArchiveUrl : t.url,
             text: t.title,
             date: formatDateToFrenchFormat(t.lastMessageDate),
             class: getTopicClass(t)

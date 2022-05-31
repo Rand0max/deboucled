@@ -212,6 +212,9 @@ function buildSettingsPage() {
         let smileyLogo = '<img src="https://image.jeuxvideo.com/smileys_img/26.gif" style="vertical-align: bottom;"></img>'
         html += addToggleOption(`Intégrer les <i>smileys JVC</i> ${smileyLogo} dans les titres`, storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default, 'Permet d\'intégrer les smileys JVC dans les titres des topics.');
 
+        let avatarLogo = '<img src="https://image.jeuxvideo.com/avatar-xs/default.jpg" class="deboucled-avatar-logo"></img>'
+        html += addToggleOption(`Afficher les <i>avatars</i> ${avatarLogo} des auteurs`, storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default, 'Afficher ou non les avatars des auteurs dans la liste des topics.');
+
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -441,6 +444,7 @@ function addSettingEvents() {
     addToggleEvent(storage_optionDisplayTopicIgnoredCount);
     addToggleEvent(storage_optionHideLongMessages);
     addToggleEvent(storage_optionDisplayTitleSmileys);
+    addToggleEvent(storage_optionDisplayTopicAvatar);
 
     addPrebouclesEvents();
 }

@@ -7,6 +7,7 @@ const store = new GMStorage(); // eslint-disable-line no-undef
 
 const localstorage_pocTopics = 'deboucled_pocTopics';
 const localstorage_topicAuthors = 'deboucled_topicAuthors';
+const localstorage_authorAvatars = 'deboucled_authorAvatars';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
 const storage_secret_displayed = 'deboucled_secret_displayed', storage_secret_displayed_default = false;
@@ -50,6 +51,7 @@ const storage_optionAntiLoopAiMode = 'deboucled_optionAntiLoopAiMode', storage_o
 const storage_optionDisplayHotTopics = 'deboucled_optionDisplayHotTopics', storage_optionDisplayHotTopics_default = true;
 const storage_optionHideLongMessages = 'deboucled_optionHideLongMessages', storage_optionHideLongMessages_default = false;
 const storage_optionDisplayTitleSmileys = 'deboucled_optionDisplayTitleSmileys', storage_optionDisplayTitleSmileys_default = true;
+const storage_optionDisplayTopicAvatar = 'deboucled_optionDisplayTopicAvatar', storage_optionDisplayTopicAvatar_default = true;
 
 const storage_disabledFilteringForums = 'deboucled_disabledFilteringForums', storage_disabledFilteringForums_default = '[]';
 
@@ -72,7 +74,7 @@ const storage_aiLoopsLastUpdate = 'deboucled_aiLoopsLastUpdate';
 const storage_lastUpdateUser = 'deboucled_lastUpdateUser';
 const storage_DiagnosticLastUpdate = 'deboucled_DiagnosticLastUpdate';
 
-const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_blacklistedShadows, storage_whitelistedTopicIds, storage_optionEnableJvcDarkTheme, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_optionAntiSpam, storage_optionSmoothScroll, storage_optionAntiLoopAiMode, storage_optionDisplayHotTopics, storage_optionHideLongMessages, storage_optionDisplayTitleSmileys, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_totalHiddenSpammers, storage_TopicStats];
+const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_blacklistedShadows, storage_whitelistedTopicIds, storage_optionEnableJvcDarkTheme, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_optionAntiSpam, storage_optionSmoothScroll, storage_optionAntiLoopAiMode, storage_optionDisplayHotTopics, storage_optionHideLongMessages, storage_optionDisplayTitleSmileys, storage_optionDisplayTopicAvatar, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_totalHiddenSpammers, storage_TopicStats];
 
 const storage_excluded_user_Keys = [storage_TopicStats];
 
@@ -163,20 +165,24 @@ async function loadLocalStorage() {
 
     let storagePocTopics;
     let storageTopicAuthors;
+    let storageAuthorAvatars;
 
     /* eslint-disable no-undef */
     if (typeof localforage !== 'undefined') {
         storagePocTopics = await localforage.getItem(localstorage_pocTopics);
         storageTopicAuthors = await localforage.getItem(localstorage_topicAuthors);
+        storageAuthorAvatars = await localforage.getItem(localstorage_authorAvatars);
     }
     else {
         storagePocTopics = store.get(localstorage_pocTopics, '[]');
         storageTopicAuthors = store.get(localstorage_topicAuthors, '[]');
+        storageAuthorAvatars = store.get(localstorage_authorAvatars, '[]');
     }
     /* eslint-enable no-undef */
 
     if (storagePocTopics) pocTopicMap = new Map([...JSON.parse(storagePocTopics)]);
     if (storageTopicAuthors) topicAuthorMap = new Map([...JSON.parse(storageTopicAuthors)]);
+    if (storageAuthorAvatars) authorAvatarMap = new Map([...JSON.parse(storageAuthorAvatars)]);
 }
 
 async function saveLocalStorage() {
@@ -187,10 +193,12 @@ async function saveLocalStorage() {
     if (typeof localforage !== 'undefined') {
         await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
         await localforage.setItem(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
+        await localforage.setItem(localstorage_authorAvatars, JSON.stringify([...authorAvatarMap]));
     }
     else {
         store.set(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
         store.set(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
+        store.set(localstorage_authorAvatars, JSON.stringify([...authorAvatarMap]));
     }
     /* eslint-enable no-undef */
 }

@@ -63,10 +63,12 @@ function parseJvArchiveTopicsResults(results) {
             creationDate: new Date(r.date_creation),
             deletionDate: new Date(r.date_suppression),
             lastMessageDate: new Date(r.date_dernier_message),
-            deleteByModeration: r.delete_by_modo, // null=not deleted; true=deleted by modo; false=deleted by author
+            deletedByModeration: r.delete_by_modo, // null=not deleted; true=deleted by modo; false=deleted by author
+            is410: r.delete_by_modo !== null,
             isRedTopic: r.nb_messages > 20,
             isBlackTopic: r.nb_messages >= 100,
             url: `/forums/42-51-${r.id}-1-0-1-0-${randomStr}.htm`,
+            jvArchiveUrl: `${jvarchiveUrl}/forums/42-51-${r.id}-1-0-1-0-${randomStr}.htm`,
             authorProfile: `/profil/${r.auteur.pseudo.toLowerCase()}?mode=infos`,
             authorJvArchiveProfile: `${jvarchiveUrl}/profil/${r.auteur.pseudo.toLowerCase()}`,
             lastPageUrl: `/forums/42-51-${r.id}-${Math.ceil(r.nb_messages / 20)}-0-1-0-${randomStr}.htm`

@@ -251,21 +251,26 @@ async function handleTopicListOptions(topics) {
     let optionDisplayTitleSmileys = store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default);
     if (optionDisplayTitleSmileys) createTopicTitleSmileys(topics);
 
-    parseTopicListAuthors(topics);
-    await handlePoc(topics);
-    await saveLocalStorage();
+    await parseTopicListAuthors(topics);
+
+    let optionDisplayTopicAvatar = store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default);
+    if (optionDisplayTopicAvatar) handleTopicAvatars(topics);
+
+    handlePoc(topics);
 
     let optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
     if (optionDisplayHotTopics) handleHotTopics(topics);
 }
 
-function parseTopicListAuthors(topics) {
+async function parseTopicListAuthors(topics) {
     topics.slice(1).forEach(function (topic) {
         const author = topic.querySelector('.topic-author')?.textContent.trim().toLowerCase();
         const topicId = topic.getAttribute('data-id');
         if (!author || !topicId) return;
         topicAuthorMap.set(topicId, author);
     });
+
+    await saveLocalStorage();
 }
 
 async function handleHotTopics(finalTopics) {
@@ -313,6 +318,8 @@ async function handlePoc(finalTopics) {
             markTopicPoc(titleElem);
         }
     }));
+
+    await saveLocalStorage();
 }
 
 function highlightBlacklistMatches(element, matches) {

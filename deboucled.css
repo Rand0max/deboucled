@@ -209,7 +209,7 @@ blockquote .deboucled-highlighted {
 }
 .deboucled-topic-blacklist {
   text-align: center;
-  vertical-align: top;
+  vertical-align: middle;
   display: table-cell;
 }
 .deboucled-preview-content-text-light {
@@ -730,6 +730,12 @@ blockquote .deboucled-highlighted {
   margin: 0 3px;
   filter: invert(var(--deboucled-filter-invert));
 }
+.deboucled-avatar-logo {
+  vertical-align: bottom;
+  height: 18px;
+  border-radius: 50%;
+  margin: 0 1px;
+}
 
 .deboucled-eye-white-logo {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGiSURBVEhL7ZSxSsNQFIYb6dZiVdxsKViwOPkGUtx8BGf1IRz0XTpJi+AiFgRBrIuDgg4uKr5ALVRRx+v335zEtKS2g9ilH3wk+c+5t+m9STJTJk5gx1SccwsctnAT13ARRQfvsIWHQRB0FY4NE2dxD99xFOpRb9aG/w6NRbzGiDPcxirmTJ0rUy1CY4o2TTo0lPFZ3fCE61YainrwUQNAY8tW6odCHh/UBZc4ZyXVSniEb+YxVq2segEvUGiOvJV+IKz7snO3GDdwrslfVRigiyVri25QY0Xd4hCCWpi7T6xY7OFady5OcAm1R6cKoGltHq4rqDlEzWJfaIeZO7AohkxLIuIN5Fz/SvQsiiHbD0uuresZn/7g7Dguaf2Dc/pfjZboA5ct9nCtDRVaFi2P7r6lABrW5uF6Bb98JblEgiDa5BvMWaxcz7w2dJAOJpdtFu9VgP5NFoTJx1SPXMFKqumum9gzG5icfB6vUKQ/poJC8kXTyzPOi7aBLxoAw1+0CBrSPhU7uIr6l1Lnu3iOEaM/FRE0/tnHbjKf6yn/SCbzDcCUuoiprpfXAAAAAElFTkSuQmCC)
@@ -1188,6 +1194,12 @@ input[type="search"] {
   margin-left: 0.9375rem;
   padding: 0.625rem;
   background: none;
+}
+.deboucled-topic-avatar {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-right: 4px;
+  border-radius: 50%;
 }
 
 .deboucled-about-version {
