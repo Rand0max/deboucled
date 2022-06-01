@@ -7,7 +7,7 @@ const store = new GMStorage(); // eslint-disable-line no-undef
 
 const localstorage_pocTopics = 'deboucled_pocTopics';
 const localstorage_topicAuthors = 'deboucled_topicAuthors';
-const localstorage_authorAvatars = 'deboucled_authorAvatars';
+const localstorage_authorAvatars = 'deboucled_topicAuthorAvatars';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
 const storage_secret_displayed = 'deboucled_secret_displayed', storage_secret_displayed_default = false;
