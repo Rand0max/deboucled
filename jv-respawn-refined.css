@@ -149,6 +149,15 @@ body.didomi-popup-open {
   .topic-list .topic-subject {
     font-size: 0.9375rem;
   }
+  .topic-list .topic-subject,
+  .topic-list .topic-author,
+  .topic-list .topic-count,
+  .topic-list .topic-count-adm,
+  .topic-list .topic-admin,
+  .topic-list .topic-select,
+  .topic-list .topic-date {
+    padding: 0;
+  }
 }
 @media (min-width: 807.99px) {
   .topic-list .topic-title {
