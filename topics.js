@@ -619,8 +619,9 @@ function removeUselessTags(topics) {
 async function handleTopicAvatars(topics) {
     GM_addStyle('.topic-list .topic-author { width: 7.4rem; }');
 
-    const imagePrefix = 'https://image.jeuxvideo.com/avatar-sm';
-    const defaultImage = `${imagePrefix}/default.jpg`;
+    const imageRootUrl = 'https://image.jeuxvideo.com';
+    const avatarSizeRoute = 'avatar-sm';
+    const defaultAvatar = `${imageRootUrl}/${avatarSizeRoute}/default.jpg`;
 
     async function getAuthorAvatarUrl(topicAuthorElem) {
         if (!topicAuthorElem) return;
@@ -630,8 +631,8 @@ async function handleTopicAvatars(topics) {
 
         if (authorAvatarMap.has(author)) {
             let url = authorAvatarMap.get(author);
-            if (url === 'def') return defaultImage;
-            return `${imagePrefix}${url}`;
+            if (url === 'def') return defaultAvatar;
+            return `${imageRootUrl}${url}`;
         }
 
         const authorProfileUrl = topicAuthorElem.href;
@@ -642,9 +643,9 @@ async function handleTopicAvatars(topics) {
 
         let avatarUrl = resHtml.querySelector('.content-img-avatar')?.firstElementChild?.src;
         if (avatarUrl?.length) {
-            avatarUrl = avatarUrl.replace('avatar-md', 'avatar-sm');
-            if (avatarUrl === defaultImage) authorAvatarMap.set(author, 'def');
-            else authorAvatarMap.set(author, avatarUrl.replace(imagePrefix, ''));
+            avatarUrl = avatarUrl.replace('avatar-md', avatarSizeRoute);
+            if (avatarUrl === defaultAvatar) authorAvatarMap.set(author, 'def');
+            else authorAvatarMap.set(author, avatarUrl.replace(imageRootUrl, ''));
             return avatarUrl;
         }
     }
@@ -662,7 +663,7 @@ async function handleTopicAvatars(topics) {
 
         const authorAvatar = document.createElement('img');
         authorAvatar.className = 'deboucled-topic-avatar';
-        authorAvatar.src = defaultImage;
+        authorAvatar.src = defaultAvatar;
         topicAuthorElem.prepend(authorAvatar);
 
         const avatarUrl = await getAuthorAvatarUrl(topicAuthorElem);
