@@ -12,6 +12,7 @@ const entityAuthor = 'author';
 const entityTopicId = 'topicid';
 
 const jvarchiveUrl = 'https://jvarchive.com';
+const avatarUseJvArchiveApi = true;
 
 const deboucledBackendUrl = 'https://deboucled.jvflux.fr';
 const deboucledApiUrl = `${deboucledBackendUrl}/deboucledapi`;

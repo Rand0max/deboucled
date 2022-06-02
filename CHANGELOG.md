@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.31.6] (02/06/2022)
+
+- Amélioration des performances pour les avatars : utilisation de l'API JvArchive
+
 ## [2.31.0] (31/05/2022)
 
 - Nouvelle option : ajout des avatars à côté des pseudos dans la liste des topics

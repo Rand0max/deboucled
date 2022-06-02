@@ -7,13 +7,15 @@ const jvarchiveApiUrl = `${jvarchiveUrl}/api`;
 const jvarchiveApiTopicsUrl = `${jvarchiveApiUrl}/topics`;
 const jvarchiveApiAuteursUrl = `${jvarchiveApiUrl}/auteurs`;
 
-const jvarchiveApiGetHotTopicsUrl = (itemsPerPage, timeInterval) => `${jvarchiveApiTopicsUrl}?page=1&itemsPerPage=${itemsPerPage}&orderBy=nb_messages&timeInterval=${timeInterval}&topicState=created`;
-const jvarchiveApiGetAuthorLastMessages = (author) => `${jvarchiveApiAuteursUrl}/${author}/last5messages`;
-const jvarchiveApiGetAuthorLastTopics = (author, itemsPerPage) => `${jvarchiveApiTopicsUrl}/search?page=1&itemsPerPage=${itemsPerPage}&search=${author}&searchType=auteur_topic_exact`;
+const jvarchiveApiGetHotTopicsRoute = (itemsPerPage, timeInterval) => `${jvarchiveApiTopicsUrl}?page=1&itemsPerPage=${itemsPerPage}&orderBy=nb_messages&timeInterval=${timeInterval}&topicState=created`;
+const jvarchiveApiGetAuthorRoute = (author) => `${jvarchiveApiAuteursUrl}/${author}`;
+const jvarchiveApiGetAuthorLastMessagesRoute = (author) => `${jvarchiveApiAuteursUrl}/${author}/last5messages`;
+const jvarchiveApiGetAuthorLastTopicsRoute = (author, itemsPerPage) => `${jvarchiveApiTopicsUrl}/search?page=1&itemsPerPage=${itemsPerPage}&search=${author}&searchType=auteur_topic_exact`;
 
-const getJvArchiveHotTopics = async (itemsPerPage = 20, timeInterval = 'day') => fetchJson(jvarchiveApiGetHotTopicsUrl(itemsPerPage, timeInterval), 3000);
-const getJvArchiveAuthorLastMessages = async (author) => fetchJson(jvarchiveApiGetAuthorLastMessages(author), 3000);
-const getJvArchiveAuthorLastTopics = async (author, itemsPerPage = 5) => fetchJson(jvarchiveApiGetAuthorLastTopics(author, itemsPerPage), 3000);
+const getJvArchiveHotTopics = async (itemsPerPage = 20, timeInterval = 'day') => fetchJson(jvarchiveApiGetHotTopicsRoute(itemsPerPage, timeInterval), 3000);
+const getJvArchiveAuthor = async (author) => fetchJson(jvarchiveApiGetAuthorRoute(author), 3000);
+const getJvArchiveAuthorLastMessages = async (author) => fetchJson(jvarchiveApiGetAuthorLastMessagesRoute(author), 3000);
+const getJvArchiveAuthorLastTopics = async (author, itemsPerPage = 5) => fetchJson(jvarchiveApiGetAuthorLastTopicsRoute(author, itemsPerPage), 3000);
 
 function parseJvArchiveHotTopicResults(results) {
     if (!results?.items?.length) return null;
@@ -32,6 +34,16 @@ function parseJvArchiveHotTopicResults(results) {
             lastPageUrl: `/forums/42-51-${r.id}-${Math.ceil(r.nb_messages / 20)}-0-1-0-${randomStr}.htm`
         };
     });
+}
+
+function parseJvArchiveAuthorResult(result) {
+    if (!result) return null;
+
+    return {
+        id: parseInt(result.id),
+        author: result.pseudo,
+        avatar: result.avatar
+    };
 }
 
 function parseJvArchiveAuthorLastMessageResults(results) {

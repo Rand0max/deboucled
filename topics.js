@@ -620,8 +620,8 @@ async function handleTopicAvatars(topics) {
     GM_addStyle('.topic-list .topic-author { width: 7.4rem; }');
 
     const imageRootUrl = 'https://image.jeuxvideo.com';
-    const avatarSizeRoute = 'avatar-sm';
-    const defaultAvatar = `${imageRootUrl}/${avatarSizeRoute}/default.jpg`;
+    const avatarSmallSizeRoute = 'avatar-sm';
+    const defaultAvatar = `${imageRootUrl}/${avatarSmallSizeRoute}/default.jpg`;
 
     async function getAuthorAvatarUrl(topicAuthorElem) {
         if (!topicAuthorElem) return;
@@ -635,18 +635,31 @@ async function handleTopicAvatars(topics) {
             return `${imageRootUrl}${url}`;
         }
 
-        const authorProfileUrl = topicAuthorElem.href;
-        if (!authorProfileUrl?.length) return;
-
-        const resHtml = await fetchHtml(authorProfileUrl);
-        if (!resHtml) return;
-
-        let avatarUrl = resHtml.querySelector('.content-img-avatar')?.firstElementChild?.src;
-        if (avatarUrl?.length) {
-            avatarUrl = avatarUrl.replace('avatar-md', avatarSizeRoute);
+        function storeAvatarUrl(avatarUrl) {
+            avatarUrl = avatarUrl.replace('avatar-md', avatarSmallSizeRoute);
             if (avatarUrl === defaultAvatar) authorAvatarMap.set(author, 'def');
             else authorAvatarMap.set(author, avatarUrl.replace(imageRootUrl, ''));
             return avatarUrl;
+        }
+
+        // Use JvArchive to get avatar in only one request instead of two (with JVC profile)
+        // Useful to avoid JVC query limitation/slowness
+        if (avatarUseJvArchiveApi) {
+            const authorJvaResult = await getJvArchiveAuthor(author);
+            const authorJva = parseJvArchiveAuthorResult(authorJvaResult);
+
+            if (!authorJva?.avatar?.length) return;
+            return storeAvatarUrl(authorJva.avatar);
+        }
+        else {
+            const authorProfileUrl = topicAuthorElem.href;
+            if (!authorProfileUrl?.length) return;
+            const resHtml = await fetchHtml(authorProfileUrl);
+            if (!resHtml) return;
+
+            let profileAvatarUrl = resHtml.querySelector('.content-img-avatar')?.firstElementChild?.src;
+            if (!profileAvatarUrl?.length) return;
+            return storeAvatarUrl(profileAvatarUrl);
         }
     }
 
