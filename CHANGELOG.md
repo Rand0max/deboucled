@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.31.7] (02/06/2022)
+
+- Avatars : fallback JVC si JvArchive est KO
+
 ## [2.31.6] (02/06/2022)
 
 - Amélioration des performances pour les avatars : utilisation de l'API JvArchive

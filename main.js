@@ -253,13 +253,13 @@ async function handleTopicListOptions(topics) {
 
     await parseTopicListAuthors(topics);
 
-    let optionDisplayTopicAvatar = store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default);
-    if (optionDisplayTopicAvatar) handleTopicAvatars(topics);
-
     handlePoc(topics);
 
     let optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
     if (optionDisplayHotTopics) handleHotTopics(topics);
+
+    let optionDisplayTopicAvatar = store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default);
+    if (optionDisplayTopicAvatar) handleTopicAvatars(topics);
 }
 
 async function parseTopicListAuthors(topics) {

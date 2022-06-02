@@ -642,25 +642,36 @@ async function handleTopicAvatars(topics) {
             return avatarUrl;
         }
 
-        // Use JvArchive to get avatar in only one request instead of two (with JVC profile)
-        // Useful to avoid JVC query limitation/slowness
-        if (avatarUseJvArchiveApi) {
-            const authorJvaResult = await getJvArchiveAuthor(author);
-            const authorJva = parseJvArchiveAuthorResult(authorJvaResult);
-
-            if (!authorJva?.avatar?.length) return;
-            return storeAvatarUrl(authorJva.avatar);
-        }
-        else {
+        async function getAvatarUsingJvcProfile() {
             const authorProfileUrl = topicAuthorElem.href;
             if (!authorProfileUrl?.length) return;
             const resHtml = await fetchHtml(authorProfileUrl);
             if (!resHtml) return;
 
-            let profileAvatarUrl = resHtml.querySelector('.content-img-avatar')?.firstElementChild?.src;
+            const profileAvatarUrl = resHtml.querySelector('.content-img-avatar')?.firstElementChild?.src;
             if (!profileAvatarUrl?.length) return;
             return storeAvatarUrl(profileAvatarUrl);
         }
+
+        async function getAvatarUsingJvArchive() {
+            const authorJvaResult = await getJvArchiveAuthor(author);
+            if (!authorJvaResult) return;
+
+            const authorJva = parseJvArchiveAuthorResult(authorJvaResult);
+            let jvaAvatarUrl = authorJva?.avatar;
+            if (!jvaAvatarUrl?.length) jvaAvatarUrl = defaultAvatar;
+
+            return storeAvatarUrl(jvaAvatarUrl);
+        }
+
+        // Use JvArchive to get avatar in only one request instead of two (with JVC profile)
+        // Useful to avoid JVC query limitation/slowness
+        if (avatarUseJvArchiveApi) {
+            const jvArchiveAvatarUrl = await getAvatarUsingJvArchive();
+            if (jvArchiveAvatarUrl?.length) return jvArchiveAvatarUrl;
+        }
+        // If not successful (too many request/jvarchive down) or not enabled, fallback with JVC
+        return await getAvatarUsingJvcProfile();
     }
 
     await Promise.all(topics.slice(1).map(async function (topic) {
