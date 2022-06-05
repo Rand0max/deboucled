@@ -109,16 +109,21 @@ function buildSettingsPage() {
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
 
+        html += '<div class="deboucled-setting-credits">';
         let jvcLogo = '<span class="deboucled-jvc-logo"></span>';
         html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm" target="_blank" title="Topic officiel JVC">${jvcLogo}</a>`;
 
         let githubLogo = '<span class="deboucled-svg-github"><svg width="20px" viewBox="0 0 16 16" id="deboucled-github-logo"><use href="#githublogo"/></svg></span>';
         html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/deboucled" target="_blank" title="Github officiel Déboucled">${githubLogo}</a>`;
 
+        let jvarchiveLogo = '<span class="deboucled-jvarchive-logo"></span>';
+        html += `<a class="deboucled-about-link-jvarchive" href="https://jvarchive.com/" target="_blank" title="JvArchive">${jvarchiveLogo}</a>`;
+
         let stylishLogo = '<span class="deboucled-stylish-logo"></span>';
         html += `<a class="deboucled-about-link-stylish" href="https://userstyles.world/style/3030/jv-respawn-refined" target="_blank" title="Thème JVC par Rand0max">${stylishLogo}</a>`;
 
         html += `<span class="deboucled-about-version">v${getCurrentScriptVersion()}</span>`;
+        html += '</div>';
 
         html += '<table class="deboucled-option-table">';
 

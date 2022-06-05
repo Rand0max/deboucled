@@ -600,7 +600,7 @@ async function topicIsModerated(topicId) {
 function removeUselessTags(topics) {
     // eslint-disable-next-line no-misleading-character-class
     const regexAlert = /^[{[(🛑🔴🚨🔕☢️\s]*alerte\s?(rouge|noire|nucl[eé]aire|[eé]carlate|g[eé]n[eé]rale|ovni|prolo|info)?[\s}\])🛑🔴🚨🔕☢️!,:-]*/giu;
-    const regexAyao = /a+y+a+o*/gi;
+    const regexAyao = /\ba+y+a+o*\b/gi;
 
     topics.slice(1).forEach(function (topic) {
         const titleElem = topic.querySelector('.lien-jv.topic-title');
@@ -691,7 +691,10 @@ async function handleTopicAvatars(topics) {
         topicAuthorElem.prepend(authorAvatar);
 
         const avatarUrl = await getAuthorAvatarUrl(topicAuthorElem);
-        if (avatarUrl?.length) authorAvatar.src = avatarUrl;
+        if (avatarUrl?.length) {
+            authorAvatar.alt = authorAvatar.src;
+            authorAvatar.src = avatarUrl;
+        }
     }));
 
     await saveLocalStorage();
@@ -861,7 +864,8 @@ async function buildHotTopics() {
     topTopics = topTopics
         .filter(t => t.lastMessageDate >= minDate) // dernier message il y a moins de 15 minutes
         .sort((a, b) => (a.nbMessages > b.nbMessages) ? -1 : 1) // tri décroissant par nb messages
-        .slice(0, 5); // sélection des 5 premiers
+        .slice(0, 5) // sélection des 5 premiers
+        .map(t => t.id); // map uniquement l'id du topic
 
     return topTopics;
 }

@@ -1,5 +1,12 @@
 # Changelog Déboucled
 
+## [2.32.0] (05/06/2022)
+
+- Création d'un cache pour les topics tendances (JvArchive)
+- Meilleure correction des images noelshack
+- Lien vers JvArchive dans les options
+- Mise à jour du Readme
+
 ## [2.31.7] (02/06/2022)
 
 - Avatars : fallback JVC si JvArchive est KO

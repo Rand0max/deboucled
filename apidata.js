@@ -40,6 +40,16 @@ async function queryAiLoops() {
     store.set(storage_aiLoopsLastUpdate, Date.now());
 }
 
+async function queryHotTopics() {
+    let newHotTopics = await buildHotTopics();
+    if (!newHotTopics) return;
+
+    hotTopicsData = newHotTopics;
+
+    store.set(storage_hotTopicsData, JSON.stringify(hotTopicsData));
+    store.set(storage_hotTopicsLastUpdate, Date.now());
+}
+
 async function checkUpdate() {
     if (!mustRefresh(storage_lastUpdateCheck, checkUpdateExpire)) return;
 
@@ -150,5 +160,14 @@ async function parseAiLoopData(forceUpdate) {
     else if (dataVersion === 2) {
         aiLoopSubjectReg = buildEntityRegex(aiLoopData.titles, true);
         aiLoopAuthorReg = buildEntityRegex(aiLoopData.authors, false);
+    }
+}
+
+async function parseHotTopicsData(forceUpdate) {
+    hotTopicsData = JSON.parse(store.get(storage_hotTopicsData, storage_hotTopicsData_default));
+    if (!hotTopicsData
+        || forceUpdate
+        || mustRefresh(storage_hotTopicsLastUpdate, hotTopicsRefreshExpire)) {
+        await queryHotTopics();
     }
 }

@@ -12,7 +12,7 @@ const entityAuthor = 'author';
 const entityTopicId = 'topicid';
 
 const jvarchiveUrl = 'https://jvarchive.com';
-const avatarUseJvArchiveApi = true;
+const avatarUseJvArchiveApi = false;
 
 const deboucledBackendUrl = 'https://deboucled.jvflux.fr';
 const deboucledApiUrl = `${deboucledBackendUrl}/deboucledapi`;
@@ -31,6 +31,7 @@ const prebouclesRefreshExpire = TimeSpan.FromHours(1);
 const aiLoopsRefreshExpire = TimeSpan.FromMinutes(10);
 const updateUserExpire = TimeSpan.FromHours(6);
 const diagnosticExpire = TimeSpan.FromHours(12);
+const hotTopicsRefreshExpire = TimeSpan.FromMinutes(10);
 /* eslint-enable no-undef */
 
 let subjectBlacklistArray = [];
@@ -48,6 +49,8 @@ let youtubeBlacklistReg;
 let aiLoopData = undefined;
 let aiLoopSubjectReg;
 let aiLoopAuthorReg;
+
+let hotTopicsData = undefined;
 
 let pocTopicMap = new Map();
 let topicAuthorMap = new Map();

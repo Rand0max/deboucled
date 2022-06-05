@@ -36,6 +36,7 @@
 
 ## Fonctionnalités :
 
+- **Intelligence Artificielle anti-boucle** : *grâce à l'I.A Déboucled dites adieu aux topics boucled !*
 - **Mots-clés à bannir des sujets** : *les topics contenant ces mots seront masqués*
 - **Caractères spéciaux et émojis pris en charge** : *pour la blacklist des sujets*
 - **Prise en charge du métacaractère '\*'** : *utilisez l'étoile pour remplacer un ou plusieurs caractères*
@@ -63,7 +64,14 @@
 - **Algorithme anti-Vinz** : *dites adieu à la boucle de Vinz en dépit de ses tentatives pour échapper au script*
 - **Filtrage des MPs** : *filtre les messages privés des pseudos blacklist ! Adieu Leao !*
 - **Masquer les messages dans les topics** : *les messages contenant une ou plusieurs expressions de votre "blacklist sujets" seront masqués*
-- **Intégration avec JvArchive**
+- **Intégration avec JvArchive** : *consultez les derniers topics et messages d'un pseudo facilement grâce à JvArchive*
+- **Affichage des avatars** : *rajoute les avatars à côté des pseudos dans la liste des topics*
+- **Topics tendances** : *mise en avant des topics les plus actifs*
+- **Défilement automatique des messages** : *vous pouvez charger automatiquement les pages d'un topic simplement en défilant vers le bas*
+- **Réduire les messages trop longs** : *possibilité de réduire partiellement les messages trop longs pour faciliter la navigation*
+- **Intégration des smileys dans les topics** : *intégration des smileys JVC dans les titres des topics*
+- **Algorithme anti-spam/anti-pub youtube** : *dites au revoir au spam des liens youtube dans les messages*
+- **Correction des liens/stickers** : *correction automatique des liens et images cassés dans les messages*
 - **Régulièrement mis à jour, les suggestions et remarques sont les bienvenues**
 - **Compatible avec tous les forums JVC et sur mobile également.**
 
@@ -76,3 +84,13 @@ Et plus encore !
 - [Topic sur JvArchive](https://jvarchive.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam)
 - [Page jvscript.fr](https://jvscript.fr/script/deboucled)
 - [Repository officiel](https://github.com/Rand0max/deboucled/)
+- [JvArchive](https://jvarchive.com/)
+
+## Remerciements
+
+- Je tiens tout d'abord à remercier personnellement tous **les membres du forum 18-25** qui m'ont aidé à améliorer ce projet, et qui ont activement participé sur les deux topics officiels depuis leur création, ainsi que tous les membres anonymes par messages privés.
+- Grand merci à l'**équipe de JvFlux** pour leur aide et leur participation technique sans qui ce projet n'aurait pas pu prendre une telle ampleur.
+- Grand merci également à l'**équipe de JvArchive** sans qui ce projet perdrait une bonne partie de ses fonctionnalités, et à qui nous devons beaucoup contre la censure de Webedia.
+- Et enfin, merci à la **boucle** temporelle sans quoi l'idée initiale de Déboucled n'aurait peut-être jamais émergée... en dépit de.
+
+*Rand0max*

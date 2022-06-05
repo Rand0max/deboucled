@@ -233,6 +233,12 @@ function getMessageContentWithoutQuotes(messageElement) {
     return content.trim();
 }
 
+function buildNoelshackMiniUrl(noelshackUrl) {
+    const matchRegex = new RegExp(/https:\/\/www\.noelshack\.com\/(\d+)-(\d+)-(\d+)-(.*)/, 'i');
+    const replacement = 'https://image.noelshack.com/minis/$1/$2/$3/$4';
+    return noelshackUrl.replace(matchRegex, replacement);
+}
+
 function fixMessageUrls(messageContent) {
     if (!messageContent) return;
 
@@ -257,7 +263,7 @@ function fixMessageUrls(messageContent) {
     parseElement(
         messageContent,
         imageUrlRegex,
-        (m) => `<a href="${m}" target="_blank" class="xXx"><img class="img-shack" src="${m}" alt="${m}" width="68" height="51"></a>`);
+        (m) => `<a href="${m}" target="_blank" class="xXx"><img class="img-shack" src="${buildNoelshackMiniUrl(m)}" alt="${m}" width="68" height="51"></a>`);
 
     // Puis on traite les urls normales
     const urlRegex = new RegExp(/\b(?:https?:\/\/)[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+/, 'gi');

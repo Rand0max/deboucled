@@ -114,6 +114,11 @@ function displaySecret() {
     store.set(storage_secret_displayed, true);
 }
 
+function sendFinalEvent() {
+    const event = new CustomEvent('deboucled:loaded');
+    dispatchEvent(event);
+}
+
 function getEntityTitle(entity) {
     switch (entity) {
         case entitySubject:
@@ -274,16 +279,16 @@ async function parseTopicListAuthors(topics) {
 }
 
 async function handleHotTopics(finalTopics) {
-    const hotTopics = await buildHotTopics();
-    if (!hotTopics?.length) return;
+    await parseHotTopicsData();
+    if (!hotTopicsData?.length) return;
 
     const matchMediaMediumWidth = window.matchMedia('(min-width: 1000px) and (max-width: 1479px)')?.matches;
 
     finalTopics.slice(1).forEach(topic => {
         const topicId = topic.getAttribute('data-id');
         if (!topicId) return;
-        const hotTopic = hotTopics.find(ht => ht.id === parseInt(topicId));
-        if (!hotTopic) return;
+        const isHotTopic = hotTopicsData.includes(parseInt(topicId));
+        if (!isHotTopic) return;
         const titleElem = topic.querySelector('.lien-jv.topic-title');
 
         if (matchMediaMediumWidth) {
@@ -913,6 +918,9 @@ async function entryPoint() {
         const elapsed = performance.now() - start;
         console.error(error);
         await sendDiagnostic(elapsed, error);
+    }
+    finally {
+        sendFinalEvent();
     }
 }
 
