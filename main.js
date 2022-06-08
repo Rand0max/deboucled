@@ -114,6 +114,17 @@ function displaySecret() {
     store.set(storage_secret_displayed, true);
 }
 
+function displayAnnouncement() {
+    let announcementDisplayed = store.get(storage_announcement_displayed, storage_announcement_displayed_default);
+    if (announcementDisplayed) return;
+
+    store.set(storage_announcement_displayed, true);
+
+    if (confirm('Déboucled présente : DÉCENSURED le nouveau script anti-censure ! Souhaitez-vous en savoir plus ?')) {
+        document.location.href = 'https://github.com/Rand0max/decensured#readme';
+    }
+}
+
 function sendFinalEvent() {
     const event = new CustomEvent('deboucled:loaded');
     dispatchEvent(event);
@@ -914,6 +925,7 @@ async function entryPoint() {
         await suggestUpdate();
 
         displaySecret();
+        displayAnnouncement();
     } catch (error) {
         const elapsed = performance.now() - start;
         console.error(error);
