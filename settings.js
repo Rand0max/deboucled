@@ -398,9 +398,10 @@ function addSelectEvent(id) {
 }
 
 function addSettingEvents() {
+    //const boucleUrl = 'https://www.youtube.com/watch?v=KkxZfUlNlDo';
     //const boucleUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
-    const boucleUrl = 'https://www.youtube.com/watch?v=KkxZfUlNlDo';
     //const boucleUrl = 'https://www.jeuxvideo.com/forums/42-51-62052373-1-0-1-0-ce-forum-est-une-putain-de-boucle-temporelle-sans-fin.htm';
+    const boucleUrl = 'https://github.com/Rand0max/decensured#readme';
     document.querySelector('.deboucled-about-version').onclick = () => window.open(boucleUrl, '_blank').focus();
 
     document.querySelector('.deboucled-svg-refresh').onclick = forcePrebouclesRefresh;
