@@ -113,6 +113,9 @@ function buildSettingsPage() {
         let jvcLogo = '<span class="deboucled-jvc-logo"></span>';
         html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm" target="_blank" title="Topic officiel JVC">${jvcLogo}</a>`;
 
+        let decensuredLogo = '<span class="deboucled-decensured-logo"></span>';
+        html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/decensured#readme" target="_blank" title="Décensured le script anti-censure">${decensuredLogo}</a>`;
+
         let githubLogo = '<span class="deboucled-svg-github"><svg width="20px" viewBox="0 0 16 16" id="deboucled-github-logo"><use href="#githublogo"/></svg></span>';
         html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/deboucled" target="_blank" title="Github officiel Déboucled">${githubLogo}</a>`;
 
