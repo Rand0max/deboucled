@@ -208,7 +208,6 @@ blockquote .deboucled-highlighted {
   display: block;
 }
 .deboucled-topic-blacklist {
-  text-align: center;
   margin: auto 0;
   display: block;
   grid-area: blacklist;
@@ -1898,16 +1897,6 @@ select.deboucled-dropdown::-ms-expand {
   .deboucled-logo-forbidden {
     width: 16px;
   }
-  .deboucled-topic-blacklist {
-    position: absolute;
-    bottom: 0.4375rem;
-    display: block;
-    text-align: center;
-    left: 50%;
-    right: 50%;
-    max-width: 100%;
-    width: auto;
-  }
   .deboucled-topic-title {
     margin-left: 1.4rem !important;
   }
@@ -1921,6 +1910,14 @@ select.deboucled-dropdown::-ms-expand {
   .deboucled-overlay {
     left: -12px;
     width: 104%;
+  }
+  .topic-list {
+    --jv-topic-template-areas: "subject subject subject subject select"
+      ". count . . select" ". author blacklist date select";
+    --jv-topic-template-columns: calc(
+        var(--jv-topic-gap) * 2 + var(--jv-topic-icon-size)
+      )
+      1fr 1fr auto;
   }
   .topic-list .topic-img {
     padding-right: 0;

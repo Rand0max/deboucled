@@ -69,15 +69,6 @@ body.didomi-popup-open {
 }
 
 /* Fix for JVC zoomed update */
-.topic-list .topic-subject,
-.topic-list .topic-author,
-.topic-list .topic-count,
-.topic-list .topic-count-adm,
-.topic-list .topic-admin,
-.topic-list .topic-select,
-.topic-list .topic-date {
-  padding: 0.21rem;
-}
 .bloc-message-forum {
   font-size: 0.875rem;
   line-height: 1.375rem;
@@ -148,15 +139,6 @@ body.didomi-popup-open {
 @media (max-width: 807.98px) {
   .topic-list .topic-subject {
     font-size: 0.9375rem;
-  }
-  .topic-list .topic-subject,
-  .topic-list .topic-author,
-  .topic-list .topic-count,
-  .topic-list .topic-count-adm,
-  .topic-list .topic-admin,
-  .topic-list .topic-select,
-  .topic-list .topic-date {
-    padding: 0;
   }
 }
 @media (min-width: 807.99px) {

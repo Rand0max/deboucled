@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.1.1
+@version        1.2.0
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -76,15 +76,6 @@
   }
 
   /* Fix for JVC zoomed update */
-  .topic-list .topic-subject,
-  .topic-list .topic-author,
-  .topic-list .topic-count,
-  .topic-list .topic-count-adm,
-  .topic-list .topic-admin,
-  .topic-list .topic-select,
-  .topic-list .topic-date {
-    padding: 0.21rem;
-  }
   .bloc-message-forum {
     font-size: 0.875rem;
     line-height: 1.375rem;
@@ -155,15 +146,6 @@
   @media (max-width: 807.98px) {
     .topic-list .topic-subject {
       font-size: 0.9375rem;
-    }
-    .topic-list .topic-subject,
-    .topic-list .topic-author,
-    .topic-list .topic-count,
-    .topic-list .topic-count-adm,
-    .topic-list .topic-admin,
-    .topic-list .topic-select,
-    .topic-list .topic-date {
-      padding: 0;
     }
   }
   @media (min-width: 807.99px) {
