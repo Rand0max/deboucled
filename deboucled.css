@@ -209,8 +209,9 @@ blockquote .deboucled-highlighted {
 }
 .deboucled-topic-blacklist {
   text-align: center;
-  vertical-align: middle;
-  display: table-cell;
+  margin: auto 0;
+  display: block;
+  grid-area: blacklist;
 }
 .deboucled-preview-content-text-light {
   color: #ddd;
@@ -332,6 +333,10 @@ blockquote .deboucled-highlighted {
 }
 
 /* JVC fix */
+.topic-list {
+  --jv-topic-template-areas: "subject author count date select blacklist";
+  --jv-topic-template-columns: 1fr 6.25rem 3.75rem 5.3rem auto 1.75rem;
+}
 .bloc-message-forum .bloc-header {
   display: grid;
   grid-template-areas: "pseudo mp boucled options" "date date date date";
