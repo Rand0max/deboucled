@@ -5,7 +5,7 @@
 
 function getAllTopics(doc) {
     if (!doc) return;
-    let allTopics = doc.querySelectorAll('.topic-list.topic-list-admin > li:not(.dfp__atf):not(.message)');
+    let allTopics = doc.querySelectorAll('.topic-list > li:not(.dfp__atf):not(.message)');
     return [...allTopics];
 }
 
@@ -39,7 +39,7 @@ async function fillTopics(topics, topicOptions) {
 }
 
 function createTopicListOverlay() {
-    let topicTable = document.querySelector('.topic-list.topic-list-admin');
+    let topicTable = document.querySelector('.topic-list');
     if (!topicTable) return;
 
     topicTable.style.opacity = '0.3';
@@ -62,7 +62,7 @@ function createTopicListOverlay() {
 function toggleTopicOverlay(active) {
     document.querySelector('.deboucled-overlay').classList.toggle('active', active);
     document.querySelector('.deboucled-overlay-spinner').classList.toggle('active', active);
-    document.querySelector('.topic-list.topic-list-admin').removeAttribute('style');
+    document.querySelector('.topic-list').removeAttribute('style');
 }
 
 async function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
@@ -156,7 +156,7 @@ function addTopic(element, topics) {
         let topicDate = topicDateSpan.firstElementChild.textContent.trim();
         topicDateSpan.innerHTML = `<a href="${topicUrl}" class="xXx lien-jv">${topicDate}</a>`;
     }
-    document.querySelector('.topic-list.topic-list-admin').appendChild(element);
+    document.querySelector('.topic-list').appendChild(element);
     topics.push(element); // on rajoute le nouveau topic à la liste en cours de remplissage pour éviter de le reprendre sur les pages suivantes
 }
 
