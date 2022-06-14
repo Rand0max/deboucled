@@ -95,7 +95,7 @@ body.didomi-popup-open {
   font-size: inherit;
 }
 .topic-list .topic-head {
-  line-height: 1.2rem;
+  line-height: 1.1rem;
   text-transform: uppercase;
   font-size: 0.69rem;
   font-weight: bold;
@@ -149,8 +149,8 @@ body.didomi-popup-open {
   .topic-list .topic-admin,
   .topic-list .topic-select,
   .topic-list .topic-date {
-    padding-top: 0.23rem;
-    padding-bottom: 0.23rem;
+    padding-top: 0.22rem;
+    padding-bottom: 0.22rem;
   }
   .topic-list .topic-title {
     font-size: 0.72rem;
@@ -165,7 +165,7 @@ body.didomi-popup-open {
 }
 @media (min-width: 1480px) {
   .layout {
-    --jv-grid-template-columns: 1fr 53rem 24.5rem 1fr;
+    --grid-template-columns: 1fr 53rem 24.5rem 1fr;
     --ad-placeholder-w: 0;
   }
 }
