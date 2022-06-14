@@ -126,7 +126,7 @@ function updateTopicsHeader() {
     let optionDisplayBlacklistTopicButton = store.get(storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default);
     if (optionDisplayBlacklistTopicButton) {
         let lastMessageHeader = document.querySelector('.topic-head > span:nth-child(4)');
-        lastMessageHeader.style.width = '5.3rem';
+        lastMessageHeader.style.width = '5.5rem';
     }
 }
 
