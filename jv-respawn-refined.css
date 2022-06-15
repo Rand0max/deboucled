@@ -95,7 +95,7 @@ body.didomi-popup-open {
   font-size: inherit;
 }
 .topic-list .topic-head {
-  line-height: 1.1rem;
+  line-height: 1.2rem;
   text-transform: uppercase;
   font-size: 0.69rem;
   font-weight: bold;
@@ -159,8 +159,8 @@ body.didomi-popup-open {
     top: 0.1rem;
     font-size: 1rem;
   }
-  .topic-list .topic-title {
-    font-size: 0.72rem;
+  .topic-head .topic-date {
+    width: 5.5rem;
   }
 }
 @media (min-width: 1480px) {
