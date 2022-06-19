@@ -61,6 +61,15 @@ body.deboucled-dark-theme {
   display: none;
 }
 
+.deboucled-sponsor {
+  text-align: center;
+  color: #777;
+  opacity: 0.8;
+  font-size: 0.5rem;
+  font-weight: 600;
+  user-select: none;
+}
+
 /* Overlay */
 #deboucled-topic-list-wrapper {
   position: relative;

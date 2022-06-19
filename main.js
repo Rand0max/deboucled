@@ -77,6 +77,16 @@ function getForumId() {
     return forumId;
 }
 
+function buildSponsor() {
+    const forumRightCol = document.querySelector('div#forum-right-col');
+    if (!forumRightCol) return;
+
+    const sponsorDiv = document.createElement('div');
+    sponsorDiv.innerHTML = `Déboucled est sponsorisé par <a href="https://jvflux.fr" target="_blank" title="JvFlux">JvFlux</a> et <a href="https://jvarchive.com" target="_blank" title="JvArchive">JvArchive</a>`;
+    sponsorDiv.className = 'deboucled-sponsor';
+    forumRightCol.appendChild(sponsorDiv);
+}
+
 function displaySecret() {
     const dateNow = new Date();
     const firstOfApril = new Date(dateNow.getFullYear(), 3, 1);
@@ -120,7 +130,7 @@ function displayAnnouncement() {
 
     store.set(storage_announcement_displayed, true);
 
-    if (confirm('Déboucled présente : DÉCENSURED le nouveau script anti-censure ! Souhaitez-vous en savoir plus ?')) {
+    if (confirm('MARRE DU 410 ?\n\nDéboucled présente : DÉCENSURED le nouveau script anti-censure !')) {
         document.location.href = 'https://github.com/Rand0max/decensured#readme';
     }
 }
@@ -910,6 +920,8 @@ async function entryPoint() {
             default:
                 break;
         }
+
+        buildSponsor();
 
         console.log('Déboucled loaded');
 
