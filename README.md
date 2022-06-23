@@ -14,9 +14,13 @@
 
 # Installation
 
-### Étape pour mobile : Il faut d'abord installer le navigateur **Kiwi Browser** (équivalent de Chrome)
+### Étape pour _Android_ : Il faut d'abord installer le navigateur **Kiwi Browser** (équivalent de Chrome)
 
 <a href="https://play.google.com/store/apps/details?id=com.kiwibrowser.browser" target="_blank"><img src="https://kiwibrowser.com/wp-content/uploads/2019/09/cropped-Favicon-512x512-32x32.png" alt="Chrome" width="20"/> Kiwi Browser</a>
+
+### Étape pour _iPhone_ : Il faut d'abord installer le navigateur **Insight Browser** (équivalent de Safari)
+
+<a href="https://apps.apple.com/app/apple-store/id1531407280?mt=8" target="_blank"><img src="https://cdn.umso.co/pxvr5mgeg4se/assets/aum444nl.png" alt="Insight" width="20"/> Insight Browser</a>
 
 ### Étape 1 : Installez un gestionnaire d'userscript comme **TamperMonkey**
 
@@ -26,7 +30,7 @@
 
 <a href="https://addons.opera.com/fr/extensions/details/tampermonkey-beta/?display=en/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.svg" alt="Opera" width="20"/> Opera</a>
 
-<a href="https://apps.apple.com/app/apple-store/id1482490089?pt=117945903&ct=tm.net&mt=8/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/en/7/71/Safari_14_icon.png" alt="Safari" width="20"/> Safari</a>
+<a href="https://apps.apple.com/app/apple-store/id1482490089?pt=117945903&ct=tm.net&mt=8/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/en/7/71/Safari_14_icon.png" alt="Safari" width="20"/> Safari (Insight)</a>
 
 <a href="https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Microsoft_Edge_logo_%282019%29.svg" alt="Edge" width="20"/> Edge</a>
 
@@ -34,7 +38,7 @@
 
 - Installez **Déboucled** en [cliquant ici](https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js) ou [ici](https://jvscript.fr/script/deboucled) puis cliquez sur le bouton "Installer" dans la fenêtre qui s'ouvre
 
-## Fonctionnalités :
+# Fonctionnalités :
 
 - **Intelligence Artificielle anti-boucle** : *grâce à l'I.A Déboucled dites adieu aux topics boucled !*
 - **Mots-clés à bannir des sujets** : *les topics contenant ces mots seront masqués*
@@ -75,18 +79,18 @@
 - **Régulièrement mis à jour, les suggestions et remarques sont les bienvenues**
 - **Compatible avec tous les forums JVC et sur mobile également.**
 
-Et plus encore !
+- Et plus encore !
 
-## Plus d'informations
+# Plus d'informations
 
-- [Contacter l'auteur](https://www.jeuxvideo.com/messages-prives/nouveau.php?all_dest=Rand0max)
+- [Contacter l'auteur](https://www.jeuxvideo.com/messages-prives/nouveau.php?all_dest=Rand0maxReborn)
 - [Topic JVC officiel](https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm)
 - [Topic sur JvArchive](https://jvarchive.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam)
 - [Page jvscript.fr](https://jvscript.fr/script/deboucled)
 - [Repository officiel](https://github.com/Rand0max/deboucled/)
 - [JvArchive](https://jvarchive.com/)
 
-## Remerciements
+# Remerciements
 
 - Je tiens tout d'abord à remercier personnellement tous **les membres du forum 18-25** qui m'ont aidé à améliorer ce projet, et qui ont activement participé sur les deux topics officiels depuis leur création, ainsi que tous les membres anonymes par messages privés.
 - Grand merci à l'**équipe de JvFlux** pour leur aide et leur participation technique sans qui ce projet n'aurait pas pu prendre une telle ampleur.
