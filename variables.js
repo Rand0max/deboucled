@@ -97,6 +97,6 @@ const domParser = new DOMParser();
 let smileyGifMap = new Map();
 let smileyGifRegex = new RegExp();
 
-const deboucledPseudos = ['rand0max', 'rand0max2', 'deboucled'];
-const deboucledTopics = ['67697509', '68410257', '68982055'];
+const deboucledPseudos = ['rand0max', 'rand0max2', 'rand0max3', 'rand0maxreborn', 'deboucled', 'decensured'];
+const deboucledTopics = ['67697509', '68410257', '68982055', '70029449'];
 
