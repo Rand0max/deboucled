@@ -196,7 +196,7 @@ async function isTopicBlacklisted(topicElement, topicOptions) {
     const title = titleTag?.textContent.trim();
     const author = authorTag?.textContent.toLowerCase().trim();
 
-    if (author?.length && author === userPseudo.toLowerCase()) {
+    if (author?.length && author === userPseudo?.toLowerCase()) {
         return false;
     }
 
