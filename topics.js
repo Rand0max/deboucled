@@ -191,7 +191,15 @@ async function isTopicBlacklisted(topicElement, topicOptions) {
     if (topicOptions.optionEnableTopicMsgCountThreshold && getTopicMessageCount(topicElement) < topicOptions.optionTopicMsgCountThreshold) return true;
 
     const titleTag = topicElement.querySelector('.lien-jv.topic-title');
+    const authorTag = topicElement.querySelector('.topic-author');
+
     const title = titleTag?.textContent.trim();
+    const author = authorTag?.textContent.toLowerCase().trim();
+
+    if (author?.length && author === userPseudo.toLowerCase()) {
+        return false;
+    }
+
     if (title?.length) {
         const subjectBlacklisted = getSubjectBlacklistMatches(title);
         if (subjectBlacklisted?.length) {
@@ -201,8 +209,6 @@ async function isTopicBlacklisted(topicElement, topicOptions) {
         }
     }
 
-    const authorTag = topicElement.querySelector('.topic-author');
-    const author = authorTag?.textContent.toLowerCase().trim();
     if (author?.length) {
         const authorBlacklisted = getAuthorBlacklistMatches(author);
         if (authorBlacklisted?.length) {
@@ -930,8 +936,9 @@ function initSmileyGifMap() {
 
 function getSmileyImgHtml(smiley, big = false) {
     if (!smiley?.length) return smiley;
-    const gifCode = smileyGifMap.get(smiley);
+    const smileyLower = smiley.toLowerCase();
+    const gifCode = smileyGifMap.get(smileyLower);
     if (!gifCode?.length) return smiley;
-    return `<img data-code="${smiley}" title="${smiley}" src="https://image.jeuxvideo.com/smileys_img/${gifCode}.gif" class="deboucled-smiley${big ? ' big' : ''}">`;
+    return `<img data-code="${smileyLower}" title="${smileyLower}" src="https://image.jeuxvideo.com/smileys_img/${gifCode}.gif" class="deboucled-smiley${big ? ' big' : ''}">`;
 }
 

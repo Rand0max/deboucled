@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.32.2] (07/09/2022)
+
+- Correction mineure sur l'intégration des smileys
+- Force l'affichage de ses propres topics
+
 ## [2.32.0] (05/06/2022)
 
 - Création d'un cache pour les topics tendances (JvArchive)

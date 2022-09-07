@@ -937,7 +937,7 @@ async function entryPoint() {
         await suggestUpdate();
 
         displaySecret();
-        displayAnnouncement();
+        //displayAnnouncement();
     } catch (error) {
         const elapsed = performance.now() - start;
         console.error(error);
