@@ -11,6 +11,7 @@ const localstorage_authorAvatars = 'deboucled_topicAuthorAvatars';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
 const storage_secret_displayed = 'deboucled_secret_displayed', storage_secret_displayed_default = false;
+const storage_anniversary_displayed = 'deboucled_anniversary_displayed', storage_anniversary_displayed_default = false;
 const storage_announcement_displayed = 'deboucled_announcement2_displayed', storage_announcement_displayed_default = false;
 const storage_userId = 'deboucled_userId', storage_userId_default = '';
 const storage_lastUsedPseudo = 'deboucled_lastUsedPseudo', storage_lastUsedPseudo_default = '';

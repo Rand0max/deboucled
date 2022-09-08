@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.33.3
+// @version     2.33.4
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -35,11 +35,14 @@
 // @resource    PEEPODARKJVCV2_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/peepodarkjvcv2.css
 // @resource    JVRESPAWNREFINED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/jv-respawn-refined.css
 // @resource    CHARTS_CSS https://unpkg.com/charts.css/dist/charts.min.css
+// @resource    SWEETALERTDARK_CSS https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark/dark.css
 // @require     https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js
 // @require     https://unpkg.com/infinite-scroll/dist/infinite-scroll.pkgd.min.js
 // @require     https://unpkg.com/timespan@2.3.0/browser/TimeSpan-1.2.min.js
 // @require     https://unpkg.com/gm-storage@1.1.0/dist/index.umd.min.js
 // @require     https://cdn.jsdelivr.net/gh/tomik23/show-more/dist/js/showMore.min.js
+// @require     https://cdn.jsdelivr.net/npm/sweetalert2
+// @require     https://cdn.jsdelivr.net/npm/canvas-confetti
 // @require     https://unpkg.com/@chocolateboy/uncommonjs
 // @require     https://unpkg.com/fastest-levenshtein
 // @require     variables.js

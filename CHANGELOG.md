@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.32.4] (08/09/2022)
+
+- Annonce anniversaire
+
 ## [2.32.2] (07/09/2022)
 
 - Correction mineure sur l'intégration des smileys

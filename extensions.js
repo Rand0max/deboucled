@@ -157,6 +157,9 @@ function plural(nb) {
 function addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme) {
     const deboucledCss = GM_getResourceText('DEBOUCLED_CSS');
     GM_addStyle(deboucledCss);
+    
+    const sweetAlertDarkCss = GM_getResourceText('SWEETALERTDARK_CSS');
+    GM_addStyle(sweetAlertDarkCss);
 
     if (enablePeepoTheme) {
         const peepoDarkJvcV2Css = GM_getResourceText('PEEPODARKJVCV2_CSS');

@@ -92,7 +92,7 @@ function displaySecret() {
     const firstOfApril = new Date(dateNow.getFullYear(), 3, 1);
     if (!dateIsToday(firstOfApril)) return;
 
-    let secretDisplayed = store.get(storage_secret_displayed, storage_secret_displayed_default);
+    const secretDisplayed = store.get(storage_secret_displayed, storage_secret_displayed_default);
     if (secretDisplayed) return;
 
     const topics = document.querySelector('.conteneur-topic-pagi');
@@ -124,8 +124,50 @@ function displaySecret() {
     store.set(storage_secret_displayed, true);
 }
 
+function displayAnniversary() {
+    const dateNow = new Date();
+    const deboucledBirthDate = new Date(2022, 8, 18);
+    if (dateNow < deboucledBirthDate) return;
+
+    const anniversaryDisplayed = store.get(storage_anniversary_displayed, storage_anniversary_displayed_default);
+    if (anniversaryDisplayed) return;
+
+    // eslint-disable-next-line no-undef
+    confetti({
+        particleCount: 200,
+        spread: 140,
+        origin: { y: 0.6 },
+        gravity: 0.8,
+        ticks: 300
+    });
+
+    // eslint-disable-next-line no-undef
+    Swal.fire({
+        title: '<strong>Joyeux anniversaire Déboucled !<strong>',
+        html: `<p>Déboucled fête sa première année.<br>Merci de votre fidélité les clés !</p>
+        <p style="font-size:0.6em">P.S : <b>Décensured</b> sera de retour bientôt, en dépit de.</p>
+        <p style="font-size:0.6em"><i>Ataraxie sur Webedia et ses sbires nonobstant.</i></p>
+        <img src="https://image.noelshack.com/fichiers/2022/22/7/1654433573-cavillax.png" alt="paz" width="100" height="75"></img>`,
+        //icon: 'success',
+        showDenyButton: true,
+        confirmButtonText: 'Compris',
+        denyButtonText: 'ENT',
+        imageUrl: 'https://jvscript.fr/storage/images/deboucled.png',
+        imageWidth: 200,
+        imageHeight: 150,
+        imageAlt: 'Déboucled',
+        footer: '<a href="mailto:rand0max@protonmail.com">Me contacter</a>'
+    }).then((result) => {
+        if (result.isDenied) {
+            window.open('https://youtu.be/KkxZfUlNlDo', '_blank').focus();
+        }
+    });
+
+    store.set(storage_anniversary_displayed, true);
+}
+
 function displayAnnouncement() {
-    let announcementDisplayed = store.get(storage_announcement_displayed, storage_announcement_displayed_default);
+    const announcementDisplayed = store.get(storage_announcement_displayed, storage_announcement_displayed_default);
     if (announcementDisplayed) return;
 
     store.set(storage_announcement_displayed, true);
@@ -938,6 +980,7 @@ async function entryPoint() {
 
         displaySecret();
         //displayAnnouncement();
+        displayAnniversary();
     } catch (error) {
         const elapsed = performance.now() - start;
         console.error(error);
