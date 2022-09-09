@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.33.4
+// @version     2.33.5
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -59,5 +59,5 @@
 // @require     privatemessages.js
 // @require     profile.js
 // @require     main.js
-// @run-at      document-start
+// @run-at      document-body
 // ==/UserScript==
