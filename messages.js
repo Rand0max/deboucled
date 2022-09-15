@@ -102,7 +102,7 @@ function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklis
     let isSelf = messageElement.querySelector('span.picto-msg-croix');
     if (isSelf) return;
 
-    let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload() });
+    let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload(); });
 
     let jvcBlacklistButton = messageElement.querySelector('span.picto-msg-tronche');
     let logged = (jvcBlacklistButton !== null);
@@ -229,7 +229,7 @@ function getParagraphChildren(element, allowBlockQuote = false) {
 
 function getMessageContentWithoutQuotes(messageElement) {
     let content = '';
-    getParagraphChildren(messageElement).forEach(c => { content = `${content}\n${c.textContent}` });
+    getParagraphChildren(messageElement).forEach(c => { content = `${content}\n${c.textContent}`; });
     return content.trim();
 }
 
@@ -371,7 +371,7 @@ function highlightQuotedAuthor(messageContent, messageElement) {
     function replaceAllTextQuotes(element, containerElement, regex, replaceCallback, prepareCallback, depth = 0) {
         getParagraphChildren(element, true).forEach(child => {
             if (['P', 'BLOCKQUOTE'].includes(child.tagName)) depth++;
-            replaceAllTextQuotes(child, containerElement, regex, replaceCallback, prepareCallback, depth)
+            replaceAllTextQuotes(child, containerElement, regex, replaceCallback, prepareCallback, depth);
         });
         const textChildren = getTextChildren(element);
         textChildren.forEach(textNode => {
@@ -409,8 +409,8 @@ function highlightQuotedAuthor(messageContent, messageElement) {
         (match) => isSelf(match.toLowerCase()) ? match : buildProfilHighlightAnchor(match),
         (n) => {
             // S'il s'agit d'une citation où le pseudo est en html on vire le html et on fusionne le texte
-            if (!n.textContent.match(quotedAuthorsFullRegex)
-                && n.textContent.match(quotedAuthorsPartRegex)) {
+            if (!n.textContent.match(quotedAuthorsFullRegex) &&
+                n.textContent.match(quotedAuthorsPartRegex)) {
                 n.textContent = `${n.textContent}${n.nextSibling?.textContent}${n.nextSibling?.nextSibling?.textContent}`;
                 n.nextSibling?.nextSibling?.remove();
                 n.nextSibling?.remove();
@@ -427,8 +427,8 @@ function highlightQuotedAuthor(messageContent, messageElement) {
             quotedSelfRegex,
             (match) => buildProfilHighlightAnchor(match, ' self'),
             (n) => {
-                if (['STRONG', 'B', 'I', 'EM', 'U'].includes(n.parentElement?.tagName)
-                    && n.parentElement.textContent.match(quotedSelfRegex)) {
+                if (['STRONG', 'B', 'I', 'EM', 'U'].includes(n.parentElement?.tagName) &&
+                    n.parentElement.textContent.match(quotedSelfRegex)) {
                     n.parentElement.outerHTML = n.parentElement.textContent;
                 }
             });

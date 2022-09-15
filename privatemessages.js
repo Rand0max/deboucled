@@ -15,10 +15,10 @@ async function sendPrivateMessagesToSpam(messageIds, onMpPage) {
     let mpFsElements = findPrivateMessageDefaultParams(mpDoc);
     if (!mpFsElements) return;
 
-    var params = new URLSearchParams();
+    let params = new URLSearchParams();
     mpFsElements.forEach(fs => { params.append(fs.name, fs.value); });
     params.append('conv_move', '666');
-    messageIds.forEach(m => { params.append('conv_select[]', m) });
+    messageIds.forEach(m => { params.append('conv_select[]', m); });
 
     await fetch(url, { method: 'POST', body: params })
         .then(function (response) {
@@ -31,7 +31,7 @@ async function sendPrivateMessagesToSpam(messageIds, onMpPage) {
 async function getPrivateMessageAuthor(messageId, hash) {
     const url = 'https://www.jeuxvideo.com/messages-prives/ajax/ajax_mp_get_participants.php';
 
-    var params = new URLSearchParams();
+    let params = new URLSearchParams();
     params.append('idc', messageId);
     params.append('h', hash);
 

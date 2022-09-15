@@ -62,7 +62,7 @@ function getUserPseudo() {
     const pseudo = pseudoElem.textContent.trim();
     if (pseudo.toLowerCase() === 'mon compte' || pseudo.toLowerCase() === 'connexion') return undefined;
 
-    const linkAccountElem = document.querySelector('.headerAccount__link')
+    const linkAccountElem = document.querySelector('.headerAccount__link');
     if (!linkAccountElem || !linkAccountElem.hasAttribute('data-account-id')) return undefined;
 
     return pseudo;
@@ -263,7 +263,7 @@ async function getForumPageContent(page) {
 
     let currentPath = window.location.pathname;
     let matches = urlRegex.exec(currentPath);
-    var currentPageId = parseInt(matches.groups.pageid);
+    let currentPageId = parseInt(matches.groups.pageid);
 
     let nextPageId = currentPageId + ((page - 1) * defaultTopicCount);
     let nextPageUrl = currentPath.replace(urlRegex, `$1${nextPageId}$3`);
@@ -410,7 +410,7 @@ function highlightBlacklistMatches(element, matches) {
         return true;
     });
 
-    if (element.nodeType == Node.TEXT_NODE) {
+    if (element.nodeType === Node.TEXT_NODE) {
         let newNode = document.createElement('span');
         element.parentElement.insertBefore(newNode, element);
         element.remove();
@@ -438,9 +438,9 @@ function handleMessageBlacklistMatches(messageElement) {
         let paragraphChildren = getParagraphChildren(element);
         paragraphChildren.forEach(paragraph => {
             const textChildren = getTextChildren(paragraph); // on ne s'intéresse qu'au texte
-            textChildren.forEach(textChild => { hasMatch = highlightMatches(textChild) ? true : hasMatch });
+            textChildren.forEach(textChild => { hasMatch = highlightMatches(textChild) ? true : hasMatch; });
             hasMatch = highlightChildren(paragraph) ? true : hasMatch;
-        })
+        });
         return hasMatch;
     }
 
@@ -468,7 +468,7 @@ function hideMessageContent(contentElement, wrapperAltClass = '') {
         this.removeAttribute('class');
         blocContenu.removeAttribute('style');
         divWrapper.onclick = null;
-    }
+    };
 }
 
 function handleBlSubjectIgnoreMessages(messageElement) {
@@ -512,7 +512,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
         if (handleBlacklistedAuthor(authorBlacklistedMatch)) return;
     }
     else if (messageOptions.optionAntiSpam && isContentYoutubeBlacklisted(messageContent)) {
-        addEntityBlacklist(shadowent, author); // on rajoute automatiquement le spammeur à la BL        
+        addEntityBlacklist(shadowent, author); // on rajoute automatiquement le spammeur à la BL
         buildBlacklistsRegex(entityAuthor);
         hiddenSpammers++;
         if (handleBlacklistedAuthor([author])) return;
@@ -579,7 +579,7 @@ function handleTopicWhitelist() {
     whitelistButtonElement.onclick = async () => {
         if (isWhitelisted) topicIdWhitelistArray.splice(topicIdIndex, 1);
         else topicIdWhitelistArray.push(currentTopicId);
-        await saveStorage()
+        await saveStorage();
         location.reload();
     };
     titleBlocElement.prepend(whitelistButtonElement);
@@ -826,7 +826,7 @@ async function handleProfile(profileTab) {
         highlightBlacklistedAuthor(undefined, infosPseudoElement.firstElementChild ?? infosPseudoElement);
     }
     else if (!userPseudo || userPseudo.toLowerCase() !== author.toLowerCase()) {
-        let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload() }, 'deboucled-blacklist-profil-button');
+        let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload(); }, 'deboucled-blacklist-profil-button');
         blocOptionProfil.append(dbcBlacklistButton);
     }
 
@@ -843,7 +843,7 @@ async function handlePrivateMessageNotifs() {
 
     let hiddenPrivateMessageArray = [];
     for (const privateMessageElem of privateMessageElements) {
-        const mpId = privateMessageElem.getAttribute('data-id')
+        const mpId = privateMessageElem.getAttribute('data-id');
         const author = privateMessageElem.querySelector('.jv-nav-dropdown-author').textContent.trim();
         const hiddenMp = handlePrivateMessage(privateMessageElem, author);
         if (hiddenMp) hiddenPrivateMessageArray.push(mpId);

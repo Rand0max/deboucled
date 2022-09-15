@@ -295,8 +295,8 @@ function backupStorage() {
     }
     const onlyBlacklists = document.querySelector('#deboucled-impexp-blonly').checked;
     const json = getStorageJson(onlyBlacklists);
-    var file = blobToFile(new Blob([json], { type: 'application/json' }), 'deboucled');
-    var anchor = document.createElement('a');
+    let file = blobToFile(new Blob([json], { type: 'application/json' }), 'deboucled');
+    let anchor = document.createElement('a');
     anchor.download = 'deboucled-settings.json';
     anchor.href = window.URL.createObjectURL(file);
     anchor.style.display = 'none';
@@ -334,7 +334,7 @@ function restoreStorage(fileContent) {
         }
     }
 
-    showRestoreCompleted()
+    showRestoreCompleted();
 }
 
 function showRestoreCompleted() {
@@ -345,7 +345,7 @@ function showRestoreCompleted() {
 }
 
 function loadFile(fileEvent) {
-    var file = fileEvent.target.files[0];
+    let file = fileEvent.target.files[0];
     if (!file) return;
     let reader = new FileReader();
     reader.onload = function (e) {
@@ -356,14 +356,14 @@ function loadFile(fileEvent) {
 }
 
 async function importFromTotalBlacklist() {
-    var blacklistFromTbl = localStorage.getItem('blacklisted');
+    let blacklistFromTbl = localStorage.getItem('blacklisted');
     if (!blacklistFromTbl) {
         alert('Aucune blacklist détectée dans TotalBlacklist.');
         return;
     }
     const blacklistFromTblArray = JSON.parse(blacklistFromTbl).filter(function (val) { return val !== 'forums' });
     authorBlacklistArray = [...new Set(authorBlacklistArray.concat(blacklistFromTblArray))];
-    await saveStorage()
+    await saveStorage();
     buildBlacklistsRegex();
     refreshAuthorKeys();
     showRestoreCompleted();

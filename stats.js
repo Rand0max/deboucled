@@ -130,11 +130,11 @@ function buildStatsChart() {
         return html;
     }
     function formatDateToGroup(d) {
-        var dateOptions = { day: '2-digit', month: '2-digit', year: '2-digit' };
+        let dateOptions = { day: '2-digit', month: '2-digit', year: '2-digit' };
         return d.toLocaleDateString(undefined, dateOptions);
     }
     function formatDateToDisplay(d) {
-        var timeOptions = { hour12: false, hour: '2-digit', minute: '2-digit' };
+        let timeOptions = { hour12: false, hour: '2-digit', minute: '2-digit' };
         return d.toLocaleTimeString(undefined, timeOptions);
     }
     function buildChartTableHtml() {

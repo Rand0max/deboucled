@@ -157,7 +157,7 @@ function plural(nb) {
 function addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme) {
     const deboucledCss = GM_getResourceText('DEBOUCLED_CSS');
     GM_addStyle(deboucledCss);
-    
+
     const sweetAlertDarkCss = GM_getResourceText('SWEETALERTDARK_CSS');
     GM_addStyle(sweetAlertDarkCss);
 
@@ -309,7 +309,7 @@ function getCaretCoordinates(element, position) {
     ];
 
     let isBrowser = (typeof window !== 'undefined');
-    let isFirefox = (isBrowser && window.mozInnerScreenX != null);
+    let isFirefox = (isBrowser && window.mozInnerScreenX !== null);
 
     let div = document.createElement('div');
     div.id = 'input-textarea-caret-position-mirror-div';
@@ -347,9 +347,9 @@ function getCaretCoordinates(element, position) {
     div.appendChild(span);
 
     let coordinates = {
-        top: span.offsetTop + parseInt(computed['borderTopWidth']),
-        left: span.offsetLeft + parseInt(computed['borderLeftWidth']),
-        height: parseInt(computed['lineHeight'])
+        top: span.offsetTop + parseInt(computed.borderTopWidth),
+        left: span.offsetLeft + parseInt(computed.borderLeftWidth),
+        height: parseInt(computed.lineHeight)
     };
 
     document.body.removeChild(div);
@@ -403,8 +403,8 @@ async function fetchWithTimeout(resource, options = {}) {
 }
 
 function formatDateToFrenchFormat(date) {
-    var dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
-    var timeOptions = { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    let dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    let timeOptions = { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
     return `${date.toLocaleDateString('fr-FR', dateOptions)} ${date.toLocaleTimeString('fr-FR', timeOptions)}`;
 }
 
@@ -419,7 +419,7 @@ function getUUIDv4() {
     }
     else {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            let r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
     }

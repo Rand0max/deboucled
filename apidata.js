@@ -62,7 +62,7 @@ async function checkUpdate() {
         data: bodyJson,
         headers: { 'Content-Type': 'application/json' },
         onload: (response) => { checkRes = response.responseText; },
-        onerror: (response) => { console.error("error : %o", response) }
+        onerror: (response) => { console.error("error : %o", response); }
     });
 
     store.set(storage_lastUpdateCheck, Date.now());
@@ -81,14 +81,14 @@ async function updateUser() {
         username: currentUserPseudo?.toLowerCase() ?? 'anonymous',
         version: getCurrentScriptVersion(),
         settings: settings
-    }
+    };
     const bodyJson = JSON.stringify(body);
     await GM.xmlHttpRequest({
         method: 'POST',
         url: updateUserUrl,
         data: bodyJson,
         headers: { 'Content-Type': 'application/json' },
-        onerror: (response) => { console.error("error : %o", response) }
+        onerror: (response) => { console.error("error : %o", response); }
     });
 
     store.set(storage_lastUpdateUser, Date.now());
@@ -108,7 +108,7 @@ async function sendDiagnostic(elapsed, exception) {
         location: window.location.href,
         settings: settings,
         ...(exception && { exception: stringifyError(exception) }),
-    }
+    };
     const bodyJson = JSON.stringify(body);
     if (!bodyJson || bodyJson === '{}') return;
 
@@ -117,7 +117,7 @@ async function sendDiagnostic(elapsed, exception) {
         url: diagnosticUrl,
         data: bodyJson,
         headers: { 'Content-Type': 'application/json' },
-        onerror: (response) => { console.error("error : %o", response) }
+        onerror: (response) => { console.error("error : %o", response); }
     });
 
     store.set(storage_DiagnosticLastUpdate, Date.now());
@@ -125,9 +125,9 @@ async function sendDiagnostic(elapsed, exception) {
 
 async function parseYoutubeBlacklistData(forceUpdate) {
     youtubeBlacklistArray = JSON.parse(store.get(storage_youtubeBlacklist, storage_youtubeBlacklist_default));
-    if (!youtubeBlacklistArray?.length
-        || forceUpdate
-        || mustRefresh(storage_youtubeBlacklistLastUpdate, youtubeBlacklistRefreshExpire)) {
+    if (!youtubeBlacklistArray?.length ||
+        forceUpdate ||
+        mustRefresh(storage_youtubeBlacklistLastUpdate, youtubeBlacklistRefreshExpire)) {
         await queryYoutubeBlacklist();
     }
     if (youtubeBlacklistArray?.length) youtubeBlacklistReg = buildArrayRegex(youtubeBlacklistArray);
@@ -135,9 +135,9 @@ async function parseYoutubeBlacklistData(forceUpdate) {
 
 async function parsePreboucleData(forceUpdate) {
     preBoucleArray = JSON.parse(store.get(storage_preBouclesData, storage_preBouclesData_default));
-    if (!preBoucleArray?.length
-        || forceUpdate
-        || mustRefresh(storage_prebouclesLastUpdate, prebouclesRefreshExpire)) {
+    if (!preBoucleArray?.length ||
+        forceUpdate ||
+        mustRefresh(storage_prebouclesLastUpdate, prebouclesRefreshExpire)) {
         await queryPreboucles();
     }
     if (preBoucleArray?.length) loadPreBouclesStatuses();
@@ -145,9 +145,9 @@ async function parsePreboucleData(forceUpdate) {
 
 async function parseAiLoopData(forceUpdate) {
     aiLoopData = JSON.parse(store.get(storage_aiLoopsData, storage_aiLoopsData_default));
-    if (!aiLoopData
-        || forceUpdate
-        || mustRefresh(storage_aiLoopsLastUpdate, aiLoopsRefreshExpire)) {
+    if (!aiLoopData ||
+        forceUpdate ||
+        mustRefresh(storage_aiLoopsLastUpdate, aiLoopsRefreshExpire)) {
         await queryAiLoops();
     }
     if (!aiLoopData) return;
@@ -165,9 +165,9 @@ async function parseAiLoopData(forceUpdate) {
 
 async function parseHotTopicsData(forceUpdate) {
     hotTopicsData = JSON.parse(store.get(storage_hotTopicsData, storage_hotTopicsData_default));
-    if (!hotTopicsData
-        || forceUpdate
-        || mustRefresh(storage_hotTopicsLastUpdate, hotTopicsRefreshExpire)) {
+    if (!hotTopicsData ||
+        forceUpdate ||
+        mustRefresh(storage_hotTopicsLastUpdate, hotTopicsRefreshExpire)) {
         await queryHotTopics();
     }
 }

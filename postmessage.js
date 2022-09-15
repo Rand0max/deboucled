@@ -40,7 +40,7 @@ async function suggestAuthors(authorHint) {
 }
 
 function getTextSelection() {
-    return window.getSelection ? window.getSelection() : document.selection
+    return window.getSelection ? window.getSelection() : document.selection;
 }
 
 function getSelectionOffset(container, pointerEvent) {
@@ -108,14 +108,14 @@ function addAuthorSuggestionEvent() {
     const autocompleteElement = document.createElement('div');
     autocompleteElement.id = 'deboucled-author-autocomplete';
     autocompleteElement.className = 'autocomplete-jv';
-    autocompleteElement.innerHTML = '<ul class="autocomplete-jv-list"></ul>'
+    autocompleteElement.innerHTML = '<ul class="autocomplete-jv-list"></ul>';
     textArea.parentElement.appendChild(autocompleteElement);
 
     // Vide et masque les suggestions
     const clearAutocomplete = (elem) => {
         elem.innerHTML = '';
         elem.parentElement.classList.toggle('on', false);
-    }
+    };
 
     // Choix d'une suggestion dans la liste
     function autocompleteOnClick(event) {
@@ -180,7 +180,7 @@ function addAuthorSuggestionEvent() {
             });
 
         // On place correctement la table
-        var caret = getCaretCoordinates(textArea, textArea.selectionEnd);
+        let caret = getCaretCoordinates(textArea, textArea.selectionEnd);
         const sLeft = `left:${caret.left + 3}px !important;`;
         const sTop = `top:${caret.top + (toolbar ? toolbar.scrollHeight + 15 : 50)}px !important;`;
         const sWidth = 'width: auto !important;';

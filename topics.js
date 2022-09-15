@@ -460,7 +460,7 @@ function addIgnoreButtons(topics) {
         anchor.setAttribute('class', 'deboucled-svg-forbidden-red');
         anchor.onclick = function () { addTopicIdBlacklist(topicId, topicSubject, true); refreshTopicIdKeys(); };
         anchor.innerHTML = '<svg viewBox="0 0 160 160" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg>';
-        span.appendChild(anchor)
+        span.appendChild(anchor);
         topic.appendChild(span);
     });
 }
@@ -777,7 +777,7 @@ function buildFloatingNavbar(infScroll) {
     }
     toggleTransparentButton();
     window.addEventListener('scroll', toggleTransparentButton, { passive: true });
-    var observer = new IntersectionObserver((entries) => { messageTopicIsVisible = entries[0].isIntersecting }, { threshold: [1] });
+    let observer = new IntersectionObserver((entries) => { messageTopicIsVisible = entries[0].isIntersecting; }, { threshold: [1] });
     observer.observe(messageTopicElement);
     observer.observe(document.querySelector('.bloc-pagi-default'));
 }
@@ -812,7 +812,7 @@ function createSmoothScroll(handleMessageCallback) {
 
     // eslint-disable-next-line no-undef
     let infScroll = new InfiniteScroll('.conteneur-messages-pagi', {
-        // debug: true,        
+        // debug: true,
         //hideNav: '.bloc-pagi-default:nth-of-type(2n)',
         scrollThreshold: -100,
         status: '.page-load-status',
@@ -855,7 +855,7 @@ function buildEnableSmoothScrollButton(smoothScrollCallback) {
     buttonEnableSC.onclick = () => {
         smoothScrollCallback();
         buttonEnableSC.style.display = 'none';
-    }
+    };
     bottomMenu.appendChild(buttonEnableSC);
 }
 
