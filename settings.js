@@ -113,8 +113,10 @@ function buildSettingsPage() {
         let jvcLogo = '<span class="deboucled-jvc-logo"></span>';
         html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm" target="_blank" title="Topic officiel JVC">${jvcLogo}</a>`;
 
+        /*
         let decensuredLogo = '<span class="deboucled-decensured-logo"></span>';
         html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/decensured#readme" target="_blank" title="Décensured le script anti-censure">${decensuredLogo}</a>`;
+        */
 
         let githubLogo = '<span class="deboucled-svg-github"><svg width="20px" viewBox="0 0 16 16" id="deboucled-github-logo"><use href="#githublogo"/></svg></span>';
         html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/deboucled" target="_blank" title="Github officiel Déboucled">${githubLogo}</a>`;
@@ -124,6 +126,9 @@ function buildSettingsPage() {
 
         let stylishLogo = '<span class="deboucled-stylish-logo"></span>';
         html += `<a class="deboucled-about-link-stylish" href="https://userstyles.world/style/3030/jv-respawn-refined" target="_blank" title="Thème JVC par Rand0max">${stylishLogo}</a>`;
+
+        let contactLogo = '<span class="deboucled-contact-logo"></span>';
+        html += `<a class="deboucled-about-link-contact" href="mailto:rand0max@protonmail.com" target="_blank" title="Me contacter">${contactLogo}</a>`;
 
         html += `<span class="deboucled-about-version">v${getCurrentScriptVersion()}</span>`;
         html += '</div>';
@@ -401,10 +406,10 @@ function addSelectEvent(id) {
 }
 
 function addSettingEvents() {
-    //const boucleUrl = 'https://www.youtube.com/watch?v=KkxZfUlNlDo';
+    const boucleUrl = 'https://www.youtube.com/watch?v=KkxZfUlNlDo';
     //const boucleUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
     //const boucleUrl = 'https://www.jeuxvideo.com/forums/42-51-62052373-1-0-1-0-ce-forum-est-une-putain-de-boucle-temporelle-sans-fin.htm';
-    const boucleUrl = 'https://github.com/Rand0max/decensured#readme';
+    //const boucleUrl = 'https://github.com/Rand0max/decensured#readme';
     document.querySelector('.deboucled-about-version').onclick = () => window.open(boucleUrl, '_blank').focus();
 
     document.querySelector('.deboucled-svg-refresh').onclick = forcePrebouclesRefresh;

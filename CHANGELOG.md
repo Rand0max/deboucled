@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.32.8] (20/09/2022)
+
+- Ajout du bouton "contact"
+
 ## [2.32.4] (08/09/2022)
 
 - Annonce anniversaire
