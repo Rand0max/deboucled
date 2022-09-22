@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.32.9] (22/09/2022)
+
+- Nouveau bouton "Profil JvArchive" à côté du pseudo d'un message
+
 ## [2.32.8] (20/09/2022)
 
 - Ajout du bouton "contact"

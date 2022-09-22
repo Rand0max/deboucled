@@ -119,10 +119,13 @@ function highlightBlacklistedAuthor(messageElement, authorElement) {
     authorElement.classList.toggle('deboucled-blacklisted', true);
 }
 
-function addBoucledAuthorButton(nearbyElement, author, optionBoucledUseJvarchive) {
+function addAuthorButtons(nearbyElement, author, optionBoucledUseJvarchive) {
     if (!nearbyElement) return;
     let boucledButton = buildBoucledAuthorButton(author, optionBoucledUseJvarchive);
     insertAfter(boucledButton, nearbyElement);
+
+    let jvArchiveProfilButton = buildJvArchiveProfilButton(author);
+    insertAfter(jvArchiveProfilButton, boucledButton);
 }
 
 function handleJvChatAndTopicLive(messageOptions) {
@@ -143,7 +146,7 @@ function handleJvChatAndTopicLive(messageOptions) {
         else {
             highlightBlacklistedAuthor(messageElement, authorElement);
             let mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
-            addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
+            addAuthorButtons(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
         }
         return false;
     }
@@ -174,7 +177,7 @@ function handleJvChatAndTopicLive(messageOptions) {
                 let optionShowJvcBlacklistButton = store.get(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
                 upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton);
                 let mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
-                addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
+                addAuthorButtons(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
             }
             else {
                 createJvChatBlacklistButton(messageElement, authorElement, author);

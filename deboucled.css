@@ -348,8 +348,8 @@ blockquote .deboucled-highlighted {
 }
 .bloc-message-forum .bloc-header {
   display: grid;
-  grid-template-areas: "pseudo mp boucled options" "date date date date";
-  grid-template-columns: auto auto auto 1fr !important;
+  grid-template-areas: "pseudo mp boucled jvarchive options" "date date date date date";
+  grid-template-columns: auto auto auto auto 1fr !important;
   grid-template-rows: auto;
 }
 .bloc-message-forum .bloc-pseudo-msg {
@@ -852,6 +852,12 @@ blockquote .deboucled-highlighted {
   border-radius: 50%;
   background-size: cover;
 }
+.bloc-option-profil .deboucled-jvarchive-logo {
+  opacity: 0.8;
+}
+.bloc-option-profil .deboucled-jvarchive-logo:hover {
+  opacity: 1;
+}
 .deboucled-setting-credits .deboucled-jvarchive-logo {
   width: 21px;
   height: 21px;
@@ -861,6 +867,16 @@ blockquote .deboucled-highlighted {
   width: 18px;
   height: 18px;
   background-size: 18px;
+}
+.conteneur-message .deboucled-jvarchive-logo {
+  height: 15px;
+  width: 15px;
+  background-size: 15px;
+  grid-area: jvarchive;
+  position: relative;
+  align-self: end;
+  margin: 0 0 3px 5px;
+  opacity: 0.7;
 }
 .deboucled-stylish-logo {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABGdBTUEAALGPC/xhBQAAAe5JREFUWAntV7FOAkEQnVmOwmBlAlhK6C0IhMZoYYsdwUBhIcFKO3vXL7A1JrYUhJgYbE2MscEQiLYWVyKQmBhjJdw4exECp8DlgLvGTe5ud2f2zdu9mc0MwlCTJMVV4z2DBDkgiLMoRAC+IZWR7nP8DNVEM7XBan83ROyxpA1ANUAshmPbJZTS6GubAGqw/nQcga9embuxvnDa1w6BXxiIdQRMr1budSUT6qWMY7dX5a5t42qdo0YUI6Lq685mRK0X6tjVzokg6AjQ0SIKElCZpBTiuvGxyxiL37mVKJ9Eq36bEQYZWavMtTFRTvx4u2s2Rw1hXDlhaHTS1VFITIrzRVPhaPCZYbhoQ5PwtUlCuzLehbSra9WbC4HwzcOpFdjueC4EEhf6ll2DVr25ECCje2cFtjv23An/CfyfgMZpkrTrsYvQG6Rks4DHz1/G5oTTcLXPy5WTaUrj5IH8m+MbsI+pGeT8HmeQmQl4HwWIoPJ2T5qqGTglQy4avGnsuW31C2remAdArpY4JcOiVwSISzWxnD8s8b+ou06CbaYK0ZLgi9Dw+bU034gd10ggdITQ0hLRMMNwaa+la34t6cpJ8M6F8CcfC2u62vDgHlAkAvtHCZ7KcvVa4ac5jxA1y3M0sSogMJs6iCb6xhWBbzc2h0a44FEWAAAAAElFTkSuQmCC)

@@ -459,7 +459,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
         }
         else {
             highlightBlacklistedAuthor(messageElement, authorElement);
-            addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
+            addAuthorButtons(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
             if (!messageOptions.isWhitelistedTopic) hideMessageContent(messageContent);
             return false;
         }
@@ -478,7 +478,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     else {
         let optionShowJvcBlacklistButton = store.get(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
         upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton);
-        addBoucledAuthorButton(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
+        addAuthorButtons(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
     }
 
     handleMessageAssignTopicAuthor(author, authorElement);
@@ -749,16 +749,6 @@ function buildBoucledAuthorButton(author, optionBoucledUseJvarchive, className =
     boucledAuthorAnchor.setAttribute('title', 'Pseudo complètement boucled ?');
     boucledAuthorAnchor.innerHTML = '<svg viewBox="0 0 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></a>';
     return boucledAuthorAnchor;
-}
-
-function buildJvArchiveProfilButton(author) {
-    let redirectUrl = `${jvarchiveUrl}/profil/${author.toLowerCase()}`;
-    let profilAnchor = document.createElement('a');
-    profilAnchor.setAttribute('class', 'xXx lien-jv deboucled-jvarchive-logo deboucled-blackandwhite');
-    profilAnchor.setAttribute('href', redirectUrl);
-    profilAnchor.setAttribute('target', '_blank');
-    profilAnchor.setAttribute('title', 'Profil JvArchive');
-    return profilAnchor;
 }
 
 async function handleProfile(profileTab) {

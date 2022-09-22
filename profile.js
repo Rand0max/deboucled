@@ -3,6 +3,16 @@
 // PROFILE
 ///////////////////////////////////////////////////////////////////////////////////////
 
+function buildJvArchiveProfilButton(author) {
+    let redirectUrl = `${jvarchiveUrl}/profil/${author.toLowerCase()}`;
+    let profilAnchor = document.createElement('a');
+    profilAnchor.setAttribute('class', 'xXx lien-jv deboucled-jvarchive-logo deboucled-blackandwhite');
+    profilAnchor.setAttribute('href', redirectUrl);
+    profilAnchor.setAttribute('target', '_blank');
+    profilAnchor.setAttribute('title', 'Profil JvArchive');
+    return profilAnchor;
+}
+
 function buildBlocProfileElements(elements) {
     if (!elements?.length) return;
     let blocProfileElementsHtml = '';
