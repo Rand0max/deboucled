@@ -78,7 +78,7 @@ function getForumId() {
 }
 
 function buildSponsor() {
-    const forumRightCol = document.querySelector('div#forum-right-col');
+    const forumRightCol = document.querySelector('div.layout__contentAside');
     if (!forumRightCol) return;
 
     const sponsorDiv = document.createElement('div');
@@ -628,6 +628,7 @@ function prepareMessageOptions(isWhitelistedTopic) {
     const optionSmoothScroll = store.get(storage_optionSmoothScroll, storage_optionSmoothScroll_default);
     const optionHideLongMessages = store.get(storage_optionHideLongMessages, storage_optionHideLongMessages_default);
     const optionDisplayTitleSmileys = store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default);
+    const optionJvFluxEmbedded = store.get(storage_optionJvFluxEmbedded, storage_optionJvFluxEmbedded_default);
 
     const messageOptions = {
         optionHideMessages: optionHideMessages,
@@ -638,7 +639,8 @@ function prepareMessageOptions(isWhitelistedTopic) {
         optionSmoothScroll: optionSmoothScroll,
         isWhitelistedTopic: isWhitelistedTopic,
         optionHideLongMessages: optionHideLongMessages,
-        optionDisplayTitleSmileys: optionDisplayTitleSmileys
+        optionDisplayTitleSmileys: optionDisplayTitleSmileys,
+        optionJvFluxEmbedded: optionJvFluxEmbedded
     };
     return messageOptions;
 }
@@ -681,6 +683,12 @@ async function handleTopicMessages() {
     }
 
     if (messageOptions.optionHideLongMessages) handleLongMessages(allMessages);
+
+    if (messageOptions.optionJvFluxEmbedded) {
+        const jvFluxCompagnon = new JVFluxCompagnon(); // eslint-disable-line no-undef
+        await jvFluxCompagnon.init();
+        await jvFluxCompagnon.handleTopicMessages();
+    }
 }
 
 async function handleSearch() {

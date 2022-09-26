@@ -174,6 +174,9 @@ function buildSettingsPage() {
         let scrollLogo = '<span class="deboucled-scroll-logo"></span>';
         html += addToggleOption(`Activer le <i>défilement automatique</i> ${scrollLogo} des messages`, storage_optionSmoothScroll, storage_optionSmoothScroll_default, 'Activer le chargement automatique des messages du topic en faisant défiler la page vers le bas.');
 
+        let jvfluxLogo = '<span class="deboucled-jvflux-logo"></span>';
+        html += addToggleOption(`Intégration du <i>wiki officiel JVFlux</i> ${jvfluxLogo} <span class="deboucled-small-text">(nouveau !)</span>`, storage_optionJvFluxEmbedded, storage_optionJvFluxEmbedded_default, 'Intégration du wiki officiel du forum en mettant en avant les pages du wiki associées aux mots-clés dans les messages.');
+
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -383,6 +386,7 @@ function buildSettingsPage() {
 
 function addToggleEvent(id, setValue = true, callback = undefined) {
     const toggleSlider = document.querySelector('#' + id);
+    if (!toggleSlider) return;
     toggleSlider.oninput = (e) => {
         const checked = e.currentTarget.checked;
         if (setValue) store.set(id, checked);
@@ -459,6 +463,7 @@ function addSettingEvents() {
     addToggleEvent(storage_optionHideLongMessages);
     addToggleEvent(storage_optionDisplayTitleSmileys);
     addToggleEvent(storage_optionDisplayTopicAvatar);
+    addToggleEvent(storage_optionJvFluxEmbedded);
 
     addPrebouclesEvents();
 }

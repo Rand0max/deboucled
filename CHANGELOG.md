@@ -1,14 +1,18 @@
 # Changelog Déboucled
 
-## [2.32.9] (22/09/2022)
+## [2.34.0] (22/09/2022)
+
+- Intégration du wiki JVFlux directement dans Déboucled
+
+## [2.33.9] (22/09/2022)
 
 - Nouveau bouton "Profil JvArchive" à côté du pseudo d'un message
 
-## [2.32.8] (20/09/2022)
+## [2.33.8] (20/09/2022)
 
 - Ajout du bouton "contact"
 
-## [2.32.4] (08/09/2022)
+## [2.33.4] (08/09/2022)
 
 - Annonce anniversaire
 
