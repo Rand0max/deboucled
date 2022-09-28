@@ -786,7 +786,10 @@ async function handleProfile(profileTab) {
         blocOptionProfil.append(dbcBlacklistButton);
     }
 
-    if (profileTab.match(/^\?mode=infos$/i)) await buildProfileHistory(author);
+    if (profileTab.match(/^\?mode=infos$/i)) {
+        await buildProfileStats(author);
+        await buildProfileHistory(author);
+    }
 }
 
 async function handlePrivateMessageNotifs() {

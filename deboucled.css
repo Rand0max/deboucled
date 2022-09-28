@@ -1372,7 +1372,16 @@ input[type="search"] {
   padding-left: 0.7em;
   border-radius: 10rem;
 }
+.deboucled-badge.largepill {
+  padding-right: 1.1em;
+  padding-left: 1.1em;
+  border-radius: 10rem;
+}
 
+.deboucled-badge-neutral {
+  color: #000 !important;
+  background-color: #eee !important;
+}
 .deboucled-badge-info {
   color: #2643e9 !important;
   background-color: #eaecfb !important;
@@ -1386,6 +1395,10 @@ input[type="search"] {
   background-color: #fdd1da !important;
 }
 
+.deboucled-badge-neutral.dark {
+  color: #fff !important;
+  background-color: #444 !important;
+}
 .deboucled-badge-info.dark {
   color: #e8e6e3 !important;
   background-color: #004daa !important;
@@ -1397,6 +1410,23 @@ input[type="search"] {
 .deboucled-badge-danger.dark {
   color: #ff1e4b !important;
   background-color: #4c0312 !important;
+}
+.deboucled-medal-container {
+  display: flex;
+  gap: 1.2em;
+  justify-content: space-evenly;
+  margin-bottom: 1em;
+}
+.deboucled-medal-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: fit-content;
+  gap: 0.4em;
+  cursor: pointer;
+}
+.deboucled-profile-list {
+  margin: 0.625rem 0.625rem 0.5rem 0.625rem;
 }
 
 /* Tooltip */

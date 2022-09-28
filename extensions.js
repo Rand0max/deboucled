@@ -191,6 +191,16 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function group(items, fn) {
+    return items.reduce((prev, next) => {
+        const prop = fn(next);
+        return {
+            ...prev,
+            [prop]: prev[prop] ? [...prev[prop], next] : [next],
+        };
+    }, {});
+}
+
 function groupBy(arr, criteria) {
     const newObj = arr.reduce(function (acc, currentValue) {
         if (!acc[currentValue[criteria]]) {

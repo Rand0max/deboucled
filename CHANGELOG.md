@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.34.5] (28/09/2022)
+
+- Ajout des médailles et récompenses sur la page du profil (source JvArchive)
+
 ## [2.34.0] (22/09/2022)
 
 - Intégration du wiki JVFlux directement dans Déboucled
