@@ -7,7 +7,7 @@ function buildQuoteMessage(messageElement, selection) {
     const textArea = document.querySelector('#message_topic');
     if (!textArea) return;
 
-    const getAuthorFromCitationBtn = (e) => e.querySelector('.bloc-pseudo-msg.text-user').textContent.trim();
+    const getAuthorFromCitationBtn = (e) => e.querySelector('.bloc-pseudo-msg.text-user,.bloc-pseudo-msg.text-modo,.bloc-pseudo-msg.text-admin').textContent.trim();
     const getDateFromCitationBtn = (e) => e.querySelector('.bloc-date-msg').textContent.trim();
     const getQuoteHeader = (e) => `> Le ${getDateFromCitationBtn(e)} '''${getAuthorFromCitationBtn(e)}''' a écrit : `;
 

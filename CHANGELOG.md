@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.34.6] (03/10/2022)
+
+- Correction suite à MàJ Webedia (avatar badge)
+
 ## [2.34.5] (28/09/2022)
 
 - Ajout des médailles et récompenses sur la page du profil (source JvArchive)

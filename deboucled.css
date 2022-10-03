@@ -354,8 +354,8 @@ blockquote .deboucled-highlighted {
 }
 .bloc-message-forum .bloc-header {
   display: grid;
-  grid-template-areas: "pseudo mp boucled jvarchive options" "date date date date date";
-  grid-template-columns: auto auto auto auto 1fr !important;
+  grid-template-areas: "avatar pseudo mp boucled jvarchive options" "avatar date date date date date";
+  grid-template-columns: auto auto auto auto auto 1fr !important;
   grid-template-rows: auto;
 }
 .bloc-message-forum .bloc-pseudo-msg {
