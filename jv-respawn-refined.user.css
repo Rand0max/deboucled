@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.2.3
+@version        1.2.4
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -50,9 +50,6 @@
   }
   .spreadContainer {
     margin-bottom: 0.8rem;
-  }
-  .bloc-message-forum .user-avatar-msg {
-    border-radius: 0;
   }
   .topic-list .topic-title {
     color: var(--jv-text-color);
