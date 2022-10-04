@@ -166,17 +166,6 @@ function buildSettingsPage() {
             storage_optionDetectPocMode_default,
             ['Désactivé', 'Mode simple', 'Mode approfondi ⚠', 'Mode automatique', 'Mode auto approfondi ⚠']);
 
-        html += addToggleOption('Uniformiser et nettoyer les <i>titres des topics</i>', storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default, 'Uniformise le titre des topics et efface les balises inutiles/répétitives comme [ALERTE], ou l\'usage abusif du &quot;AYA&quot; et ses dérivés.\n\nExemple : &quot;[ALERTE] cet EXEMPLE incroyable AYAAAA&quot; => &quot;Cet exemple incroyable&quot;');
-
-        let quoteLogo = '<span class="deboucled-quote-logo"></span>';
-        html += addToggleOption(`Améliorer les <i>citations</i> ${quoteLogo} des messages`, storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default, 'Améliore les citations avec plusieurs fonctionnalités :\n\n• Insère le pseudo du message cité\n• Citer une partie des messages en sélectionnant le texte\n• Citer et suggérer des pseudos en écrivant avec l\'arobase @ (conditions : connecté et minimum 3 lettres)\n• Mettre en couleur les pseudos lorsqu\'ils sont cités');
-
-        let scrollLogo = '<span class="deboucled-scroll-logo"></span>';
-        html += addToggleOption(`Activer le <i>défilement automatique</i> ${scrollLogo} des messages`, storage_optionSmoothScroll, storage_optionSmoothScroll_default, 'Activer le chargement automatique des messages du topic en faisant défiler la page vers le bas.');
-
-        let jvfluxLogo = '<span class="deboucled-jvflux-logo"></span>';
-        html += addToggleOption(`Intégration du <i>wiki officiel JVFlux</i> ${jvfluxLogo} <span class="deboucled-small-text">(nouveau !)</span>`, storage_optionJvFluxEmbedded, storage_optionJvFluxEmbedded_default, 'Intégration du wiki officiel du forum en mettant en avant les pages du wiki associées aux mots-clés dans les messages.');
-
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -208,9 +197,6 @@ function buildSettingsPage() {
         let previewLogo = '<span><svg width="16px" viewBox="0 0 30 30" id="deboucled-preview-logo"><use href="#previewlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour avoir un <i>aperçu du topic</i> ${previewLogo}`, storage_optionPrevisualizeTopic, storage_optionPrevisualizeTopic_default, 'Afficher ou non l\'icone \'loupe\' à côté du sujet pour prévisualiser le topic au survol.');
 
-        let hotTopicLogo = '<span class="deboucled-fire-logo"></span>';
-        html += addToggleOption(`Mettre en avant les <i>topics tendances</i> ${hotTopicLogo}`, storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default, 'Afficher un pictogramme de flamme à côté des topics très actifs.');
-
         let matchesLogo = '<span class="deboucled-list-logo"></span>';
         html += addToggleOption(`Afficher les <i>détails du filtrage</i> ${matchesLogo} des topics`, storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default, 'Afficher ou non le tableau des détails de filtrage des topics sur la droite de la page.');
 
@@ -219,9 +205,39 @@ function buildSettingsPage() {
         html += addToggleOption(`Cliquer sur l'oeil ${eyeLogo} pour <i>afficher les détails</i>`, storage_optionClickToShowTopicMatches, storage_optionClickToShowTopicMatches_default, 'Affiche par défaut l\'icone en oeil, nécéssite de cliquer pour afficher le détail du filtrage par catégorie.', optionDisplayTopicMatches, true);
 
         let statsLogo = '<span class="deboucled-chart-logo"></span>';
-        html += addToggleOption(`Afficher la <i>tendance de filtrage</i> ${statsLogo} des topics`, storage_optionDisplayTopicCharts, storage_optionDisplayTopicCharts_default, 'Afficher ou non le graphique des tendances de filtrage de topics sur la droite de la page.');
+        html += addToggleOption(`Afficher les <i>statistiques de filtrage</i> ${statsLogo} des topics`, storage_optionDisplayTopicCharts, storage_optionDisplayTopicCharts_default, 'Afficher ou non le graphique des tendances de filtrage de topics sur la droite de la page.');
 
         html += addToggleOption(`Afficher le nombre de <i>topics ignorés</i> dans l'entête`, storage_optionDisplayTopicIgnoredCount, storage_optionDisplayTopicIgnoredCount_default, 'Afficher ou non le nombre de topics ignorés dans l\'entête de la liste des sujets : &quot;SUJETS (X IGNORÉS)&quot; .');
+
+        let avatarBorderLogo = '<span class="deboucled-avatarborder-logo"></span>';
+        html += addToggleOption(`Masquer les </i>bordures d'avatars</i> ${avatarBorderLogo} <span class="deboucled-small-text">(nouveau !)</span>`, storage_optionHideAvatarBorder, storage_optionHideAvatarBorder_default, 'Ne pas afficher les anneaux (cercles) du JV Fan Contest autour des avatars.');
+
+        html += '</table>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
+    function addEnhancementSection(sectionIsActive) {
+        let html = '';
+        html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">AMÉLIORATIONS</div>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-enhancement-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
+        html += '<div class="deboucled-setting-content">';
+
+        html += '<table class="deboucled-option-table">';
+
+        html += addToggleOption('Uniformiser et nettoyer les <i>titres des topics</i>', storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default, 'Uniformise le titre des topics et efface les balises inutiles/répétitives comme [ALERTE], ou l\'usage abusif du &quot;AYA&quot; et ses dérivés.\n\nExemple : &quot;[ALERTE] cet EXEMPLE incroyable AYAAAA&quot; => &quot;Cet exemple incroyable&quot;');
+
+        let quoteLogo = '<span class="deboucled-quote-logo"></span>';
+        html += addToggleOption(`Améliorer les <i>citations</i> ${quoteLogo} des messages`, storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default, 'Améliore les citations avec plusieurs fonctionnalités :\n\n• Insère le pseudo du message cité\n• Citer une partie des messages en sélectionnant le texte\n• Citer et suggérer des pseudos en écrivant avec l\'arobase @ (conditions : connecté et minimum 3 lettres)\n• Mettre en couleur les pseudos lorsqu\'ils sont cités');
+
+        let scrollLogo = '<span class="deboucled-scroll-logo"></span>';
+        html += addToggleOption(`Activer le <i>défilement automatique</i> ${scrollLogo} des messages`, storage_optionSmoothScroll, storage_optionSmoothScroll_default, 'Activer le chargement automatique des messages du topic en faisant défiler la page vers le bas.');
+
+        let jvfluxLogo = '<span class="deboucled-jvflux-logo"></span>';
+        html += addToggleOption(`Intégration du <i>wiki officiel JVFlux</i> ${jvfluxLogo} <span class="deboucled-small-text">(nouveau !)</span>`, storage_optionJvFluxEmbedded, storage_optionJvFluxEmbedded_default, 'Intégration du wiki officiel du forum en mettant en avant les pages du wiki associées aux mots-clés dans les messages.');
+
+        let hotTopicLogo = '<span class="deboucled-fire-logo"></span>';
+        html += addToggleOption(`Mettre en avant les <i>topics tendances</i> ${hotTopicLogo}`, storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default, 'Afficher un pictogramme de flamme à côté des topics très actifs.');
 
         html += addToggleOption(`Masquer une partie des <i>messages trop longs</i>`, storage_optionHideLongMessages, storage_optionHideLongMessages_default, 'Si cette option est activée, le contenu des longs messages sera masqué et un bouton &quot;lire la suite&quot; apparaitra.');
 
@@ -362,6 +378,7 @@ function buildSettingsPage() {
     let settingsHtml = '';
     settingsHtml += addOptionsSection(false);
     settingsHtml += addCustomisationSection(false);
+    settingsHtml += addEnhancementSection(false);
     settingsHtml += addPreBouclesSection(firstLaunch);
     settingsHtml += addEntitySettingSection(entitySubject, 'LISTE NOIRE - SUJETS', 'Mot-clé', 'Utilisez le caractère étoile * pour remplacer n\'importe quelle expression.', !firstLaunch);
     settingsHtml += addEntitySettingSection(entityAuthor, 'LISTE NOIRE - AUTEURS', 'Pseudo', undefined, false);
@@ -464,6 +481,7 @@ function addSettingEvents() {
     addToggleEvent(storage_optionDisplayTitleSmileys);
     addToggleEvent(storage_optionDisplayTopicAvatar);
     addToggleEvent(storage_optionJvFluxEmbedded);
+    addToggleEvent(storage_optionHideAvatarBorder);
 
     addPrebouclesEvents();
 }

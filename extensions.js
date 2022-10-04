@@ -154,7 +154,7 @@ function plural(nb) {
     return nb > 1 ? 's' : '';
 }
 
-function addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme) {
+function addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme, hideAvatarBorder) {
     const deboucledCss = GM_getResourceText('DEBOUCLED_CSS');
     GM_addStyle(deboucledCss);
 
@@ -169,6 +169,11 @@ function addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme) {
     if (enableJvRespawnRefinedTheme) {
         const jvRespawnRefinedCss = GM_getResourceText('JVRESPAWNREFINED_CSS');
         GM_addStyle(jvRespawnRefinedCss);
+    }
+
+    if (hideAvatarBorder) {
+        const avatarBorderHiddenCss = '.challenge-border-avatar { display: none; }';
+        GM_addStyle(avatarBorderHiddenCss);
     }
 }
 

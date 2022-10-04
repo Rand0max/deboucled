@@ -957,6 +957,15 @@ blockquote .deboucled-highlighted {
   vertical-align: bottom;
   margin-right: 5px;
 }
+.deboucled-avatarborder-logo {
+  background: url(https://static.jvc.gg/22.17.1/img/challenge/diamond.png) 0
+    no-repeat;
+  display: inline-block;
+  background-size: 20px;
+  width: 20px;
+  height: 20px;
+  vertical-align: bottom;
+}
 
 /* Quotes */
 .deboucled-quote {

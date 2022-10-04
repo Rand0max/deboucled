@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.35.0] (04/10/2022)
+
+- Nouveau panneau de configuration "Améliorations"
+- Option pour masquer les bordures d'avatars (cercles)
+
 ## [2.34.6] (03/10/2022)
 
 - Correction suite à MàJ Webedia (avatar badge)
