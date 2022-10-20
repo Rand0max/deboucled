@@ -152,12 +152,12 @@ function getEntityTitle(entity) {
     return '';
 }
 
-function getEntityRegex(entityType) {
+function getEntityRegex(entityType, fullList = true) {
     switch (entityType) {
         case entitySubject:
-            return subjectsBlacklistReg;
+            return fullList ? subjectsBlacklistReg : userSubjectBlacklistReg;
         case entityAuthor:
-            return authorsBlacklistReg;
+            return fullList ? authorsBlacklistReg : userAuthorBlacklistReg;
     }
     return null;
 }
@@ -416,8 +416,8 @@ function blacklistsIncludingEntity(entity, entityType) {
     let normEntity = entity.normalizeDiacritic();
     if (entityType == entityAuthor) normEntity = normEntity.toLowerCase();
 
-    const customBlacklistRegex = getEntityRegex(entityType);
-    if (normEntity.match(customBlacklistRegex)) blacklists.push({ id: 'custom', description: `Liste noire ${getEntityTitle(entityType)}` });
+    const userBlacklistRegex = getEntityRegex(entityType, false);
+    if (normEntity.match(userBlacklistRegex)) blacklists.push({ id: 'custom', description: `Liste noire ${getEntityTitle(entityType)}` });
 
     preBoucleArray
         .filter(pb => pb.enabled && pb.type === entityType)

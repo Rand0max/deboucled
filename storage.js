@@ -379,6 +379,7 @@ function buildBlacklistsRegex(entityOption = 'both') {
 
         const mergedSubjectBlacklistArray = [...new Set([...preBoucleEnabledSubjects, ...subjectBlacklistArray])];
         subjectsBlacklistReg = buildEntityRegex(mergedSubjectBlacklistArray, true);
+        userSubjectBlacklistReg = buildEntityRegex(subjectBlacklistArray, true);
     }
 
     if (entityOption === 'both' || entityOption === entityAuthor) {
@@ -388,6 +389,7 @@ function buildBlacklistsRegex(entityOption = 'both') {
 
         const mergedAuthorBlacklistArray = [...new Set([...preBoucleEnabledAuthors, ...authorBlacklistArray, ...shadowent])];
         authorsBlacklistReg = buildEntityRegex(mergedAuthorBlacklistArray, false);
+        userAuthorBlacklistReg = buildEntityRegex(authorBlacklistArray, false);
     }
 }
 

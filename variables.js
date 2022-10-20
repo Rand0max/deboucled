@@ -39,6 +39,8 @@ let authorBlacklistArray = [];
 let topicIdBlacklistMap = new Map();
 let subjectsBlacklistReg;
 let authorsBlacklistReg;
+let userSubjectBlacklistReg;
+let userAuthorBlacklistReg;
 
 let topicIdWhitelistArray = [];
 let shadowent = [];
