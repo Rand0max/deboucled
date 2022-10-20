@@ -3,7 +3,7 @@
 // ANTI-BOUCLES
 ///////////////////////////////////////////////////////////////////////////////////////
 
-function loadPreboucleCache(entityType) {
+function loadPreboucleArrayCache(entityType) {
     if (entityType === entitySubject) {
         if (!preBoucleSubjectEnabledArray?.length) {
             preBoucleSubjectEnabledArray = preBoucleArray.filter(pb => pb.enabled && pb.type === entityType).flatMap(pb => pb.entities);
@@ -14,6 +14,10 @@ function loadPreboucleCache(entityType) {
             preBoucleAuthorEnabledArray = preBoucleArray.filter(pb => pb.enabled && pb.type === entityType).flatMap(pb => pb.entities);
         }
     }
+}
+
+function loadPreBoucleRegexCache() {
+    preBoucleArray.forEach(pb => { pb.regex = buildEntityRegex(pb.entities, pb.type === entitySubject); });
 }
 
 function isEntityInPreboucles(entityType, entity) {

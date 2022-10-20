@@ -152,6 +152,16 @@ function getEntityTitle(entity) {
     return '';
 }
 
+function getEntityRegex(entityType) {
+    switch (entityType) {
+        case entitySubject:
+            return subjectsBlacklistReg;
+        case entityAuthor:
+            return authorsBlacklistReg;
+    }
+    return null;
+}
+
 function toggleDeboucledDarkTheme(enabled) {
     document.body.classList.toggle('deboucled-dark-theme', enabled);
 }
@@ -348,12 +358,34 @@ async function handlePoc(finalTopics) {
     await saveLocalStorage();
 }
 
+function highlightBlacklistedAuthor(messageElement, authorElement) {
+    const pictoCross = messageElement?.querySelector('span.picto-msg-croix');
+
+    const author = authorElement.textContent.trim().toLowerCase();
+    if (pictoCross || (userPseudo && userPseudo.toLowerCase() === author)) return;
+
+    authorElement.classList.toggle('deboucled-blacklisted', true);
+
+    const blacklists = blacklistsIncludingEntity(author, entityAuthor);
+    if (!blacklists?.length) return;
+
+    const blacklistHint = `Présent dans : ${blacklists.map(bl => `« ${bl.description} »`).join(', ')}.`;
+    authorElement.setAttribute('deboucled-data-tooltip', blacklistHint);
+    authorElement.setAttribute('data-tooltip-location', 'right');
+}
+
 function highlightBlacklistMatches(element, matches) {
     let content = element.textContent;
 
     // Supprime les surrogate pairs car c'est ingérable
     // Surrogate pairs = grosse merde = JS = calvitie foudroyante
     const pureMatches = matches.map(m => m.removeSurrogatePairs().trim()).filter(m => m !== '');
+
+    const buildBlacklistHint = (match) => {
+        const blacklists = blacklistsIncludingEntity(match, entitySubject);
+        if (blacklists?.length) return ` deboucled-data-tooltip="Présent dans : ${blacklists.map(bl => `« ${bl.description} »`).join(', ')}." data-tooltip-location="right" `;
+        return '';
+    };
 
     let index = -1;
     pureMatches.every(match => {
@@ -362,7 +394,7 @@ function highlightBlacklistMatches(element, matches) {
         index = normContent.indexOf(normMatch, index + 1);
         if (index <= -1) return false;
         const realMatchContent = content.slice(index, index + normMatch.length);
-        const newContent = `<span class="deboucled-blacklisted">${realMatchContent}</span>`;
+        const newContent = `<span class="deboucled-blacklisted"${buildBlacklistHint(match)}>${realMatchContent}</span>`;
         content = `${content.slice(0, index)}${newContent}${content.slice(index + match.length, content.length)}`;
         index += newContent.length;
         return true;
@@ -377,6 +409,21 @@ function highlightBlacklistMatches(element, matches) {
     else {
         element.innerHTML = content;
     }
+}
+
+function blacklistsIncludingEntity(entity, entityType) {
+    let blacklists = [];
+    let normEntity = entity.normalizeDiacritic();
+    if (entityType == entityAuthor) normEntity = normEntity.toLowerCase();
+
+    const customBlacklistRegex = getEntityRegex(entityType);
+    if (normEntity.match(customBlacklistRegex)) blacklists.push({ id: 'custom', description: `Liste noire ${getEntityTitle(entityType)}` });
+
+    preBoucleArray
+        .filter(pb => pb.enabled && pb.type === entityType)
+        .forEach(pb => { if (normEntity.match(pb.regex)) blacklists.push({ id: pb.id, description: pb.title }); });
+
+    return blacklists;
 }
 
 function handleMessageBlacklistMatches(messageElement) {

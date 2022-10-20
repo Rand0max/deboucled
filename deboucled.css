@@ -149,6 +149,8 @@ blockquote .deboucled-highlighted {
 }
 .deboucled-blacklisted {
   color: #e60000 !important;
+  overflow: visible !important;
+  cursor: pointer;
 }
 .deboucled-ignored-messages {
   margin: 5px 0 5px 5px;

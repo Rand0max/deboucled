@@ -28,7 +28,7 @@ const checkUpdateExpire = TimeSpan.FromDays(1);
 const checkUpdateDeferredExpire = TimeSpan.FromDays(5);
 const youtubeBlacklistRefreshExpire = TimeSpan.FromHours(1);
 const prebouclesRefreshExpire = TimeSpan.FromMinutes(30);
-const aiLoopsRefreshExpire = TimeSpan.FromMinutes(10);
+const aiLoopsRefreshExpire = TimeSpan.FromMinutes(5);
 const updateUserExpire = TimeSpan.FromHours(6);
 const diagnosticExpire = TimeSpan.FromHours(12);
 const hotTopicsRefreshExpire = TimeSpan.FromMinutes(10);
@@ -97,6 +97,6 @@ const domParser = new DOMParser();
 let smileyGifMap = new Map();
 let smileyGifRegex = new RegExp();
 
-const deboucledPseudos = ['rand0max', 'rand0max2', 'rand0max3', 'rand0maxreborn', 'deboucled', 'decensured'];
+const deboucledPseudos = ['rand0max', 'rand0max2', 'rand0max3', 'rand0max4', 'rand0maxreborn', 'deboucled', 'decensured'];
 const deboucledTopics = ['67697509', '68410257', '68982055', '70029449'];
 

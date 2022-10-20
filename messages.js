@@ -112,13 +112,6 @@ function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklis
     if (!optionShowJvcBlacklistButton && logged) jvcBlacklistButton.style.display = 'none';
 }
 
-function highlightBlacklistedAuthor(messageElement, authorElement) {
-    const pictoCross = messageElement?.querySelector('span.picto-msg-croix');
-    const author = authorElement.textContent.trim().toLowerCase();
-    if (pictoCross || (userPseudo && userPseudo.toLowerCase() === author)) return;
-    authorElement.classList.toggle('deboucled-blacklisted', true);
-}
-
 function addAuthorButtons(nearbyElement, author, optionBoucledUseJvarchive) {
     if (!nearbyElement) return;
     let boucledButton = buildBoucledAuthorButton(author, optionBoucledUseJvarchive);

@@ -88,12 +88,12 @@ const storage_Keys_Blacklists = [storage_blacklistedTopicIds, storage_blackliste
 
 function getBlacklistWithKey(key) {
     switch (key) {
-        case storage_blacklistedTopicIds:
-            return topicIdBlacklistMap;
         case storage_blacklistedSubjects:
             return subjectBlacklistArray;
         case storage_blacklistedAuthors:
             return authorBlacklistArray;
+        case storage_blacklistedTopicIds:
+            return topicIdBlacklistMap;
         case storage_blacklistedShadows:
             return shadowent;
     }

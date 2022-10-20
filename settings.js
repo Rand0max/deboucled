@@ -111,7 +111,8 @@ function buildSettingsPage() {
 
         html += '<div class="deboucled-setting-credits">';
         let jvcLogo = '<span class="deboucled-jvc-logo"></span>';
-        html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm" target="_blank" title="Topic officiel JVC">${jvcLogo}</a>`;
+        // html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm" target="_blank" title="Topic officiel JVC">${jvcLogo}</a>`;
+        html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/messages-prives/nouveau.php?all_dest=Rand0max4" target="_blank" title="Me contacter par MP">${jvcLogo}</a>`;
 
         /*
         let decensuredLogo = '<span class="deboucled-decensured-logo"></span>';
@@ -654,7 +655,7 @@ function refreshSubjectKeys(filter = null) {
             break;
     }
 
-    loadPreboucleCache(entitySubject);
+    loadPreboucleArrayCache(entitySubject);
 
     writeEntityKeys(
         entitySubject,
@@ -682,7 +683,7 @@ function refreshAuthorKeys(filter = null) {
             break;
     }
 
-    loadPreboucleCache(entityAuthor);
+    loadPreboucleArrayCache(entityAuthor);
 
     writeEntityKeys(
         entityAuthor,

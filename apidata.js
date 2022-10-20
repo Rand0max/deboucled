@@ -140,7 +140,10 @@ async function parsePreboucleData(forceUpdate) {
         mustRefresh(storage_prebouclesLastUpdate, prebouclesRefreshExpire)) {
         await queryPreboucles();
     }
-    if (preBoucleArray?.length) loadPreBouclesStatuses();
+    if (preBoucleArray?.length) {
+        loadPreBouclesStatuses();
+        loadPreBoucleRegexCache();
+    }
 }
 
 async function parseAiLoopData(forceUpdate) {

@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.36.0] (20/10/2022)
+
+- Affichage des listes contenant les sujets et auteurs blacklist au passage de la souris
+- Valable pour les titres de topics, les pseudos dans les topics et le pseudo d'un profil
+
 ## [2.35.0] (04/10/2022)
 
 - Nouveau panneau de configuration "Améliorations"
