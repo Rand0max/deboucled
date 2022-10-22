@@ -1388,10 +1388,19 @@ input[type="search"] {
   padding-left: 1.1em;
   border-radius: 10rem;
 }
+.deboucled-badge.big {
+  padding: 0.4rem 0.5rem 0.4rem 0.5rem;
+  font-size: 95% !important;
+  border-radius: 0.5rem;
+}
 
 .deboucled-badge-neutral {
   color: #000 !important;
   background-color: #eee !important;
+}
+.deboucled-badge-blacklist {
+  color: #b73636 !important;
+  background-color: #eaecfb !important;
 }
 .deboucled-badge-info {
   color: #2643e9 !important;
@@ -1409,6 +1418,10 @@ input[type="search"] {
 .deboucled-badge-neutral.dark {
   color: #fff !important;
   background-color: #444 !important;
+}
+.deboucled-badge-blacklist.dark {
+  color: #e8e6e3 !important;
+  background-color: #7b3030 !important;
 }
 .deboucled-badge-info.dark {
   color: #e8e6e3 !important;

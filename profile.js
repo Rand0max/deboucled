@@ -13,6 +13,19 @@ function buildJvArchiveProfilButton(author) {
     return profilAnchor;
 }
 
+function buildProfileBlacklistBadges(author, authorElement) {
+    if (!authorElement) return;
+    const blacklists = blacklistsIncludingEntity(author, entityAuthor);
+    if (!blacklists?.length) return;
+
+    if (authorElement.firstElementChild) authorElement.firstElementChild.style.marginRight = '1rem';
+
+    blacklists.forEach(bl => {
+        const badge = buildBadge(bl.description, `Présent dans la liste « ${bl.description} ».`, '', 'blacklist', 'big');
+        authorElement.appendChild(badge);
+    });
+}
+
 function buildProfileLinkElements(elements) {
     if (!elements?.length) return;
     let profileElementsHtml = '';

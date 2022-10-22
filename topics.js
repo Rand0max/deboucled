@@ -396,17 +396,21 @@ async function isTopicPoC(element, optionDetectPocMode) {
 }
 
 function buildBadge(content, hint, url, level, iconClass) {
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.target = '_blank';
     const badge = document.createElement('span');
     let badgeClass = 'deboucled-badge';
     if (level) badgeClass = `${badgeClass} ${badgeClass}-${level}${preferDarkTheme() ? ' dark' : ''}`;
     badge.className = `${badgeClass} ${hint ? '' : 'pill'} ${iconClass ? iconClass : ''}`.trim();
     badge.textContent = content;
     if (hint?.length) badge.setAttribute('deboucled-data-tooltip', hint);
-    anchor.appendChild(badge);
-    return anchor;
+
+    if (url?.length) {
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.target = '_blank';
+        anchor.appendChild(badge);
+        return anchor;
+    }
+    return badge;
 }
 
 function markTopicPoc(nearElement, withHint = true) {

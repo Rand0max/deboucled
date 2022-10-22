@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.37.0] (22/10/2022)
+
+- Création de badges sur les profils appartenant à des listes noires
+
 ## [2.36.0] (20/10/2022)
 
 - Affichage des listes contenant les sujets et auteurs blacklist au passage de la souris

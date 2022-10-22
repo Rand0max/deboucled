@@ -358,13 +358,15 @@ async function handlePoc(finalTopics) {
     await saveLocalStorage();
 }
 
-function highlightBlacklistedAuthor(messageElement, authorElement) {
+function highlightBlacklistedAuthor(messageElement, authorElement, withTooltip = true) {
     const pictoCross = messageElement?.querySelector('span.picto-msg-croix');
 
     const author = authorElement.textContent.trim().toLowerCase();
     if (pictoCross || (userPseudo && userPseudo.toLowerCase() === author)) return;
 
     authorElement.classList.toggle('deboucled-blacklisted', true);
+
+    if (!withTooltip) return;
 
     const blacklists = blacklistsIncludingEntity(author, entityAuthor);
     if (!blacklists?.length) return;
@@ -826,7 +828,8 @@ async function handleProfile(profileTab) {
 
     const authorBlacklistMatches = getAuthorBlacklistMatches(author);
     if (authorBlacklistMatches?.length) {
-        highlightBlacklistedAuthor(undefined, infosPseudoElement.firstElementChild ?? infosPseudoElement);
+        highlightBlacklistedAuthor(undefined, infosPseudoElement.firstElementChild ?? infosPseudoElement, false);
+        buildProfileBlacklistBadges(author, infosPseudoElement);
     }
     else if (!userPseudo || userPseudo.toLowerCase() !== author.toLowerCase()) {
         let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload(); }, 'deboucled-blacklist-profil-button');
