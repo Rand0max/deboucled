@@ -15,10 +15,8 @@ function buildJvArchiveProfilButton(author) {
 
 function buildProfileBlacklistBadges(author, authorElement) {
     if (!authorElement) return;
-    const blacklists = blacklistsIncludingEntity(author, entityAuthor);
+    const blacklists = blacklistsIncludingEntity(author, entityAuthor, false);
     if (!blacklists?.length) return;
-
-    if (authorElement.firstElementChild) authorElement.firstElementChild.style.marginRight = '1rem';
 
     blacklists.forEach(bl => {
         const badge = buildBadge(bl.description, `Présent dans la liste « ${bl.description} ».`, '', 'blacklist', 'big');

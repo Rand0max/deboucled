@@ -413,7 +413,7 @@ function highlightBlacklistMatches(element, matches) {
     }
 }
 
-function blacklistsIncludingEntity(entity, entityType) {
+function blacklistsIncludingEntity(entity, entityType, mustBeEnabled = true) {
     let blacklists = [];
     let normEntity = entity.normalizeDiacritic();
     if (entityType == entityAuthor) normEntity = normEntity.toLowerCase();
@@ -422,7 +422,8 @@ function blacklistsIncludingEntity(entity, entityType) {
     if (normEntity.match(userBlacklistRegex)) blacklists.push({ id: 'custom', description: `Liste noire ${getEntityTitle(entityType)}` });
 
     preBoucleArray
-        .filter(pb => pb.enabled && pb.type === entityType)
+        .filter(pb => pb.type === entityType)
+        .filter(pb => !mustBeEnabled || pb.enabled)
         .forEach(pb => { if (normEntity.match(pb.regex)) blacklists.push({ id: pb.id, description: pb.title }); });
 
     return blacklists;
@@ -829,12 +830,13 @@ async function handleProfile(profileTab) {
     const authorBlacklistMatches = getAuthorBlacklistMatches(author);
     if (authorBlacklistMatches?.length) {
         highlightBlacklistedAuthor(undefined, infosPseudoElement.firstElementChild ?? infosPseudoElement, false);
-        buildProfileBlacklistBadges(author, infosPseudoElement);
     }
     else if (!userPseudo || userPseudo.toLowerCase() !== author.toLowerCase()) {
         let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload(); }, 'deboucled-blacklist-profil-button');
         blocOptionProfil.append(dbcBlacklistButton);
     }
+
+    buildProfileBlacklistBadges(author, infosPseudoElement);
 
     if (profileTab.match(/^\?mode=infos$/i)) {
         await buildProfileStats(author);

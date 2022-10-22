@@ -418,6 +418,14 @@ blockquote .deboucled-highlighted {
   width: 6.4rem;
   text-overflow: clip;
 }
+#header-profil .infos-pseudo {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+#header-profil .infos-pseudo h1 {
+  margin-right: 1rem;
+  overflow: visible;
+}
 
 /* Bloc tool bar */
 #forum-main-col .bloc-pre-pagi-forum .bloc-rech-forum {
@@ -2039,6 +2047,19 @@ select.deboucled-dropdown::-ms-expand {
   }
   [deboucled-data-tooltip]::before {
     max-width: 33vw;
+  }
+}
+@media (min-width: 612px) {
+  #header-profil {
+    grid-template-columns: 9.375rem 2fr 1fr;
+  }
+}
+@media (max-width: 611.98px) {
+  #header-profil {
+    grid-template-rows: 9.375rem auto auto auto;
+  }
+  .infos-pseudo .deboucled-badge {
+    margin: 5px;
   }
 }
 @media (max-width: 558px) {
