@@ -114,10 +114,8 @@ function buildSettingsPage() {
         // html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm" target="_blank" title="Topic officiel JVC">${jvcLogo}</a>`;
         html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/messages-prives/nouveau.php?all_dest=Rand0max4" target="_blank" title="Me contacter par MP">${jvcLogo}</a>`;
 
-        /*
         let decensuredLogo = '<span class="deboucled-decensured-logo"></span>';
         html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/decensured#readme" target="_blank" title="Décensured le script anti-censure">${decensuredLogo}</a>`;
-        */
 
         let githubLogo = '<span class="deboucled-svg-github"><svg width="20px" viewBox="0 0 16 16" id="deboucled-github-logo"><use href="#githublogo"/></svg></span>';
         html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/deboucled" target="_blank" title="Github officiel Déboucled">${githubLogo}</a>`;
@@ -127,6 +125,9 @@ function buildSettingsPage() {
 
         let stylishLogo = '<span class="deboucled-stylish-logo"></span>';
         html += `<a class="deboucled-about-link-stylish" href="https://userstyles.world/style/3030/jv-respawn-refined" target="_blank" title="Thème JVC par Rand0max">${stylishLogo}</a>`;
+
+        let discordLogo = '<span class="deboucled-discord-logo"></span>';
+        html += `<a class="deboucled-about-link-discord" href="https://discord.com/users/781564172483166268" target="_blank" title="Me contacter sur Discord">${discordLogo}</a>`;
 
         let contactLogo = '<span class="deboucled-contact-logo"></span>';
         html += `<a class="deboucled-about-link-contact" href="mailto:rand0max@protonmail.com" target="_blank" title="Me contacter">${contactLogo}</a>`;

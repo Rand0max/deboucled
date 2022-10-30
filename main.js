@@ -130,7 +130,7 @@ function displayAnnouncement() {
 
     store.set(storage_announcement_displayed, true);
 
-    if (confirm('MARRE DU 410 ?\n\nDéboucled présente : DÉCENSURED le nouveau script anti-censure !')) {
+    if (confirm('DÉCENSURED le script anti-censure EST DE RETOUR ! Webedia en PLS.')) {
         document.location.href = 'https://github.com/Rand0max/decensured#readme';
     }
 }
@@ -991,7 +991,7 @@ async function entryPoint() {
         await suggestUpdate();
 
         displaySecret();
-        //displayAnnouncement();
+        displayAnnouncement();
     } catch (error) {
         const elapsed = performance.now() - start;
         console.error(error);
