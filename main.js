@@ -78,13 +78,34 @@ function getForumId() {
 }
 
 function buildSponsor() {
-    const forumRightCol = document.querySelector('div.layout__contentAside');
-    if (!forumRightCol) return;
+    const layoutContentAside = document.querySelector('div.layout__contentAside');
+    if (layoutContentAside) {
+        const sponsorDiv = document.createElement('div');
+        sponsorDiv.innerHTML = `Déboucled est sponsorisé par <a href="https://jvflux.fr" target="_blank" title="JvFlux">JvFlux</a> et <a href="https://jvarchive.com" target="_blank" title="JvArchive">JvArchive</a>`;
+        sponsorDiv.className = 'deboucled-sponsor';
+        layoutContentAside.appendChild(sponsorDiv);
+    }
 
-    const sponsorDiv = document.createElement('div');
-    sponsorDiv.innerHTML = `Déboucled est sponsorisé par <a href="https://jvflux.fr" target="_blank" title="JvFlux">JvFlux</a> et <a href="https://jvarchive.com" target="_blank" title="JvArchive">JvArchive</a>`;
-    sponsorDiv.className = 'deboucled-sponsor';
-    forumRightCol.appendChild(sponsorDiv);
+    const forumRightCol = document.querySelector('div#forum-right-col');
+    if (forumRightCol) {
+        const decensuredLink = `<a href="https://github.com/Rand0max/decensured#readme" target="_blank">Décensured <span class="deboucled-sponsoring-decensured-logo"></span></a>`;
+        const decensuredCardHtml = `<div class="deboucled-sponsoring"><div style="font-weight: 800;">Marre des bans et des 410 intempestifs ?</div><div>Découvrez ${decensuredLink} le script anti-censure !</div></div>`;
+        const decensuredCard = buildCardForum('Déboucled présente', '', 'deboucled-sponsoring-decensured', decensuredCardHtml);
+        console.log(decensuredCard);
+        forumRightCol.appendChild(decensuredCard);
+    }
+}
+
+function buildCardForum(mainTitle, rightTitle, contentId, contentHtml) {
+    const cardForum = document.createElement('div');
+    cardForum.className = 'card card-jv-forum card-forum-margin';
+    cardForum.innerHTML = `<div class="card-header">${mainTitle}<span class="deboucled-card-header-right">${rightTitle}</span></div>
+<div class="card-body">
+<div class="scrollable">
+<div class="scrollable-wrapper">
+<div class="scrollable-content bloc-info-forum" id="${contentId}">${contentHtml}
+</div></div></div></div>`;
+    return cardForum;
 }
 
 function displaySecret() {

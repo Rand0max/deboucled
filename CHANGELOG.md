@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.37.3] (08/11/2022)
+
+- Promotion
+
 ## [2.37.0] (22/10/2022)
 
 - Création de badges sur les profils appartenant à des listes noires
