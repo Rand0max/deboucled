@@ -996,7 +996,7 @@ blockquote .deboucled-highlighted {
   margin-right: 5px;
 }
 .deboucled-avatarborder-logo {
-  background: url(https://static.jvc.gg/22.17.1/img/challenge/diamond.png) 0
+  background: url(https://static.jvc.gg/22.20.2/img/challenge/diamond.png) 0
     no-repeat;
   display: inline-block;
   background-size: 20px;
@@ -2090,6 +2090,12 @@ select.deboucled-dropdown::-ms-expand {
   }
   .infos-pseudo .deboucled-badge {
     margin: 5px;
+  }
+  .conteneur-message .deboucled-jvarchive-logo {
+    margin: 0 0 3px 10px;
+  }
+  .bloc-header .deboucled-author-boucled-button {
+    margin: 0 0 1px 10px;
   }
 }
 @media (max-width: 558px) {

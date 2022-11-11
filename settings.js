@@ -130,7 +130,7 @@ function buildSettingsPage() {
         html += `<a class="deboucled-about-link-discord" href="https://discord.com/users/781564172483166268" target="_blank" title="Me contacter sur Discord">${discordLogo}</a>`;
 
         let contactLogo = '<span class="deboucled-contact-logo"></span>';
-        html += `<a class="deboucled-about-link-contact" href="mailto:rand0max@protonmail.com" target="_blank" title="Me contacter">${contactLogo}</a>`;
+        html += `<a class="deboucled-about-link-contact" href="mailto:rand0max@protonmail.com" target="_blank" title="Me contacter par email">${contactLogo}</a>`;
 
         html += `<span class="deboucled-about-version">v${getCurrentScriptVersion()}</span>`;
         html += '</div>';
