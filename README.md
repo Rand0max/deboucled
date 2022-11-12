@@ -30,7 +30,7 @@
 
 <a href="https://addons.opera.com/fr/extensions/details/tampermonkey-beta/?display=en/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.svg" alt="Opera" width="20"/> Opera</a>
 
-<a href="https://apps.apple.com/app/apple-store/id1482490089?pt=117945903&ct=tm.net&mt=8/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/en/7/71/Safari_14_icon.png" alt="Safari" width="20"/> Safari (Insight)</a>
+<a href="https://apps.apple.com/app/apple-store/id1482490089?pt=117945903&ct=tm.net&mt=8/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Safari_browser_logo.svg/234px-Safari_browser_logo.svg.png" alt="Safari" width="20"/> Safari (Insight)</a>
 
 <a href="https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Microsoft_Edge_logo_%282019%29.svg" alt="Edge" width="20"/> Edge</a>
 
