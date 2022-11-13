@@ -88,7 +88,7 @@ function buildSponsor() {
 
     const forumRightCol = document.querySelector('div#forum-right-col');
     if (forumRightCol) {
-        const decensuredLink = `<a href="https://github.com/Rand0max/decensured#readme" target="_blank">Décensured <span class="deboucled-sponsoring-decensured-logo"></span></a>`;
+        const decensuredLink = `<a href="https://github.com/Rand0max/decensured#readme" target="_blank"><b>Décensured</b> <span class="deboucled-sponsoring-decensured-logo"></span></a>`;
         const decensuredCardHtml = `<div class="deboucled-sponsoring"><div style="font-weight: 800;">Marre des bans et des 410 intempestifs ?</div><div>Découvrez ${decensuredLink} le script anti-censure !</div></div>`;
         const decensuredCard = buildCardForum('Déboucled présente', '', 'deboucled-sponsoring-decensured', decensuredCardHtml);
         console.log(decensuredCard);
@@ -958,6 +958,8 @@ async function entryPoint() {
 
         await init(currentPageType);
 
+        buildSponsor();
+
         switch (currentPageType) {
             case 'topiclist': {
                 if (forumFilteringIsDisabled) break;
@@ -995,8 +997,6 @@ async function entryPoint() {
             default:
                 break;
         }
-
-        buildSponsor();
 
         console.log('Déboucled loaded');
 
