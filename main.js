@@ -91,7 +91,6 @@ function buildSponsor() {
         const decensuredLink = `<a href="https://github.com/Rand0max/decensured#readme" target="_blank"><b>Décensured</b> <span class="deboucled-sponsoring-decensured-logo"></span></a>`;
         const decensuredCardHtml = `<div class="deboucled-sponsoring"><div style="font-weight: 800;">Marre des bans et des 410 intempestifs ?</div><div>Découvrez ${decensuredLink} le script anti-censure !</div></div>`;
         const decensuredCard = buildCardForum('Déboucled présente', '', 'deboucled-sponsoring-decensured', decensuredCardHtml);
-        console.log(decensuredCard);
         forumRightCol.appendChild(decensuredCard);
     }
 }
@@ -106,6 +105,22 @@ function buildCardForum(mainTitle, rightTitle, contentId, contentHtml) {
 <div class="scrollable-content bloc-info-forum" id="${contentId}">${contentHtml}
 </div></div></div></div>`;
     return cardForum;
+}
+
+function buildAds() {
+    document.querySelectorAll('.sideDfp').forEach(e => e.remove());
+
+    const layoutContentAside = document.querySelector('div.layout__contentAside');
+    if (!layoutContentAside) return;
+    const wrapper = document.createElement('div');
+    wrapper.style = 'display: flex; justify-content: center; flex-wrap: nowrap; align-content: center; margin: 10px 0;';
+    layoutContentAside.appendChild(wrapper);
+
+    const adsElem = document.createElement('iframe');
+    adsElem.src = '//ad.a-ads.com/2120513?size=336x280';
+    adsElem.style = 'width:336px; height:280px; border:0px; padding:0; overflow:hidden; background-color: transparent;';
+    adsElem.setAttribute('data-aa', '2120513');
+    wrapper.appendChild(adsElem);
 }
 
 function displaySecret() {
@@ -959,6 +974,8 @@ async function entryPoint() {
         await init(currentPageType);
 
         buildSponsor();
+        buildAds();
+
 
         switch (currentPageType) {
             case 'topiclist': {
