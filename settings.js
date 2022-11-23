@@ -110,34 +110,42 @@ function buildSettingsPage() {
         html += '<div class="deboucled-setting-content">';
 
         html += '<div class="deboucled-setting-credits">';
-        let jvcLogo = '<span class="deboucled-jvc-logo"></span>';
+
+        /*
+        const jvcLogo = '<span class="deboucled-jvc-logo"></span>';
         // html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm" target="_blank" title="Topic officiel JVC">${jvcLogo}</a>`;
         html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/messages-prives/nouveau.php?all_dest=Rand0max4" target="_blank" title="Me contacter par MP">${jvcLogo}</a>`;
+        */
 
-        let decensuredLogo = '<span class="deboucled-decensured-logo"></span>';
+        const decensuredLogo = '<span class="deboucled-decensured-logo"></span>';
         html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/decensured#readme" target="_blank" title="Décensured le script anti-censure">${decensuredLogo}</a>`;
 
-        let githubLogo = '<span class="deboucled-svg-github"><svg width="20px" viewBox="0 0 16 16" id="deboucled-github-logo"><use href="#githublogo"/></svg></span>';
+        const githubLogo = '<span class="deboucled-svg-github"><svg width="20px" viewBox="0 0 16 16" id="deboucled-github-logo"><use href="#githublogo"/></svg></span>';
         html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/deboucled" target="_blank" title="Github officiel Déboucled">${githubLogo}</a>`;
 
-        let jvarchiveLogo = '<span class="deboucled-jvarchive-logo"></span>';
+        /*
+        const jvarchiveLogo = '<span class="deboucled-jvarchive-logo"></span>';
         html += `<a class="deboucled-about-link-jvarchive" href="https://jvarchive.com/" target="_blank" title="JvArchive">${jvarchiveLogo}</a>`;
+        */
 
-        let stylishLogo = '<span class="deboucled-stylish-logo"></span>';
+        const stylishLogo = '<span class="deboucled-stylish-logo"></span>';
         html += `<a class="deboucled-about-link-stylish" href="https://userstyles.world/style/3030/jv-respawn-refined" target="_blank" title="Thème JVC par Rand0max">${stylishLogo}</a>`;
 
-        let discordLogo = '<span class="deboucled-discord-logo"></span>';
+        const discordLogo = '<span class="deboucled-discord-logo"></span>';
         html += `<a class="deboucled-about-link-discord" href="https://discord.com/users/781564172483166268" target="_blank" title="Me contacter sur Discord">${discordLogo}</a>`;
 
-        let contactLogo = '<span class="deboucled-contact-logo"></span>';
+        const contactLogo = '<span class="deboucled-contact-logo"></span>';
         html += `<a class="deboucled-about-link-contact" href="mailto:rand0max@protonmail.com" target="_blank" title="Me contacter par email">${contactLogo}</a>`;
+
+        const donationLogo = '<span class="deboucled-donation-logo"></span>';
+        html += `<a class="deboucled-about-link-donation" href="https://commerce.coinbase.com/checkout/8ea5e4cc-cc0b-432f-852f-5cc4e30458b5" target="_blank" title="Faire un don">${donationLogo}</a>`;
 
         html += `<span class="deboucled-about-version">v${getCurrentScriptVersion()}</span>`;
         html += '</div>';
 
         html += '<table class="deboucled-option-table">';
 
-        let aiLogo = '<span class="deboucled-ai-logo"></span>';
+        const aiLogo = '<span class="deboucled-ai-logo"></span>';
         html += addDropdownOption(`Intelligence artificielle ${aiLogo} Anti-Boucle`,
             storage_optionAntiLoopAiMode,
             'Intelligence artificielle de détection des &quot;boucles&quot; (topics répétitifs) développée spécialement pour Déboucled.\n• Désactivé : aucune vérification sur les boucles.\n• Mode informatif : affiche une balise rouge &quot;BOUCLE&quot; à côté du sujet.\n• Mode filtrage : filtre automatiquement les sujets boucles.',
@@ -147,13 +155,13 @@ function buildSettingsPage() {
 
         html += addToggleOption('Masquer totalement les messages des <span class="deboucled-blacklisted">pseudos blacklist</span>', storage_optionHideMessages, storage_optionHideMessages_default, 'Permet de masquer complètement les messages d\'un pseudo dans les topics. Si l\'option est désactivée, le contenu des messages sera caché et visible après un clic sur l\'oeil.');
 
-        let mpLogo = '<span class="deboucled-mp-logo icon-pm"></span>';
+        const mpLogo = '<span class="deboucled-mp-logo icon-pm"></span>';
         html += addToggleOption(`Filtrer les <i>Messages Privés</i> ${mpLogo} des <i>auteurs blacklist</i>`, storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default, 'Ignorer les MPs des pseudos présents dans votre liste noire et les déplacer automatiquement dans le dossier &quot;Spam&quot;.');
 
-        let spiralLogo = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
+        const spiralLogo = '<span class="deboucled-svg-spiral-black"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
         html += addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiralLogo}`, storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.');
 
-        let messageLogo = '<span class="deboucled-msg-logo"></span>';
+        const messageLogo = '<span class="deboucled-msg-logo"></span>';
         html += addToggleOption(`Masquer les <i>messages</i> ${messageLogo} avec les <i>sujets blacklist</i>`, storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default, 'Masque les messages contenant les mots-clés présents dans la &quot;Blacklist Sujets&quot;.\nCliquez sur l\'oeil pour afficher le message, et les expressions blacklist apparaitront en rouge.');
 
         html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default, 'Autoriser l\'affichage des topics même si le sujet est blacklist, à partir d\'un certain nombre de messages.');
@@ -161,7 +169,7 @@ function buildSettingsPage() {
         let allowDisplayThreshold = store.get(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
         html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, storage_optionDisplayThreshold_default, 10, 1000, 10, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.', allowDisplayThreshold, true);
 
-        let pocLogo = '<span class="deboucled-poc-logo"></span>';
+        const pocLogo = '<span class="deboucled-poc-logo"></span>';
         html += addDropdownOption(`Protection contre les <i>PoC</i> ${pocLogo}`,
             storage_optionDetectPocMode,
             'Protection contre les topics &quot;post ou cancer&quot; et les dérivés.\n• Désactivé : aucune protection\n• Mode simple (rapide) : recherche dans les messages uniquement si le titre contient un indice\n• Mode approfondi (plus lent) : recherche systématiquement dans les messages et le titre\n• Mode automatique (rapide) : mode simple + masque automatiquement le topic\n• Mode auto approfondi (plus lent) : mode approfondi + masque automatiquement le topic.',
@@ -181,34 +189,34 @@ function buildSettingsPage() {
 
         html += '<table class="deboucled-option-table">';
 
-        let darkLogo = '<span class="deboucled-dark-logo"></span>';
+        const darkLogo = '<span class="deboucled-dark-logo"></span>';
         html += addToggleOption(`Utiliser le <i>thème sombre</i> ${darkLogo} pour <b>Déboucled</b>`, storage_optionEnableDeboucledDarkTheme, storage_optionEnableDeboucledDarkTheme_default, 'Permet de basculer entre le thème normal et le thème sombre pour le script Déboucled.');
 
-        let themeLogo = '<span class="deboucled-stylish-logo deboucled-theme-logo"></span>';
+        const themeLogo = '<span class="deboucled-stylish-logo deboucled-theme-logo"></span>';
         html += addToggleOption(`Utiliser le <i>thème Déboucled Officiel</i> ${themeLogo} pour <b>JVC</b>`, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableJvRespawnRefinedTheme_default, 'Basculer entre le thème JVC normal, et le thème officiel Déboucled. (pensez à rafraichir la page pour voir les changements)');
 
-        let forbiddenLogo = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
+        const forbiddenLogo = '<span class="deboucled-svg-forbidden-black"><svg viewBox="0 0 180 180" id="deboucled-forbidden-logo" class="deboucled-logo-forbidden"><use href="#forbiddenlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour <i>Blacklist le topic</i> ${forbiddenLogo}`, storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default, 'Afficher ou non le bouton rouge à droite des sujets pour ignorer les topics souhaités.');
 
-        let blackTopicLogo = '<span class="topic-img deboucled-topic-black-logo" style="display: inline-block; vertical-align: middle;"></span>';
+        const blackTopicLogo = '<span class="topic-img deboucled-topic-black-logo" style="display: inline-block; vertical-align: middle;"></span>';
         html += addToggleOption(`Afficher le pictogramme pour les <i>topics noirs</i> ${blackTopicLogo}`, storage_optionDisplayBlackTopic, storage_optionDisplayBlackTopic_default, 'Afficher les topics de plus de 100 messages avec le pictogramme noir (en plus du jaune, rouge, résolu, épinglé etc).');
 
-        let previewLogo = '<span><svg width="16px" viewBox="0 0 30 30" id="deboucled-preview-logo"><use href="#previewlogo"/></svg></span>';
+        const previewLogo = '<span><svg width="16px" viewBox="0 0 30 30" id="deboucled-preview-logo"><use href="#previewlogo"/></svg></span>';
         html += addToggleOption(`Afficher les boutons pour avoir un <i>aperçu du topic</i> ${previewLogo}`, storage_optionPrevisualizeTopic, storage_optionPrevisualizeTopic_default, 'Afficher ou non l\'icone \'loupe\' à côté du sujet pour prévisualiser le topic au survol.');
 
-        let matchesLogo = '<span class="deboucled-list-logo"></span>';
+        const matchesLogo = '<span class="deboucled-list-logo"></span>';
         html += addToggleOption(`Afficher les <i>détails du filtrage</i> ${matchesLogo} des topics`, storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default, 'Afficher ou non le tableau des détails de filtrage des topics sur la droite de la page.');
 
         let optionDisplayTopicMatches = store.get(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
-        let eyeLogo = '<span class="deboucled-eye-logo"></span>';
+        const eyeLogo = '<span class="deboucled-eye-logo"></span>';
         html += addToggleOption(`Cliquer sur l'oeil ${eyeLogo} pour <i>afficher les détails</i>`, storage_optionClickToShowTopicMatches, storage_optionClickToShowTopicMatches_default, 'Affiche par défaut l\'icone en oeil, nécéssite de cliquer pour afficher le détail du filtrage par catégorie.', optionDisplayTopicMatches, true);
 
-        let statsLogo = '<span class="deboucled-chart-logo"></span>';
+        const statsLogo = '<span class="deboucled-chart-logo"></span>';
         html += addToggleOption(`Afficher les <i>statistiques de filtrage</i> ${statsLogo} des topics`, storage_optionDisplayTopicCharts, storage_optionDisplayTopicCharts_default, 'Afficher ou non le graphique des tendances de filtrage de topics sur la droite de la page.');
 
         html += addToggleOption(`Afficher le nombre de <i>topics ignorés</i> dans l'entête`, storage_optionDisplayTopicIgnoredCount, storage_optionDisplayTopicIgnoredCount_default, 'Afficher ou non le nombre de topics ignorés dans l\'entête de la liste des sujets : &quot;SUJETS (X IGNORÉS)&quot; .');
 
-        let avatarBorderLogo = '<span class="deboucled-avatarborder-logo"></span>';
+        const avatarBorderLogo = '<span class="deboucled-avatarborder-logo"></span>';
         html += addToggleOption(`Masquer les </i>bordures d'avatars</i> ${avatarBorderLogo} <span class="deboucled-small-text">(nouveau !)</span>`, storage_optionHideAvatarBorder, storage_optionHideAvatarBorder_default, 'Ne pas afficher les anneaux (cercles) du JV Fan Contest autour des avatars.');
 
         html += '</table>';
@@ -226,24 +234,24 @@ function buildSettingsPage() {
 
         html += addToggleOption('Uniformiser et nettoyer les <i>titres des topics</i>', storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default, 'Uniformise le titre des topics et efface les balises inutiles/répétitives comme [ALERTE], ou l\'usage abusif du &quot;AYA&quot; et ses dérivés.\n\nExemple : &quot;[ALERTE] cet EXEMPLE incroyable AYAAAA&quot; => &quot;Cet exemple incroyable&quot;');
 
-        let quoteLogo = '<span class="deboucled-quote-logo"></span>';
+        const quoteLogo = '<span class="deboucled-quote-logo"></span>';
         html += addToggleOption(`Améliorer les <i>citations</i> ${quoteLogo} des messages`, storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default, 'Améliore les citations avec plusieurs fonctionnalités :\n\n• Insère le pseudo du message cité\n• Citer une partie des messages en sélectionnant le texte\n• Citer et suggérer des pseudos en écrivant avec l\'arobase @ (conditions : connecté et minimum 3 lettres)\n• Mettre en couleur les pseudos lorsqu\'ils sont cités');
 
-        let scrollLogo = '<span class="deboucled-scroll-logo"></span>';
+        const scrollLogo = '<span class="deboucled-scroll-logo"></span>';
         html += addToggleOption(`Activer le <i>défilement automatique</i> ${scrollLogo} des messages`, storage_optionSmoothScroll, storage_optionSmoothScroll_default, 'Activer le chargement automatique des messages du topic en faisant défiler la page vers le bas.');
 
-        let jvfluxLogo = '<span class="deboucled-jvflux-logo"></span>';
+        const jvfluxLogo = '<span class="deboucled-jvflux-logo"></span>';
         html += addToggleOption(`Intégration du <i>wiki officiel JVFlux</i> ${jvfluxLogo} <span class="deboucled-small-text">(nouveau !)</span>`, storage_optionJvFluxEmbedded, storage_optionJvFluxEmbedded_default, 'Intégration du wiki officiel du forum en mettant en avant les pages du wiki associées aux mots-clés dans les messages.');
 
-        let hotTopicLogo = '<span class="deboucled-fire-logo"></span>';
+        const hotTopicLogo = '<span class="deboucled-fire-logo"></span>';
         html += addToggleOption(`Mettre en avant les <i>topics tendances</i> ${hotTopicLogo}`, storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default, 'Afficher un pictogramme de flamme à côté des topics très actifs.');
 
         html += addToggleOption(`Masquer une partie des <i>messages trop longs</i>`, storage_optionHideLongMessages, storage_optionHideLongMessages_default, 'Si cette option est activée, le contenu des longs messages sera masqué et un bouton &quot;lire la suite&quot; apparaitra.');
 
-        let smileyLogo = '<img src="https://image.jeuxvideo.com/smileys_img/26.gif" style="vertical-align: bottom;"></img>';
+        const smileyLogo = '<img src="https://image.jeuxvideo.com/smileys_img/26.gif" style="vertical-align: bottom;"></img>';
         html += addToggleOption(`Intégrer les <i>smileys JVC</i> ${smileyLogo} dans les titres`, storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default, 'Permet d\'intégrer les smileys JVC dans les titres des topics.');
 
-        let avatarLogo = '<img src="https://image.jeuxvideo.com/avatar-xs/default.jpg" class="deboucled-avatar-logo"></img>';
+        const avatarLogo = '<img src="https://image.jeuxvideo.com/avatar-xs/default.jpg" class="deboucled-avatar-logo"></img>';
         html += addToggleOption(`Afficher les <i>avatars</i> ${avatarLogo} des auteurs`, storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default, 'Afficher ou non les avatars des auteurs dans la liste des topics.');
 
         html += '</table>';
@@ -310,19 +318,19 @@ function buildSettingsPage() {
         html += '<div class="deboucled-setting-content">';
         html += '<table class="deboucled-option-table">';
 
-        let vinzLogo = '<span class="deboucled-vinz-logo"></span>';
+        const vinzLogo = '<span class="deboucled-vinz-logo"></span>';
         html += addToggleOption(`Algorithme de filtrage <i>anti-Vinz</i> ${vinzLogo}`, storage_optionAntiVinz, storage_optionAntiVinz_default, 'Algorithme intelligent pour éradiquer totalement Vinz et sa boucle infernale, en dépit de ses tentatives d\'évitement.');
 
-        let spamLogo = '<span class="deboucled-spam-logo"></span>';
+        const spamLogo = '<span class="deboucled-spam-logo"></span>';
         html += addToggleOption(`Algorithme <i>anti-spam et publicité</i> ${spamLogo}`, storage_optionAntiSpam, storage_optionAntiSpam_default, 'Algorithme pour blacklister automatiquement les spammeurs (publicité Youtube).');
 
-        let resolvedLogo = '<span class="deboucled-topic-resolved-logo"></span>';
+        const resolvedLogo = '<span class="deboucled-topic-resolved-logo"></span>';
         html += addToggleOption(`Remplacer le pictogramme ${resolvedLogo} <i>résolu</i> des topics`, storage_optionReplaceResolvedPicto, storage_optionReplaceResolvedPicto_default, 'Remplacer le pictogramme résolu sur la gauche des topics par le picto normal (jaune, rouge, verrouillé, etc).');
 
-        let blJvcLogo = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>';
+        const blJvcLogo = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>';
         html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvcLogo} de JVC`, storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
 
-        let peepoLogo = '<span class="deboucled-peepo-logo"></span>';
+        const peepoLogo = '<span class="deboucled-peepo-logo"></span>';
         html += addToggleOption(`Utiliser le <i>thème sombre</i> ${peepoLogo} pour <b>JVC</b> (par Peepo)`, storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default, 'Basculer entre le thème JVC normal, et le nouveau thème sombre créé par Peepo. (pensez à rafraichir la page pour voir les changements)');
 
         html += addRangeOption('Nombre de topics à afficher sur la page', storage_optionMaxTopicCount, storage_optionMaxTopicCount_default, defaultTopicCount, 50, 1, 'Nombre de topics à afficher sur la page (25 par défaut).', true, false);
@@ -858,7 +866,7 @@ function addDisableFilteringButton() {
 
     const enableFilteringId = 'deboucled-enable-filtering';
     let menuChild = document.createElement('li');
-    let spiralLogo = '<span class="deboucled-svg-spiral-black" style="margin-right: 7px;"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
+    const spiralLogo = '<span class="deboucled-svg-spiral-black" style="margin-right: 7px;"><svg width="16px" viewBox="0 2 24 24" id="deboucled-spiral-logo"><use href="#spirallogo"/></svg></span>';
     menuChild.innerHTML = `<span class="float-start">${spiralLogo}Activer Déboucled sur ce forum</span><input type="checkbox" class="input-on-off" id="${enableFilteringId}"${forumFilteringIsDisabled ? '' : ' checked=""'}><label for="deboucled-enable-filtering" class="btn-on-off"></label>`;
     menuForumElement.appendChild(menuChild);
 

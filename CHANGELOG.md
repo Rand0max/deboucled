@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.37.7] (23/11/2022)
+
+- Extras
+
 ## [2.37.3] (08/11/2022)
 
 - Promotion
