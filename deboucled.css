@@ -61,6 +61,15 @@ body.deboucled-dark-theme {
   display: none;
 }
 
+.deboucled-ads-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  place-content: center;
+  flex-wrap: nowrap;
+  margin: 10px 0;
+  row-gap: 10px;
+}
 .deboucled-sponsor,
 .deboucled-donation {
   text-align: center;
