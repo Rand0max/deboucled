@@ -118,7 +118,7 @@ function buildSettingsPage() {
         */
 
         const decensuredLogo = '<span class="deboucled-decensured-logo"></span>';
-        html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/decensured#readme" target="_blank" title="Décensured le script anti-censure">${decensuredLogo}</a>`;
+        html += `<a class="deboucled-about-link-github" href="${decensuredUrl}" target="_blank" title="Décensured le script anti-censure">${decensuredLogo}</a>`;
 
         const githubLogo = '<span class="deboucled-svg-github"><svg width="20px" viewBox="0 0 16 16" id="deboucled-github-logo"><use href="#githublogo"/></svg></span>';
         html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/deboucled" target="_blank" title="Github officiel Déboucled">${githubLogo}</a>`;
@@ -440,7 +440,6 @@ function addSettingEvents() {
     const boucleUrl = 'https://www.youtube.com/watch?v=KkxZfUlNlDo';
     //const boucleUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
     //const boucleUrl = 'https://www.jeuxvideo.com/forums/42-51-62052373-1-0-1-0-ce-forum-est-une-putain-de-boucle-temporelle-sans-fin.htm';
-    //const boucleUrl = 'https://github.com/Rand0max/decensured#readme';
     document.querySelector('.deboucled-about-version').onclick = () => window.open(boucleUrl, '_blank').focus();
 
     document.querySelector('.deboucled-svg-refresh').onclick = forcePrebouclesRefresh;

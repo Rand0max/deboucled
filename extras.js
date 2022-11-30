@@ -26,7 +26,7 @@ function buildSponsor() {
 
     const forumRightCol = document.querySelector('div#forum-right-col');
     if (forumRightCol) {
-        const decensuredLink = `<a href="https://github.com/Rand0max/decensured#readme" target="_blank"><b>Décensured</b> <span class="deboucled-sponsoring-decensured-logo"></span></a>`;
+        const decensuredLink = `<a href="${decensuredUrl}" target="_blank"><b>Décensured</b> <span class="deboucled-sponsoring-decensured-logo"></span></a>`;
         const decensuredCardHtml = `<div class="deboucled-sponsoring"><div style="font-weight: 800;">Marre des bans et des 410 intempestifs ?</div><div>Découvrez ${decensuredLink} le script anti-censure !</div></div>`;
         const decensuredCard = buildCardForum('Déboucled présente', '', 'deboucled-sponsoring-decensured', decensuredCardHtml);
         forumRightCol.appendChild(decensuredCard);
@@ -111,7 +111,7 @@ function displayAnnouncement() {
     store.set(storage_announcement_displayed, true);
 
     if (confirm('DÉCENSURED le script anti-censure EST DE RETOUR ! Webedia en PLS.')) {
-        document.location.href = 'https://github.com/Rand0max/decensured#readme';
+        document.location.href = decensuredUrl;
     }
 }
 

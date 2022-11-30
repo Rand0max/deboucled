@@ -216,6 +216,13 @@ function enableJvChatAndTopicLiveEvents(handleCallback) {
     });
 }
 
+function enableDecensuredEvents() {
+    addEventListener('decensured:active', () => {
+        decensuredActive = true;
+        document.querySelectorAll('p.deboucled-decensured-message').forEach(e => e.remove());
+    });
+}
+
 function getParagraphChildren(element, allowBlockQuote = false) {
     if (!element?.children?.length) return [];
     const allowedTags = ['P', 'STRONG', 'U', 'I', 'EM', 'B'];
@@ -500,5 +507,13 @@ async function enhanceBlockquotes(messageContent) {
 
     let nestedQuotes = await awaitElements(messageContent, '.nested-quote-toggle-box');
     nestedQuotes.forEach((e) => e.remove());
+}
+
+function handleMessageMayBeHidden(messageContent) {
+    if (!messageContent?.textContent?.includes(' ')) return;
+    const hiddenMessage = document.createElement('p');
+    hiddenMessage.className = 'deboucled-decensured-message';
+    hiddenMessage.innerHTML = `L'extension <a href="${decensuredUrl}" target="_blank">Décensured</a> est nécéssaire pour déchiffrer ce message.`;
+    messageContent.parentElement.appendChild(hiddenMessage);
 }
 

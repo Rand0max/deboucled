@@ -315,6 +315,18 @@ blockquote .deboucled-highlighted {
   opacity: 0.7;
   font-family: "Roboto", Arial, Helvetica, sans-serif;
 }
+.deboucled-decensured-message {
+  color: #888;
+  font-style: italic;
+  font-size: 0.69rem;
+  font-weight: 600;
+  opacity: 0.6;
+  cursor: default;
+  user-select: none;
+}
+.deboucled-decensured-message:hover {
+  opacity: 1;
+}
 
 /* Button */
 .deboucled-button {

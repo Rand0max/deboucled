@@ -486,6 +486,8 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     if (messageOptions.optionBlSubjectIgnoreMessages && !isSelf) {
         handleBlSubjectIgnoreMessages(messageElement);
     }
+
+    if (!decensuredActive) handleMessageMayBeHidden(messageContent);
 }
 
 async function parseTopicAuthor(pageId) {
@@ -943,6 +945,8 @@ async function entryPoint() {
         sendFinalEvent();
     }
 }
+
+enableDecensuredEvents();
 
 if (document.readyState === 'interactive' || document.readyState === 'complete') {
     entryPoint();
