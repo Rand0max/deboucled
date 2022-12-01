@@ -331,7 +331,7 @@ async function isVinzTopic(subject, author, topicUrl) {
         /* 
             +50% on a encore un doute, on ira vérifier le contenu de son topic éclatax 
             après avoir vérifié toutes les boucles, si aucune ne dépasse 80%.
-            P.S : je sais que tu lis ça Vinz, je t'invite à disposax.
+            P.S : je sais que tu lis ça Vinz, je t'invite à disposax dans les plus brefs délaxs.
         */
         if (score >= 50) possibleBoucle = true;
     }

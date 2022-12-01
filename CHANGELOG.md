@@ -1,5 +1,14 @@
 # Changelog Déboucled
 
+## [2.38.1] (01/12/2022)
+
+- Ménage dans les options
+- Ajout logo Décensured
+
+## [2.38.0] (30/11/2022)
+
+- Nouveau message informatif pour Décensured
+
 ## [2.37.7] (23/11/2022)
 
 - Extras

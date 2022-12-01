@@ -216,9 +216,6 @@ function buildSettingsPage() {
 
         html += addToggleOption(`Afficher le nombre de <i>topics ignorés</i> dans l'entête`, storage_optionDisplayTopicIgnoredCount, storage_optionDisplayTopicIgnoredCount_default, 'Afficher ou non le nombre de topics ignorés dans l\'entête de la liste des sujets : &quot;SUJETS (X IGNORÉS)&quot; .');
 
-        const avatarBorderLogo = '<span class="deboucled-avatarborder-logo"></span>';
-        html += addToggleOption(`Masquer les </i>bordures d'avatars</i> ${avatarBorderLogo} <span class="deboucled-small-text">(nouveau !)</span>`, storage_optionHideAvatarBorder, storage_optionHideAvatarBorder_default, 'Ne pas afficher les anneaux (cercles) du JV Fan Contest autour des avatars.');
-
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -241,7 +238,7 @@ function buildSettingsPage() {
         html += addToggleOption(`Activer le <i>défilement automatique</i> ${scrollLogo} des messages`, storage_optionSmoothScroll, storage_optionSmoothScroll_default, 'Activer le chargement automatique des messages du topic en faisant défiler la page vers le bas.');
 
         const jvfluxLogo = '<span class="deboucled-jvflux-logo"></span>';
-        html += addToggleOption(`Intégration du <i>wiki officiel JVFlux</i> ${jvfluxLogo} <span class="deboucled-small-text">(nouveau !)</span>`, storage_optionJvFluxEmbedded, storage_optionJvFluxEmbedded_default, 'Intégration du wiki officiel du forum en mettant en avant les pages du wiki associées aux mots-clés dans les messages.');
+        html += addToggleOption(`Intégration du <i>wiki officiel JVFlux</i> ${jvfluxLogo}`, storage_optionJvFluxEmbedded, storage_optionJvFluxEmbedded_default, 'Intégration du wiki officiel du forum en mettant en avant les pages du wiki associées aux mots-clés dans les messages.');
 
         const hotTopicLogo = '<span class="deboucled-fire-logo"></span>';
         html += addToggleOption(`Mettre en avant les <i>topics tendances</i> ${hotTopicLogo}`, storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default, 'Afficher un pictogramme de flamme à côté des topics très actifs.');
@@ -261,14 +258,14 @@ function buildSettingsPage() {
     }
     function addPreBouclesSection(sectionIsActive) {
         let html = '';
-        html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">ANTI-BOUCLES</div>`;
+        html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">LISTES PRÉDÉFINIES</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
 
         html += '<div class="deboucled-preboucle-header">';
 
         const titleTooltip = buildTooltip('Cochez les catégories que vous souhaitez filtrer sur le forum.\nPassez la souris ou cliquez sur les intitulés de catégorie pour voir les mots-clés qui seront utilisés.', 'bottom');
-        html += `<span class="deboucled-preboucle-title" ${titleTooltip}>Listes anti-boucle pré-enregistrées</span>`;
+        html += `<span class="deboucled-preboucle-title" ${titleTooltip}>Listes anti-boucle prédéfinies</span>`;
 
         const lastUpdate = formatDateToFrenchFormat(new Date(store.get(storage_prebouclesLastUpdate)));
         const refreshTooltip = buildTooltip(`Dernière mise à jour : ${lastUpdate}`, 'left');
@@ -331,7 +328,7 @@ function buildSettingsPage() {
         html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvcLogo} de JVC`, storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
 
         const peepoLogo = '<span class="deboucled-peepo-logo"></span>';
-        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${peepoLogo} pour <b>JVC</b> (par Peepo)`, storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default, 'Basculer entre le thème JVC normal, et le nouveau thème sombre créé par Peepo. (pensez à rafraichir la page pour voir les changements)');
+        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${peepoLogo} pour <b>JVC</b> (par Peepo)`, storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default, 'Basculer entre le thème JVC normal, et le thème sombre créé par Peepo. (pensez à rafraichir la page pour voir les changements)');
 
         html += addRangeOption('Nombre de topics à afficher sur la page', storage_optionMaxTopicCount, storage_optionMaxTopicCount_default, defaultTopicCount, 50, 1, 'Nombre de topics à afficher sur la page (25 par défaut).', true, false);
 
