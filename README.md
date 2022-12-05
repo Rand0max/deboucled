@@ -84,9 +84,10 @@
 
 # Plus d'informations
 
-- [Contacter l'auteur](https://www.jeuxvideo.com/messages-prives/nouveau.php?all_dest=Rand0maxReborn)
-- [Contact email](mailto:rand0max@protonmail.com)
-- [Topic JVC officiel](https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm)
+- [Contact Email](mailto:rand0max@protonmail.com)
+- [Contact Discord Rand0max#3135](https://discord.com/users/781564172483166268)
+- [Contact MP](https://www.jeuxvideo.com/messages-prives/nouveau.php?all_dest=Rand0max4)
+- [~~Topic JVC officiel 410~~](https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm)
 - [Topic sur JvArchive](https://jvarchive.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam)
 - [Page jvscript.fr](https://jvscript.fr/script/deboucled)
 - [Repository officiel](https://github.com/Rand0max/deboucled/)
