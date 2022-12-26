@@ -220,6 +220,8 @@ function enableDecensuredEvents() {
     addEventListener('decensured:active', () => {
         decensuredActive = true;
         document.querySelectorAll('p.deboucled-decensured-message').forEach(e => e.remove());
+        const decensuredSponsoring = document.querySelector('#card-header-decensured');
+        if (decensuredSponsoring) decensuredSponsoring.remove();
     });
 }
 

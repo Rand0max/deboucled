@@ -3,10 +3,11 @@
 // EXTRAS
 ///////////////////////////////////////////////////////////////////////////////////////
 
-function buildCardForum(mainTitle, rightTitle, contentId, contentHtml) {
+function buildCardForum(mainTitle, rightTitle, contentId, contentHtml, cardId) {
     const cardForum = document.createElement('div');
     cardForum.className = 'card card-jv-forum card-forum-margin';
-    cardForum.innerHTML = `<div class="card-header">${mainTitle}<span class="deboucled-card-header-right">${rightTitle}</span></div>
+    const id = cardId ? `id="${cardId}"` : '';
+    cardForum.innerHTML = `<div ${id} class="card-header">${mainTitle}<span class="deboucled-card-header-right">${rightTitle}</span></div>
 <div class="card-body">
 <div class="scrollable">
 <div class="scrollable-wrapper">
@@ -25,10 +26,10 @@ function buildSponsor() {
     }
 
     const forumRightCol = document.querySelector('div#forum-right-col');
-    if (forumRightCol) {
+    if (forumRightCol && !decensuredActive) {
         const decensuredLink = `<a href="${decensuredUrl}" target="_blank"><b>Décensured</b> <span class="deboucled-sponsoring-decensured-logo"></span></a>`;
         const decensuredCardHtml = `<div class="deboucled-sponsoring"><div style="font-weight: 800;">Marre des bans et des 410 intempestifs ?</div><div>Découvrez ${decensuredLink} le script anti-censure !</div></div>`;
-        const decensuredCard = buildCardForum('Déboucled présente', '', 'deboucled-sponsoring-decensured', decensuredCardHtml);
+        const decensuredCard = buildCardForum('Déboucled présente', '', 'deboucled-sponsoring-decensured', decensuredCardHtml, 'card-header-decensured');
         forumRightCol.appendChild(decensuredCard);
     }
 }
@@ -118,6 +119,6 @@ function displayAnnouncement() {
 function buildExtras() {
     buildDonation();
     buildSponsor();
-    buildAds();
+    //buildAds();
 }
 
