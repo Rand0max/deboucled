@@ -131,6 +131,9 @@ body.didomi-popup-open {
   font-size: 2.1rem;
   font-weight: 600;
 }
+.text-enrichi-forum p:last-child {
+  margin-bottom: 0.3rem;
+}
 
 /* Media */
 @media (max-width: 807.98px) {

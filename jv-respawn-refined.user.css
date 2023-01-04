@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.2.4
+@version        1.2.5
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -137,6 +137,9 @@
   #header-profil .infos-pseudo h1 {
     font-size: 2.1rem;
     font-weight: 600;
+  }
+  .text-enrichi-forum p:last-child {
+    margin-bottom: 0.3rem;
   }
 
   /* Media */
