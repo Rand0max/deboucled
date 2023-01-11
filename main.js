@@ -883,7 +883,6 @@ async function entryPoint() {
 
         await init(currentPageType);
 
-        /*
         switch (currentPageType) {
             case 'topiclist': {
                 if (forumFilteringIsDisabled) break;
@@ -921,7 +920,6 @@ async function entryPoint() {
             default:
                 break;
         }
-        */
 
         console.log('Déboucled loaded');
 
