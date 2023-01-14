@@ -24,7 +24,7 @@ const updateUserUrl = `${deboucledApiUrl}/user`;
 const diagnosticUrl = `${deboucledApiUrl}/diagnostic`;
 
 /* eslint-disable no-undef */
-const checkUpdateExpire = TimeSpan.FromDays(1);
+const checkUpdateExpire = TimeSpan.FromHours(6);
 const checkUpdateDeferredExpire = TimeSpan.FromDays(5);
 const youtubeBlacklistRefreshExpire = TimeSpan.FromHours(1);
 const prebouclesRefreshExpire = TimeSpan.FromMinutes(30);

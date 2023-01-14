@@ -34,27 +34,6 @@ function buildSponsor() {
     }
 }
 
-function buildAds() {
-    document.querySelectorAll('.sideDfp').forEach(e => e.remove());
-
-    const layoutContentAside = document.querySelector('div.layout__contentAside');
-    if (!layoutContentAside) return;
-    const wrapper = document.createElement('div');
-    wrapper.className = 'deboucled-ads-wrapper';
-    layoutContentAside.appendChild(wrapper);
-
-    const adsElem = document.createElement('iframe');
-    adsElem.src = '//ad.a-ads.com/2120513?size=336x280';
-    adsElem.style = 'width:336px; height:280px; border:0px; padding:0; overflow:hidden; background-color: transparent;';
-    adsElem.setAttribute('data-aa', '2120513');
-    wrapper.appendChild(adsElem);
-
-    const affiliateElem = document.createElement('a');
-    affiliateElem.href = 'https://click.a-ads.com/2124869/1/';
-    affiliateElem.innerHTML = '<img src="https://static.a-ads.com/a-ads-banners/425764/320x50?region=eu-central-1"></img>';
-    wrapper.appendChild(affiliateElem);
-}
-
 function buildDonation() {
     const layoutContentAside = document.querySelector('div.layout__contentAside');
     if (!layoutContentAside) return;
@@ -119,6 +98,5 @@ function displayAnnouncement() {
 function buildExtras() {
     buildDonation();
     buildSponsor();
-    //buildAds();
 }
 
