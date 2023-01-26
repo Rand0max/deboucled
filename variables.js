@@ -102,6 +102,6 @@ let smileyGifRegex = new RegExp();
 const decensuredUrl = 'https://github.com/Rand0max/decensured#readme';
 let decensuredActive = false;
 
-const deboucledPseudos = ['rand0max', 'rand0max2', 'rand0max3', 'rand0max4', 'rand0max5', 'rand0maxreborn', 'deboucled', 'decensured'];
-const deboucledTopics = ['67697509', '68410257', '68982055', '70029449'];
+const deboucledPseudos = ['rand0max', 'rand0max2', 'rand0max3', 'rand0max4', 'rand0max5', 'rand0max6', 'rand0maxreborn', 'deboucled', 'decensured', 'roninwf'];
+const deboucledTopics = ['67697509', '68410257', '68982055', '70029449', '71596925'];
 
