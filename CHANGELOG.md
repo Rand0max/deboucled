@@ -1,5 +1,13 @@
 # Changelog Déboucled
 
+## [2.39.1] (15/02/2023)
+
+- Correction icone dossier
+
+## [2.39.0] (11/01/2023)
+
+- Réactivation
+
 ## [2.38.1] (01/12/2022)
 
 - Ménage dans les options
