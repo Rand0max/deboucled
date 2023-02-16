@@ -792,14 +792,14 @@ async function handlePrivateMessageNotifs() {
     let optionBlAuthorIgnoreMp = store.get(storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default);
     if (!optionBlAuthorIgnoreMp) return;
 
-    const mpElem = document.querySelector('.jv-nav-account-mp > div > .jv-nav-dropdown-container-content');
+    const mpElem = document.querySelector('.headerAccount--pm > .headerAccount__dropdownContainer > .headerAccount__dropdownContainerContent');
     if (!mpElem) return; // not connected
-    let privateMessageElements = await awaitElements(mpElem, '.jv-nav-dropdown-item');
+    let privateMessageElements = await awaitElements(mpElem, '.headerAccount__dropdownItem');
 
     let hiddenPrivateMessageArray = [];
     for (const privateMessageElem of privateMessageElements) {
         const mpId = privateMessageElem.getAttribute('data-id');
-        const author = privateMessageElem.querySelector('.jv-nav-dropdown-author').textContent.trim();
+        const author = privateMessageElem.querySelector('.headerAccount__dropdownSubInfo--author').textContent.trim();
         const hiddenMp = handlePrivateMessage(privateMessageElem, author);
         if (hiddenMp) hiddenPrivateMessageArray.push(mpId);
     }

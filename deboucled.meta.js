@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.39.1
+// @version     2.40.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -39,7 +39,7 @@
 // @require     https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js
 // @require     https://unpkg.com/infinite-scroll/dist/infinite-scroll.pkgd.min.js
 // @require     https://unpkg.com/timespan@2.3.0/browser/TimeSpan-1.2.min.js
-// @require     https://unpkg.com/gm-storage@1.1.0/dist/index.umd.min.js
+// @require     https://unpkg.com/gm-storage@2.0.3/dist/index.umd.min.js
 // @require     https://cdn.jsdelivr.net/gh/tomik23/show-more/dist/js/showMore.min.js
 // @require     https://unpkg.com/@chocolateboy/uncommonjs
 // @require     https://unpkg.com/fastest-levenshtein

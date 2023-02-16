@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.40.0] (16/02/2023)
+
+- Correction blacklist MP
+
 ## [2.39.1] (15/02/2023)
 
 - Correction icone dossier
