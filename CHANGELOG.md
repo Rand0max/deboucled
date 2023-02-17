@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.40.1] (17/02/2023)
+
+- Correction z-index du menu
+
 ## [2.40.0] (16/02/2023)
 
 - Correction blacklist MP
