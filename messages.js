@@ -26,11 +26,11 @@ function buildMessagesHeader() {
     let toggleIgnoredAuthors = document.createElement('a');
     toggleIgnoredAuthors.className = 'titre-bloc deboucled-toggle-ignored-authors';
     toggleIgnoredAuthors.setAttribute('role', 'button');
-    toggleIgnoredAuthors.textContent = '(voir)';
+    toggleIgnoredAuthors.textContent = '(afficher)';
     toggleIgnoredAuthors.onclick = function () {
         if (ignoredAuthors.style.display === 'inline') {
             ignoredAuthors.style.display = 'none';
-            toggleIgnoredAuthors.textContent = '(voir)';
+            toggleIgnoredAuthors.textContent = '(afficher)';
         }
         else {
             ignoredAuthors.style.display = 'inline';
@@ -520,3 +520,13 @@ function handleMessageMayBeHidden(messageContent) {
     messageContent.parentElement.appendChild(hiddenMessage);
 }
 
+function getLocationMessageId() {
+    const locationHash = window.location.hash;
+    if (!locationHash?.length) return;
+
+    const reg = new RegExp(/^#post_(?<id>[0-9]+)$/);
+    const match = locationHash.match(reg);
+    if (!match) return;
+    
+    return parseInt(match.groups?.id);
+}
