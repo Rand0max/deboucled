@@ -511,15 +511,6 @@ async function enhanceBlockquotes(messageContent) {
     nestedQuotes.forEach((e) => e.remove());
 }
 
-function handleMessageMayBeHidden(messageContent) {
-    const reg = new RegExp(/\u00A0\s*$/, 'g');
-    if (!reg.test(messageContent?.textContent)) return;
-    const hiddenMessage = document.createElement('p');
-    hiddenMessage.className = 'deboucled-decensured-message';
-    hiddenMessage.innerHTML = `L'extension <a href="${decensuredUrl}" target="_blank">Décensured <span class="deboucled-decensured-logo footer"></span></a> est nécéssaire pour déchiffrer ce message.`;
-    messageContent.parentElement.appendChild(hiddenMessage);
-}
-
 function getLocationMessageId() {
     const locationHash = window.location.hash;
     if (!locationHash?.length) return;

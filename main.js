@@ -486,8 +486,6 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     if (messageOptions.optionBlSubjectIgnoreMessages && !isSelf) {
         handleBlSubjectIgnoreMessages(messageElement);
     }
-
-    //if (!decensuredActive) handleMessageMayBeHidden(messageContent);
 }
 
 async function parseTopicAuthor(pageId) {
