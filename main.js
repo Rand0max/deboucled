@@ -752,7 +752,7 @@ function buildBoucledAuthorButton(author, optionBoucledUseJvarchive, className =
 }
 
 async function handleProfile(profileTab) {
-    const infosPseudoElement = document.querySelector('.infos-pseudo');
+    const infosPseudoElement = document.querySelector('.infos-pseudo > h1');
     if (!infosPseudoElement) return;
     const author = infosPseudoElement.textContent.trim();
 

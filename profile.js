@@ -20,7 +20,7 @@ function buildProfileBlacklistBadges(author, authorElement) {
 
     blacklists.forEach(bl => {
         const badge = buildBadge(bl.description, `Présent dans la liste « ${bl.description} ».`, '', 'blacklist', 'big');
-        authorElement.appendChild(badge);
+        authorElement.parentElement.append(badge);
     });
 }
 
