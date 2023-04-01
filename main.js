@@ -925,7 +925,7 @@ async function entryPoint() {
         //console.log(`Déboucled load : totaltime = ${elapsed}ms`);
 
         if (elapsed >= 3000) {
-            console.warn(`Déboucled slow load : totaltime = ${elapsed}ms`);
+            console.warn(`Déboucled slow loading : totaltime = ${elapsed}ms`);
             await sendDiagnostic(elapsed);
         }
 

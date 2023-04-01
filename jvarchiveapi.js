@@ -12,10 +12,10 @@ const jvarchiveApiGetAuthorRoute = (author) => `${jvarchiveApiAuteursUrl}/${auth
 const jvarchiveApiGetAuthorLastMessagesRoute = (author) => `${jvarchiveApiAuteursUrl}/${author}/last5messages`;
 const jvarchiveApiGetAuthorLastTopicsRoute = (author, itemsPerPage) => `${jvarchiveApiTopicsUrl}/search?page=1&itemsPerPage=${itemsPerPage}&search=${author}&searchType=auteur_topic_exact`;
 
-const getJvArchiveHotTopics = async (itemsPerPage = 20, timeInterval = 'day') => fetchJson(jvarchiveApiGetHotTopicsRoute(itemsPerPage, timeInterval), 3000);
-const getJvArchiveAuthor = async (author) => fetchJson(jvarchiveApiGetAuthorRoute(author), 3000);
-const getJvArchiveAuthorLastMessages = async (author) => fetchJson(jvarchiveApiGetAuthorLastMessagesRoute(author), 3000);
-const getJvArchiveAuthorLastTopics = async (author, itemsPerPage = 5) => fetchJson(jvarchiveApiGetAuthorLastTopicsRoute(author, itemsPerPage), 3000);
+const getJvArchiveHotTopics = async (itemsPerPage = 20, timeInterval = 'day') => fetchJson(jvarchiveApiGetHotTopicsRoute(itemsPerPage, timeInterval), 1000);
+const getJvArchiveAuthor = async (author) => fetchJson(jvarchiveApiGetAuthorRoute(author), 1000);
+const getJvArchiveAuthorLastMessages = async (author) => fetchJson(jvarchiveApiGetAuthorLastMessagesRoute(author), 1000);
+const getJvArchiveAuthorLastTopics = async (author, itemsPerPage = 5) => fetchJson(jvarchiveApiGetAuthorLastTopicsRoute(author, itemsPerPage), 1000);
 
 const jvArchiveTop1Url = `${jvarchiveUrl}/_nuxt/img/1.24cfc48.svg`;
 const jvArchiveTop2Url = `${jvarchiveUrl}/_nuxt/img/2.84b5d8d.svg`;
