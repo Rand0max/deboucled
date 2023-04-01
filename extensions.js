@@ -390,7 +390,7 @@ async function fetchHtml(url, handle410 = false) {
         });
 }
 
-async function fetchJson(url, timeout = 10000) {
+async function fetchJson(url, timeout = 1000) {
     return fetchWithTimeout(url, { timeout: timeout })
         .then(function (response) {
             if (!response.ok) throw Error(response.statusText);

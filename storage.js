@@ -10,7 +10,7 @@ const localstorage_topicAuthors = 'deboucled_topicAuthors';
 const localstorage_authorAvatars = 'deboucled_topicAuthorAvatars';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
-const storage_secret_displayed = 'deboucled_secret_displayed', storage_secret_displayed_default = false;
+const storage_secret_displayed = 'deboucled_secret2_displayed', storage_secret_displayed_default = false;
 const storage_announcement_displayed = 'deboucled_announcement4_displayed', storage_announcement_displayed_default = false;
 const storage_userId = 'deboucled_userId', storage_userId_default = '';
 const storage_lastUsedPseudo = 'deboucled_lastUsedPseudo', storage_lastUsedPseudo_default = '';
@@ -209,9 +209,11 @@ async function saveLocalStorage() {
 }
 
 async function refreshApiData(forceUpdate = false) {
-    await parsePreboucleData(forceUpdate);
-    await parseYoutubeBlacklistData(forceUpdate);
-    await parseAiLoopData(forceUpdate);
+    await Promise.allSettled([
+        parsePreboucleData(forceUpdate),
+        parseYoutubeBlacklistData(forceUpdate),
+        parseAiLoopData(forceUpdate),
+    ]);
 }
 
 function loadPreBouclesStatuses() {

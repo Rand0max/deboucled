@@ -511,6 +511,7 @@ async function enhanceBlockquotes(messageContent) {
     nestedQuotes.forEach((e) => e.remove());
 }
 
+/*
 function getLocationMessageId() {
     const locationHash = window.location.hash;
     if (!locationHash?.length) return;
@@ -521,3 +522,4 @@ function getLocationMessageId() {
     
     return parseInt(match.groups?.id);
 }
+*/
