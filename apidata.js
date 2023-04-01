@@ -12,42 +12,42 @@ function mustRefresh(storageLastUpdateId, dataExpire) {
 
 async function queryYoutubeBlacklist() {
     let newYoutubeBlacklist = await fetchJson(youtubeBlacklistUrl);
+    store.set(storage_youtubeBlacklistLastUpdate, Date.now());
     if (!newYoutubeBlacklist?.length) return;
 
     youtubeBlacklistArray = newYoutubeBlacklist.flatMap(yp => yp.videos);
 
     store.set(storage_youtubeBlacklist, JSON.stringify(youtubeBlacklistArray));
-    store.set(storage_youtubeBlacklistLastUpdate, Date.now());
 }
 
 async function queryPreboucles() {
     let newPreboucles = await fetchJson(prebouclesDataUrl);
+    store.set(storage_prebouclesLastUpdate, Date.now());
     if (!newPreboucles?.length) return;
 
     preBoucleArray = newPreboucles;
 
     store.set(storage_preBouclesData, JSON.stringify(preBoucleArray));
-    store.set(storage_prebouclesLastUpdate, Date.now());
 }
 
 async function queryAiLoops() {
     let newAiLoops = await fetchJson(aiLoopsDataUrl);
+    store.set(storage_aiLoopsLastUpdate, Date.now());
     if (!newAiLoops) return;
 
     aiLoopData = newAiLoops;
 
     store.set(storage_aiLoopsData, JSON.stringify(aiLoopData));
-    store.set(storage_aiLoopsLastUpdate, Date.now());
 }
 
 async function queryHotTopics() {
     let newHotTopics = await buildHotTopics();
+    store.set(storage_hotTopicsLastUpdate, Date.now());
     if (!newHotTopics) return;
 
     hotTopicsData = newHotTopics;
 
     store.set(storage_hotTopicsData, JSON.stringify(hotTopicsData));
-    store.set(storage_hotTopicsLastUpdate, Date.now());
 }
 
 async function checkUpdate() {
