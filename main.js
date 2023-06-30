@@ -476,6 +476,10 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     handleMessageAssignTopicAuthor(author, authorElement);
     fixMessageUrls(messageContent);
 
+    if (messageOptions.optionDecensureTwitter) {
+        decensureTwitterLinks(messageContent);
+    }
+
     if (messageOptions.optionEnhanceQuotations) {
         highlightSpecialAuthors(author, authorElement, isSelf);
         highlightQuotedAuthor(messageContent, messageElement);
@@ -621,6 +625,7 @@ function prepareMessageOptions(isWhitelistedTopic) {
     const optionHideLongMessages = store.get(storage_optionHideLongMessages, storage_optionHideLongMessages_default);
     const optionDisplayTitleSmileys = store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default);
     const optionJvFluxEmbedded = store.get(storage_optionJvFluxEmbedded, storage_optionJvFluxEmbedded_default);
+    const optionDecensureTwitter = store.get(storage_optionDecensureTwitter, storage_optionDecensureTwitter_default);
 
     const messageOptions = {
         optionHideMessages: optionHideMessages,
@@ -632,8 +637,10 @@ function prepareMessageOptions(isWhitelistedTopic) {
         isWhitelistedTopic: isWhitelistedTopic,
         optionHideLongMessages: optionHideLongMessages,
         optionDisplayTitleSmileys: optionDisplayTitleSmileys,
-        optionJvFluxEmbedded: optionJvFluxEmbedded
+        optionJvFluxEmbedded: optionJvFluxEmbedded,
+        optionDecensureTwitter: optionDecensureTwitter
     };
+
     return messageOptions;
 }
 

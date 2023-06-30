@@ -278,6 +278,19 @@ function fixMessageUrls(messageContent) {
         (m) => `<a class="xXx" href="${m}" title="${m}" target="_blank">${m}</a>`);
 }
 
+function decensureTwitterLinks(messageContent) {
+    if (!messageContent) return;
+
+    const decensureTwitterUrl = 'https://nitter.net/';
+    const twitterRegex = new RegExp(/\bhttps:\/\/twitter\.com\/\b/, 'gi');
+    messageContent.querySelectorAll('a').forEach(e => {
+        if (!e.href?.length) return;
+        e.href = e.href.replace(twitterRegex, decensureTwitterUrl);
+        e.title = e.title.replace(twitterRegex, decensureTwitterUrl);
+        e.textContent = e.textContent.replace(twitterRegex, decensureTwitterUrl);
+    });
+}
+
 function handleLongMessages(allMessages) {
     allMessages.forEach(m => {
         const txtMsg = m.querySelector('.txt-msg.text-enrichi-forum');

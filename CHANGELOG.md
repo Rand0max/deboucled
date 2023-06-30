@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.41.0] (30/06/2023)
+
+- Nouvelle option pour décensurer les liens twitter (nitter)
+
 ## [2.40.1] (17/02/2023)
 
 - Correction z-index du menu

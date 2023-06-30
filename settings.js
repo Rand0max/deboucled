@@ -251,6 +251,9 @@ function buildSettingsPage() {
         const avatarLogo = '<img src="https://image.jeuxvideo.com/avatar-xs/default.jpg" class="deboucled-avatar-logo"></img>';
         html += addToggleOption(`Afficher les <i>avatars</i> ${avatarLogo} des auteurs`, storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default, 'Afficher ou non les avatars des auteurs dans la liste des topics.');
 
+        const twitterLogo = '<span class="deboucled-twitter-logo"></span>';
+        html += addToggleOption(`Décensurer les <i>liens Twitter</i> ${twitterLogo}`, storage_optionDecensureTwitter, storage_optionDecensureTwitter_default, 'Redirige automatiquement les liens twitter vers Nitter pour contourner la censure.');
+
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -488,6 +491,7 @@ function addSettingEvents() {
     addToggleEvent(storage_optionDisplayTopicAvatar);
     addToggleEvent(storage_optionJvFluxEmbedded);
     addToggleEvent(storage_optionHideAvatarBorder);
+    addToggleEvent(storage_optionDecensureTwitter);
 
     addPrebouclesEvents();
 }
