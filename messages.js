@@ -285,6 +285,8 @@ function decensureTwitterLinks(messageContent) {
     const twitterRegex = new RegExp(/\bhttps:\/\/twitter\.com\/\b/, 'gi');
     messageContent.querySelectorAll('a').forEach(e => {
         if (!e.href?.length) return;
+        if (!e.href.match(twitterRegex)) return;
+
         e.href = e.href.replace(twitterRegex, decensureTwitterUrl);
         e.title = e.title.replace(twitterRegex, decensureTwitterUrl);
         e.textContent = e.textContent.replace(twitterRegex, decensureTwitterUrl);
