@@ -281,15 +281,25 @@ function fixMessageUrls(messageContent) {
 function decensureTwitterLinks(messageContent) {
     if (!messageContent) return;
 
-    const decensureTwitterUrl = 'https://nitter.net/';
-    const twitterRegex = new RegExp(/\bhttps:\/\/twitter\.com\/\b/, 'gi');
-    messageContent.querySelectorAll('a').forEach(e => {
-        if (!e.href?.length) return;
-        if (!e.href.match(twitterRegex)) return;
+    const twitterLinks = document.querySelectorAll('a[href*="twitter.com/"][href*="/status/"]');
+    if (!twitterLinks?.length) return;
 
-        e.href = e.href.replace(twitterRegex, decensureTwitterUrl);
-        e.title = e.title.replace(twitterRegex, decensureTwitterUrl);
-        e.textContent = e.textContent.replace(twitterRegex, decensureTwitterUrl);
+    let currentTwitterScript = document.querySelector('script[src="https://platform.twitter.com/widgets.js"]');
+    if (currentTwitterScript) currentTwitterScript.remove();
+
+    twitterLinks.forEach(link => {
+        if (link.closest('.signature-msg') !== null || link.closest('.twitter-tweet') !== null) return;
+
+        let tweetElement = document.createElement('blockquote');
+        tweetElement.setAttribute('class', 'twitter-tweet');
+        tweetElement.innerHTML = `<blockquote class="twitter-tweet"><a href="${link}"></a></blockquote>`;
+        link.parentNode.replaceChild(tweetElement, link);
+
+        if (!currentTwitterScript) {
+            const newTwitterScript = document.createElement('script');
+            newTwitterScript.setAttribute('src', 'https://platform.twitter.com/widgets.js');
+            document.body.appendChild(newTwitterScript);
+        }
     });
 }
 
