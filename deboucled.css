@@ -562,6 +562,7 @@ blockquote .deboucled-highlighted {
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center;
+  font-weight: 600;
 }
 .topic-list .topic-title {
   display: inline !important;
@@ -844,11 +845,10 @@ blockquote .deboucled-highlighted {
   opacity: 0.9;
 }
 .deboucled-twitter-logo::before {
-  content: '\EA0B';
-  font-family: 'icons';
+  content: "\EA0B";
+  font-family: "icons";
   font-size: 1.5rem;
 }
-
 
 .deboucled-eye-white-logo {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGiSURBVEhL7ZSxSsNQFIYb6dZiVdxsKViwOPkGUtx8BGf1IRz0XTpJi+AiFgRBrIuDgg4uKr5ALVRRx+v335zEtKS2g9ilH3wk+c+5t+m9STJTJk5gx1SccwsctnAT13ARRQfvsIWHQRB0FY4NE2dxD99xFOpRb9aG/w6NRbzGiDPcxirmTJ0rUy1CY4o2TTo0lPFZ3fCE61YainrwUQNAY8tW6odCHh/UBZc4ZyXVSniEb+YxVq2segEvUGiOvJV+IKz7snO3GDdwrslfVRigiyVri25QY0Xd4hCCWpi7T6xY7OFady5OcAm1R6cKoGltHq4rqDlEzWJfaIeZO7AohkxLIuIN5Fz/SvQsiiHbD0uuresZn/7g7Dguaf2Dc/pfjZboA5ct9nCtDRVaFi2P7r6lABrW5uF6Bb98JblEgiDa5BvMWaxcz7w2dJAOJpdtFu9VgP5NFoTJx1SPXMFKqumum9gzG5icfB6vUKQ/poJC8kXTyzPOi7aBLxoAw1+0CBrSPhU7uIr6l1Lnu3iOEaM/FRE0/tnHbjKf6yn/SCbzDcCUuoiprpfXAAAAAElFTkSuQmCC)
@@ -1292,7 +1292,7 @@ blockquote .deboucled-highlighted {
 }
 body,
 input {
-  font: 12px/16px var(--jv-body-font-family);
+  font: 12px/16px sans-serif; /* var(--jv-body-font-family); */
 }
 input[type="text"] {
   border: 1px solid #d2d2d2;

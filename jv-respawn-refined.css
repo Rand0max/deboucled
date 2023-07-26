@@ -26,6 +26,7 @@
 .topic-list li {
   font-size: 0.7rem;
   line-height: 1.1rem;
+  font-family: sans-serif;
 }
 .card-forum-margin {
   margin-bottom: 1.1rem;
