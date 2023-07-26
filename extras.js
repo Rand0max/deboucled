@@ -20,11 +20,12 @@ function buildSponsor() {
     const layoutContentAside = document.querySelector('div.layout__contentAside');
     if (layoutContentAside) {
         const sponsorDiv = document.createElement('div');
-        sponsorDiv.innerHTML = `Sponsorisé par <a href="https://jvflux.fr" target="_blank" title="JvFlux">JvFlux</a> et <a href="https://jvarchive.com" target="_blank" title="JvArchive">JvArchive</a>`;
+        sponsorDiv.innerHTML = `Sponsorisé par <a href="https://jvarchive.com" target="_blank" title="JvArchive">JvArchive</a>`;
         sponsorDiv.className = 'deboucled-sponsor';
         layoutContentAside.appendChild(sponsorDiv);
     }
 
+    /*
     const forumRightCol = document.querySelector('div#forum-right-col');
     if (forumRightCol && !decensuredActive) {
         const decensuredLink = `<a href="${decensuredUrl}" target="_blank"><b>Décensured</b> <span class="deboucled-sponsoring-decensured-logo"></span></a>`;
@@ -32,6 +33,7 @@ function buildSponsor() {
         const decensuredCard = buildCardForum('Déboucled présente', '', 'deboucled-sponsoring-decensured', decensuredCardHtml, 'card-header-decensured');
         forumRightCol.appendChild(decensuredCard);
     }
+    */
 }
 
 function buildDonation() {
@@ -84,6 +86,7 @@ function displaySecret() {
     store.set(storage_secret_displayed, true);
 }
 
+/*
 function displayAnnouncement() {
     const announcementDisplayed = store.get(storage_announcement_displayed, storage_announcement_displayed_default);
     if (announcementDisplayed) return;
@@ -94,6 +97,7 @@ function displayAnnouncement() {
         document.location.href = decensuredUrl;
     }
 }
+*/
 
 function buildExtras() {
     buildDonation();

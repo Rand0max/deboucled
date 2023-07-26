@@ -216,6 +216,7 @@ function enableJvChatAndTopicLiveEvents(handleCallback) {
     });
 }
 
+/*
 function enableDecensuredEvents() {
     addEventListener('decensured:active', () => {
         decensuredActive = true;
@@ -224,6 +225,7 @@ function enableDecensuredEvents() {
         if (decensuredSponsoring) decensuredSponsoring.remove();
     });
 }
+*/
 
 function getParagraphChildren(element, allowBlockQuote = false) {
     if (!element?.children?.length) return [];

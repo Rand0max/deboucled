@@ -1292,7 +1292,7 @@ blockquote .deboucled-highlighted {
 }
 body,
 input {
-  font: 12px/16px sans-serif;
+  font: 12px/16px var(--jv-body-font-family);
 }
 input[type="text"] {
   border: 1px solid #d2d2d2;

@@ -683,11 +683,13 @@ async function handleTopicMessages() {
 
     if (messageOptions.optionHideLongMessages) handleLongMessages(allMessages);
 
+    /*
     if (messageOptions.optionJvFluxEmbedded) {
         const jvFluxCompagnon = new JVFluxCompagnon(); // eslint-disable-line no-undef
         await jvFluxCompagnon.init();
         await jvFluxCompagnon.handleTopicMessages();
     }
+    */
 }
 
 async function handleSearch() {
@@ -937,10 +939,10 @@ async function entryPoint() {
         }
 
         await updateUser();
-        await suggestUpdate();
+        //await suggestUpdate();
 
         displaySecret();
-        displayAnnouncement();
+        //displayAnnouncement();
     } catch (error) {
         const elapsed = performance.now() - start;
         console.error(error);
@@ -951,7 +953,7 @@ async function entryPoint() {
     }
 }
 
-enableDecensuredEvents();
+//enableDecensuredEvents();
 
 if (document.readyState === 'interactive' || document.readyState === 'complete') {
     entryPoint();
