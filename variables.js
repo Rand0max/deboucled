@@ -14,10 +14,10 @@ const entityTopicId = 'topicid';
 const jvarchiveUrl = 'https://jvarchive.com';
 const avatarUseJvArchiveApi = false;
 
-const deboucledBackendUrl = 'https://deboucled.jvflux.fr';
-const deboucledApiUrl = `${deboucledBackendUrl}/deboucledapi`;
-const youtubeBlacklistUrl = `${deboucledApiUrl}/youtubeblacklist`;
-const prebouclesDataUrl = `${deboucledApiUrl}/preboucles`;
+const deboucledBackendUrl = 'https://raw.githubusercontent.com/Rand0max/deboucled/master'; // 'https://deboucled.jvflux.fr';
+const deboucledApiUrl = `${deboucledBackendUrl}/data`; // `${deboucledBackendUrl}/deboucledapi`;
+const youtubeBlacklistUrl = `${deboucledApiUrl}/blacklisted-youtube-profiles.json`; // `${deboucledApiUrl}/youtubeblacklist`;
+const prebouclesDataUrl = `${deboucledApiUrl}/deboucled-preboucles.json`; // `${deboucledApiUrl}/preboucles`;
 const aiLoopsDataUrl = `${deboucledApiUrl}/loops/v2`;
 const checkUpdateUrl = `${deboucledApiUrl}/checkupdate`;
 const updateUserUrl = `${deboucledApiUrl}/user`;

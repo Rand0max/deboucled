@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.42.0] (26/07/2023)
+
+- Bascule preboucle + YT blacklist sur les fichiers json (data)
+
 ## [2.41.1] (03/07/2023)
 
 - Remplacement de Nitter (KO) par l'intégration de Twitter dans les messages
