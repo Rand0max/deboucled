@@ -562,7 +562,6 @@ blockquote .deboucled-highlighted {
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center;
-  font-weight: 600;
 }
 .topic-list .topic-title {
   display: inline !important;
@@ -1289,10 +1288,6 @@ blockquote .deboucled-highlighted {
   padding-left: 1px;
   margin: 0;
   cursor: pointer;
-}
-body,
-input {
-  font: 12px/16px sans-serif; /* var(--jv-body-font-family); */
 }
 input[type="text"] {
   border: 1px solid #d2d2d2;

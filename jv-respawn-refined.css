@@ -1,5 +1,9 @@
 /* JV Respawn Refined theme by Rand0max */
 
+body,
+input {
+  font: 12px/16px sans-serif;
+}
 .header {
   position: absolute;
 }
