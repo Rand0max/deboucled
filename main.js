@@ -311,7 +311,7 @@ function highlightBlacklistedAuthor(messageElement, authorElement, withTooltip =
     if (!withTooltip) return;
 
     const blacklists = blacklistsIncludingEntity(author, entityAuthor);
-    if (!blacklists?.length) return;
+    if (!blacklists.length) return;
 
     const blacklistHint = `Présent dans : ${blacklists.map(bl => `« ${bl.description} »`).join(', ')}.`;
     authorElement.setAttribute('deboucled-data-tooltip', blacklistHint);
@@ -327,7 +327,7 @@ function highlightBlacklistMatches(element, matches) {
 
     const buildBlacklistHint = (match) => {
         const blacklists = blacklistsIncludingEntity(match, entitySubject);
-        if (blacklists?.length) return ` deboucled-data-tooltip="Présent dans : ${blacklists.map(bl => `« ${bl.description} »`).join(', ')}." data-tooltip-location="right" `;
+        if (blacklists.length) return ` deboucled-data-tooltip="Présent dans : ${blacklists.map(bl => `« ${bl.description} »`).join(', ')}." data-tooltip-location="right" `;
         return '';
     };
 
@@ -944,7 +944,7 @@ async function entryPoint() {
         displaySecret();
         //displayAnnouncement();
     } catch (error) {
-        const elapsed = performance.now() - start;
+        //const elapsed = performance.now() - start;
         console.error(error);
         //await sendDiagnostic(elapsed, error);
     }
