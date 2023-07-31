@@ -334,9 +334,6 @@ function buildSettingsPage() {
         const blJvcLogo = '<span class="picto-msg-tronche deboucled-blacklist-jvc-button" style="width: 13px;height: 13px;background-size: 13px;"></span>';
         html += addToggleOption(`Afficher le bouton <i>Blacklist pseudo</i> ${blJvcLogo} de JVC`, storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default, 'Afficher ou non le bouton blacklist original de JVC à côté du nouveau bouton blacklist de Déboucled.');
 
-        const peepoLogo = '<span class="deboucled-peepo-logo"></span>';
-        html += addToggleOption(`Utiliser le <i>thème sombre</i> ${peepoLogo} pour <b>JVC</b> (par Peepo)`, storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default, 'Basculer entre le thème JVC normal, et le thème sombre créé par Peepo. (pensez à rafraichir la page pour voir les changements)');
-
         html += addRangeOption('Nombre de topics à afficher sur la page', storage_optionMaxTopicCount, storage_optionMaxTopicCount_default, defaultTopicCount, 50, 1, 'Nombre de topics à afficher sur la page (25 par défaut).', true, false);
 
         html += addToggleOption('Filtrer les topics en dessous d\'un nombre de messages', storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default, 'Filtrer automatiquement les topics qui n\'ont pas le nombre minimum de messages voulu.');
@@ -449,7 +446,6 @@ function addSettingEvents() {
     document.querySelector('.deboucled-svg-refresh').onclick = forcePrebouclesRefresh;
 
     addToggleEvent(storage_optionEnableDeboucledDarkTheme, undefined, toggleDeboucledDarkTheme);
-    addToggleEvent(storage_optionEnableJvcDarkTheme);
     addToggleEvent(storage_optionEnableJvRespawnRefinedTheme);
     addSelectEvent(storage_optionAntiLoopAiMode);
     addToggleEvent(storage_optionHideMessages);

@@ -154,17 +154,12 @@ function plural(nb) {
     return nb > 1 ? 's' : '';
 }
 
-function addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme, hideAvatarBorder) {
+function addStyles(enableJvRespawnRefinedTheme, hideAvatarBorder) {
     const deboucledCss = GM_getResourceText('DEBOUCLED_CSS');
     GM_addStyle(deboucledCss);
 
     const sweetAlertDarkCss = GM_getResourceText('SWEETALERTDARK_CSS');
     GM_addStyle(sweetAlertDarkCss);
-
-    if (enablePeepoTheme) {
-        const peepoDarkJvcV2Css = GM_getResourceText('PEEPODARKJVCV2_CSS');
-        GM_addStyle(peepoDarkJvcV2Css);
-    }
 
     if (enableJvRespawnRefinedTheme) {
         const jvRespawnRefinedCss = GM_getResourceText('JVRESPAWNREFINED_CSS');

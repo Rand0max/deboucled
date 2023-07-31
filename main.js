@@ -852,10 +852,9 @@ function handleError() {
 }
 
 function loadStyles() {
-    const enablePeepoTheme = store.get(storage_optionEnableJvcDarkTheme, storage_optionEnableJvcDarkTheme_default);
     const enableJvRespawnRefinedTheme = store.get(storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableJvRespawnRefinedTheme_default);
     const hideAvatarBorder = store.get(storage_optionHideAvatarBorder, storage_optionHideAvatarBorder_default);
-    addStyles(enablePeepoTheme, enableJvRespawnRefinedTheme, hideAvatarBorder);
+    addStyles(enableJvRespawnRefinedTheme, hideAvatarBorder);
 }
 
 async function init(currentPageType) {
