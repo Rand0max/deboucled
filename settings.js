@@ -239,11 +239,6 @@ function buildSettingsPage() {
         const scrollLogo = '<span class="deboucled-scroll-logo"></span>';
         html += addToggleOption(`Activer le <i>défilement automatique</i> ${scrollLogo} des messages`, storage_optionSmoothScroll, storage_optionSmoothScroll_default, 'Activer le chargement automatique des messages du topic en faisant défiler la page vers le bas.');
 
-        /*
-        const jvfluxLogo = '<span class="deboucled-jvflux-logo"></span>';
-        html += addToggleOption(`Intégration du <i>wiki officiel JVFlux</i> ${jvfluxLogo}`, storage_optionJvFluxEmbedded, storage_optionJvFluxEmbedded_default, 'Intégration du wiki officiel du forum en mettant en avant les pages du wiki associées aux mots-clés dans les messages.');
-        */
-
         const hotTopicLogo = '<span class="deboucled-fire-logo"></span>';
         html += addToggleOption(`Mettre en avant les <i>topics tendances</i> ${hotTopicLogo}`, storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default, 'Afficher un pictogramme de flamme à côté des topics très actifs.');
 
@@ -489,7 +484,6 @@ function addSettingEvents() {
     addToggleEvent(storage_optionHideLongMessages);
     addToggleEvent(storage_optionDisplayTitleSmileys);
     addToggleEvent(storage_optionDisplayTopicAvatar);
-    //addToggleEvent(storage_optionJvFluxEmbedded);
     addToggleEvent(storage_optionHideAvatarBorder);
     addToggleEvent(storage_optionDecensureTwitter);
 

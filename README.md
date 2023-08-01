@@ -76,7 +76,6 @@
 - **Intégration des smileys dans les topics** : *intégration des smileys JVC dans les titres des topics*
 - **Algorithme anti-spam/anti-pub youtube** : *dites au revoir au spam des liens youtube dans les messages*
 - **Correction des liens/stickers** : *correction automatique des liens et images cassés dans les messages*
-- **Intégration du wiki JVFlux** : *intégration dans le forum du wiki officiel JVFlux.fr*
 - **Régulièrement mis à jour, les suggestions et remarques sont les bienvenues**
 - **Compatible avec tous les forums JVC et sur mobile également.**
 
@@ -91,14 +90,12 @@
 - [Topic sur JvArchive](https://jvarchive.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam)
 - [Page jvscript.fr](https://jvscript.fr/script/deboucled)
 - [Repository officiel](https://github.com/Rand0max/deboucled/)
-- [JVFlux](https://jvflux.fr/)
 - [JvArchive](https://jvarchive.com/)
 
 # Remerciements
 
 - Je tiens tout d'abord à remercier personnellement tous **les membres du forum 18-25** qui m'ont aidé à améliorer ce projet, et qui ont activement participé sur les deux topics officiels depuis leur création, ainsi que tous les membres anonymes par messages privés.
-- Grand merci à l'**équipe de JvFlux** pour leur aide et leur participation technique sans qui ce projet n'aurait pas pu prendre une telle ampleur.
-- Grand merci également à l'**équipe de JvArchive** sans qui ce projet perdrait une bonne partie de ses fonctionnalités, et à qui nous devons beaucoup contre la censure de Webedia.
+- Merci  à l'**équipe de JvArchive** sans qui ce projet perdrait une bonne partie de ses fonctionnalités, et à qui nous devons beaucoup contre la censure de Webedia.
 - Et enfin, merci à la **boucle** temporelle sans quoi l'idée initiale de Déboucled n'aurait peut-être jamais émergée... en dépit de.
 
 *Rand0max*

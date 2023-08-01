@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.42.2
+// @version     2.42.3
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -17,7 +17,6 @@
 // @match       https://www.jeuxvideo.com/profil/*
 // @match       http://www.jeuxvideo.com/sso/*
 // @match       https://www.jeuxvideo.com/sso/*
-// @connect     deboucled.jvflux.fr
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
@@ -33,7 +32,6 @@
 // @grant       GM.xmlHttpRequest
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
 // @resource    JVRESPAWNREFINED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/jv-respawn-refined.css
-// @resource    JVFLUX_CSS https://raw.githubusercontent.com/Rand0max/jvflux/master/jvfluxcompagnon.css
 // @resource    CHARTS_CSS https://unpkg.com/charts.css@0.9.0/dist/charts.min.css
 // @require     https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js
 // @require     https://unpkg.com/infinite-scroll@4.0.1/dist/infinite-scroll.pkgd.min.js
@@ -55,7 +53,6 @@
 // @require     settings.js
 // @require     privatemessages.js
 // @require     profile.js
-// @require     https://raw.githubusercontent.com/Rand0max/jvflux/master/jvfluxcompagnon.js
 // @require     extras.js
 // @require     main.js
 // @run-at      document-start
