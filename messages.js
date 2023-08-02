@@ -432,8 +432,8 @@ function highlightQuotedAuthor(messageContent, messageElement) {
         (match) => isSelf(match.toLowerCase()) ? match : buildProfilHighlightAnchor(match));
 
     // On met en surbrillance grise tous les pseudos cités avec le bouton "standard" (sauf le compte de l'utilisateur)
-    const quotedAuthorsFullRegex = new RegExp(`(?!le\\s[0-9]{1,2}\\s[a-zéù]{3,10}\\s[0-9]{4}\\sà\\s[0-9]{2}:[0-9]{2}:[0-9]{2}\\s:)(?<author>${allowedPseudo}+)(?=\\sa\\sécrit\\s:)`, 'gi');
-    const quotedAuthorsPartRegex = new RegExp(/le\s[0-9]{1,2}\s[a-zéù]{3,10}\s[0-9]{4}\sà\s[0-9]{2}:[0-9]{2}:[0-9]{2}\s(?!:)/, 'gi');
+    const quotedAuthorsFullRegex = new RegExp(`(?!le\\s[0-9]{1,2}\\s[a-zéùû]{3,10}\\s[0-9]{4}\\sà\\s[0-9]{2}:[0-9]{2}:[0-9]{2}\\s:)(?<author>${allowedPseudo}+)(?=\\sa\\sécrit\\s:)`, 'gi');
+    const quotedAuthorsPartRegex = new RegExp(/le\s[0-9]{1,2}\s[a-zéùû]{3,10}\s[0-9]{4}\sà\s[0-9]{2}:[0-9]{2}:[0-9]{2}\s(?!:)/, 'gi');
     replaceAllTextQuotes(
         messageContent,
         undefined,
