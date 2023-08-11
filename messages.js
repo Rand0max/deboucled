@@ -440,10 +440,10 @@ function highlightQuotedAuthor(messageContent, messageElement) {
         quotedAuthorsFullRegex,
         (match) => isSelf(match.toLowerCase()) ? match : buildProfilHighlightAnchor(match),
         (n) => {
+            const nodeContent = n.textContent.removeDoubleSpaces();
             // S'il s'agit d'une citation où le pseudo est en html on vire le html et on fusionne le texte
-            if (!n.textContent.match(quotedAuthorsFullRegex) &&
-                n.textContent.match(quotedAuthorsPartRegex)) {
-                n.textContent = `${n.textContent}${n.nextSibling?.textContent}${n.nextSibling?.nextSibling?.textContent}`;
+            if (!nodeContent.match(quotedAuthorsFullRegex) && nodeContent.match(quotedAuthorsPartRegex)) {
+                n.textContent = `${nodeContent}${n.nextSibling?.textContent}${n.nextSibling?.nextSibling?.textContent}`;
                 n.nextSibling?.nextSibling?.remove();
                 n.nextSibling?.remove();
             }
