@@ -283,7 +283,7 @@ function fixMessageUrls(messageContent) {
 function decensureTwitterLinks(messageContent) {
     if (!messageContent) return;
 
-    const twitterLinks = document.querySelectorAll('a[href*="twitter.com/"][href*="/status/"]');
+    const twitterLinks = document.querySelectorAll('a[href*="twitter.com/"][href*="/status/"], a[href*="x.com/"][href*="/status/"]');
     if (!twitterLinks?.length) return;
 
     let currentTwitterScript = document.querySelector('script[src="https://platform.twitter.com/widgets.js"]');
