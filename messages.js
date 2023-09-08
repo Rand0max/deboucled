@@ -283,10 +283,22 @@ function fixMessageUrls(messageContent) {
 function decensureTwitterLinks(messageContent) {
     if (!messageContent) return;
 
-    const twitterLinks = document.querySelectorAll('a[href*="twitter.com/"][href*="/status/"], a[href*="x.com/"][href*="/status/"]');
+    const twitterDns = 'twitter.com';
+    const newTwitterDns = 'x.com';
+
+    const newTwitterLinks = document.querySelectorAll(`a[href*="${newTwitterDns}/"][href*="/status/"]`);
+    if (newTwitterLinks?.length) {
+        newTwitterLinks.forEach(link => {
+            link.href = link.href.replace(newTwitterDns, twitterDns);
+            link.title = link.title.replace(newTwitterDns, twitterDns);
+            link.textContent = link.textContent.replace(newTwitterDns, twitterDns);
+        });
+    }
+
+    const twitterLinks = document.querySelectorAll(`a[href*="${twitterDns}/"][href*="/status/"]`);
     if (!twitterLinks?.length) return;
 
-    let currentTwitterScript = document.querySelector('script[src="https://platform.twitter.com/widgets.js"]');
+    let currentTwitterScript = document.querySelector(`script[src="https://platform.${twitterDns}/widgets.js"]`);
     if (currentTwitterScript) currentTwitterScript.remove();
 
     twitterLinks.forEach(link => {
@@ -299,7 +311,7 @@ function decensureTwitterLinks(messageContent) {
 
         if (!currentTwitterScript) {
             const newTwitterScript = document.createElement('script');
-            newTwitterScript.setAttribute('src', 'https://platform.twitter.com/widgets.js');
+            newTwitterScript.setAttribute('src', `https://platform.${twitterDns}/widgets.js`);
             document.body.appendChild(newTwitterScript);
         }
     });
