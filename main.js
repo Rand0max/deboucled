@@ -924,18 +924,18 @@ async function entryPoint() {
 
         if (elapsed >= 3000) {
             console.warn(`Déboucled slow loading : totaltime = ${elapsed}ms`);
-            //await sendDiagnostic(elapsed);
+            await sendDiagnostic(elapsed);
         }
 
-        //await updateUser();
-        //await suggestUpdate();
+        await updateUser();
+        await suggestUpdate();
 
         displaySecret();
         //displayAnnouncement();
     } catch (error) {
-        //const elapsed = performance.now() - start;
+        const elapsed = performance.now() - start;
         console.error(error);
-        //await sendDiagnostic(elapsed, error);
+        await sendDiagnostic(elapsed, error);
     }
     finally {
         sendFinalEvent();

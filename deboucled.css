@@ -1491,7 +1491,7 @@ input[type="search"] {
   background-color: #eaecfb !important;
 }
 .deboucled-badge-warning {
-  color: #f89100 !important;
+  color: #f88000 !important;
   background-color: #ffd9ae !important;
 }
 .deboucled-badge-danger {
@@ -1512,7 +1512,7 @@ input[type="search"] {
   background-color: #004daa !important;
 }
 .deboucled-badge-warning.dark {
-  color: #eca94d !important;
+  color: #ecc185 !important;
   background-color: #b16b1b !important;
 }
 .deboucled-badge-danger.dark {

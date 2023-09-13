@@ -14,10 +14,10 @@ const entityTopicId = 'topicid';
 const jvarchiveUrl = 'https://jvarchive.com';
 const avatarUseJvArchiveApi = false;
 
-const deboucledBackendUrl = 'https://raw.githubusercontent.com/Rand0max/deboucled/master';
-const deboucledApiUrl = `${deboucledBackendUrl}/data`;
-const youtubeBlacklistUrl = `${deboucledApiUrl}/blacklisted-youtube-profiles.json`;
-const prebouclesDataUrl = `${deboucledApiUrl}/deboucled-preboucles.json`;
+const deboucledBackendUrl = 'https://deboucled.randomax.com';
+const deboucledApiUrl = `${deboucledBackendUrl}/api`;
+const youtubeBlacklistUrl = `${deboucledApiUrl}/youtubeblacklist`;
+const prebouclesDataUrl = `${deboucledApiUrl}/preboucles`;
 const aiLoopsDataUrl = `${deboucledApiUrl}/loops/v2`;
 const checkUpdateUrl = `${deboucledApiUrl}/checkupdate`;
 const updateUserUrl = `${deboucledApiUrl}/user`;

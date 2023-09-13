@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.42.7
+// @version     2.43.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
-// @description Censure les topics et les auteurs éclatax et vous sort de la boucle
+// @description Masque les topics, les sujets et les auteurs indésirables et vous sort de la boucle.
 // @icon        https://image.noelshack.com/fichiers/2021/38/6/1632606701-deboucled.png
 // @match       http://www.jeuxvideo.com/forums/*
 // @match       https://www.jeuxvideo.com/forums/*
@@ -17,6 +17,7 @@
 // @match       https://www.jeuxvideo.com/profil/*
 // @match       http://www.jeuxvideo.com/sso/*
 // @match       https://www.jeuxvideo.com/sso/*
+// @connect     randomax.com
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle

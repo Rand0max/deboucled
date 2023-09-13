@@ -85,7 +85,8 @@
 
 - [Contact Email](mailto:rand0max@protonmail.com)
 - [Contact Discord Rand0max#3135](https://discord.com/users/781564172483166268)
-- [Contact MP](https://www.jeuxvideo.com/messages-prives/nouveau.php?all_dest=Rand0max4)
+- [Contact MP Rand0max](https://www.jeuxvideo.com/messages-prives/nouveau.php?all_dest=Rand0max7)
+- [Contact MP RoninWF](https://www.jeuxvideo.com/messages-prives/nouveau.php?all_dest=RoninWF2)
 - [~~Topic JVC officiel 410~~](https://www.jeuxvideo.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam.htm)
 - [Topic sur JvArchive](https://jvarchive.com/forums/42-51-68410257-1-0-1-0-officiel-deboucled-v2-est-arrive-fini-la-boucle-et-le-spam)
 - [Page jvscript.fr](https://jvscript.fr/script/deboucled)
@@ -95,7 +96,7 @@
 # Remerciements
 
 - Je tiens tout d'abord à remercier personnellement tous **les membres du forum 18-25** qui m'ont aidé à améliorer ce projet, et qui ont activement participé sur les deux topics officiels depuis leur création, ainsi que tous les membres anonymes par messages privés.
-- Merci  à l'**équipe de JvArchive** sans qui ce projet perdrait une bonne partie de ses fonctionnalités, et à qui nous devons beaucoup contre la censure de Webedia.
+- Merci à notre partenaire **JvArchive.com** sans qui ce projet perdrait une bonne partie de ses fonctionnalités, et à qui nous devons beaucoup contre la censure de Webedia.
 - Et enfin, merci à la **boucle** temporelle sans quoi l'idée initiale de Déboucled n'aurait peut-être jamais émergée... en dépit de.
 
 *Rand0max*

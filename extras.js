@@ -3,6 +3,7 @@
 // EXTRAS
 ///////////////////////////////////////////////////////////////////////////////////////
 
+/*
 function buildCardForum(mainTitle, rightTitle, contentId, contentHtml, cardId) {
     const cardForum = document.createElement('div');
     cardForum.className = 'card card-jv-forum card-forum-margin';
@@ -15,6 +16,7 @@ function buildCardForum(mainTitle, rightTitle, contentId, contentHtml, cardId) {
 </div></div></div></div>`;
     return cardForum;
 }
+*/
 
 function buildSponsor() {
     const layoutContentAside = document.querySelector('div.layout__contentAside');

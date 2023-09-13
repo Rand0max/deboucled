@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.43.0] (12/09/2023)
+
+- Réactivation de toutes les fonctionnalités et de l'API Déboucled
+- Amélioration de l'I.A anti-boucle
+
 ## [2.42.0] (26/07/2023)
 
 - Bascule preboucle + YT blacklist sur les fichiers json (data)

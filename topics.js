@@ -175,6 +175,35 @@ function getTopicMessageCount(element) {
     return parseInt(messageCountElement?.textContent.trim() ?? "0");
 }
 
+function handleAntiLoopAi(topicOptions, title, author, titleTag) {
+    const subjectBlacklisted = getSubjectBlacklistMatches(title, aiLoopSubjectReg);
+    const authorBlacklisted = getAuthorBlacklistMatches(author, undefined, aiLoopAuthorReg);
+    if (!subjectBlacklisted?.length && !authorBlacklisted?.length) return false;
+
+    if (topicOptions.optionAntiLoopAiMode === 1) {
+        titleTag.style.width = 'auto';
+        if (subjectBlacklisted?.length) {
+            const loopSubject = subjectBlacklisted[0] ?? title;
+            markTopicLoop(loopSubject, titleTag);
+        }
+        else if (authorBlacklisted?.length) {
+            const loopAuthor = authorBlacklisted[0] ?? author;
+            if (loopAuthor === 'pseudo supprimé') return false; // faux positif
+            markAuthorLoop(loopAuthor, titleTag);
+        }
+        return false;
+    }
+    else if (topicOptions.optionAntiLoopAiMode === 2 && subjectBlacklisted?.length) {
+        matchedSubjects.addArrayIncrement(subjectBlacklisted);
+        hiddenSubjects++;
+        if (authorBlacklisted?.length) {
+            matchedAuthors.addArrayIncrement(authorBlacklisted);
+            hiddenAuthors++;
+        }
+        return true;
+    }
+}
+
 async function isTopicBlacklisted(topicElement, topicOptions) {
     if (!topicElement.hasAttribute('data-id')) return true;
 
@@ -231,25 +260,7 @@ async function isTopicBlacklisted(topicElement, topicOptions) {
     }
 
     if (topicOptions.optionAntiLoopAiMode !== 0) {
-        const authorBlacklisted = getAuthorBlacklistMatches(author, undefined, aiLoopAuthorReg);
-        if (!authorBlacklisted?.length) return false;
-
-        const subjectBlacklisted = getSubjectBlacklistMatches(title, aiLoopSubjectReg);
-        if (!subjectBlacklisted?.length) return false;
-
-        if (topicOptions.optionAntiLoopAiMode === 1) {
-            const subject = subjectBlacklisted[0] ?? title;
-            titleTag.style.width = 'auto';
-            markTopicLoop(subject, titleTag);
-            return false;
-        }
-        else if (topicOptions.optionAntiLoopAiMode === 2) {
-            matchedSubjects.addArrayIncrement(subjectBlacklisted);
-            matchedAuthors.addArrayIncrement(authorBlacklisted);
-            hiddenSubjects++;
-            hiddenAuthors++;
-            return true;
-        }
+        return handleAntiLoopAi(topicOptions, title, author, titleTag);
     }
 
     return false;
@@ -422,6 +433,13 @@ function markTopicLoop(subject, nearElement, withHint = true) {
     const cleanSubject = subject.replaceAll('%', '').trim();
     const redirectUrl = `${jvarchiveUrl}/topic/recherche?searchType=titre_topic&search=${cleanSubject}`;
     const loopBadge = buildBadge('BOUCLE', withHint ? `Consulter cette boucle sur JvArchive` : undefined, redirectUrl, 'danger');
+    nearElement.insertAdjacentElement('afterend', loopBadge);
+}
+
+function markAuthorLoop(author, nearElement, withHint = true) {
+    const cleanAuthor = author.replaceAll('%', '').trim();
+    const redirectUrl = `${jvarchiveUrl}/topic/recherche?searchType=auteur_topic_exact&search=${cleanAuthor}`;
+    const loopBadge = buildBadge('BOUCLEUR', withHint ? `Consulter les topics de ce boucleur sur JvArchive` : undefined, redirectUrl, 'warning');
     nearElement.insertAdjacentElement('afterend', loopBadge);
 }
 
