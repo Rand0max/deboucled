@@ -436,11 +436,12 @@ function markTopicLoop(subject, nearElement, withHint = true) {
     nearElement.insertAdjacentElement('afterend', loopBadge);
 }
 
-function markAuthorLoop(author, nearElement, withHint = true) {
+function markAuthorLoop(author, nearElement, withHint = true, appendElement = false) {
     const cleanAuthor = author.replaceAll('%', '').trim();
     const redirectUrl = `${jvarchiveUrl}/topic/recherche?searchType=auteur_topic_exact&search=${cleanAuthor}`;
     const loopBadge = buildBadge('BOUCLEUR', withHint ? `Consulter les topics de ce boucleur sur JvArchive` : undefined, redirectUrl, 'warning');
-    nearElement.insertAdjacentElement('afterend', loopBadge);
+    if (appendElement) nearElement.append(loopBadge);
+    else nearElement.insertAdjacentElement('afterend', loopBadge);
 }
 
 function markTopicHot(titleElem, withHint = true, append = true) {

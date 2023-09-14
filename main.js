@@ -566,10 +566,18 @@ function buildTopicHeaderBadges() {
     if (optionAntiLoopAiMode !== 0) {
         const title = titleElement.textContent.trim();
         const subjectBlacklisted = getSubjectBlacklistMatches(title, aiLoopSubjectReg);
+        if (subjectBlacklisted?.length) {
+            const subject = subjectBlacklisted[0] ?? title;
+            markTopicLoop(subject, titleElement, false);
+        }
+
         const authorBlacklisted = getAuthorBlacklistMatches(currentTopicAuthor, undefined, aiLoopAuthorReg);
-        if (!subjectBlacklisted?.length || !authorBlacklisted?.length) return;
-        const subject = subjectBlacklisted[0] ?? title;
-        markTopicLoop(subject, titleElement, false);
+        if (authorBlacklisted?.length) {
+            const authorElement = document.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+            if (!authorElement) return;
+            const author = authorBlacklisted[0] ?? authorElement.textContent.trim();
+            markAuthorLoop(author, authorElement, false, true);
+        }
     }
 }
 
