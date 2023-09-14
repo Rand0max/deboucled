@@ -121,6 +121,15 @@ function addAuthorButtons(nearbyElement, author, optionBoucledUseJvarchive) {
     insertAfter(jvArchiveProfilButton, boucledButton);
 }
 
+function buildAuthorBadge(authorElement, author, messageOptions) {
+    if (messageOptions.optionAntiLoopAiMode !== 0) {
+        const authorBlacklisted = getAuthorBlacklistMatches(author, undefined, aiLoopAuthorReg);
+        if (!authorBlacklisted?.length) return;
+        const loopAuthor = authorBlacklisted[0] ?? author;
+        markAuthorLoop(loopAuthor, authorElement, false, 'deboucled-badge-bloc-pseudo-msg', 'deboucled-badge-message');
+    }
+}
+
 function handleJvChatAndTopicLive(messageOptions) {
     function removeLiveMessage(messageElement, author, topicLiveEvent) {
         if (topicLiveEvent) topicLiveEvent.detail.cancel();

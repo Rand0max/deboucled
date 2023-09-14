@@ -474,6 +474,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     }
 
     handleMessageAssignTopicAuthor(author, authorElement);
+    buildAuthorBadge(authorElement, author, messageOptions);
     fixMessageUrls(messageContent);
 
     if (messageOptions.optionDecensureTwitter) {
@@ -570,14 +571,6 @@ function buildTopicHeaderBadges() {
             const subject = subjectBlacklisted[0] ?? title;
             markTopicLoop(subject, titleElement, false);
         }
-
-        const authorBlacklisted = getAuthorBlacklistMatches(currentTopicAuthor, undefined, aiLoopAuthorReg);
-        if (authorBlacklisted?.length) {
-            const authorElement = document.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
-            if (!authorElement) return;
-            const author = authorBlacklisted[0] ?? authorElement.textContent.trim();
-            markAuthorLoop(author, authorElement, false, true);
-        }
     }
 }
 
@@ -633,6 +626,7 @@ function prepareMessageOptions(isWhitelistedTopic) {
     const optionHideLongMessages = store.get(storage_optionHideLongMessages, storage_optionHideLongMessages_default);
     const optionDisplayTitleSmileys = store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default);
     const optionDecensureTwitter = store.get(storage_optionDecensureTwitter, storage_optionDecensureTwitter_default);
+    const optionAntiLoopAiMode = store.get(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default);
 
     const messageOptions = {
         optionHideMessages: optionHideMessages,
@@ -644,7 +638,8 @@ function prepareMessageOptions(isWhitelistedTopic) {
         isWhitelistedTopic: isWhitelistedTopic,
         optionHideLongMessages: optionHideLongMessages,
         optionDisplayTitleSmileys: optionDisplayTitleSmileys,
-        optionDecensureTwitter: optionDecensureTwitter
+        optionDecensureTwitter: optionDecensureTwitter,
+        optionAntiLoopAiMode: optionAntiLoopAiMode
     };
 
     return messageOptions;
