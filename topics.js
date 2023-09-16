@@ -185,14 +185,15 @@ function handleAntiLoopAi(topicOptions, title, author, titleTag) {
         && !boucledAuthorBlacklisted?.length) return false;
 
     if (topicOptions.optionAntiLoopAiMode === 1) {
-        titleTag.style.width = 'auto';
         if (subjectBlacklisted?.length && authorBlacklisted?.length) {
             const loopSubject = subjectBlacklisted[0] ?? title;
+            titleTag.style.width = 'auto';
             markTopicLoop(loopSubject, titleTag);
         }
         else if (boucledAuthorBlacklisted?.length) {
             const loopAuthor = boucledAuthorBlacklisted[0] ?? author;
             if (loopAuthor === 'pseudo supprimé') return false; // faux positif
+            titleTag.style.width = 'auto';
             markAuthorLoop(loopAuthor, titleTag);
         }
         return false;
