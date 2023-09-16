@@ -435,6 +435,9 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     const authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
     if (!authorElement) return;
 
+    const titleElement = document.querySelector('#bloc-title-forum');
+    const title = titleElement?.textContent?.trim();
+
     const author = authorElement.textContent.trim();
     const isSelf = userPseudo?.toLowerCase() === author.toLowerCase();
     const mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
@@ -474,7 +477,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     }
 
     handleMessageAssignTopicAuthor(author, authorElement);
-    buildAuthorBadge(authorElement, author, messageOptions);
+    buildAuthorBadge(authorElement, author, messageOptions, title);
     fixMessageUrls(messageContent);
 
     if (messageOptions.optionDecensureTwitter) {
@@ -567,10 +570,9 @@ function buildTopicHeaderBadges() {
     if (optionAntiLoopAiMode !== 0) {
         const title = titleElement.textContent.trim();
         const subjectBlacklisted = getSubjectBlacklistMatches(title, aiLoopSubjectReg);
-        if (subjectBlacklisted?.length) {
-            const subject = subjectBlacklisted[0] ?? title;
-            markTopicLoop(subject, titleElement, false);
-        }
+        if (!subjectBlacklisted?.length) return;
+        const subject = subjectBlacklisted[0] ?? title;
+        markTopicLoop(subject, titleElement, false);
     }
 }
 

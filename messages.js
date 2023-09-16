@@ -121,12 +121,20 @@ function addAuthorButtons(nearbyElement, author, optionBoucledUseJvarchive) {
     insertAfter(jvArchiveProfilButton, boucledButton);
 }
 
-function buildAuthorBadge(authorElement, author, messageOptions) {
+function buildAuthorBadge(authorElement, author, messageOptions, title) {
     if (messageOptions.optionAntiLoopAiMode !== 0) {
-        const authorBlacklisted = getAuthorBlacklistMatches(author, undefined, aiLoopAuthorReg);
-        if (!authorBlacklisted?.length) return;
-        const loopAuthor = authorBlacklisted[0] ?? author;
-        markAuthorLoop(loopAuthor, authorElement, false, 'deboucled-badge-bloc-pseudo-msg', 'deboucled-badge-message');
+        const boucledAuthorBlacklisted = getAuthorBlacklistMatches(author, undefined, aiBoucledAuthorsReg);
+        if (boucledAuthorBlacklisted?.length) {
+            const loopAuthor = boucledAuthorBlacklisted[0] ?? author;
+            markAuthorLoop(loopAuthor, authorElement, false, 'deboucled-badge-bloc-pseudo-msg', 'deboucled-badge-message');
+        }
+        else {
+            const subjectBlacklisted = getSubjectBlacklistMatches(title, aiLoopSubjectReg);
+            const authorBlacklisted = getAuthorBlacklistMatches(author, undefined, aiLoopAuthorReg);
+            if (!subjectBlacklisted?.length || !authorBlacklisted?.length) return
+            const loopAuthor = authorBlacklisted[0] ?? author;
+            markAuthorLoop(loopAuthor, authorElement, false, 'deboucled-badge-bloc-pseudo-msg', 'deboucled-badge-message');
+        }
     }
 }
 

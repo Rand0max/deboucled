@@ -19,6 +19,7 @@ const deboucledApiUrl = `${deboucledBackendUrl}/api`;
 const youtubeBlacklistUrl = `${deboucledApiUrl}/youtubeblacklist`;
 const prebouclesDataUrl = `${deboucledApiUrl}/preboucles`;
 const aiLoopsDataUrl = `${deboucledApiUrl}/loops/v2`;
+const aiBoucledAuthorsDataUrl = `${deboucledApiUrl}/loops/authors`;
 const checkUpdateUrl = `${deboucledApiUrl}/checkupdate`;
 const updateUserUrl = `${deboucledApiUrl}/user`;
 const diagnosticUrl = `${deboucledApiUrl}/diagnostic`;
@@ -29,6 +30,7 @@ const checkUpdateDeferredExpire = TimeSpan.FromDays(5);
 const youtubeBlacklistRefreshExpire = TimeSpan.FromHours(1);
 const prebouclesRefreshExpire = TimeSpan.FromMinutes(30);
 const aiLoopsRefreshExpire = TimeSpan.FromMinutes(5);
+const aiBoucledAuthorsRefreshExpire = TimeSpan.FromMinutes(30);
 const updateUserExpire = TimeSpan.FromHours(6);
 const diagnosticExpire = TimeSpan.FromHours(12);
 const hotTopicsRefreshExpire = TimeSpan.FromMinutes(10);
@@ -51,6 +53,9 @@ let youtubeBlacklistReg;
 let aiLoopData = undefined;
 let aiLoopSubjectReg;
 let aiLoopAuthorReg;
+
+let aiBoucledAuthorsData = undefined;
+let aiBoucledAuthorsReg;
 
 let hotTopicsData = undefined;
 

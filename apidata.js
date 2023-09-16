@@ -3,41 +3,28 @@
 // API DATA
 ///////////////////////////////////////////////////////////////////////////////////////
 
-function mustRefresh(storageLastUpdateId, dataExpire) {
-    let lastUpdate = new Date(store.get(storageLastUpdateId, new Date(0)));
+function mustRefresh(storageLastUpdateKey, dataExpire) {
+    let lastUpdate = new Date(store.get(storageLastUpdateKey, new Date(0)));
     let datenow = new Date();
     let dateExpireRange = new Date(datenow.setMinutes(datenow.getMinutes() - dataExpire.totalMinutes()));
     return lastUpdate <= dateExpireRange;
 }
 
-async function queryYoutubeBlacklist() {
-    let newYoutubeBlacklist = await fetchJson(youtubeBlacklistUrl);
-    store.set(storage_youtubeBlacklistLastUpdate, Date.now());
-    if (!newYoutubeBlacklist?.length) return;
+async function queryApiData(forceUpdate, dataUrl, storageLastUpdateKey, dataExpire, storageDataKey, storageDataDefaultKey, dataTransformFn) {
+    let resultData = JSON.parse(store.get(storageDataKey, storageDataDefaultKey));
 
-    youtubeBlacklistArray = newYoutubeBlacklist.flatMap(yp => yp.videos);
+    if (!resultData || forceUpdate || mustRefresh(storageLastUpdateKey, dataExpire)) {
+        let newData = await fetchJson(dataUrl);
+        store.set(storageLastUpdateKey, Date.now());
+        if (!newData) return resultData;
 
-    store.set(storage_youtubeBlacklist, JSON.stringify(youtubeBlacklistArray));
-}
+        if (dataTransformFn) newData = dataTransformFn(newData);
 
-async function queryPreboucles() {
-    let newPreboucles = await fetchJson(prebouclesDataUrl);
-    store.set(storage_prebouclesLastUpdate, Date.now());
-    if (!newPreboucles?.length) return;
+        store.set(storageDataKey, JSON.stringify(newData));
+        return newData;
+    }
 
-    preBoucleArray = newPreboucles;
-
-    store.set(storage_preBouclesData, JSON.stringify(preBoucleArray));
-}
-
-async function queryAiLoops() {
-    let newAiLoops = await fetchJson(aiLoopsDataUrl);
-    store.set(storage_aiLoopsLastUpdate, Date.now());
-    if (!newAiLoops) return;
-
-    aiLoopData = newAiLoops;
-
-    store.set(storage_aiLoopsData, JSON.stringify(aiLoopData));
+    return resultData;
 }
 
 async function queryHotTopics() {
@@ -124,22 +111,29 @@ async function sendDiagnostic(elapsed, exception) {
 }
 
 async function parseYoutubeBlacklistData(forceUpdate) {
-    youtubeBlacklistArray = JSON.parse(store.get(storage_youtubeBlacklist, storage_youtubeBlacklist_default));
-    if (!youtubeBlacklistArray?.length ||
-        forceUpdate ||
-        mustRefresh(storage_youtubeBlacklistLastUpdate, youtubeBlacklistRefreshExpire)) {
-        await queryYoutubeBlacklist();
-    }
+    youtubeBlacklistArray = await queryApiData(
+        forceUpdate,
+        youtubeBlacklistUrl,
+        storage_youtubeBlacklistLastUpdate,
+        youtubeBlacklistRefreshExpire,
+        storage_youtubeBlacklist,
+        storage_youtubeBlacklist_default,
+        (data) => data.flatMap(yp => yp.videos)
+    );
+
     if (youtubeBlacklistArray?.length) youtubeBlacklistReg = buildArrayRegex(youtubeBlacklistArray);
 }
 
 async function parsePreboucleData(forceUpdate) {
-    preBoucleArray = JSON.parse(store.get(storage_preBouclesData, storage_preBouclesData_default));
-    if (!preBoucleArray?.length ||
-        forceUpdate ||
-        mustRefresh(storage_prebouclesLastUpdate, prebouclesRefreshExpire)) {
-        await queryPreboucles();
-    }
+    preBoucleArray = await queryApiData(
+        forceUpdate,
+        prebouclesDataUrl,
+        storage_prebouclesLastUpdate,
+        prebouclesRefreshExpire,
+        storage_preBouclesData,
+        storage_preBouclesData_default
+    );
+
     if (preBoucleArray?.length) {
         loadPreBouclesStatuses();
         loadPreBoucleRegexCache();
@@ -147,12 +141,14 @@ async function parsePreboucleData(forceUpdate) {
 }
 
 async function parseAiLoopData(forceUpdate) {
-    aiLoopData = JSON.parse(store.get(storage_aiLoopsData, storage_aiLoopsData_default));
-    if (!aiLoopData ||
-        forceUpdate ||
-        mustRefresh(storage_aiLoopsLastUpdate, aiLoopsRefreshExpire)) {
-        await queryAiLoops();
-    }
+    aiLoopData = await queryApiData(
+        forceUpdate,
+        aiLoopsDataUrl,
+        storage_aiLoopsLastUpdate,
+        aiLoopsRefreshExpire,
+        storage_aiLoopsData,
+        storage_aiLoopsData_default
+    );
     if (!aiLoopData) return;
 
     const dataVersion = parseInt(aiLoopData.version ?? '1');
@@ -163,6 +159,24 @@ async function parseAiLoopData(forceUpdate) {
     else if (dataVersion === 2) {
         aiLoopSubjectReg = buildEntityRegex(aiLoopData.titles, true);
         aiLoopAuthorReg = buildEntityRegex(aiLoopData.authors, false);
+    }
+}
+
+async function parseAiBoucledAuthorsData(forceUpdate) {
+    aiBoucledAuthorsData = await queryApiData(
+        forceUpdate,
+        aiBoucledAuthorsDataUrl,
+        storage_aiBoucledAuthorsLastUpdate,
+        aiBoucledAuthorsRefreshExpire,
+        storage_aiBoucledAuthorsData,
+        storage_aiBoucledAuthorsData_default
+    );
+
+    if (!aiBoucledAuthorsData) return;
+
+    const dataVersion = parseInt(aiBoucledAuthorsData.version ?? '1');
+    if (dataVersion === 1) {
+        aiBoucledAuthorsReg = buildEntityRegex(aiBoucledAuthorsData.boucledAuthors, false);
     }
 }
 

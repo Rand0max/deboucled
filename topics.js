@@ -178,16 +178,20 @@ function getTopicMessageCount(element) {
 function handleAntiLoopAi(topicOptions, title, author, titleTag) {
     const subjectBlacklisted = getSubjectBlacklistMatches(title, aiLoopSubjectReg);
     const authorBlacklisted = getAuthorBlacklistMatches(author, undefined, aiLoopAuthorReg);
-    if (!subjectBlacklisted?.length && !authorBlacklisted?.length) return false;
+    const boucledAuthorBlacklisted = getAuthorBlacklistMatches(author, undefined, aiBoucledAuthorsReg);
+
+    if (!subjectBlacklisted?.length
+        && !authorBlacklisted?.length
+        && !boucledAuthorBlacklisted?.length) return false;
 
     if (topicOptions.optionAntiLoopAiMode === 1) {
         titleTag.style.width = 'auto';
-        if (subjectBlacklisted?.length) {
+        if (subjectBlacklisted?.length && authorBlacklisted?.length) {
             const loopSubject = subjectBlacklisted[0] ?? title;
             markTopicLoop(loopSubject, titleTag);
         }
-        else if (authorBlacklisted?.length) {
-            const loopAuthor = authorBlacklisted[0] ?? author;
+        else if (boucledAuthorBlacklisted?.length) {
+            const loopAuthor = boucledAuthorBlacklisted[0] ?? author;
             if (loopAuthor === 'pseudo supprimé') return false; // faux positif
             markAuthorLoop(loopAuthor, titleTag);
         }
@@ -196,8 +200,8 @@ function handleAntiLoopAi(topicOptions, title, author, titleTag) {
     else if (topicOptions.optionAntiLoopAiMode === 2 && subjectBlacklisted?.length) {
         matchedSubjects.addArrayIncrement(subjectBlacklisted);
         hiddenSubjects++;
-        if (authorBlacklisted?.length) {
-            matchedAuthors.addArrayIncrement(authorBlacklisted);
+        if (boucledAuthorBlacklisted?.length) {
+            matchedAuthors.addArrayIncrement(boucledAuthorBlacklisted);
             hiddenAuthors++;
         }
         return true;

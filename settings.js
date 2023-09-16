@@ -438,7 +438,7 @@ function addSettingEvents() {
     //const boucleUrl = 'https://www.jeuxvideo.com/forums/42-51-62052373-1-0-1-0-ce-forum-est-une-putain-de-boucle-temporelle-sans-fin.htm';
     document.querySelector('.deboucled-about-version').onclick = () => window.open(boucleUrl, '_blank').focus();
 
-    document.querySelector('.deboucled-svg-refresh').onclick = forcePrebouclesRefresh;
+    document.querySelector('.deboucled-svg-refresh').onclick = forceApiDataRefresh;
 
     addToggleEvent(storage_optionEnableDeboucledDarkTheme, undefined, toggleDeboucledDarkTheme);
     addToggleEvent(storage_optionEnableJvRespawnRefinedTheme);
@@ -970,7 +970,7 @@ async function highlightModeratedTopics() {
     }
 }
 
-async function forcePrebouclesRefresh() {
+async function forceApiDataRefresh() {
     const button = document.querySelector('.deboucled-svg-refresh');
     button.onclick = undefined;
 
@@ -991,7 +991,7 @@ async function forcePrebouclesRefresh() {
 
     button.classList.toggle('deboucled-disabled', true);
     await sleep(2000);
-    button.onclick = forcePrebouclesRefresh;
+    button.onclick = forceApiDataRefresh;
     button.classList.toggle('deboucled-disabled', false);
 }
 

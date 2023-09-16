@@ -73,6 +73,8 @@ const storage_preBouclesData = 'deboucled_preBouclesData', storage_preBouclesDat
 const storage_prebouclesLastUpdate = 'deboucled_prebouclesLastUpdate';
 const storage_aiLoopsData = 'deboucled_aiLoopsData', storage_aiLoopsData_default = '{}';
 const storage_aiLoopsLastUpdate = 'deboucled_aiLoopsLastUpdate';
+const storage_aiBoucledAuthorsData = 'deboucled_aiBoucledAuthorsData', storage_aiBoucledAuthorsData_default = '{}';
+const storage_aiBoucledAuthorsLastUpdate = 'deboucled_aiBoucledAuthorsLastUpdate';
 const storage_lastUpdateUser = 'deboucled_lastUpdateUser';
 const storage_DiagnosticLastUpdate = 'deboucled_DiagnosticLastUpdate';
 const storage_hotTopicsData = 'deboucled_hotTopicsData', storage_hotTopicsData_default = '[]';
@@ -212,6 +214,7 @@ async function refreshApiData(forceUpdate = false) {
         parsePreboucleData(forceUpdate),
         parseYoutubeBlacklistData(forceUpdate),
         parseAiLoopData(forceUpdate),
+        parseAiBoucledAuthorsData(forceUpdate),
     ]);
 }
 

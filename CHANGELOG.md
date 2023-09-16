@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.44.0] (16/09/2023)
+
+- Amélioration de l'I.A anti-boucle : création d'une IA dédiée aux boucleurs
+
 ## [2.43.0] (12/09/2023)
 
 - Réactivation de toutes les fonctionnalités et de l'API Déboucled
