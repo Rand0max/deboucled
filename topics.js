@@ -175,34 +175,48 @@ function getTopicMessageCount(element) {
     return parseInt(messageCountElement?.textContent.trim() ?? "0");
 }
 
-function handleAntiLoopAi(topicOptions, title, author, titleTag) {
-    const subjectBlacklisted = getSubjectBlacklistMatches(title, aiLoopSubjectReg);
-    const authorBlacklisted = getAuthorBlacklistMatches(author, undefined, aiLoopAuthorReg);
-    const boucledAuthorBlacklisted = getAuthorBlacklistMatches(author, undefined, aiBoucledAuthorsReg);
+function getTopicLoop(subject, author) {
+    const subjectBlacklisted = subject?.length ? getSubjectBlacklistMatches(subject, aiLoopSubjectReg) : null;
+    const authorBlacklisted = author?.length ? getAuthorBlacklistMatches(author, undefined, aiLoopAuthorReg) : null;
+    const boucledAuthorBlacklisted = author?.length ? getAuthorBlacklistMatches(author, undefined, aiBoucledAuthorsReg) : null;
+    const subjectLoopScore = subjectBlacklisted?.length && authorBlacklisted?.length ? calcStringDistanceScore(subject, subjectBlacklisted[0]) : 0;
+    const isSubjectLoop = subjectLoopScore >= 70;
 
-    if (!subjectBlacklisted?.length
-        && !authorBlacklisted?.length
-        && !boucledAuthorBlacklisted?.length) return false;
+    return {
+        subjectMatches: subjectBlacklisted,
+        authorMatches: authorBlacklisted,
+        boucledAuthorMatches: boucledAuthorBlacklisted,
+        isSubjectLoop: isSubjectLoop,
+        isAuthorLoop: boucledAuthorBlacklisted?.length > 0 || (isSubjectLoop && authorBlacklisted?.length > 0),
+        loopSubject: subjectBlacklisted?.length ? subjectBlacklisted[0] ?? subject : subject,
+        loopAuthor: boucledAuthorBlacklisted?.length ? boucledAuthorBlacklisted[0] ?? author : author,
+        isLoop: function () { return this.isSubjectLoop || this.isAuthorLoop; }
+    };
+}
+
+function handleAntiLoopAi(topicOptions, title, author, titleTag) {
+    const topicLoop = getTopicLoop(title, author);
+    if (!topicLoop.isLoop()) return false;
 
     if (topicOptions.optionAntiLoopAiMode === 1) {
-        if (subjectBlacklisted?.length && authorBlacklisted?.length) {
-            const loopSubject = subjectBlacklisted[0] ?? title;
+        if (topicLoop.isSubjectLoop) {
             titleTag.style.width = 'auto';
-            markTopicLoop(loopSubject, titleTag);
+            markTopicLoop(topicLoop.loopSubject, titleTag);
         }
-        else if (boucledAuthorBlacklisted?.length) {
-            const loopAuthor = boucledAuthorBlacklisted[0] ?? author;
-            if (loopAuthor === 'pseudo supprimé') return false; // faux positif
+        else if (topicLoop.isAuthorLoop) {
+            if (topicLoop.loopAuthor === 'pseudo supprimé') return false; // faux positif
             titleTag.style.width = 'auto';
-            markAuthorLoop(loopAuthor, titleTag);
+            markAuthorLoop(topicLoop.loopAuthor, titleTag);
         }
         return false;
     }
-    else if (topicOptions.optionAntiLoopAiMode === 2 && subjectBlacklisted?.length) {
-        matchedSubjects.addArrayIncrement(subjectBlacklisted);
-        hiddenSubjects++;
-        if (boucledAuthorBlacklisted?.length) {
-            matchedAuthors.addArrayIncrement(boucledAuthorBlacklisted);
+    else if (topicOptions.optionAntiLoopAiMode === 2) {
+        if (topicLoop.isSubjectLoop) {
+            matchedSubjects.addArrayIncrement(topicLoop.subjectMatches);
+            hiddenSubjects++;
+        }
+        if (topicLoop.isAuthorLoop) {
+            matchedAuthors.addArrayIncrement(topicLoop.boucledAuthorMatches);
             hiddenAuthors++;
         }
         return true;
@@ -338,7 +352,7 @@ async function isVinzTopic(subject, author, topicUrl) {
     const pureSubject = makeVinzSubjectPure(subject);
     let possibleBoucle = false;
     for (const boucle of vinzBoucleArray) {
-        let score = calculateStringDistance(boucle, pureSubject);
+        let score = calcStringDistanceScore(boucle, pureSubject);
         if (authorMayBeVinz) score += 10; // on rajoute 10% au score si l'on soupçonne l'auteur d'être Vinz
 
         // +80% c'est certifié Vinz le zinzin
@@ -545,9 +559,9 @@ function addPrevisualizeTopicEvent(topics) {
     }
 
     topics.slice(1).forEach(function (topic) {
-        let topicTitle = topic.querySelector('.topic-title');
-
-        const topicUrl = topicTitle.getAttribute('href');
+        const topicTitleElement = topic.querySelector('.topic-title');
+        if (!topicTitleElement) return;
+        const topicUrl = topicTitleElement.getAttribute('href');
 
         let anchor = document.createElement('a');
         anchor.setAttribute('href', topicUrl);

@@ -118,7 +118,7 @@ function buildEntityRegex(array, withBoundaries) {
     function transformGenericChars(str) {
         const genCharsRegex = /^(?<leadingGeneric>\*?)(?<expression>.*?)(?<trailingGeneric>\*?)$/gi;
         const matches = genCharsRegex.exec(str);
-        if (!matches.groups.expression) return null;
+        if (!matches.groups?.expression) return null;
         const leadingGeneric = matches.groups.leadingGeneric ? `(?:${matches.groups.leadingGeneric.handleGenericChar()})` : '';
         const trailingGeneric = matches.groups.trailingGeneric ? `(?:${matches.groups.trailingGeneric.handleGenericChar()})` : '';
         const expression = matches.groups.expression.handleGenericChar();
@@ -241,7 +241,7 @@ function replaceNumbersSimilarToCharacters(str) {
     return res;
 }
 
-function calculateStringDistance(str1, str2) {
+function calcStringDistanceScore(str1, str2) {
     // eslint-disable-next-line no-undef
     let result = 100 - 100 * distance(str1, str2) / Math.max(str1.length, str2.length);
     return Math.round(result);

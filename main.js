@@ -569,10 +569,8 @@ function buildTopicHeaderBadges() {
     const optionAntiLoopAiMode = store.get(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default);
     if (optionAntiLoopAiMode !== 0) {
         const title = titleElement.textContent.trim();
-        const subjectBlacklisted = getSubjectBlacklistMatches(title, aiLoopSubjectReg);
-        if (!subjectBlacklisted?.length) return;
-        const subject = subjectBlacklisted[0] ?? title;
-        markTopicLoop(subject, titleElement, false);
+        const topicLoop = getTopicLoop(title, currentTopicAuthor);
+        if (topicLoop.isSubjectLoop) markTopicLoop(topicLoop.loopSubject, titleElement, false);
     }
 }
 

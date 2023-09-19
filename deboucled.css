@@ -416,7 +416,10 @@ blockquote .deboucled-highlighted {
 }
 .bloc-message-forum .bloc-header {
   display: grid;
-  grid-template-areas: "avatar pseudo badge mp boucled jvarchive options" "avatar level level level level level level" "avatar date date date date date date";
+  grid-template-areas:
+    "avatar pseudo badge mp boucled jvarchive options"
+    "avatar level level level level level level"
+    "avatar date date date date date date";
   grid-template-columns: auto auto auto auto auto auto 1fr !important;
   /* grid-template-rows: auto; */
 }
@@ -1525,6 +1528,8 @@ input[type="search"] {
 .deboucled-badge-message {
   line-height: 0.6rem;
   margin-right: 0.35rem;
+  grid-area: badge;
+  align-self: auto;
 }
 .deboucled-medal-container {
   display: flex;
