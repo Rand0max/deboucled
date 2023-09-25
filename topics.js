@@ -181,13 +181,14 @@ function getTopicLoop(subject, author) {
     const boucledAuthorBlacklisted = author?.length ? getAuthorBlacklistMatches(author, undefined, aiBoucledAuthorsReg) : null;
     const subjectLoopScore = subjectBlacklisted?.length && authorBlacklisted?.length ? calcStringDistanceScore(subject, subjectBlacklisted[0]) : 0;
     const isSubjectLoop = subjectLoopScore >= 70;
+    const isAuthorLoop = boucledAuthorBlacklisted?.length > 0 || (isSubjectLoop && authorBlacklisted?.length > 0);
 
     return {
         subjectMatches: subjectBlacklisted,
         authorMatches: authorBlacklisted,
         boucledAuthorMatches: boucledAuthorBlacklisted,
         isSubjectLoop: isSubjectLoop,
-        isAuthorLoop: boucledAuthorBlacklisted?.length > 0 || (isSubjectLoop && authorBlacklisted?.length > 0),
+        isAuthorLoop: isAuthorLoop,
         loopSubject: subjectBlacklisted?.length ? subjectBlacklisted[0] ?? subject : subject,
         loopAuthor: boucledAuthorBlacklisted?.length ? boucledAuthorBlacklisted[0] ?? author : author,
         isLoop: function () { return this.isSubjectLoop || this.isAuthorLoop; }
@@ -216,7 +217,7 @@ function handleAntiLoopAi(topicOptions, title, author, titleTag) {
             hiddenSubjects++;
         }
         if (topicLoop.isAuthorLoop) {
-            matchedAuthors.addArrayIncrement(topicLoop.boucledAuthorMatches);
+            matchedAuthors.addArrayIncrement(topicLoop.boucledAuthorMatches ?? topicLoop.authorMatches);
             hiddenAuthors++;
         }
         return true;

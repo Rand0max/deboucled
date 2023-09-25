@@ -118,7 +118,7 @@ function buildEntityRegex(array, withBoundaries) {
     function transformGenericChars(str) {
         const genCharsRegex = /^(?<leadingGeneric>\*?)(?<expression>.*?)(?<trailingGeneric>\*?)$/gi;
         const matches = genCharsRegex.exec(str);
-        if (!matches.groups?.expression) return null;
+        if (!matches?.groups?.expression) return null;
         const leadingGeneric = matches.groups.leadingGeneric ? `(?:${matches.groups.leadingGeneric.handleGenericChar()})` : '';
         const trailingGeneric = matches.groups.trailingGeneric ? `(?:${matches.groups.trailingGeneric.handleGenericChar()})` : '';
         const expression = matches.groups.expression.handleGenericChar();
