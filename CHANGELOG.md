@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.45.0] (27/09/2023)
+
+- Ajout des badges pour les auteurs en liste noire
+
 ## [2.44.2] (19/09/2023)
 
 - Amélioration de l'I.A anti-boucle

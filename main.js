@@ -242,9 +242,16 @@ async function handleTopicListOptions(topics) {
 
 async function parseTopicListAuthors(topics) {
     topics.slice(1).forEach(function (topic) {
-        const author = topic.querySelector('.topic-author')?.textContent.trim().toLowerCase();
+        const author = topic.querySelector('.topic-author')?.textContent?.trim()?.toLowerCase();
+        if (!author?.length) return;
+
+        const excludedLists = [];
+        if (topic.querySelector(`#deboucled_ai_boucledauthor,#deboucled_ai_boucledsubject`)) excludedLists.push('boucledauthors');
+        buildAuthorBlacklistBadges(author, topic.querySelector('.topic-subject'), excludedLists);
+
         const topicId = topic.getAttribute('data-id');
-        if (!author || !topicId) return;
+        if (!topicId) return;
+
         topicAuthorMap.set(topicId, author);
     });
 
@@ -260,16 +267,17 @@ async function handleHotTopics(finalTopics) {
     finalTopics.slice(1).forEach(topic => {
         const topicId = topic.getAttribute('data-id');
         if (!topicId) return;
+
         const isHotTopic = hotTopicsData.includes(parseInt(topicId));
         if (!isHotTopic) return;
-        const titleElem = topic.querySelector('.lien-jv.topic-title');
 
+        const titleElem = topic.querySelector('.lien-jv.topic-title');
         if (matchMediaMediumWidth) {
-            markTopicHot(titleElem, true, false);
+            markTopicHot(titleElem, false); // put the flag before the subject
         }
         else {
             titleElem.style.overflow = 'visible';
-            markTopicHot(titleElem, true, true);
+            markTopicHot(titleElem, true);
         }
     });
 }
@@ -361,12 +369,24 @@ function blacklistsIncludingEntity(entity, entityType, mustBeEnabled = true) {
     if (entityType == entityAuthor) normEntity = normEntity.toLowerCase();
 
     const userBlacklistRegex = getEntityRegex(entityType, false);
-    if (normEntity.match(userBlacklistRegex)) blacklists.push({ id: 'custom', description: `Liste noire ${getEntityTitle(entityType)}` });
+    if (normEntity.match(userBlacklistRegex))
+        blacklists.push({
+            id: `custom_${entityType}`,
+            description: `Liste noire ${getEntityTitle(entityType)}`,
+            enabled: true
+        });
 
     preBoucleArray
         .filter(pb => pb.type === entityType)
         .filter(pb => !mustBeEnabled || pb.enabled)
-        .forEach(pb => { if (normEntity.match(pb.regex)) blacklists.push({ id: pb.id, description: pb.title }); });
+        .forEach(pb => {
+            if (normEntity.match(pb.regex))
+                blacklists.push({
+                    id: pb.id,
+                    description: pb.title,
+                    enabled: pb.enabled
+                });
+        });
 
     return blacklists;
 }
@@ -477,7 +497,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     }
 
     handleMessageAssignTopicAuthor(author, authorElement);
-    buildAuthorBadge(authorElement, author, messageOptions, title);
+    buildAuthorBadges(authorElement, author, messageOptions, title);
     fixMessageUrls(messageContent);
 
     if (messageOptions.optionDecensureTwitter) {

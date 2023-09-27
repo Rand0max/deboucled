@@ -121,12 +121,13 @@ function addAuthorButtons(nearbyElement, author, optionBoucledUseJvarchive) {
     insertAfter(jvArchiveProfilButton, boucledButton);
 }
 
-function buildAuthorBadge(authorElement, author, messageOptions, title) {
+function buildAuthorBadges(authorElement, author, messageOptions, title) {
     if (messageOptions.optionAntiLoopAiMode !== 0) {
         const isTopicAuthor = author.toLowerCase() === currentTopicAuthor;
         const topicLoop = getTopicLoop(isTopicAuthor ? title : undefined, author);
-        if (topicLoop.isAuthorLoop) markAuthorLoop(topicLoop.loopAuthor, authorElement, false, 'deboucled-badge-bloc-pseudo-msg', 'deboucled-badge-message');
+        if (topicLoop.isAuthorLoop) markAuthorLoop(topicLoop.loopAuthor, authorElement, true, 'deboucled-badge-message');
     }
+    buildAuthorBlacklistBadges(author, authorElement.parentElement, [], 'deboucled-badge-message');
 }
 
 function handleJvChatAndTopicLive(messageOptions) {

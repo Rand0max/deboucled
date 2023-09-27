@@ -426,13 +426,16 @@ async function isTopicPoC(element, optionDetectPocMode) {
     return isPoc;
 }
 
-function buildBadge(content, hint, url, level, iconClass) {
+function buildBadge(id, content, hint, url, level, iconClass, badgeLogoClass) {
     const badge = document.createElement('span');
+    badge.id = `deboucled_${id}`;
     let badgeClass = 'deboucled-badge';
     if (level) badgeClass = `${badgeClass} ${badgeClass}-${level}${preferDarkTheme() ? ' dark' : ''}`;
     badge.className = `${badgeClass} ${hint ? '' : 'pill'} ${iconClass ? iconClass : ''}`.trim();
     badge.textContent = content;
     if (hint?.length) badge.setAttribute('deboucled-data-tooltip', hint);
+
+    if (badgeLogoClass?.length) badge.classList.add(badgeLogoClass);
 
     if (url?.length) {
         const anchor = document.createElement('a');
@@ -441,39 +444,67 @@ function buildBadge(content, hint, url, level, iconClass) {
         anchor.appendChild(badge);
         return anchor;
     }
+
     return badge;
 }
 
+function addBadgeTag(badgeOpt) {
+    const badgeTag = buildBadge(badgeOpt.id, badgeOpt.content, badgeOpt.hint, badgeOpt.url, badgeOpt.level, undefined, badgeOpt.badgeLogoClass);
+    if (badgeOpt.insertFn) badgeOpt.insertFn(badgeTag);
+    else badgeOpt.parent.append(badgeTag);
+}
+
 function markTopicPoc(nearElement, withHint = true) {
-    const pocBadge = buildBadge('PoC', withHint ? 'Détection d\'un "post ou cancer"' : undefined, 'https://jvflux.fr/Post_ou_cancer', 'danger');
-    nearElement.insertAdjacentElement('afterend', pocBadge);
+    const badgeOpt = {
+        id: 'subject_poc',
+        content: 'PoC',
+        hint: withHint ? 'Détection d\'un "post ou cancer"' : undefined,
+        url: 'https://jvflux.fr/Post_ou_cancer',
+        level: 'danger',
+        parent: nearElement,
+        insertFn: function (elem) { this.parent.insertAdjacentElement('afterend', elem); }
+    };
+    addBadgeTag(badgeOpt);
 }
 
 function markTopicLoop(subject, nearElement, withHint = true) {
     const cleanSubject = subject.replaceAll('%', '').trim();
     const redirectUrl = `${jvarchiveUrl}/topic/recherche?searchType=titre_topic&search=${cleanSubject}`;
-    const loopBadge = buildBadge('BOUCLE', withHint ? `Consulter cette boucle sur JvArchive` : undefined, redirectUrl, 'danger');
-    nearElement.insertAdjacentElement('afterend', loopBadge);
+    const badgeOpt = {
+        id: 'ai_boucledsubject',
+        content: 'BOUCLE',
+        hint: withHint ? `<I.A Déboucled> - consulter cette boucle sur JvArchive` : undefined,
+        url: redirectUrl,
+        level: 'danger',
+        parent: nearElement,
+        badgeLogoClass: 'deboucled-idea-logo',
+        insertFn: function (elem) { this.parent.insertAdjacentElement('afterend', elem); }
+    };
+    addBadgeTag(badgeOpt);
 }
 
-function markAuthorLoop(author, nearElement, withHint = true, nearElementCustomClass, badgeClass) {
+function markAuthorLoop(author, nearElement, withHint = true, badgeContainerClass) {
     const cleanAuthor = author.replaceAll('%', '').trim();
     const redirectUrl = `${jvarchiveUrl}/topic/recherche?searchType=auteur_topic_exact&search=${cleanAuthor}`;
-    const loopBadge = buildBadge('BOUCLEUR', withHint ? `Consulter les topics de ce boucleur sur JvArchive` : undefined, redirectUrl, 'warning');
-    if (badgeClass) loopBadge.classList.add(badgeClass);
-    nearElement.insertAdjacentElement('afterend', loopBadge);
-    if (nearElementCustomClass) nearElement.classList.add(nearElementCustomClass);
+    const badgeContainer = buildBadgeContainer(nearElement.parentElement, badgeContainerClass);
+    const badgeOpt = {
+        id: 'ai_boucledauthor',
+        content: 'BOUCLEUR',
+        hint: withHint ? `<I.A Déboucled> - consulter les topics de ce boucleur sur JvArchive` : undefined,
+        url: redirectUrl,
+        level: 'warning',
+        parent: badgeContainer,
+        badgeLogoClass: 'deboucled-idea-logo',
+        insertFn: function (elem) { this.parent.prepend(elem); }
+    };
+    addBadgeTag(badgeOpt);
 }
 
-function markTopicHot(titleElem, withHint = true, append = true) {
+function markTopicHot(titleElem, append = true) {
     const loopBadge = document.createElement('span');
-    if (withHint) {
-        loopBadge.className = 'deboucled-badge deboucled-fire-logo';
-        loopBadge.setAttribute('deboucled-data-tooltip', 'Topic tendance');
-    }
-    else {
-        loopBadge.className = 'deboucled-badge deboucled-fire-logo big';
-    }
+    loopBadge.className = 'deboucled-badge deboucled-fire-logo';
+    loopBadge.setAttribute('deboucled-data-tooltip', 'Topic tendance');
+
     if (append) {
         titleElem.appendChild(loopBadge);
     }
@@ -481,6 +512,44 @@ function markTopicHot(titleElem, withHint = true, append = true) {
         loopBadge.style.marginLeft = '0';
         titleElem.prepend(loopBadge);
     }
+}
+
+function buildBadgeContainer(parentElement, customClass) {
+    let badgeContainer = parentElement.querySelector('.deboucled-badge-container');
+    if (badgeContainer) return badgeContainer;
+
+    badgeContainer = document.createElement('div');
+    badgeContainer.className = `deboucled-badge-container ${customClass ? customClass : ''}`;
+    parentElement.append(badgeContainer);
+    return badgeContainer
+}
+
+function buildAuthorBlacklistBadges(author, parentElement, excludedLists, containerClass) {
+    if (!parentElement) return;
+
+    const blacklists = blacklistsIncludingEntity(author, entityAuthor, false);
+    if (!blacklists?.length) return;
+
+    const badgeContainer = buildBadgeContainer(parentElement, containerClass);
+
+    const cleanAuthor = author.replaceAll('%', '').trim();
+    const redirectUrl = `${jvarchiveUrl}/topic/recherche?searchType=auteur_topic_exact&search=${cleanAuthor}`;
+
+    blacklists
+        .filter(bl => !excludedLists?.includes(bl.id))
+        .sort((a, b) => (a.enabled > b.enabled) ? -1 : 1)
+        .forEach(bl => {
+            const badgeOpt = {
+                id: `blacklist_${bl.id}`,
+                content: bl.description.toUpperCase(),
+                hint: `Présent dans la liste « ${bl.description} ».`,
+                level: bl.enabled ? 'blacklist' : 'neutral',
+                url: redirectUrl,
+                parent: badgeContainer,
+                insertFn: function (elem) { this.parent.append(elem); }
+            };
+            addBadgeTag(badgeOpt);
+        });
 }
 
 function addIgnoreButtons(topics) {
