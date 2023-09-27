@@ -834,6 +834,28 @@ blockquote .deboucled-highlighted {
   opacity: 0.8;
   content: "";
 }
+.pill.deboucled-idea-logo::after {
+  width: 1rem;
+  height: 1rem;
+  background-size: 1rem;
+}
+.deboucled-skull-logo::after {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAABSklEQVR4nN2VvS4FQRTHf77iJngDKjpK0dCI5opEQiOKGwlegEegFO/gEWjEO4jIVfpMdlVqyUWzMvK/ycHs7MwqhH8yxZz5nXNmzpmdhf+uXmAZOAJugGeNa9ncWk/d4DNAGygqxiUwnRp8HXhRgHtgB5gEhjSmgF3gQUwHWIsNvgC8yfEAGAiwbu1Q7CswXxW8oR07h73o88K+fG6BwRC4LfBCDY5Vn3rhfDdD4JmgFunakO9pCHoUNFojwZh88xDUEeR6kaqGuVGluhM0rvmSTuV2tWg4n33CNLpUJ4K2NM/NB5UZzmfvXpDjUIJVQe0aCa40Xwkl6DeO6Pi5gjQN57N3/VyMoGyCr5oDZkn3+6TM86A5jQBPGsMflu+cLWOpmp4k6MU81xfrXlo8wW0Zo1RUHDu6LL+WIIv44UTVPaUfxU/r/rf0DpYpj131nCaBAAAAAElFTkSuQmCC)
+    0 no-repeat;
+  width: 0.7rem;
+  height: 0.7rem;
+  background-size: 0.7rem;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 0 0.1rem 0.2rem;
+  opacity: 0.8;
+  content: "";
+}
+.pill.deboucled-skull-logo::after {
+  width: 1rem;
+  height: 1rem;
+  background-size: 1rem;
+}
 .deboucled-avatar-logo {
   vertical-align: bottom;
   height: 18px;
@@ -1538,44 +1560,54 @@ input[type="search"] {
   background-color: #4c0312 !important;
 }
 
-.deboucled-badge-neutral.deboucled-idea-logo::after {
+.deboucled-badge-neutral.deboucled-idea-logo::after,
+.deboucled-badge-neutral.deboucled-skull-logo::after {
   filter: invert(0%) sepia(100%) saturate(7500%) hue-rotate(347deg)
     brightness(89%) contrast(111%);
 }
-.deboucled-badge-blacklist.deboucled-idea-logo::after {
+.deboucled-badge-blacklist.deboucled-idea-logo::after,
+.deboucled-badge-blacklist.deboucled-skull-logo::after {
   filter: invert(26%) sepia(47%) saturate(2287%) hue-rotate(332deg)
     brightness(94%) contrast(92%);
 }
-.deboucled-badge-info.deboucled-idea-logo::after {
+.deboucled-badge-info.deboucled-idea-logo::after,
+.deboucled-badge-info.deboucled-skull-logo::after {
   filter: invert(23%) sepia(98%) saturate(5875%) hue-rotate(236deg)
     brightness(94%) contrast(94%);
 }
-.deboucled-badge-warning.deboucled-idea-logo::after {
+.deboucled-badge-warning.deboucled-idea-logo::after,
+.deboucled-badge-warning.deboucled-skull-logo::after {
   filter: invert(52%) sepia(47%) saturate(2317%) hue-rotate(3deg)
     brightness(99%) contrast(103%);
 }
-.deboucled-badge-danger.deboucled-idea-logo::after {
+.deboucled-badge-danger.deboucled-idea-logo::after,
+.deboucled-badge-danger.deboucled-skull-logo::after {
   filter: invert(13%) sepia(93%) saturate(7056%) hue-rotate(343deg)
     brightness(94%) contrast(107%);
 }
 
-.deboucled-badge-neutral.dark.deboucled-idea-logo::after {
+.deboucled-badge-neutral.dark.deboucled-idea-logo::after,
+.deboucled-badge-neutral.dark.deboucled-skull-logo::after {
   filter: invert(93%) sepia(100%) saturate(0%) hue-rotate(98deg)
     brightness(104%) contrast(102%);
 }
-.deboucled-badge-blacklist.dark.deboucled-idea-logo::after {
+.deboucled-badge-blacklist.dark.deboucled-idea-logo::after,
+.deboucled-badge-blacklist.dark.deboucled-skull-logo::after {
   filter: invert(95%) sepia(90%) saturate(20%) hue-rotate(330deg)
     brightness(93%) contrast(94%);
 }
-.deboucled-badge-info.dark.deboucled-idea-logo::after {
+.deboucled-badge-info.dark.deboucled-idea-logo::after,
+.deboucled-badge-info.dark.deboucled-skull-logo::after {
   filter: invert(95%) sepia(90%) saturate(20%) hue-rotate(330deg)
     brightness(93%) contrast(94%);
 }
-.deboucled-badge-warning.dark.deboucled-idea-logo::after {
+.deboucled-badge-warning.dark.deboucled-idea-logo::after,
+.deboucled-badge-warning.dark.deboucled-skull-logo::after {
   filter: invert(89%) sepia(90%) saturate(516%) hue-rotate(309deg)
     brightness(99%) contrast(86%);
 }
-.deboucled-badge-danger.dark.deboucled-idea-logo::after {
+.deboucled-badge-danger.dark.deboucled-idea-logo::after,
+.deboucled-badge-danger.dark.deboucled-skull-logo::after {
   filter: invert(24%) sepia(39%) saturate(7212%) hue-rotate(336deg)
     brightness(100%) contrast(102%);
 }

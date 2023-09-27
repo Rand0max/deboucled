@@ -462,6 +462,7 @@ function markTopicPoc(nearElement, withHint = true) {
         url: 'https://jvflux.fr/Post_ou_cancer',
         level: 'danger',
         parent: nearElement,
+        badgeLogoClass: 'deboucled-skull-logo',
         insertFn: function (elem) { this.parent.insertAdjacentElement('afterend', elem); }
     };
     addBadgeTag(badgeOpt);
