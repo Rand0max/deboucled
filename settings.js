@@ -218,6 +218,9 @@ function buildSettingsPage() {
 
         html += addToggleOption(`Afficher le nombre de <i>topics ignorés</i> dans l'entête`, storage_optionDisplayTopicIgnoredCount, storage_optionDisplayTopicIgnoredCount_default, 'Afficher ou non le nombre de topics ignorés dans l\'entête de la liste des sujets : &quot;SUJETS (X IGNORÉS)&quot; .');
 
+        const badgeLogo = `<span class="deboucled-badge deboucled-badge-blacklist ${preferDarkTheme() ? ' dark' : ''}" style="vertical-align:bottom;">BADGES</span>`;
+        html += addToggleOption(`Afficher les ${badgeLogo} des auteurs en liste noire`, storage_optionDisplayBadges, storage_optionDisplayBadges_default, 'Afficher ou non les badges des pseudos présents dans les listes noires.');
+
         html += '</table>';
         html += '</div>';
         html += '</div>';
@@ -486,6 +489,7 @@ function addSettingEvents() {
     addToggleEvent(storage_optionDisplayTopicAvatar);
     addToggleEvent(storage_optionHideAvatarBorder);
     addToggleEvent(storage_optionDecensureTwitter);
+    addToggleEvent(storage_optionDisplayBadges);
 
     addPrebouclesEvents();
 }

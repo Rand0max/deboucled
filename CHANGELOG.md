@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.45.2] (28/09/2023)
+
+- Option pour afficher/masquer les badges
+
 ## [2.45.0] (27/09/2023)
 
 - Ajout des badges pour les auteurs en liste noire

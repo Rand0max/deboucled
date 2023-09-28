@@ -181,11 +181,9 @@ async function getForumPageContent(page) {
     return fetchHtml(nextPageUrl);
 }
 
-async function handleTopicList(canFillTopics) {
+async function handleTopicList(canFillTopics, topicOptions) {
     let topics = getAllTopics(document);
     if (!topics?.length) return;
-
-    const topicOptions = prepareTopicOptions();
 
     let topicsToRemove = [];
     let finalTopics = [];
@@ -212,42 +210,37 @@ async function handleTopicList(canFillTopics) {
     return finalTopics;
 }
 
-async function handleTopicListOptions(topics) {
-    let optionDisplayBlacklistTopicButton = store.get(storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default);
-    if (optionDisplayBlacklistTopicButton) addIgnoreButtons(topics);
+async function handleTopicListOptions(topics, topicOptions) {
+    if (topicOptions.optionDisplayBlacklistTopicButton) addIgnoreButtons(topics);
 
-    let optionPrevisualizeTopic = store.get(storage_optionPrevisualizeTopic, storage_optionPrevisualizeTopic_default);
-    if (optionPrevisualizeTopic) addPrevisualizeTopicEvent(topics);
+    if (topicOptions.optionPrevisualizeTopic) addPrevisualizeTopicEvent(topics);
 
-    let optionDisplayBlackTopic = store.get(storage_optionDisplayBlackTopic, storage_optionDisplayBlackTopic_default);
-    let optionReplaceResolvedPicto = store.get(storage_optionReplaceResolvedPicto, storage_optionReplaceResolvedPicto_default);
-    if (optionDisplayBlackTopic || optionReplaceResolvedPicto) handleTopicPictos(topics, optionDisplayBlackTopic, optionReplaceResolvedPicto);
+    if (topicOptions.optionDisplayBlackTopic || topicOptions.optionReplaceResolvedPicto)
+        handleTopicPictos(topics, topicOptions.optionDisplayBlackTopic, topicOptions.optionReplaceResolvedPicto);
 
-    let optionRemoveUselessTags = store.get(storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default);
-    if (optionRemoveUselessTags) removeUselessTags(topics);
+    if (topicOptions.optionRemoveUselessTags) removeUselessTags(topics);
 
-    let optionDisplayTitleSmileys = store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default);
-    if (optionDisplayTitleSmileys) createTopicTitleSmileys(topics);
+    if (topicOptions.optionDisplayTitleSmileys) createTopicTitleSmileys(topics);
 
-    await parseTopicListAuthors(topics);
+    await parseTopicListAuthors(topics, topicOptions.optionDisplayBadges);
 
-    handlePoc(topics);
+    handlePoc(topics, topicOptions.optionDetectPocMode); // not necessary to await
 
-    let optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
-    if (optionDisplayHotTopics) handleHotTopics(topics);
+    if (topicOptions.optionDisplayHotTopics) handleHotTopics(topics);
 
-    let optionDisplayTopicAvatar = store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default);
-    if (optionDisplayTopicAvatar) handleTopicAvatars(topics);
+    if (topicOptions.optionDisplayTopicAvatar) handleTopicAvatars(topics);
 }
 
-async function parseTopicListAuthors(topics) {
+async function parseTopicListAuthors(topics, optionDisplayBadges) {
     topics.slice(1).forEach(function (topic) {
         const author = topic.querySelector('.topic-author')?.textContent?.trim()?.toLowerCase();
         if (!author?.length) return;
 
-        const excludedLists = [];
-        if (topic.querySelector(`#deboucled_ai_boucledauthor,#deboucled_ai_boucledsubject`)) excludedLists.push('boucledauthors');
-        buildAuthorBlacklistBadges(author, topic.querySelector('.topic-subject'), excludedLists);
+        if (optionDisplayBadges) {
+            const excludedLists = [];
+            if (topic.querySelector(`#deboucled_ai_boucledauthor,#deboucled_ai_boucledsubject`)) excludedLists.push('boucledauthors');
+            buildAuthorBlacklistBadges(author, topic.querySelector('.topic-subject'), excludedLists);
+        }
 
         const topicId = topic.getAttribute('data-id');
         if (!topicId) return;
@@ -282,9 +275,8 @@ async function handleHotTopics(finalTopics) {
     });
 }
 
-async function handlePoc(finalTopics) {
+async function handlePoc(finalTopics, optionDetectPocMode) {
     // 0 = désactivé ; 1 = recherche simple ; 2 = recherche approfondie ; 3 = recherche simple automatique ; 4 = recherche approfondie automatique
-    let optionDetectPocMode = store.get(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
     if (optionDetectPocMode === 0) return;
 
     // On gère les PoC à la fin pour ne pas figer la page pendant le traitement
@@ -616,53 +608,41 @@ function displayTopicDeboucledMessage() {
 }
 
 function prepareTopicOptions() {
-    const optionAllowDisplayThreshold = store.get(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
-    const optionDisplayThreshold = store.get(storage_optionDisplayThreshold, storage_optionDisplayThreshold_default);
-    const optionEnableTopicMsgCountThreshold = store.get(storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default);
-    const optionTopicMsgCountThreshold = store.get(storage_optionTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold_default);
-    const optionAntiVinz = store.get(storage_optionAntiVinz, storage_optionAntiVinz_default);
-    const optionAntiLoopAiMode = store.get(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default);
-    const optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
-
-    const topicOptions = {
-        optionAllowDisplayThreshold: optionAllowDisplayThreshold,
-        optionDisplayThreshold: optionDisplayThreshold,
-        optionEnableTopicMsgCountThreshold: optionEnableTopicMsgCountThreshold,
-        optionTopicMsgCountThreshold: optionTopicMsgCountThreshold,
-        optionAntiVinz: optionAntiVinz,
-        optionAntiLoopAiMode: optionAntiLoopAiMode,
-        optionDisplayHotTopics: optionDisplayHotTopics
+    return {
+        optionAllowDisplayThreshold: store.get(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default),
+        optionDisplayThreshold: store.get(storage_optionDisplayThreshold, storage_optionDisplayThreshold_default),
+        optionEnableTopicMsgCountThreshold: store.get(storage_optionEnableTopicMsgCountThreshold, storage_optionEnableTopicMsgCountThreshold_default),
+        optionTopicMsgCountThreshold: store.get(storage_optionTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold_default),
+        optionAntiVinz: store.get(storage_optionAntiVinz, storage_optionAntiVinz_default),
+        optionAntiLoopAiMode: store.get(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default),
+        optionDisplayHotTopics: store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default),
+        optionDisplayBadges: store.get(storage_optionDisplayBadges, storage_optionDisplayBadges_default),
+        optionDetectPocMode: store.get(storage_optionDetectPocMode, storage_optionDetectPocMode_default),
+        optionDisplayBlacklistTopicButton: store.get(storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default),
+        optionPrevisualizeTopic: store.get(storage_optionPrevisualizeTopic, storage_optionPrevisualizeTopic_default),
+        optionDisplayBlackTopic: store.get(storage_optionDisplayBlackTopic, storage_optionDisplayBlackTopic_default),
+        optionReplaceResolvedPicto: store.get(storage_optionReplaceResolvedPicto, storage_optionReplaceResolvedPicto_default),
+        optionRemoveUselessTags: store.get(storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default),
+        optionDisplayTitleSmileys: store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default),
+        optionDisplayTopicAvatar: store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default)
     };
-    return topicOptions;
 }
 
 function prepareMessageOptions(isWhitelistedTopic) {
-    const optionHideMessages = !isWhitelistedTopic && store.get(storage_optionHideMessages, storage_optionHideMessages_default);
-    const optionBoucledUseJvarchive = store.get(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default);
-    const optionBlSubjectIgnoreMessages = !isWhitelistedTopic && store.get(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default);
-    const optionEnhanceQuotations = store.get(storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default);
-    const optionAntiSpam = store.get(storage_optionAntiSpam, storage_optionAntiSpam_default);
-    const optionSmoothScroll = store.get(storage_optionSmoothScroll, storage_optionSmoothScroll_default);
-    const optionHideLongMessages = store.get(storage_optionHideLongMessages, storage_optionHideLongMessages_default);
-    const optionDisplayTitleSmileys = store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default);
-    const optionDecensureTwitter = store.get(storage_optionDecensureTwitter, storage_optionDecensureTwitter_default);
-    const optionAntiLoopAiMode = store.get(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default);
-
-    const messageOptions = {
-        optionHideMessages: optionHideMessages,
-        optionBoucledUseJvarchive: optionBoucledUseJvarchive,
-        optionBlSubjectIgnoreMessages: optionBlSubjectIgnoreMessages,
-        optionEnhanceQuotations: optionEnhanceQuotations,
-        optionAntiSpam: optionAntiSpam,
-        optionSmoothScroll: optionSmoothScroll,
-        isWhitelistedTopic: isWhitelistedTopic,
-        optionHideLongMessages: optionHideLongMessages,
-        optionDisplayTitleSmileys: optionDisplayTitleSmileys,
-        optionDecensureTwitter: optionDecensureTwitter,
-        optionAntiLoopAiMode: optionAntiLoopAiMode
+    return {
+        optionHideMessages: !isWhitelistedTopic && store.get(storage_optionHideMessages, storage_optionHideMessages_default),
+        optionBoucledUseJvarchive: store.get(storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default),
+        optionBlSubjectIgnoreMessages: !isWhitelistedTopic && store.get(storage_optionBlSubjectIgnoreMessages, storage_optionBlSubjectIgnoreMessages_default),
+        optionEnhanceQuotations: store.get(storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default),
+        optionAntiSpam: store.get(storage_optionAntiSpam, storage_optionAntiSpam_default),
+        optionSmoothScroll: store.get(storage_optionSmoothScroll, storage_optionSmoothScroll_default),
+        optionHideLongMessages: store.get(storage_optionHideLongMessages, storage_optionHideLongMessages_default),
+        optionDisplayTitleSmileys: store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default),
+        optionDecensureTwitter: store.get(storage_optionDecensureTwitter, storage_optionDecensureTwitter_default),
+        optionAntiLoopAiMode: store.get(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default),
+        optionDisplayBadges: store.get(storage_optionDisplayBadges, storage_optionDisplayBadges_default),
+        isWhitelistedTopic: isWhitelistedTopic
     };
-
-    return messageOptions;
 }
 
 async function handleTopicMessages() {
@@ -706,12 +686,13 @@ async function handleTopicMessages() {
 }
 
 async function handleSearch() {
-    let optionFilterResearch = addSearchFilterToggle();
-    if (optionFilterResearch) await handleTopicList(false);
+    const optionFilterResearch = addSearchFilterToggle();
+    const topicOptions = prepareTopicOptions();
+    if (optionFilterResearch) await handleTopicList(false, topicOptions);
 
     let topics = getAllTopics(document);
     if (!topics || topics.length <= 1) return; // first is header
-    await handleTopicListOptions(topics);
+    await handleTopicListOptions(topics, topicOptions);
 }
 
 function handlePrivateMessage(privateMessageElement, author) {
@@ -906,9 +887,10 @@ async function entryPoint() {
             case 'topiclist': {
                 if (forumFilteringIsDisabled) break;
                 createTopicListOverlay();
-                const finalTopics = await handleTopicList(true);
+                const topicOptions = prepareTopicOptions();
+                const finalTopics = await handleTopicList(true, topicOptions);
                 if (!finalTopics || finalTopics.length <= 1) break; // first is header
-                await handleTopicListOptions(finalTopics);
+                await handleTopicListOptions(finalTopics, topicOptions);
                 addRightBlocMatches();
                 addRightBlocStats();
                 toggleTopicOverlay(false);
@@ -964,8 +946,6 @@ async function entryPoint() {
         sendFinalEvent();
     }
 }
-
-//enableDecensuredEvents();
 
 if (document.readyState === 'interactive' || document.readyState === 'complete') {
     entryPoint();
