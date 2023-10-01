@@ -14,7 +14,7 @@
     "resources/**",
     "variables.js",
     "storage.js",
-    "extensions.js",
+    "helpers.js",
     "preboucles.js",
     "apidata.js",
     "jvarchiveapi.js",

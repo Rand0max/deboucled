@@ -189,6 +189,7 @@ function handleJvChatAndTopicLive(messageOptions) {
         }
 
         handleMessageAssignTopicAuthor(author, authorElement);
+        buildAuthorBadges(authorElement, author, messageOptions);
 
         if (messageOptions.optionEnhanceQuotations) {
             highlightSpecialAuthors(author, authorElement, isSelf);

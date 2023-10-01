@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.45.2
+// @version     2.45.3
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -42,7 +42,7 @@
 // @require     https://unpkg.com/@chocolateboy/uncommonjs@3.2.1/dist/polyfill.iife.min.js
 // @require     https://unpkg.com/fastest-levenshtein@1.0.16/mod.js
 // @require     variables.js
-// @require     extensions.js
+// @require     helpers.js
 // @require     storage.js
 // @require     preboucles.js
 // @require     apidata.js

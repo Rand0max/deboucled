@@ -474,7 +474,7 @@ function markTopicLoop(subject, nearElement, withHint = true) {
     const badgeOpt = {
         id: 'ai_boucledsubject',
         content: 'BOUCLE',
-        hint: withHint ? `<I.A Déboucled> - consulter cette boucle sur JvArchive` : undefined,
+        hint: withHint ? `‹I.A Déboucled› - consulter cette boucle sur JvArchive` : undefined,
         url: redirectUrl,
         level: 'danger',
         parent: nearElement,
@@ -491,7 +491,7 @@ function markAuthorLoop(author, nearElement, withHint = true, badgeContainerClas
     const badgeOpt = {
         id: 'ai_boucledauthor',
         content: 'BOUCLEUR',
-        hint: withHint ? `<I.A Déboucled> - consulter les topics de ce boucleur sur JvArchive` : undefined,
+        hint: withHint ? `‹I.A Déboucled› - consulter les topics de ce boucleur sur JvArchive` : undefined,
         url: redirectUrl,
         level: 'warning',
         parent: badgeContainer,

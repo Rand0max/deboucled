@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.45.3] (01/10/2023)
+
+- Ajout des badges avec JvChat/TopicLive
+
 ## [2.45.2] (28/09/2023)
 
 - Option pour afficher/masquer les badges
