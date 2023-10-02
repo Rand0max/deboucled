@@ -506,6 +506,10 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     if (messageOptions.optionBlSubjectIgnoreMessages && !isSelf) {
         handleBlSubjectIgnoreMessages(messageElement);
     }
+
+    if (currentTopicFilteredAuthor?.length && author.toLowerCase() !== currentTopicFilteredAuthor.toLowerCase()) {
+        messageElement.style.display = 'none';
+    }
 }
 
 async function parseTopicAuthor(pageId) {

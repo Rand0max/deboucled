@@ -98,6 +98,7 @@ let currentTopicId = undefined;
 let currentTopicPageId = undefined;
 let currentTopicAuthor = undefined;
 let forumFilteringIsDisabled = false;
+let currentTopicFilteredAuthor = undefined;
 
 const domParser = new DOMParser();
 

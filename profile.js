@@ -4,13 +4,62 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function buildJvArchiveProfilButton(author) {
-    let redirectUrl = `${jvarchiveUrl}/profil/${author.toLowerCase()}`;
-    let profilAnchor = document.createElement('a');
+    const redirectUrl = `${jvarchiveUrl}/profil/${author.toLowerCase()}`;
+    const profilAnchor = document.createElement('a');
     profilAnchor.setAttribute('class', 'xXx lien-jv deboucled-jvarchive-logo deboucled-blackandwhite');
     profilAnchor.setAttribute('href', redirectUrl);
     profilAnchor.setAttribute('target', '_blank');
     profilAnchor.setAttribute('title', 'Profil JvArchive');
     return profilAnchor;
+}
+
+function handleAuthorMessageFilter(filterElement, author) {
+    if (!filterElement) return;
+
+    const messages = getAllMessages();
+    if (!messages?.length) return;
+
+    function toggleFilterClass(elem, enabled) {
+        if (!elem) return;
+        elem.classList.toggle('deboucled-filter-logo', enabled);
+        elem.classList.toggle('deboucled-clearfilter-logo', !enabled);
+    }
+
+    messages.forEach(m => m.style.removeProperty('display'));
+
+    if (filterElement.classList.contains('deboucled-filter-logo')) {
+        currentTopicFilteredAuthor = author;
+
+        messages.forEach(m => {
+            const mAuthorElement = m.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+            if (!mAuthorElement) return;
+
+            const mFilterElement = m.querySelector('.deboucled-filter-logo,.deboucled-clearfilter-logo');
+            const mAuthor = mAuthorElement.textContent?.trim();
+            if (mAuthor?.toLowerCase() === author?.toLowerCase()) {
+                toggleFilterClass(mFilterElement, false);
+            } else {
+                m.style.display = 'none';
+                toggleFilterClass(mFilterElement, true);
+            }
+        });
+    }
+    else {
+        currentTopicFilteredAuthor = undefined;
+
+        messages.forEach(m => {
+            const mFilterElement = m.querySelector('.deboucled-clearfilter-logo');
+            toggleFilterClass(mFilterElement, true);
+        });
+    }
+}
+
+function buildFilterAuthorMessageButton(author) {
+    const filterElement = document.createElement('div');
+    filterElement.className = 'deboucled-filter-logo deboucled-blackandwhite';
+    filterElement.setAttribute('deboucled-data-tooltip', 'Filter sur les messages de ce pseudo.');
+    filterElement.onclick = () => handleAuthorMessageFilter(filterElement, author);
+    return filterElement;
 }
 
 function buildProfileBlacklistBadges(author, authorElement) {

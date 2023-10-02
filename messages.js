@@ -4,6 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function getAllMessages(doc) {
+    if (!doc) doc = document;
     let allMessages = doc.querySelectorAll('.conteneur-messages-pagi > div.bloc-message-forum');
     return [...allMessages];
 }
@@ -119,6 +120,9 @@ function addAuthorButtons(nearbyElement, author, optionBoucledUseJvarchive) {
 
     let jvArchiveProfilButton = buildJvArchiveProfilButton(author);
     insertAfter(jvArchiveProfilButton, boucledButton);
+
+    let filterAuthorButton = buildFilterAuthorMessageButton(author);
+    insertAfter(filterAuthorButton, jvArchiveProfilButton);
 }
 
 function buildAuthorBadges(authorElement, author, messageOptions, title) {

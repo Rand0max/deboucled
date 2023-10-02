@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.46.0] (02/10/2023)
+
+- Nouveau bouton pour filter sur les messages d'un pseudo
+
 ## [2.45.3] (01/10/2023)
 
 - Ajout des badges avec JvChat/TopicLive

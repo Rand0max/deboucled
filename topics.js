@@ -942,7 +942,7 @@ function createSmoothScroll(handleMessageCallback) {
         bottomPagi.insertAdjacentElement('beforebegin', separator);
 
         allMessages.forEach(m => {
-            let fixedMessage = fixMessageJvCare(m);
+            const fixedMessage = fixMessageJvCare(m);
             bottomPagi.insertAdjacentElement('beforebegin', fixedMessage);
             handleMessageCallback(fixedMessage);
         });
