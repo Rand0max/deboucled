@@ -2289,6 +2289,27 @@ select.deboucled-dropdown::-ms-expand {
   .bloc-header .deboucled-author-boucled-button {
     margin: 0 0 1px 10px;
   }
+  .conteneur-message .deboucled-filter-logo,
+  .conteneur-message .deboucled-clearfilter-logo {
+    margin: 0 0 2px 8px;
+  }
+  .bloc-message-forum .bloc-header {
+    grid-template-areas:
+      "avatar pseudo pseudo mp boucled jvarchive filter options"
+      "avatar level badge badge badge badge badge badge"
+      "avatar date date date date date date date";
+    grid-template-rows: 1rem 1.3rem 0.6rem;
+  }
+  .deboucled-badge-container {
+    align-self: center;
+  }
+  .bloc-message-forum .bloc-date-msg {
+    margin-top: initial;
+  }
+  .deboucled-badge {
+    padding: 0.15rem 0.3rem 0.15rem 0.3rem;
+    font-size: 60% !important;
+  }
 }
 @media (max-width: 558px) {
   .deboucled-overlay {
