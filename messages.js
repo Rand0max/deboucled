@@ -126,13 +126,17 @@ function addAuthorButtons(nearbyElement, author, optionBoucledUseJvarchive) {
 }
 
 function buildAuthorBadges(authorElement, author, messageOptions, title) {
+    let authorMarkedLoop = false;
     if (messageOptions.optionAntiLoopAiMode !== 0) {
         const isTopicAuthor = author.toLowerCase() === currentTopicAuthor;
         const topicLoop = getTopicLoop(isTopicAuthor ? title : undefined, author);
-        if (topicLoop.isAuthorLoop) markAuthorLoop(topicLoop.loopAuthor, authorElement, true, 'deboucled-badge-message');
+        if (topicLoop.isAuthorLoop) {
+            authorMarkedLoop = true;
+            markAuthorLoop(topicLoop.loopAuthor, authorElement, true, 'deboucled-badge-message');
+        }
     }
     if (messageOptions.optionDisplayBadges) {
-        buildAuthorBlacklistBadges(author, authorElement.parentElement, [], 'deboucled-badge-message');
+        buildAuthorBlacklistBadges(author, authorElement.parentElement, authorMarkedLoop ? ['boucledauthors'] : [], 'deboucled-badge-message');
     }
 }
 

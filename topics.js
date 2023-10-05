@@ -542,7 +542,7 @@ function buildAuthorBlacklistBadges(author, parentElement, excludedLists, contai
         .forEach(bl => {
             const badgeOpt = {
                 id: `blacklist_${bl.id}`,
-                content: bl.description.toUpperCase(),
+                content: bl.shortDescription.toUpperCase(),
                 hint: `Présent dans la liste « ${bl.description} ».`,
                 level: bl.enabled ? 'blacklist' : 'neutral',
                 url: redirectUrl,

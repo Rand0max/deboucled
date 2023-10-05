@@ -238,7 +238,7 @@ async function parseTopicListAuthors(topics, optionDisplayBadges) {
 
         if (optionDisplayBadges) {
             const excludedLists = [];
-            if (topic.querySelector(`#deboucled_ai_boucledauthor,#deboucled_ai_boucledsubject`)) excludedLists.push('boucledauthors');
+            if (topic.querySelector('#deboucled_ai_boucledauthor,#deboucled_ai_boucledsubject')) excludedLists.push('boucledauthors');
             buildAuthorBlacklistBadges(author, topic.querySelector('.topic-subject'), excludedLists);
         }
 
@@ -376,6 +376,7 @@ function blacklistsIncludingEntity(entity, entityType, mustBeEnabled = true) {
                 blacklists.push({
                     id: pb.id,
                     description: pb.title,
+                    shortDescription: pb.shortTitle,
                     enabled: pb.enabled
                 });
         });

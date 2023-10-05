@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.46.2] (05/10/2023)
+
+- Améliorations mineures des badges
+
 ## [2.46.0] (02/10/2023)
 
 - Nouveau bouton pour filter sur les messages d'un pseudo
