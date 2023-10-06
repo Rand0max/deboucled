@@ -365,6 +365,7 @@ function blacklistsIncludingEntity(entity, entityType, mustBeEnabled = true) {
         blacklists.push({
             id: `custom_${entityType}`,
             description: `Liste noire ${getEntityTitle(entityType)}`,
+            shortDescription: `Liste noire ${getEntityTitle(entityType)}`,
             enabled: true
         });
 
