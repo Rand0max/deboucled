@@ -60,9 +60,9 @@ function createTopicListOverlay() {
 }
 
 function toggleTopicOverlay(active) {
-    document.querySelector('.deboucled-overlay').classList.toggle('active', active);
-    document.querySelector('.deboucled-overlay-spinner').classList.toggle('active', active);
-    document.querySelector('.topic-list').removeAttribute('style');
+    document.querySelector('.deboucled-overlay')?.classList.toggle('active', active);
+    document.querySelector('.deboucled-overlay-spinner')?.classList.toggle('active', active);
+    document.querySelector('.topic-list')?.removeAttribute('style');
 }
 
 async function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {

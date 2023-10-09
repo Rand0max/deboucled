@@ -1649,7 +1649,7 @@ input[type="search"] {
   row-gap: 0.3rem;
   margin-left: auto;
   width: auto;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 .deboucled-medal-container {
   display: flex;
@@ -2302,13 +2302,15 @@ select.deboucled-dropdown::-ms-expand {
   }
   .deboucled-badge-container {
     align-self: center;
+    margin-left: 0.5rem;
   }
   .bloc-message-forum .bloc-date-msg {
     margin-top: initial;
   }
   .deboucled-badge {
     padding: 0.15rem 0.3rem 0.15rem 0.3rem;
-    font-size: 60% !important;
+    font-size: 0.6rem !important;
+    /* letter-spacing: 0.05em; */
   }
 }
 @media (max-width: 558px) {
