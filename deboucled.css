@@ -865,7 +865,8 @@ blockquote .deboucled-highlighted {
 .deboucled-twitter-logo::before {
   content: "\EA0B";
   font-family: "icons";
-  font-size: 1.5rem;
+  font-size: 0.9em;
+  vertical-align: bottom;
 }
 
 .deboucled-eye-white-logo {
