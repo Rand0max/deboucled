@@ -64,7 +64,7 @@ function updateFilteredMessages() {
     }
 
     messages.forEach(message => {
-        message.style.removeProperty('display');
+        if (!message.getAttribute('blacklisted')) message.style.removeProperty('display');
 
         const mAuthorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
         if (!mAuthorElement) return;

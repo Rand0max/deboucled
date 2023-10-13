@@ -76,6 +76,7 @@ function removeMessage(element) {
         */
 
         elem.style.display = 'none';
+        elem.setAttribute('blacklisted', true);
         const parent = elem.parentElement;
         parent.removeChild(elem);
         parent.appendChild(elem);
