@@ -71,7 +71,7 @@ body.deboucled-dark-theme {
   row-gap: 10px;
 }
 .deboucled-sponsor,
-.deboucled-donation {
+.deboucled-support {
   text-align: center;
   color: #777;
   opacity: 0.8;
@@ -80,10 +80,10 @@ body.deboucled-dark-theme {
   user-select: none;
 }
 .deboucled-sponsor:hover,
-.deboucled-donation:hover {
+.deboucled-support:hover {
   opacity: 1;
 }
-.deboucled-donation {
+.deboucled-support {
   cursor: pointer;
   font-size: 0.8125rem;
   font-weight: 800;
@@ -1010,7 +1010,7 @@ blockquote .deboucled-highlighted {
   height: 23px;
   vertical-align: bottom;
 }
-.deboucled-donation-logo {
+.deboucled-support-logo {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAADLklEQVRYhe3XW4hWVRQH8F/jjF1siAxqLOfB7lQmERGZBYFdIAkMSugipUFEdHuIkKKiCzEPBQVJ9BKEGNGNghIqEhS0qGwmowmjKBuQsohS02lqpof//vqOM854vvryqT+ch7PO3nutvdZ/XQ7/o3XMRh8+w2/YiU14GEe3ethBLa6/Es9jO1ZhEMOYi2vQg+V4qVVD6mAJRvAAuorsovJAJ+7Hn7i63cqPwk94sPJ+PF7DK5hWWXsfdog32oZH8SWml/cnMFZ5vhJuEE8MCk/2i46aBlyK1fi9IluPE3AaRrGsyP8QnlxR5+DOmgbMk/hWMQf3CB+OwxeVb58W4zqKcZOirgdGTMyYThyJw4vyh3Bo5du0feyZgLoe+B6n482KbECT7QskJL3YglOxVTKiLViJfk2PjSfhGNaU7x1SpJ5ul3I4Ebtxb3k/GQvxDt7FOZqpeDv24KR2GgC3CMNXaHpiSXkU2Z1lzY3tVt7ArXK7j4uyhbgEd0s/2Imb/ivlDZyCZ7FNM/6DeEqzGP0rdOBiPCc3HRJmvyGNZvrkW8HleB2fCzF7hEPz97f3MInzFonjGon3siJfKf1gQArPeMzBW1IzXpQQDeFnTU9tKuuWY1G5rB7p5T+WxX2TKCD9/hN8jTOLrEsq4i5slKo5Ey+UizwpWbOoGDEq4duFZ+DbcuAd6J7KRQUz8V45bEByflQ40C19Y0ia13lSDW8Tgq7HBeWcpfhBuW21ndbFPDyGj/CrvYtSP2aIu9fK5HSXZvrOwmZp5W3DLJxfFI1IKHdgg4SggauktH+oxRGuU/J9sdT8yRpNb1G8u6xvePcYvCy86MMhrSgnLl1bDh6T2WCrDCONZ5s0oPdlTmjgWiH5Zinbf2OqdtldrNw+Tt4lnXF2uVWVP8PFkA1CzGOF6ZfJrR8pa6bEEdLJRspN10m5bRU3SFr346y6mxbgO3yD64VUq8Wt63BhjTN6pYgNyxTVNfXyvbEUj5tYD87Aq+LWt3HuPvZ24Gb8Igyf24riujhbpqLGAHJdMW4xPhCCrlB/0vrHmC8e2aOZEauk6RxQHCw/KDMOtOK24S+7scakVx6WVgAAAABJRU5ErkJggg==)
     0 no-repeat;
   width: 24px;
@@ -1445,7 +1445,7 @@ input[type="search"] {
 .deboucled-about-link-discord,
 .deboucled-about-link-stylish,
 .deboucled-about-link-jvarchive,
-.deboucled-about-link-donation {
+.deboucled-about-link-support {
   display: inline-block;
   position: relative;
   cursor: pointer;
@@ -1464,7 +1464,7 @@ input[type="search"] {
 .deboucled-about-link-discord:hover,
 .deboucled-about-link-stylish:hover,
 .deboucled-about-link-jvarchive:hover,
-.deboucled-about-link-donation:hover {
+.deboucled-about-link-support:hover {
   opacity: 1;
 }
 
@@ -1544,10 +1544,25 @@ input[type="search"] {
   font-size: 95% !important;
   border-radius: 0.5rem;
 }
+.deboucled-badge.close {
+  margin: 0.4rem 0 0.8rem 0;
+  display: inline-block;
+  opacity: 0.9;
+  font-size: 85% !important;
+}
+.deboucled-badge.close:hover {
+  opacity: 1;
+}
+.deboucled-badge.close::after {
+  content: "X";
+  margin-left: 0.4em;
+  font-weight: 800;
+  color: gray;
+}
 
 .deboucled-badge-neutral {
   color: #000 !important;
-  background-color: #eee !important;
+  background-color: #ddd !important;
 }
 .deboucled-badge-blacklist {
   color: #b73636 !important;

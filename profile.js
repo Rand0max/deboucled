@@ -13,11 +13,49 @@ function buildJvArchiveProfilButton(author) {
     return profilAnchor;
 }
 
-function handleAuthorMessageFilter(filterElement, author) {
-    if (!filterElement) return;
+function updateFilteredAuthorHeader() {
+    const filteredAuthor = topicFilteredAuthorMap.get(currentTopicId);
 
+    let filteredAuthorElement = document.querySelector('#deboucled-filtered-author');
+
+    if (filteredAuthorElement && !filteredAuthor?.length) { // suppression du bouton
+        filteredAuthorElement.remove();
+    }
+    else if (!filteredAuthorElement && filteredAuthor?.length) { // création du bouton
+        const paginationElement = document.querySelector('div.bloc-pagi-default');
+        if (!paginationElement) return;
+
+        filteredAuthorElement = document.createElement('div');
+        filteredAuthorElement.id = 'deboucled-filtered-author'
+        filteredAuthorElement.className = `deboucled-badge deboucled-badge-neutral${preferDarkTheme() ? ' dark' : ''} pill close`;
+        filteredAuthorElement.textContent = filteredAuthor.trim().toUpperCase();
+        filteredAuthorElement.onclick = async () => {
+            await toggleFilteredTopicAuthor();
+            updateFilteredMessages();
+        };
+        paginationElement.insertAdjacentElement('afterend', filteredAuthorElement);
+    }
+    else if (filteredAuthorElement && filteredAuthor?.length) { // mise à jour
+        filteredAuthorElement.textContent = filteredAuthor.trim().toUpperCase();
+    }
+}
+
+async function toggleFilteredTopicAuthor(author) {
+    const currentFilteredAuthor = topicFilteredAuthorMap.get(currentTopicId);
+    if (currentFilteredAuthor?.toLowerCase() !== author?.toLowerCase()) {
+        topicFilteredAuthorMap.set(currentTopicId, author);
+    }
+    else {
+        topicFilteredAuthorMap.delete(currentTopicId);
+    }
+    await saveLocalStorage();
+}
+
+function updateFilteredMessages() {
     const messages = getAllMessages();
     if (!messages?.length) return;
+
+    const filteredAuthor = topicFilteredAuthorMap.get(currentTopicId);
 
     function toggleFilterClass(elem, enabled) {
         if (!elem) return;
@@ -25,40 +63,43 @@ function handleAuthorMessageFilter(filterElement, author) {
         elem.classList.toggle('deboucled-clearfilter-logo', !enabled);
     }
 
-    messages.forEach(m => m.style.removeProperty('display'));
+    messages.forEach(message => {
+        message.style.removeProperty('display');
 
-    if (filterElement.classList.contains('deboucled-filter-logo')) {
-        currentTopicFilteredAuthor = author;
+        const mAuthorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+        if (!mAuthorElement) return;
 
-        messages.forEach(m => {
-            const mAuthorElement = m.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
-            if (!mAuthorElement) return;
+        const mAuthor = mAuthorElement.textContent?.trim();
+        if (!mAuthor?.length) return;
 
-            const mFilterElement = m.querySelector('.deboucled-filter-logo,.deboucled-clearfilter-logo');
-            const mAuthor = mAuthorElement.textContent?.trim();
-            if (mAuthor?.toLowerCase() === author?.toLowerCase()) {
+        const mFilterElement = message.querySelector('.deboucled-filter-logo,.deboucled-clearfilter-logo');
+        if (!mFilterElement) return;
+
+        if (filteredAuthor?.length) {
+            if (filteredAuthor.toLowerCase() === mAuthor.toLowerCase()) {
                 toggleFilterClass(mFilterElement, false);
-            } else {
-                m.style.display = 'none';
+            }
+            else {
+                message.style.display = 'none';
                 toggleFilterClass(mFilterElement, true);
             }
-        });
-    }
-    else {
-        currentTopicFilteredAuthor = undefined;
-
-        messages.forEach(m => {
-            const mFilterElement = m.querySelector('.deboucled-clearfilter-logo');
+        }
+        else {
             toggleFilterClass(mFilterElement, true);
-        });
-    }
+        }
+    });
+
+    updateFilteredAuthorHeader();
 }
 
 function buildFilterAuthorMessageButton(author) {
     const filterElement = document.createElement('div');
     filterElement.className = 'deboucled-filter-logo deboucled-blackandwhite';
     filterElement.setAttribute('deboucled-data-tooltip', 'Filter sur les messages de ce pseudo.');
-    filterElement.onclick = () => handleAuthorMessageFilter(filterElement, author);
+    filterElement.onclick = async () => {
+        await toggleFilteredTopicAuthor(author);
+        updateFilteredMessages();
+    }
     return filterElement;
 }
 

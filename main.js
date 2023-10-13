@@ -509,7 +509,8 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
         handleBlSubjectIgnoreMessages(messageElement);
     }
 
-    if (currentTopicFilteredAuthor?.length && author.toLowerCase() !== currentTopicFilteredAuthor.toLowerCase()) {
+    const topicFilteredAuthor = topicFilteredAuthorMap.get(currentTopicId);
+    if (topicFilteredAuthor?.length && author.toLowerCase() !== topicFilteredAuthor.toLowerCase()) {
         messageElement.style.display = 'none';
     }
 }
@@ -668,6 +669,8 @@ async function handleTopicMessages() {
 
     const isFirstMessage = (index) => index === 0 && currentTopicPageId === 1;
     allMessages.forEach((message, index) => handleMessage(message, messageOptions, isFirstMessage(index)));
+
+    updateFilteredMessages();
 
     if (hiddenSpammers > 0) refreshAuthorKeys();
     if (hiddenMessages === allMessages.length) displayTopicDeboucledMessage();

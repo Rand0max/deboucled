@@ -62,6 +62,7 @@ let hotTopicsData = undefined;
 let pocTopicMap = new Map();
 let topicAuthorMap = new Map();
 let authorAvatarMap = new Map();
+let topicFilteredAuthorMap = new Map();
 
 let hiddenTotalTopics = 0;
 let hiddenSubjects = 0;
@@ -98,7 +99,6 @@ let currentTopicId = undefined;
 let currentTopicPageId = undefined;
 let currentTopicAuthor = undefined;
 let forumFilteringIsDisabled = false;
-let currentTopicFilteredAuthor = undefined;
 
 const domParser = new DOMParser();
 

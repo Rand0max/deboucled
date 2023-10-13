@@ -38,17 +38,17 @@ function buildSponsor() {
     */
 }
 
-function buildDonation() {
+function buildSupport() {
     const layoutContentAside = document.querySelector('div.layout__contentAside');
     if (!layoutContentAside) return;
 
-    const donationLogo = '<span class="deboucled-donation-logo"></span>';
-    const donationDiv = document.createElement('div');
-    donationDiv.className = 'deboucled-donation';
-    donationDiv.innerHTML = `Aider Déboucled ${donationLogo}`;
-    donationDiv.title = 'Faire un don';
-    layoutContentAside.appendChild(donationDiv);
-    donationDiv.onclick = () => window.open(`https://commerce.coinbase.com/checkout/8ea5e4cc-cc0b-432f-852f-5cc4e30458b5`, '_blank');
+    const supportLogo = '<span class="deboucled-support-logo"></span>';
+    const supportDiv = document.createElement('div');
+    supportDiv.className = 'deboucled-support';
+    supportDiv.innerHTML = `Aider Déboucled ${supportLogo}`;
+    supportDiv.title = 'Faire un don';
+    layoutContentAside.appendChild(supportDiv);
+    supportDiv.onclick = () => window.open(`https://commerce.coinbase.com/checkout/8ea5e4cc-cc0b-432f-852f-5cc4e30458b5`, '_blank');
 }
 
 function displaySecret() {
@@ -102,7 +102,7 @@ function displayAnnouncement() {
 */
 
 function buildExtras() {
-    buildDonation();
+    buildSupport();
     buildSponsor();
 }
 

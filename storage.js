@@ -8,6 +8,7 @@ const store = new GMStorage(); // eslint-disable-line no-undef
 const localstorage_pocTopics = 'deboucled_pocTopics';
 const localstorage_topicAuthors = 'deboucled_topicAuthors';
 const localstorage_authorAvatars = 'deboucled_topicAuthorAvatars';
+const localstorage_topicFilteredAuthors = 'deboucled_topicFilteredAuthors';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
 const storage_secret_displayed = 'deboucled_secret2_displayed', storage_secret_displayed_default = false;
@@ -173,23 +174,27 @@ async function loadLocalStorage() {
     let storagePocTopics;
     let storageTopicAuthors;
     let storageAuthorAvatars;
+    let storageTopicFilteredAuthors;
 
     /* eslint-disable no-undef */
     if (typeof localforage !== 'undefined') {
         storagePocTopics = await localforage.getItem(localstorage_pocTopics);
         storageTopicAuthors = await localforage.getItem(localstorage_topicAuthors);
         storageAuthorAvatars = await localforage.getItem(localstorage_authorAvatars);
+        storageTopicFilteredAuthors = await localforage.getItem(localstorage_topicFilteredAuthors);
     }
     else {
         storagePocTopics = store.get(localstorage_pocTopics, '[]');
         storageTopicAuthors = store.get(localstorage_topicAuthors, '[]');
         storageAuthorAvatars = store.get(localstorage_authorAvatars, '[]');
+        storageTopicFilteredAuthors = store.get(localstorage_topicFilteredAuthors, '[]');
     }
     /* eslint-enable no-undef */
 
     if (storagePocTopics) pocTopicMap = new Map([...JSON.parse(storagePocTopics)]);
     if (storageTopicAuthors) topicAuthorMap = new Map([...JSON.parse(storageTopicAuthors)]);
     if (storageAuthorAvatars) authorAvatarMap = new Map([...JSON.parse(storageAuthorAvatars)]);
+    if (storageTopicFilteredAuthors) topicFilteredAuthorMap = new Map([...JSON.parse(storageTopicFilteredAuthors)]);
 }
 
 async function saveLocalStorage() {
@@ -201,11 +206,13 @@ async function saveLocalStorage() {
         await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
         await localforage.setItem(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
         await localforage.setItem(localstorage_authorAvatars, JSON.stringify([...authorAvatarMap]));
+        await localforage.setItem(localstorage_topicFilteredAuthors, JSON.stringify([...topicFilteredAuthorMap]));
     }
     else {
         store.set(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
         store.set(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
         store.set(localstorage_authorAvatars, JSON.stringify([...authorAvatarMap]));
+        store.set(localstorage_topicFilteredAuthors, JSON.stringify([...topicFilteredAuthorMap]));
     }
     /* eslint-enable no-undef */
 }

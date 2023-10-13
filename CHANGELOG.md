@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.46.6] (13/10/2023)
+
+- Amélioration de la fonctionnalité de filtrage des messages
+
 ## [2.46.2] (05/10/2023)
 
 - Améliorations mineures des badges
