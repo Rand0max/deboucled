@@ -10,11 +10,11 @@ function mustRefresh(storageLastUpdateKey, dataExpire) {
     return lastUpdate <= dateExpireRange;
 }
 
-async function queryApiData(forceUpdate, dataUrl, storageLastUpdateKey, dataExpire, storageDataKey, storageDataDefaultKey, dataTransformFn) {
+async function queryApiData(forceUpdate, dataUrl, storageLastUpdateKey, dataExpire, storageDataKey, storageDataDefaultKey, dataTransformFn, queryParams) {
     let resultData = JSON.parse(store.get(storageDataKey, storageDataDefaultKey));
 
     if (!resultData || forceUpdate || mustRefresh(storageLastUpdateKey, dataExpire)) {
-        let newData = await fetchJson(dataUrl);
+        let newData = queryParams ? await fetchJsonWithParams(dataUrl, queryParams) : await fetchJson(dataUrl);
         store.set(storageLastUpdateKey, Date.now());
         if (!newData) return resultData;
 
@@ -45,7 +45,7 @@ async function checkUpdate() {
     let checkRes;
     await GM.xmlHttpRequest({
         method: 'POST',
-        url: checkUpdateUrl,
+        url: apiCheckUpdateUrl,
         data: bodyJson,
         headers: { 'Content-Type': 'application/json' },
         onload: (response) => { checkRes = response.responseText; },
@@ -72,7 +72,7 @@ async function updateUser() {
     const bodyJson = JSON.stringify(body);
     await GM.xmlHttpRequest({
         method: 'POST',
-        url: updateUserUrl,
+        url: apiUpdateUserUrl,
         data: bodyJson,
         headers: { 'Content-Type': 'application/json' },
         onerror: (response) => { console.error("error : %o", response); }
@@ -101,7 +101,7 @@ async function sendDiagnostic(elapsed, exception) {
 
     await GM.xmlHttpRequest({
         method: 'POST',
-        url: diagnosticUrl,
+        url: apiDiagnosticUrl,
         data: bodyJson,
         headers: { 'Content-Type': 'application/json' },
         onerror: (response) => { console.error("error : %o", response); }
@@ -110,10 +110,36 @@ async function sendDiagnostic(elapsed, exception) {
     store.set(storage_DiagnosticLastUpdate, Date.now());
 }
 
+async function sendMessageQuote(messageQuoteInfo) {
+    const body = {
+        userid: messageQuoteInfo.userId,
+        quoted_message_id: messageQuoteInfo.quotedMessageId,
+        quoted_username: messageQuoteInfo.quotedUsername,
+        quoted_message_url: messageQuoteInfo.quotedMessageUrl,
+        new_message_id: messageQuoteInfo.newMessageId,
+        new_message_username: messageQuoteInfo.newMessageUsername,
+        new_message_content: messageQuoteInfo.newMessageContent,
+        new_message_url: messageQuoteInfo.newMessageUrl,
+        topic_id: messageQuoteInfo.topicId,
+        topic_url: messageQuoteInfo.topicUrl,
+        topic_title: messageQuoteInfo.topicTitle,
+        creation_date: new Date()
+    };
+    const bodyJson = JSON.stringify(body);
+
+    await GM.xmlHttpRequest({
+        method: 'POST',
+        url: apiMessageQuoteUrl,
+        data: bodyJson,
+        headers: { 'Content-Type': 'application/json' },
+        onerror: (response) => { console.error("error : %o", response); }
+    });
+}
+
 async function parseYoutubeBlacklistData(forceUpdate) {
     youtubeBlacklistArray = await queryApiData(
         forceUpdate,
-        youtubeBlacklistUrl,
+        apiYoutubeBlacklistUrl,
         storage_youtubeBlacklistLastUpdate,
         youtubeBlacklistRefreshExpire,
         storage_youtubeBlacklist,
@@ -127,7 +153,7 @@ async function parseYoutubeBlacklistData(forceUpdate) {
 async function parsePreboucleData(forceUpdate) {
     preBoucleArray = await queryApiData(
         forceUpdate,
-        prebouclesDataUrl,
+        apiPrebouclesDataUrl,
         storage_prebouclesLastUpdate,
         prebouclesRefreshExpire,
         storage_preBouclesData,
@@ -143,7 +169,7 @@ async function parsePreboucleData(forceUpdate) {
 async function parseAiLoopData(forceUpdate) {
     aiLoopData = await queryApiData(
         forceUpdate,
-        aiLoopsDataUrl,
+        apiAiLoopsDataUrl,
         storage_aiLoopsLastUpdate,
         aiLoopsRefreshExpire,
         storage_aiLoopsData,
@@ -165,7 +191,7 @@ async function parseAiLoopData(forceUpdate) {
 async function parseAiBoucledAuthorsData(forceUpdate) {
     aiBoucledAuthorsData = await queryApiData(
         forceUpdate,
-        aiBoucledAuthorsDataUrl,
+        apiAiBoucledAuthorsDataUrl,
         storage_aiBoucledAuthorsLastUpdate,
         aiBoucledAuthorsRefreshExpire,
         storage_aiBoucledAuthorsData,
@@ -187,4 +213,19 @@ async function parseHotTopicsData(forceUpdate) {
         mustRefresh(storage_hotTopicsLastUpdate, hotTopicsRefreshExpire)) {
         await queryHotTopics();
     }
+}
+
+async function parseMessageQuotesData(forceUpdate) {
+    if (!userPseudo?.length || !userId) return;
+
+    messageQuotesData = await queryApiData(
+        forceUpdate,
+        apiMessageQuoteUrl,
+        storage_messageQuotesLastUpdate,
+        messageQuotesRefreshExpire,
+        storage_messageQuotesData,
+        storage_messageQuotesData_default,
+        undefined,
+        { username: userPseudo.toLowerCase(), userid: userId }
+    );
 }

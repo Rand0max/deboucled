@@ -3,18 +3,102 @@
 // POST MESSAGE
 ///////////////////////////////////////////////////////////////////////////////////////
 
-function buildQuoteMessage(messageElement, selection) {
+function getAuthorFromMessage(messageElement) {
+    return messageElement.querySelector('.bloc-pseudo-msg.text-user,.bloc-pseudo-msg.text-modo,.bloc-pseudo-msg.text-admin')?.textContent?.trim() ?? '';
+}
+
+function getDateFromMessage(messageElement) {
+    return messageElement.querySelector('.bloc-date-msg')?.textContent?.trim() ?? '';
+}
+
+function getRawTypedMessage() {
+    const textArea = document.querySelector('#message_topic');
+    if (!textArea?.value?.length) return '';
+    const val = textArea.value;
+    const regex = new RegExp(/^[^>].*/, 'gmi');
+    return val.match(regex)?.join('\n')?.trim() ?? val.trim();
+}
+
+function prepareMessageQuoteInfo(messageElement) {
+    const currentUserPseudo = userPseudo ?? store.get(storage_lastUsedPseudo, userId);
+    return {
+        userId: userId,
+        quotedMessageId: messageElement.getAttribute('data-id'),
+        quotedUsername: getAuthorFromMessage(messageElement)?.toLowerCase(),
+        quotedMessageUrl: messageElement.querySelector('.bloc-date-msg .lien-jv')?.href,
+        newMessageId: 0, // filled after redirect
+        newMessageUsername: currentUserPseudo?.toLowerCase() ?? 'anonymous',
+        newMessageContent: '', // filled at validation
+        newMessageUrl: '', // filled after redirect
+        topicId: currentTopicId,
+        topicUrl: window.location.origin + window.location.pathname,
+        topicTitle: getTopicTitle(),
+        status: 'pending',
+        lastUpdateDate: new Date()
+    }
+}
+
+async function validatePendingMessageQuotes() {
+    const rawMessage = getRawTypedMessage();
+    messageQuotesPendingArray
+        .filter(mqp =>
+            mqp.status === 'pending'
+            && mqp.topicId === currentTopicId)
+        .forEach(mqp => {
+            mqp.newMessageContent = rawMessage;
+            mqp.status = 'validated';
+            mqp.lastUpdateDate = new Date();
+        });
+    await saveLocalStorage();
+}
+
+async function cleanupPendingMessageQuotes() {
+    const datenow = new Date();
+    messageQuotesPendingArray = messageQuotesPendingArray
+        .filter((q) => {
+            const dateExpireRange = new Date(datenow.setMinutes(datenow.getMinutes() - pendingMessageQuoteExpire.totalMinutes()));
+            console.log('dateExpireRange', dateExpireRange);
+            console.log('lastUpdateDate', q.lastUpdateDate);
+            return q.status !== 'validated' && q.lastUpdateDate > dateExpireRange;
+        });
+
+    await saveLocalStorage();
+}
+
+/*
+async function postNewMessage() {
     const textArea = document.querySelector('#message_topic');
     if (!textArea) return;
 
-    const getAuthorFromCitationBtn = (e) => e.querySelector('.bloc-pseudo-msg.text-user,.bloc-pseudo-msg.text-modo,.bloc-pseudo-msg.text-admin').textContent.trim();
-    const getDateFromCitationBtn = (e) => e.querySelector('.bloc-date-msg').textContent.trim();
-    const getQuoteHeader = (e) => `> Le ${getDateFromCitationBtn(e)} '''${getAuthorFromCitationBtn(e)}''' a écrit : `;
+    const formElement = document.querySelector('.form-post-message');
+    if (!formElement) return;
+
+    const formData = new FormData(formElement);
+
+    let checkRes;
+    await GM.xmlHttpRequest({
+        method: 'POST',
+        url: location.href,
+        data: formData,
+        headers: { 'Content-Type': 'application/json' },
+        onload: (response) => { checkRes = response.responseText; },
+        onerror: (response) => { console.error("error : %o", response); }
+    });
+
+    return checkRes;
+}
+*/
+
+async function buildQuoteMessage(messageElement, selection) {
+    const textArea = document.querySelector('#message_topic');
+    if (!textArea) return;
+
+    const newQuoteHeader = `> Le ${getDateFromMessage(messageElement)} '''${getAuthorFromMessage(messageElement)}''' a écrit : `;
 
     if (selection?.length) {
         const currentContent = textArea.value.length === 0 ? '' : `${textArea.value.trim()}\n\n`;
         const quotedText = selection.replaceAll('\n', '\n> ');
-        textArea.value = `${currentContent}${getQuoteHeader(messageElement)}\n> ${quotedText}\n\n`;
+        textArea.value = `${currentContent}${newQuoteHeader}\n> ${quotedText}\n\n`;
         textArea.dispatchEvent(new Event('change'));
         textArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
         textArea.focus({ preventScroll: true });
@@ -22,11 +106,14 @@ function buildQuoteMessage(messageElement, selection) {
     }
     else {
         setTimeout(() => {
-            const date = getDateFromCitationBtn(messageElement);
+            const date = getDateFromMessage(messageElement);
             const regex = new RegExp(`> Le\\s+?${date}\\s+?:`);
-            textArea.value = textArea.value.replace(regex, getQuoteHeader(messageElement));
+            textArea.value = textArea.value.replace(regex, newQuoteHeader);
         }, 600);
     }
+
+    messageQuotesPendingArray.push(prepareMessageQuoteInfo(messageElement));
+    await saveLocalStorage();
 }
 
 async function suggestAuthors(authorHint) {
@@ -53,7 +140,7 @@ function getSelectionOffset(container, pointerEvent) {
     return { offsetLeft: offsetLeft, offsetTop: offsetTop };
 }
 
-function addMessageQuoteEvents(allMessages) {
+function addMessagePartialQuoteEvents(allMessages) {
     function buildPartialQuoteButton(message) {
         const blocContenu = message.querySelector('.bloc-contenu');
         if (!blocContenu) return;
@@ -92,9 +179,13 @@ function addMessageQuoteEvents(allMessages) {
 
         message.onpointerup = (pe) => partialQuoteEvent(pe); // Pointer events = mouse + touch + pen
         message.oncontextmenu = (pe) => partialQuoteEvent(pe); // TouchEnd/MouseUp/PointerUp does not fire on mobile (in despite of)
+    });
+}
 
+function addMessageQuoteEvents(allMessages) {
+    allMessages.forEach((message) => {
         const quoteButton = message.querySelector('.picto-msg-quote');
-        if (quoteButton) quoteButton.onclick = () => buildQuoteMessage(message); // Full quote
+        if (quoteButton) quoteButton.addEventListener('click', () => buildQuoteMessage(message)); // Full quote
     });
 }
 

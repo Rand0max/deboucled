@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.47.0] (15/10/2023)
+
+- Surprise...
+
 ## [2.46.6] (13/10/2023)
 
 - Amélioration de la fonctionnalité de filtrage des messages

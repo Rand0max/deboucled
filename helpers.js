@@ -400,6 +400,10 @@ async function fetchJson(url, timeout = 1000) {
         });
 }
 
+async function fetchJsonWithParams(url, params, timeout = 1000) {
+    return fetchJson(url + '?' + new URLSearchParams(params), timeout);
+}
+
 async function fetchWithTimeout(resource, options = {}) {
     const { timeout = 8000 } = options;
     const controller = new AbortController();
@@ -448,3 +452,7 @@ function buildRandomStr(maxLength) {
     return (Math.random() + 1).toString(36).substring(maxLength);
 }
 
+function prependEvent(element, event, fn) {
+    if (!element) return;
+    element.addEventListener(event, fn, { capture: true });
+}

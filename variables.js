@@ -16,13 +16,14 @@ const avatarUseJvArchiveApi = false;
 
 const deboucledBackendUrl = 'https://deboucled.randomax.com';
 const deboucledApiUrl = `${deboucledBackendUrl}/api`;
-const youtubeBlacklistUrl = `${deboucledApiUrl}/youtubeblacklist`;
-const prebouclesDataUrl = `${deboucledApiUrl}/preboucles`;
-const aiLoopsDataUrl = `${deboucledApiUrl}/loops/v2`;
-const aiBoucledAuthorsDataUrl = `${deboucledApiUrl}/loops/authors`;
-const checkUpdateUrl = `${deboucledApiUrl}/checkupdate`;
-const updateUserUrl = `${deboucledApiUrl}/user`;
-const diagnosticUrl = `${deboucledApiUrl}/diagnostic`;
+const apiYoutubeBlacklistUrl = `${deboucledApiUrl}/youtubeblacklist`;
+const apiPrebouclesDataUrl = `${deboucledApiUrl}/preboucles`;
+const apiAiLoopsDataUrl = `${deboucledApiUrl}/loops/v2`;
+const apiAiBoucledAuthorsDataUrl = `${deboucledApiUrl}/loops/authors`;
+const apiCheckUpdateUrl = `${deboucledApiUrl}/checkupdate`;
+const apiUpdateUserUrl = `${deboucledApiUrl}/user`;
+const apiDiagnosticUrl = `${deboucledApiUrl}/diagnostic`;
+const apiMessageQuoteUrl = `${deboucledApiUrl}/message/quote`;
 
 /* eslint-disable no-undef */
 const checkUpdateExpire = TimeSpan.FromHours(6);
@@ -34,6 +35,9 @@ const aiBoucledAuthorsRefreshExpire = TimeSpan.FromMinutes(30);
 const updateUserExpire = TimeSpan.FromHours(6);
 const diagnosticExpire = TimeSpan.FromHours(12);
 const hotTopicsRefreshExpire = TimeSpan.FromMinutes(10);
+const messageQuotesRefreshExpire = TimeSpan.FromMinutes(1);
+
+const pendingMessageQuoteExpire = TimeSpan.FromDays(3);
 /* eslint-enable no-undef */
 
 let subjectBlacklistArray = [];
@@ -58,6 +62,9 @@ let aiBoucledAuthorsData = undefined;
 let aiBoucledAuthorsReg;
 
 let hotTopicsData = undefined;
+
+let messageQuotesPendingArray = [];
+let messageQuotesData = undefined;
 
 let pocTopicMap = new Map();
 let topicAuthorMap = new Map();
@@ -108,6 +115,6 @@ let smileyGifRegex = new RegExp();
 //const decensuredUrl = 'https://github.com/Rand0max/decensured#readme';
 //let decensuredActive = false;
 
-const deboucledPseudos = ['rand0max', 'rand0max2', 'rand0max3', 'rand0max4', 'rand0max5', 'rand0max6', 'rand0maxreborn', 'deboucled', 'decensured', 'roninwf'];
+const deboucledPseudos = ['rand0max', 'rand0max2', 'rand0max3', 'rand0max4', 'rand0max5', 'rand0max6', 'rand0max7', 'rand0maxreborn', 'deboucled', 'decensured', 'roninwf', 'roninwf2'];
 const deboucledTopics = ['67697509', '68410257', '68982055', '70029449', '71596925'];
 

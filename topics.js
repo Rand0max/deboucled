@@ -79,6 +79,11 @@ async function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
     }
 }
 
+function getTopicTitle() {
+    const titleElement = document.querySelector('#bloc-title-forum');
+    return titleElement?.textContent?.trim();
+}
+
 function getTopicId() {
     /*
     const urlRegex = /^\/forums\/(42|1)-[0-9]+-(?<topicid>[0-9]+)-[0-9]+-0-1-0-.*\.htm$/gi;

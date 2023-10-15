@@ -9,6 +9,7 @@ const localstorage_pocTopics = 'deboucled_pocTopics';
 const localstorage_topicAuthors = 'deboucled_topicAuthors';
 const localstorage_authorAvatars = 'deboucled_topicAuthorAvatars';
 const localstorage_topicFilteredAuthors = 'deboucled_topicFilteredAuthors';
+const localstorage_pendingMessageQuotes = 'deboucled_pendingMessageQuotes';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
 const storage_secret_displayed = 'deboucled_secret2_displayed', storage_secret_displayed_default = false;
@@ -56,6 +57,7 @@ const storage_optionDisplayTopicAvatar = 'deboucled_optionDisplayTopicAvatar', s
 const storage_optionHideAvatarBorder = 'deboucled_optionHideAvatarBorder', storage_optionHideAvatarBorder_default = false;
 const storage_optionDecensureTwitter = 'deboucled_optionDecensureTwitter', storage_optionDecensureTwitter_default = false;
 const storage_optionDisplayBadges = 'deboucled_optionDisplayBadges', storage_optionDisplayBadges_default = true;
+const storage_optionGetMessageQuotes = 'deboucled_optionGetMessageQuotes', storage_optionGetMessageQuotes_default = true;
 
 const storage_disabledFilteringForums = 'deboucled_disabledFilteringForums', storage_disabledFilteringForums_default = '[]';
 
@@ -81,8 +83,10 @@ const storage_lastUpdateUser = 'deboucled_lastUpdateUser';
 const storage_DiagnosticLastUpdate = 'deboucled_DiagnosticLastUpdate';
 const storage_hotTopicsData = 'deboucled_hotTopicsData', storage_hotTopicsData_default = '[]';
 const storage_hotTopicsLastUpdate = 'deboucled_hotTopicsLastUpdate';
+const storage_messageQuotesData = 'deboucled_messageQuotesData', storage_messageQuotesData_default = '{}';
+const storage_messageQuotesLastUpdate = 'deboucled_messageQuotesLastUpdate';
 
-const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_blacklistedShadows, storage_whitelistedTopicIds, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_optionAntiSpam, storage_optionSmoothScroll, storage_optionAntiLoopAiMode, storage_optionDisplayHotTopics, storage_optionHideLongMessages, storage_optionDisplayTitleSmileys, storage_optionDisplayTopicAvatar, storage_optionHideAvatarBorder, storage_optionDecensureTwitter, storage_optionDisplayBadges, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_totalHiddenSpammers, storage_TopicStats];
+const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_blacklistedShadows, storage_whitelistedTopicIds, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_optionAntiSpam, storage_optionSmoothScroll, storage_optionAntiLoopAiMode, storage_optionDisplayHotTopics, storage_optionHideLongMessages, storage_optionDisplayTitleSmileys, storage_optionDisplayTopicAvatar, storage_optionHideAvatarBorder, storage_optionDecensureTwitter, storage_optionDisplayBadges, storage_optionGetMessageQuotes, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_totalHiddenSpammers, storage_TopicStats];
 
 const storage_excluded_user_Keys = [storage_TopicStats];
 
@@ -175,6 +179,7 @@ async function loadLocalStorage() {
     let storageTopicAuthors;
     let storageAuthorAvatars;
     let storageTopicFilteredAuthors;
+    let storagePendingMessageQuotes;
 
     /* eslint-disable no-undef */
     if (typeof localforage !== 'undefined') {
@@ -182,12 +187,14 @@ async function loadLocalStorage() {
         storageTopicAuthors = await localforage.getItem(localstorage_topicAuthors);
         storageAuthorAvatars = await localforage.getItem(localstorage_authorAvatars);
         storageTopicFilteredAuthors = await localforage.getItem(localstorage_topicFilteredAuthors);
+        storagePendingMessageQuotes = await localforage.getItem(localstorage_pendingMessageQuotes);
     }
     else {
         storagePocTopics = store.get(localstorage_pocTopics, '[]');
         storageTopicAuthors = store.get(localstorage_topicAuthors, '[]');
         storageAuthorAvatars = store.get(localstorage_authorAvatars, '[]');
         storageTopicFilteredAuthors = store.get(localstorage_topicFilteredAuthors, '[]');
+        storagePendingMessageQuotes = store.get(localstorage_pendingMessageQuotes, '[]');
     }
     /* eslint-enable no-undef */
 
@@ -195,6 +202,7 @@ async function loadLocalStorage() {
     if (storageTopicAuthors) topicAuthorMap = new Map([...JSON.parse(storageTopicAuthors)]);
     if (storageAuthorAvatars) authorAvatarMap = new Map([...JSON.parse(storageAuthorAvatars)]);
     if (storageTopicFilteredAuthors) topicFilteredAuthorMap = new Map([...JSON.parse(storageTopicFilteredAuthors)]);
+    if (storagePendingMessageQuotes) messageQuotesPendingArray = JSON.parse(storagePendingMessageQuotes);
 }
 
 async function saveLocalStorage() {
@@ -207,12 +215,14 @@ async function saveLocalStorage() {
         await localforage.setItem(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
         await localforage.setItem(localstorage_authorAvatars, JSON.stringify([...authorAvatarMap]));
         await localforage.setItem(localstorage_topicFilteredAuthors, JSON.stringify([...topicFilteredAuthorMap]));
+        await localforage.setItem(localstorage_pendingMessageQuotes, JSON.stringify([...messageQuotesPendingArray]));
     }
     else {
         store.set(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
         store.set(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
         store.set(localstorage_authorAvatars, JSON.stringify([...authorAvatarMap]));
         store.set(localstorage_topicFilteredAuthors, JSON.stringify([...topicFilteredAuthorMap]));
+        store.set(localstorage_pendingMessageQuotes, JSON.stringify([...messageQuotesPendingArray]));
     }
     /* eslint-enable no-undef */
 }
@@ -223,6 +233,7 @@ async function refreshApiData(forceUpdate = false) {
         parseYoutubeBlacklistData(forceUpdate),
         parseAiLoopData(forceUpdate),
         parseAiBoucledAuthorsData(forceUpdate),
+        parseMessageQuotesData(forceUpdate),
     ]);
 }
 
@@ -269,18 +280,18 @@ async function removeTopicIdBlacklist(topicId) {
     }
 }
 
-function incrementTotalHidden(settingKey, value) {
+function storageIncrement(settingKey, value) {
     let currentValue = parseInt(store.get(settingKey, '0'));
     store.set(settingKey, currentValue + value);
 }
 
 function saveTotalHidden() {
-    incrementTotalHidden(storage_totalHiddenTopicIds, hiddenTopicsIds);
-    incrementTotalHidden(storage_totalHiddenSubjects, hiddenSubjects);
-    incrementTotalHidden(storage_totalHiddenAuthors, hiddenAuthors);
-    incrementTotalHidden(storage_totalHiddenMessages, hiddenMessages);
-    incrementTotalHidden(storage_totalHiddenPrivateMessages, hiddenPrivateMessages);
-    incrementTotalHidden(storage_totalHiddenSpammers, hiddenSpammers);
+    storageIncrement(storage_totalHiddenTopicIds, hiddenTopicsIds);
+    storageIncrement(storage_totalHiddenSubjects, hiddenSubjects);
+    storageIncrement(storage_totalHiddenAuthors, hiddenAuthors);
+    storageIncrement(storage_totalHiddenMessages, hiddenMessages);
+    storageIncrement(storage_totalHiddenPrivateMessages, hiddenPrivateMessages);
+    storageIncrement(storage_totalHiddenSpammers, hiddenSpammers);
 }
 
 function getStorageJson(onlyBlacklists = false, excludedKeys = undefined) {

@@ -181,6 +181,25 @@ async function getForumPageContent(page) {
     return fetchHtml(nextPageUrl);
 }
 
+async function handlePendingMessageQuotes() {
+    const validatedQuotes = messageQuotesPendingArray?.filter(mqp => mqp.status === 'validated');
+
+    if (validatedQuotes?.length) {
+        const currentUrlHash = window.location.hash;
+        const match = currentUrlHash.match(/^#post_(?<messageid>[0-9]{10})/);
+        const messageId = match?.groups?.messageid;
+        if (!messageId?.length) return;
+
+        validatedQuotes.forEach(q => {
+            q.newMessageId = messageId;
+            q.newMessageUrl = window.location.href;
+            sendMessageQuote(q);
+        });
+    }
+
+    await cleanupPendingMessageQuotes();
+}
+
 async function handleTopicList(canFillTopics, topicOptions) {
     let topics = getAllTopics(document);
     if (!topics?.length) return;
@@ -449,9 +468,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     const authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
     if (!authorElement) return;
 
-    const titleElement = document.querySelector('#bloc-title-forum');
-    const title = titleElement?.textContent?.trim();
-
+    const title = getTopicTitle();
     const author = authorElement.textContent.trim();
     const isSelf = userPseudo?.toLowerCase() === author.toLowerCase();
     const mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
@@ -631,7 +648,8 @@ function prepareTopicOptions() {
         optionReplaceResolvedPicto: store.get(storage_optionReplaceResolvedPicto, storage_optionReplaceResolvedPicto_default),
         optionRemoveUselessTags: store.get(storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default),
         optionDisplayTitleSmileys: store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default),
-        optionDisplayTopicAvatar: store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default)
+        optionDisplayTopicAvatar: store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default),
+        optionGetMessageQuotes: store.get(storage_optionGetMessageQuotes, storage_optionGetMessageQuotes_default)
     };
 }
 
@@ -678,8 +696,9 @@ async function handleTopicMessages() {
     addRightBlocMatches();
     saveTotalHidden();
 
+    addMessageQuoteEvents(allMessages); // Always enhance standard quotes
     if (messageOptions.optionEnhanceQuotations) {
-        addMessageQuoteEvents(allMessages);
+        addMessagePartialQuoteEvents(allMessages);
         addAuthorSuggestionEvent();
     }
 
@@ -692,6 +711,9 @@ async function handleTopicMessages() {
     }
 
     if (messageOptions.optionHideLongMessages) handleLongMessages(allMessages);
+
+    const postMessageElement = document.querySelector('.btn-poster-msg');
+    prependEvent(postMessageElement, 'click', async () => await validatePendingMessageQuotes());
 }
 
 async function handleSearch() {
@@ -863,6 +885,9 @@ function loadStyles() {
 async function init(currentPageType) {
     loadStyles();
 
+    userPseudo = getUserPseudo();
+    if (userPseudo?.length) store.set(storage_lastUsedPseudo, userPseudo);
+
     await initStorage();
 
     if (currentPageType === 'sso' || currentPageType === 'error') return;
@@ -878,8 +903,7 @@ async function init(currentPageType) {
 
     buildExtras();
 
-    userPseudo = getUserPseudo();
-    if (userPseudo?.length) store.set(storage_lastUsedPseudo, userPseudo);
+    handlePendingMessageQuotes();
 }
 
 async function entryPoint() {
@@ -898,7 +922,7 @@ async function entryPoint() {
                 createTopicListOverlay();
                 const topicOptions = prepareTopicOptions();
                 const finalTopics = await handleTopicList(true, topicOptions);
-                if (!finalTopics || finalTopics.length <= 1) break; // first is header
+                if (!finalTopics || finalTopics.length < 2) break; // first is header
                 await handleTopicListOptions(finalTopics, topicOptions);
                 addRightBlocMatches();
                 addRightBlocStats();
