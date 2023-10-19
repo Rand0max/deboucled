@@ -1005,7 +1005,7 @@ async function buildHotTopics() {
 
 function isHotTopic(topic) {
     const topicId = getTopicId(topic);
-    if (!topicId) return;
+    if (!topicId || !hotTopicsData?.length) return false;
     return hotTopicsData.includes(parseInt(topicId));
 }
 

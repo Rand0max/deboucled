@@ -204,7 +204,7 @@ async function handleTopicList(canFillTopics, topicOptions) {
     let topics = getAllTopics(document);
     if (!topics?.length) return;
 
-    await parseHotTopicsData();
+    parseHotTopicsData();
 
     let topicsToRemove = [];
     let finalTopics = [];
