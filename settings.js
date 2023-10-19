@@ -168,8 +168,12 @@ function buildSettingsPage() {
 
         html += addToggleOption('Autoriser l\'affichage du topic à partir d\'un seuil', storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default, 'Autoriser l\'affichage des topics même si le sujet est blacklist, à partir d\'un certain nombre de messages.');
 
-        let allowDisplayThreshold = store.get(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
+        const allowDisplayThreshold = store.get(storage_optionAllowDisplayThreshold, storage_optionAllowDisplayThreshold_default);
         html += addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, storage_optionDisplayThreshold_default, 10, 1000, 10, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.', allowDisplayThreshold, true);
+
+        const displayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
+        const hotTopicLogo = '<span class="deboucled-fire-logo"></span>';
+        html += addToggleOption(`Filtrer les <i>topics tendances</i> ${hotTopicLogo}`, storage_optionFilterHotTopics, storage_optionFilterHotTopics_default, 'Filtrer ou non les topics en tendance.', displayHotTopics, false);
 
         const pocLogo = '<span class="deboucled-poc-logo"></span>';
         html += addDropdownOption(`Protection contre les <i>PoC</i> ${pocLogo}`,
@@ -236,8 +240,8 @@ function buildSettingsPage() {
 
         html += addToggleOption('Uniformiser et nettoyer les <i>titres des topics</i>', storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default, 'Uniformise le titre des topics et efface les balises inutiles/répétitives comme [ALERTE], ou l\'usage abusif du &quot;AYA&quot; et ses dérivés.\n\nExemple : &quot;[ALERTE] cet EXEMPLE incroyable AYAAAA&quot; => &quot;Cet exemple incroyable&quot;');
 
-        const quoteLogo = '<span class="deboucled-quote-logo"></span>';
-        html += addToggleOption(`Améliorer les <i>citations</i> ${quoteLogo} des messages`, storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default, 'Améliore les citations avec plusieurs fonctionnalités :\n\n• Insère le pseudo du message cité\n• Citer une partie des messages en sélectionnant le texte\n• Citer et suggérer des pseudos en écrivant avec l\'arobase @ (conditions : connecté et minimum 3 lettres)\n• Mettre en couleur les pseudos lorsqu\'ils sont cités');
+        const quoteRoundLogo = '<span class="deboucled-quoteround-logo settings"></span>';
+        html += addToggleOption(`Recevoir les <i>notifications</i> ${quoteRoundLogo} de citation`, storage_optionGetMessageQuotes, storage_optionGetMessageQuotes_default, 'Recevoir ou non les notifications lorsque quelqu\'un cite vos messages.');
 
         const scrollLogo = '<span class="deboucled-scroll-logo"></span>';
         html += addToggleOption(`Activer le <i>défilement automatique</i> ${scrollLogo} des messages`, storage_optionSmoothScroll, storage_optionSmoothScroll_default, 'Activer le chargement automatique des messages du topic en faisant défiler la page vers le bas.');
@@ -255,6 +259,9 @@ function buildSettingsPage() {
 
         const twitterLogo = '<span class="deboucled-twitter-logo"></span>';
         html += addToggleOption(`Intégrer <i>Twitter</i> ${twitterLogo} dans les messages`, storage_optionDecensureTwitter, storage_optionDecensureTwitter_default, 'Intègre automatiquement les miniatures de Tweet dans les messages. ⚠ Attention ⚠ certains bloqueurs de pub peuvent empêcher les tweets de s\'afficher.');
+
+        const quoteLogo = '<span class="deboucled-quote-logo"></span>';
+        html += addToggleOption(`Améliorer les <i>citations</i> ${quoteLogo} des messages`, storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default, 'Améliore les citations avec plusieurs fonctionnalités :\n\n• Insère le pseudo du message cité\n• Citer une partie des messages en sélectionnant le texte\n• Citer et suggérer des pseudos en écrivant avec l\'arobase @ (conditions : connecté et minimum 3 lettres)\n• Mettre en couleur les pseudos lorsqu\'ils sont cités');
 
         html += '</table>';
         html += '</div>';
@@ -453,7 +460,11 @@ function addSettingEvents() {
     addToggleEvent(storage_optionDisplayBlacklistTopicButton);
     addToggleEvent(storage_optionDisplayBlackTopic);
     addToggleEvent(storage_optionPrevisualizeTopic);
-    addToggleEvent(storage_optionDisplayHotTopics);
+    addToggleEvent(storage_optionDisplayHotTopics, undefined, function () {
+        document.querySelectorAll(`[id = ${storage_optionFilterHotTopics}-container]`).forEach(function (el) {
+            el.classList.toggle('deboucled-disabled');
+        });
+    });
     addToggleEvent(storage_optionShowJvcBlacklistButton);
     addToggleEvent(storage_optionDisplayTopicCharts);
     addToggleEvent(storage_optionDisplayTopicMatches, undefined, function () {
@@ -490,6 +501,8 @@ function addSettingEvents() {
     addToggleEvent(storage_optionHideAvatarBorder);
     addToggleEvent(storage_optionDecensureTwitter);
     addToggleEvent(storage_optionDisplayBadges);
+    addToggleEvent(storage_optionGetMessageQuotes);
+    addToggleEvent(storage_optionFilterHotTopics);
 
     addPrebouclesEvents();
 }

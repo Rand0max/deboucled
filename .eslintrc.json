@@ -15,6 +15,7 @@
     "variables.js",
     "storage.js",
     "helpers.js",
+    "header.js",
     "preboucles.js",
     "apidata.js",
     "jvarchiveapi.js",

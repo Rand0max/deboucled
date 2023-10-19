@@ -34,8 +34,8 @@ const aiLoopsRefreshExpire = TimeSpan.FromMinutes(5);
 const aiBoucledAuthorsRefreshExpire = TimeSpan.FromMinutes(30);
 const updateUserExpire = TimeSpan.FromHours(6);
 const diagnosticExpire = TimeSpan.FromHours(12);
-const hotTopicsRefreshExpire = TimeSpan.FromMinutes(10);
-const messageQuotesRefreshExpire = TimeSpan.FromMinutes(1);
+const hotTopicsRefreshExpire = TimeSpan.FromMinutes(15);
+const messageQuotesRefreshExpire = TimeSpan.FromSeconds(30);
 
 const pendingMessageQuoteExpire = TimeSpan.FromDays(3);
 /* eslint-enable no-undef */

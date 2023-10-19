@@ -136,6 +136,25 @@ async function sendMessageQuote(messageQuoteInfo) {
     });
 }
 
+async function updateMessageQuote(userId, username, isRead, quoteId) {
+    const body = {
+        userid: userId,
+        username: username,
+        isread: isRead
+    };
+    if (quoteId?.length) body.id = quoteId;
+
+    const bodyJson = JSON.stringify(body);
+
+    await GM.xmlHttpRequest({
+        method: 'PUT',
+        url: apiMessageQuoteUrl,
+        data: bodyJson,
+        headers: { 'Content-Type': 'application/json' },
+        onerror: (response) => { console.error("error : %o", response); }
+    });
+}
+
 async function parseYoutubeBlacklistData(forceUpdate) {
     youtubeBlacklistArray = await queryApiData(
         forceUpdate,

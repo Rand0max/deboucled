@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.48.0] (19/10/2023)
+
+- Les vraies notifications de citation !
+- Option pour ne pas filtrer les topics tendances
+
 ## [2.47.0] (15/10/2023)
 
 - Surprise...

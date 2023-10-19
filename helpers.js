@@ -416,10 +416,10 @@ async function fetchWithTimeout(resource, options = {}) {
     return response;
 }
 
-function formatDateToFrenchFormat(date) {
+function formatDateToFrenchFormat(date, withSugar = false) {
     let dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
     let timeOptions = { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
-    return `${date.toLocaleDateString('fr-FR', dateOptions)} ${date.toLocaleTimeString('fr-FR', timeOptions)}`;
+    return `${withSugar ? 'Le ' : ''}${date.toLocaleDateString('fr-FR', dateOptions)}${withSugar ? ' à' : ''} ${date.toLocaleTimeString('fr-FR', timeOptions)}`;
 }
 
 function getUUIDv4() {

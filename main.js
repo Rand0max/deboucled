@@ -204,6 +204,8 @@ async function handleTopicList(canFillTopics, topicOptions) {
     let topics = getAllTopics(document);
     if (!topics?.length) return;
 
+    await parseHotTopicsData();
+
     let topicsToRemove = [];
     let finalTopics = [];
     finalTopics.push(topics[0]); // header
@@ -261,7 +263,7 @@ async function parseTopicListAuthors(topics, optionDisplayBadges) {
             buildAuthorBlacklistBadges(author, topic.querySelector('.topic-subject'), excludedLists);
         }
 
-        const topicId = topic.getAttribute('data-id');
+        const topicId = getTopicId(topic);
         if (!topicId) return;
 
         topicAuthorMap.set(topicId, author);
@@ -271,17 +273,12 @@ async function parseTopicListAuthors(topics, optionDisplayBadges) {
 }
 
 async function handleHotTopics(finalTopics) {
-    await parseHotTopicsData();
     if (!hotTopicsData?.length) return;
 
     const matchMediaMediumWidth = window.matchMedia('(min-width: 1000px) and (max-width: 1479px)')?.matches;
 
     finalTopics.slice(1).forEach(topic => {
-        const topicId = topic.getAttribute('data-id');
-        if (!topicId) return;
-
-        const isHotTopic = hotTopicsData.includes(parseInt(topicId));
-        if (!isHotTopic) return;
+        if (!isHotTopic(topic)) return;
 
         const titleElem = topic.querySelector('.lien-jv.topic-title');
         if (matchMediaMediumWidth) {
@@ -649,7 +646,7 @@ function prepareTopicOptions() {
         optionRemoveUselessTags: store.get(storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default),
         optionDisplayTitleSmileys: store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default),
         optionDisplayTopicAvatar: store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default),
-        optionGetMessageQuotes: store.get(storage_optionGetMessageQuotes, storage_optionGetMessageQuotes_default)
+        optionFilterHotTopics: store.get(storage_optionFilterHotTopics, storage_optionFilterHotTopics_default)
     };
 }
 
@@ -671,7 +668,7 @@ function prepareMessageOptions(isWhitelistedTopic) {
 }
 
 async function handleTopicMessages() {
-    currentTopicId = getTopicId();
+    currentTopicId = getCurrentTopicId();
     currentTopicPageId = getTopicCurrentPageId();
     currentTopicAuthor = await parseTopicAuthor();
 
@@ -897,13 +894,16 @@ async function init(currentPageType) {
     const enableDeboucledDarkTheme = store.get(storage_optionEnableDeboucledDarkTheme, storage_optionEnableDeboucledDarkTheme_default);
     toggleDeboucledDarkTheme(enableDeboucledDarkTheme);
 
+    const optionGetMessageQuotes = store.get(storage_optionGetMessageQuotes, storage_optionGetMessageQuotes_default);
+    if (optionGetMessageQuotes) buildQuoteNotifications();
+
     buildSettingsPage();
     addSettingButton();
     addDisableFilteringButton();
 
-    buildExtras();
-
     handlePendingMessageQuotes();
+
+    buildExtras();
 }
 
 async function entryPoint() {

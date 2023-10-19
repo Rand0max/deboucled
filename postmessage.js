@@ -57,8 +57,6 @@ async function cleanupPendingMessageQuotes() {
     messageQuotesPendingArray = messageQuotesPendingArray
         .filter((q) => {
             const dateExpireRange = new Date(datenow.setMinutes(datenow.getMinutes() - pendingMessageQuoteExpire.totalMinutes()));
-            console.log('dateExpireRange', dateExpireRange);
-            console.log('lastUpdateDate', q.lastUpdateDate);
             return q.status !== 'validated' && q.lastUpdateDate > dateExpireRange;
         });
 

@@ -84,7 +84,7 @@ function getTopicTitle() {
     return titleElement?.textContent?.trim();
 }
 
-function getTopicId() {
+function getCurrentTopicId() {
     /*
     const urlRegex = /^\/forums\/(42|1)-[0-9]+-(?<topicid>[0-9]+)-[0-9]+-0-1-0-.*\.htm$/gi;
     const matches = urlRegex.exec(window.location.pathname);
@@ -94,6 +94,10 @@ function getTopicId() {
     const blocFormulaireElem = document.querySelector('#bloc-formulaire-forum');
     if (!blocFormulaireElem) return undefined;
     return blocFormulaireElem.getAttribute('data-topic-id');
+}
+
+function getTopicId(topicElement) {
+    return topicElement?.getAttribute('data-id');
 }
 
 function getTopicCurrentPageId(doc) {
@@ -170,9 +174,9 @@ function topicExists(topics, element) {
     * Le temps de charger la page certains sujets peuvent se retrouver à la page précédente.
     * Cela peut provoquer des doublons à l'affichage.
     */
-    let topicId = element.getAttribute('data-id');
+    let topicId = getTopicId(element);
     if (!topicId) return false;
-    return topics.some((elem) => elem.getAttribute('data-id') === topicId);
+    return topics.some((elem) => getTopicId(elem) === topicId);
 }
 
 function getTopicMessageCount(element) {
@@ -232,7 +236,7 @@ function handleAntiLoopAi(topicOptions, title, author, titleTag) {
 async function isTopicBlacklisted(topicElement, topicOptions) {
     if (!topicElement.hasAttribute('data-id')) return true;
 
-    const topicId = topicElement.getAttribute('data-id');
+    const topicId = getTopicId(topicElement);
     if (topicIdBlacklistMap.has(topicId) && !deboucledTopics.includes(topicId)) {
         matchedTopics.set(topicId, topicIdBlacklistMap.get(topicId));
         hiddenTopicsIds++;
@@ -241,6 +245,8 @@ async function isTopicBlacklisted(topicElement, topicOptions) {
 
     // Seuil d'affichage valable uniquement pour les BL sujets et auteurs
     if (topicOptions.optionAllowDisplayThreshold && getTopicMessageCount(topicElement) >= topicOptions.optionDisplayThreshold) return false;
+
+    if (!topicOptions.optionFilterHotTopics && isHotTopic(topicElement)) return false;
 
     if (topicOptions.optionEnableTopicMsgCountThreshold && getTopicMessageCount(topicElement) < topicOptions.optionTopicMsgCountThreshold) return true;
 
@@ -354,12 +360,14 @@ async function isVinzTopic(subject, author, topicUrl) {
         return false;
     }
 
-    const authorMayBeVinz = author.startsWith('vinz') || ((author.length >= 5 && author.length <= 7) && author.charAt(0) === 'v');
+    const authorMayBeVinz = author.match(/^(vinz|farine|tchoupi|chicken|smash|garfield)/, 'i')
+        || ((author.length >= 5 && author.length <= 7) && author.charAt(0) === 'v');
+
     const pureSubject = makeVinzSubjectPure(subject);
     let possibleBoucle = false;
     for (const boucle of vinzBoucleArray) {
         let score = calcStringDistanceScore(boucle, pureSubject);
-        if (authorMayBeVinz) score += 10; // on rajoute 10% au score si l'on soupçonne l'auteur d'être Vinz
+        if (authorMayBeVinz) score += 20; // on rajoute 20% au score si l'on soupçonne l'auteur d'être Vinz
 
         // +80% c'est certifié Vinz le zinzin
         if (score >= 80) return true;
@@ -381,7 +389,7 @@ function getTopicPocStatus(topicId) {
 
 async function isTopicPoC(element, optionDetectPocMode) {
     if (!element.hasAttribute('data-id')) return false;
-    let topicId = element.getAttribute('data-id');
+    let topicId = getTopicId(element);
 
     if (deboucledTopics.includes(topicId)) return false;
 
@@ -569,7 +577,7 @@ function addIgnoreButtons(topics) {
         const topicSubjectElem = topic.querySelector('span:nth-child(1) > a:nth-child(2)');
         if (!topicSubjectElem) return;
         let topicSubject = topicSubjectElem.textContent.trim();
-        let topicId = topic.getAttribute('data-id');
+        let topicId = getTopicId(topic);
 
         let span = document.createElement('span');
         span.setAttribute('class', 'deboucled-topic-blacklist');
@@ -993,6 +1001,12 @@ async function buildHotTopics() {
         .map(t => t.id); // map uniquement l'id du topic
 
     return topTopics;
+}
+
+function isHotTopic(topic) {
+    const topicId = getTopicId(topic);
+    if (!topicId) return;
+    return hotTopicsData.includes(parseInt(topicId));
 }
 
 function initSmileyGifMap() {
