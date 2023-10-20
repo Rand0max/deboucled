@@ -1132,7 +1132,7 @@ blockquote .deboucled-highlighted {
   vertical-align: bottom;
 }
 .deboucled-quoteround-logo.dark {
-  filter: invert(var(--deboucled-filter-invert));
+  filter: invert(1);
 }
 
 /* Quotes */
