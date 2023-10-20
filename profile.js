@@ -109,7 +109,8 @@ function buildProfileBlacklistBadges(author, authorElement) {
     if (!blacklists?.length) return;
 
     blacklists.forEach(bl => {
-        const badge = buildBadge(bl.id, bl.shortDescription, `Présent dans la liste « ${bl.description} ».`, '', 'blacklist', 'big');
+        const content = bl.shortDescription ?? bl.description ?? bl.id ?? 'BL';
+        const badge = buildBadge(bl.id, content, `Présent dans la liste « ${bl.description} ».`, '', 'blacklist', 'big');
         authorElement.parentElement.append(badge);
     });
 }

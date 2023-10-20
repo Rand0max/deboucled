@@ -24,7 +24,7 @@ function prepareMessageQuoteInfo(messageElement) {
     return {
         userId: userId,
         quotedMessageId: messageElement.getAttribute('data-id'),
-        quotedUsername: getAuthorFromMessage(messageElement)?.toLowerCase(),
+        quotedUsername: getAuthorFromMessage(messageElement).toLowerCase(),
         quotedMessageUrl: messageElement.querySelector('.bloc-date-msg .lien-jv')?.href,
         newMessageId: 0, // filled after redirect
         newMessageUsername: currentUserPseudo?.toLowerCase() ?? 'anonymous',
