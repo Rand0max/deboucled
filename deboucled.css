@@ -1214,6 +1214,9 @@ blockquote .deboucled-highlighted {
 .deboucled-header-quotes {
   margin-left: 0.2em;
 }
+.deboucled-header-subinfolabel {
+  max-width: 15rem;
+}
 
 .deboucled-preboucle-header {
   display: flex;

@@ -57,8 +57,8 @@ async function checkUpdate() {
     return checkRes;
 }
 
-async function updateUser() {
-    if (!mustRefresh(storage_lastUpdateUser, updateUserExpire)) return;
+async function updateUser(forceUpdate = false) {
+    if (!mustRefresh(storage_lastUpdateUser, updateUserExpire) && !forceUpdate) return;
 
     const currentUserPseudo = userPseudo ?? store.get(storage_lastUsedPseudo, userId);
     const settings = getStorageJson(false, storage_excluded_user_Keys);

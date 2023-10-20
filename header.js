@@ -114,7 +114,7 @@ function buildHeaderNotif(notifSeen, notifRead, notifTitle, notifId, notifUrl, n
     rootDropdownItem.append(dropdownSubInfoFooter);
 
     const dropdownSubInfoFooterLabel = document.createElement('span');
-    dropdownSubInfoFooterLabel.className = 'headerAccount__dropdownSubInfoLabel icon-reply';
+    dropdownSubInfoFooterLabel.className = 'headerAccount__dropdownSubInfoLabel icon-reply deboucled-header-subinfolabel';
     dropdownSubInfoFooterLabel.textContent = notifSubInfo;
     dropdownSubInfoFooter.append(dropdownSubInfoFooterLabel);
 
@@ -136,7 +136,7 @@ async function buildQuoteNotifications() {
         const notifChildElement = buildHeaderNotif(
             q.notification_read,
             q.notification_read,
-            `Citation de ${q.new_message_username}`,
+            `Citation de <b>${q.new_message_username.toUpperCase()}</b>`,
             q.new_message_id,
             q.new_message_url,
             q.topic_title,

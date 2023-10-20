@@ -879,11 +879,19 @@ function loadStyles() {
     addStyles(enableJvRespawnRefinedTheme, hideAvatarBorder);
 }
 
+async function updateCurrentUser() {
+    const lastUsedUserPseudo = store.get(storage_lastUsedPseudo, storage_lastUsedPseudo_default);
+    userPseudo = getUserPseudo();
+    if (userPseudo?.length && lastUsedUserPseudo.toLowerCase() !== userPseudo.toLowerCase()) {
+        store.set(storage_lastUsedPseudo, userPseudo);
+        await updateUser(true);
+    }
+}
+
 async function init(currentPageType) {
     loadStyles();
 
-    userPseudo = getUserPseudo();
-    if (userPseudo?.length) store.set(storage_lastUsedPseudo, userPseudo);
+    await updateCurrentUser();
 
     await initStorage();
 
@@ -965,8 +973,8 @@ async function entryPoint() {
             await sendDiagnostic(elapsed);
         }
 
-        await updateUser();
-        await suggestUpdate();
+        updateUser();
+        suggestUpdate();
 
         displaySecret();
         //displayAnnouncement();
