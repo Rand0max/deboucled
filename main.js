@@ -34,23 +34,6 @@ async function suggestUpdate() {
     }
 }
 
-function preferDarkTheme() {
-    // Adjust text contrast for Dark Reader and JVC new Dark Theme
-    // N.B : JVC qui troll en switchant le thème tout seul en fonction des réglages de Dark Reader
-    // Bien sûr les attributs sont pas toujours les mêmes ni même cohérents sinon c'est pas drôle
-
-    const darkReaderEnabled = document.documentElement.getAttribute('data-darkreader-scheme') === 'dark';
-    const jvcLightThemeEnabled = document.documentElement.classList.contains('theme-light');
-    const jvcDarkThemeEnabled = document.documentElement.classList.contains('theme-dark');
-    const preferDarkColorScheme = window?.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (darkReaderEnabled) return true; // Dark reader has priority over everything
-    if (jvcLightThemeEnabled) return false; // Next priority is jvc light theme enabled (if dark reader is enabled but off on jvc)
-    if (jvcDarkThemeEnabled) return true; // Next priority is jvc dark theme enabled
-    if (preferDarkColorScheme) return true; // Finally we check prefered color scheme if all above are false
-    return false;
-}
-
 function filteringIsDisabled(forumId = undefined) {
     return disabledFilteringForumSet.has(forumId ?? getForumId());
 }
@@ -977,7 +960,7 @@ async function entryPoint() {
         suggestUpdate();
 
         displaySecret();
-        //displayAnnouncement();
+        displayAnnouncement();
     } catch (error) {
         const elapsed = performance.now() - start;
         console.error(error);

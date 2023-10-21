@@ -48,7 +48,8 @@ function buildSupport() {
     supportDiv.innerHTML = `Aider Déboucled ${supportLogo}`;
     supportDiv.title = 'Faire un don';
     layoutContentAside.appendChild(supportDiv);
-    supportDiv.onclick = () => window.open(`https://commerce.coinbase.com/checkout/8ea5e4cc-cc0b-432f-852f-5cc4e30458b5`, '_blank');
+    // supportDiv.onclick = () => window.open(`https://commerce.coinbase.com/checkout/8ea5e4cc-cc0b-432f-852f-5cc4e30458b5`, '_blank');
+    supportDiv.onclick = () => window.open(`https://www.buymeacoffee.com/jvcdeboucled`, '_blank');
 }
 
 function displaySecret() {
@@ -88,18 +89,35 @@ function displaySecret() {
     store.set(storage_secret_displayed, true);
 }
 
-/*
 function displayAnnouncement() {
     const announcementDisplayed = store.get(storage_announcement_displayed, storage_announcement_displayed_default);
     if (announcementDisplayed) return;
-
     store.set(storage_announcement_displayed, true);
 
-    if (confirm('DÉCENSURED le script anti-censure EST DE RETOUR ! Webedia en PLS.')) {
-        document.location.href = decensuredUrl;
-    }
+    // eslint-disable-next-line no-undef
+    Swal.fire({
+        title: '<strong>Déboucled a besoin de vous !<strong>',
+        html: `<p>Après plus de deux ans de développement, nous faisons appel à votre aide pour la première fois.</p><p><b>Pour fonctionner, Déboucled a besoin d'une infrastructure couteuse, d'investissement personnel et de beaucoup de temps.</b></p><p><i>Avec votre soutien, nous pourrons continuer.<i/></p>
+        <img src="https://image.noelshack.com/fichiers/2022/22/7/1654433573-cavillax.png" alt="paz" width="100" height="75"></img>`,
+        icon: 'info',
+        showDenyButton: true,
+        confirmButtonText: 'Je souhaite aider',
+        denyButtonText: 'Non merci',
+        footer: '<a href="mailto:rand0max@protonmail.com">Nous contacter</a>',
+        customClass: {
+            confirmButton: 'deboucled-bold'
+        },
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.open(`https://www.buymeacoffee.com/jvcdeboucled`, '_blank').focus();
+        }
+        /*
+        else if (result.isDenied) {
+            window.open('https://youtu.be/KkxZfUlNlDo', '_blank').focus();
+        }
+        */
+    });
 }
-*/
 
 function buildExtras() {
     buildSupport();

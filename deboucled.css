@@ -1218,6 +1218,9 @@ blockquote .deboucled-highlighted {
   max-width: 15rem;
 }
 
+.deboucled-bold {
+  font-weight: bold !important;
+}
 .deboucled-preboucle-header {
   display: flex;
   flex-direction: row;

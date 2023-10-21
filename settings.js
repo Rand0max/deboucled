@@ -140,7 +140,8 @@ function buildSettingsPage() {
         html += `<a class="deboucled-about-link-contact" href="mailto:rand0max@protonmail.com" target="_blank" title="Me contacter par email">${contactLogo}</a>`;
 
         const supportLogo = '<span class="deboucled-support-logo"></span>';
-        html += `<a class="deboucled-about-link-support" href="https://commerce.coinbase.com/checkout/8ea5e4cc-cc0b-432f-852f-5cc4e30458b5" target="_blank" title="Faire un don">${supportLogo}</a>`;
+        // html += `<a class="deboucled-about-link-support" href="https://commerce.coinbase.com/checkout/8ea5e4cc-cc0b-432f-852f-5cc4e30458b5" target="_blank" title="Faire un don">${supportLogo}</a>`;
+        html += `<a class="deboucled-about-link-support" href="https://www.buymeacoffee.com/jvcdeboucled" target="_blank" title="Faire un don">${supportLogo}</a>`;
 
         html += `<span class="deboucled-about-version">v${getCurrentScriptVersion()}</span>`;
         html += '</div>';

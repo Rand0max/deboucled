@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.48.3
+// @version     2.48.4
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -33,12 +33,14 @@
 // @grant       GM.xmlHttpRequest
 // @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
 // @resource    JVRESPAWNREFINED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/jv-respawn-refined.css
-// @resource    CHARTS_CSS https://unpkg.com/charts.css@0.9.0/dist/charts.min.css
+// @resource    CHARTS_CSS https://unpkg.com/charts.css@1.1.0/dist/charts.min.css
+// @resource    SWEETALERTDARK_CSS https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark/dark.css
 // @require     https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js
 // @require     https://unpkg.com/infinite-scroll@4.0.1/dist/infinite-scroll.pkgd.min.js
 // @require     https://unpkg.com/timespan@2.3.0/browser/TimeSpan-1.2.min.js
 // @require     https://unpkg.com/gm-storage@2.0.3/dist/index.umd.min.js
 // @require     https://cdn.jsdelivr.net/gh/tomik23/show-more/dist/js/showMore.min.js
+// @require     https://cdn.jsdelivr.net/npm/sweetalert2
 // @require     https://unpkg.com/@chocolateboy/uncommonjs@3.2.1/dist/polyfill.iife.min.js
 // @require     https://unpkg.com/fastest-levenshtein@1.0.16/mod.js
 // @require     variables.js
