@@ -13,7 +13,7 @@ const localstorage_pendingMessageQuotes = 'deboucled_pendingMessageQuotes';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
 const storage_secret_displayed = 'deboucled_secret3_displayed', storage_secret_displayed_default = false;
-const storage_announcement_displayed = 'deboucled_announcement5_displayed', storage_announcement_displayed_default = false;
+const storage_announcement_displayed = 'deboucled_announcement6_displayed', storage_announcement_displayed_default = false;
 const storage_userId = 'deboucled_userId', storage_userId_default = '';
 const storage_lastUsedPseudo = 'deboucled_lastUsedPseudo', storage_lastUsedPseudo_default = '';
 const storage_preBoucles = 'deboucled_preBoucles', storage_preBoucles_default = '[]';
@@ -117,7 +117,6 @@ function initUserId() {
 }
 
 async function initStorage() {
-    initUserId();
     initVinzBoucles();
     //initShadowent();
     initSmileyGifMap();

@@ -863,6 +863,8 @@ function loadStyles() {
 }
 
 async function updateCurrentUser() {
+    initUserId();
+
     const lastUsedUserPseudo = store.get(storage_lastUsedPseudo, storage_lastUsedPseudo_default);
     userPseudo = getUserPseudo();
     if (userPseudo?.length && lastUsedUserPseudo.toLowerCase() !== userPseudo.toLowerCase()) {
