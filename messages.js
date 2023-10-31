@@ -210,21 +210,53 @@ function handleJvChatAndTopicLive(messageOptions) {
         handleBlSubjectIgnoreMessages(messageElement);
     }
 
-    enableJvChatAndTopicLiveEvents(handleLiveMessage);
+    async function handlePostLiveMessage(postMessageDetail) {
+        const quoteMessages = findQuotedMessagesFromContent(postMessageDetail.messageContent);
+        if (!quoteMessages?.length) return;
+
+        const currentUrl = `${window.location.origin}${window.location.pathname}`;
+
+        quoteMessages.forEach(qm => {
+            const quotedMessageId = qm.quoteMessageElement.getAttribute('jvchat-id');
+            const messageQuote = {
+                userId: userId,
+                quotedMessageId: quotedMessageId,
+                quotedUsername: getAuthorFromMessageElem(qm.quoteMessageElement).toLowerCase(),
+                quotedMessageUrl: `https://www.jeuxvideo.com/forums/message/${quotedMessageId}`,
+                newMessageId: postMessageDetail.messageId,
+                newMessageUsername: postMessageDetail.messageUsername?.toLowerCase() ?? 'anonymous',
+                newMessageContent: getRawTypedMessage(postMessageDetail.messageContent),
+                newMessageUrl: `https://www.jeuxvideo.com/forums/message/${postMessageDetail.messageId}`, //`${currentUrl}#post_${postMessageDetail.messageId}`,
+                topicId: currentTopicId,
+                topicUrl: currentUrl,
+                topicTitle: getTopicTitle(),
+                status: 'validated',
+                lastUpdateDate: new Date()
+            }
+            sendMessageQuote(messageQuote);
+        });
+    }
+
+    enableJvChatAndTopicLiveEvents(handleLiveMessage, handlePostLiveMessage);
 }
 
-function enableJvChatAndTopicLiveEvents(handleCallback) {
+function enableJvChatAndTopicLiveEvents(newMessageCallback, postMessageCallback) {
     // JvChat
     addEventListener('jvchat:newmessage', function (event) {
         const messageElement = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
         const authorElement = messageElement.querySelector('h5.jvchat-author');
         if (!authorElement) return;
-        handleCallback(messageElement, authorElement);
+        newMessageCallback(messageElement, authorElement);
     });
     addEventListener('jvchat:activation', function () {
         hiddenMessages = 0;
         hiddenAuthorArray.clear();
         updateMessagesHeader();
+    });
+    addEventListener('jvchat:postmessage', function (event) {
+        if (!event.detail) return;
+        const postedMessageDetail = { messageId: event.detail.id, messageContent: event.detail.content, messageUsername: event.detail.username };
+        postMessageCallback(postedMessageDetail);
     });
 
     // TopicLive
@@ -233,7 +265,7 @@ function enableJvChatAndTopicLiveEvents(handleCallback) {
         if (!messageElement) return;
         const authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
         if (!authorElement) return;
-        handleCallback(messageElement, authorElement, event);
+        newMessageCallback(messageElement, authorElement, event);
     });
 }
 
@@ -417,6 +449,33 @@ function handleQuotedAuthorBlacklist(messageContent) {
         e.classList.toggle('deboucled-blacklisted', true);
         hideMessageContent(e.parentElement, 'deboucled-blacklisted-blockquote');
     });
+}
+
+function findQuotedMessagesFromContent(messageContent) {
+    const regex = new RegExp(/>\sLe\s(?<date>.*)\sà\s(?<hour>[0-9]+:[0-9]+:[0-9]+)\s(?<username>.*)\sa\sécrit\s:/, 'gmi');
+    const matches = [...messageContent.matchAll(regex)];
+    if (!matches?.length) return;
+
+    const quotedMessages = matches.map(m => {
+        return {
+            quoteDate: m.groups?.date?.trim(),
+            quoteHour: m.groups?.hour?.trim(),
+            quoteUsername: m.groups?.username?.trim()
+        };
+    });
+
+    quotedMessages.forEach(qm => {
+        const messagesFromAuthor = [...document.querySelectorAll('.jvchat-author')].filter(e => e.textContent?.trim()?.toLowerCase() === qm.quoteUsername.toLowerCase());
+        if (!messagesFromAuthor?.length) return;
+        const messageMatch = messagesFromAuthor.find(m => {
+            const mDate = m.parentElement.querySelector('.jvchat-date');
+            return (mDate.getAttribute('to-quote') === `${qm.quoteDate} à ${qm.quoteHour}`);
+        });
+        if (!messageMatch) return;
+        qm.quoteMessageElement = messageMatch.parentElement.parentElement.parentElement;
+    });
+
+    return quotedMessages.filter(qm => qm.quoteMessageElement);
 }
 
 // TODO : Refacto cette satanerie

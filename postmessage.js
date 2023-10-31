@@ -3,28 +3,30 @@
 // POST MESSAGE
 ///////////////////////////////////////////////////////////////////////////////////////
 
-function getAuthorFromMessage(messageElement) {
-    return messageElement.querySelector('.bloc-pseudo-msg.text-user,.bloc-pseudo-msg.text-modo,.bloc-pseudo-msg.text-admin')?.textContent?.trim() ?? '';
+function getAuthorFromMessageElem(messageElement) {
+    return messageElement?.querySelector('.bloc-pseudo-msg.text-user,.bloc-pseudo-msg.text-modo,.bloc-pseudo-msg.text-admin,.jvchat-author')?.textContent?.trim() ?? '';
 }
 
-function getDateFromMessage(messageElement) {
+function getDateFromMessageElem(messageElement) {
     return messageElement.querySelector('.bloc-date-msg')?.textContent?.trim() ?? '';
 }
 
-function getRawTypedMessage() {
-    const textArea = document.querySelector('#message_topic');
-    if (!textArea?.value?.length) return '';
-    const val = textArea.value;
+function getRawTypedMessage(text) {
+    if (!text?.length) {
+        const textArea = document.querySelector('#message_topic');
+        if (!textArea?.value?.length) return '';
+        text = textArea.value;
+    }
     const regex = new RegExp(/^[^>].*/, 'gmi');
-    return val.match(regex)?.join('\n')?.trim() ?? val.trim();
+    return text.match(regex)?.join('\n')?.trim() ?? text.trim();
 }
 
 function prepareMessageQuoteInfo(messageElement) {
     const currentUserPseudo = userPseudo ?? store.get(storage_lastUsedPseudo, userId);
     return {
         userId: userId,
-        quotedMessageId: messageElement.getAttribute('data-id'),
-        quotedUsername: getAuthorFromMessage(messageElement).toLowerCase(),
+        quotedMessageId: messageElement.getAttribute('data-id') ?? messageElement.getAttribute('jvchat-id'),
+        quotedUsername: getAuthorFromMessageElem(messageElement).toLowerCase(),
         quotedMessageUrl: messageElement.querySelector('.bloc-date-msg .lien-jv')?.href,
         newMessageId: 0, // filled after redirect
         newMessageUsername: currentUserPseudo?.toLowerCase() ?? 'anonymous',
@@ -40,13 +42,14 @@ function prepareMessageQuoteInfo(messageElement) {
 
 async function validatePendingMessageQuotes() {
     const rawMessage = getRawTypedMessage();
+    const newStatus = rawMessage?.length ? 'validated' : 'canceled'; // Citation vide
     messageQuotesPendingArray
         .filter(mqp =>
             mqp.status === 'pending'
             && mqp.topicId === currentTopicId)
         .forEach(mqp => {
             mqp.newMessageContent = rawMessage;
-            mqp.status = 'validated';
+            mqp.status = newStatus;
             mqp.lastUpdateDate = new Date();
         });
     await saveLocalStorage();
@@ -55,9 +58,9 @@ async function validatePendingMessageQuotes() {
 async function cleanupPendingMessageQuotes() {
     const datenow = new Date();
     messageQuotesPendingArray = messageQuotesPendingArray
-        .filter((q) => {
+        .filter((q) => { // On ne garde que les statuts pending de moins de 3 jours
             const dateExpireRange = new Date(datenow.setMinutes(datenow.getMinutes() - pendingMessageQuoteExpire.totalMinutes()));
-            return q.status !== 'validated' && q.lastUpdateDate > dateExpireRange;
+            return (q.status !== 'validated' && q.lastUpdateDate > dateExpireRange) && q.status !== 'canceled';
         });
 
     await saveLocalStorage();
@@ -91,7 +94,7 @@ async function buildQuoteMessage(messageElement, selection) {
     const textArea = document.querySelector('#message_topic');
     if (!textArea) return;
 
-    const newQuoteHeader = `> Le ${getDateFromMessage(messageElement)} '''${getAuthorFromMessage(messageElement)}''' a écrit : `;
+    const newQuoteHeader = `> Le ${getDateFromMessageElem(messageElement)} '''${getAuthorFromMessageElem(messageElement)}''' a écrit : `;
 
     if (selection?.length) {
         const currentContent = textArea.value.length === 0 ? '' : `${textArea.value.trim()}\n\n`;
@@ -104,7 +107,7 @@ async function buildQuoteMessage(messageElement, selection) {
     }
     else {
         setTimeout(() => {
-            const date = getDateFromMessage(messageElement);
+            const date = getDateFromMessageElem(messageElement);
             const regex = new RegExp(`> Le\\s+?${date}\\s+?:`);
             textArea.value = textArea.value.replace(regex, newQuoteHeader);
         }, 600);

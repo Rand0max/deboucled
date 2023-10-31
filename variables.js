@@ -36,7 +36,6 @@ const updateUserExpire = TimeSpan.FromHours(3);
 const diagnosticExpire = TimeSpan.FromHours(12);
 const hotTopicsRefreshExpire = TimeSpan.FromMinutes(15);
 const messageQuotesRefreshExpire = TimeSpan.FromMinutes(2);
-
 const pendingMessageQuoteExpire = TimeSpan.FromDays(3);
 /* eslint-enable no-undef */
 

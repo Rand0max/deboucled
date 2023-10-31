@@ -94,6 +94,11 @@ function displayAnnouncement() {
     if (announcementDisplayed) return;
     store.set(storage_announcement_displayed, true);
 
+    const supportButton = document.querySelector('.deboucled-support');
+    if (!supportButton) return;
+    supportButton.classList.add('blinking');
+
+    /*
     // eslint-disable-next-line no-undef
     Swal.fire({
         title: '<strong>Déboucled a besoin de vous !<strong>',
@@ -111,12 +116,11 @@ function displayAnnouncement() {
         if (result.isConfirmed) {
             window.open(`https://www.buymeacoffee.com/jvcdeboucled`, '_blank').focus();
         }
-        /*
-        else if (result.isDenied) {
-            window.open('https://youtu.be/KkxZfUlNlDo', '_blank').focus();
-        }
-        */
+        // else if (result.isDenied) {
+        //     window.open('https://youtu.be/KkxZfUlNlDo', '_blank').focus();
+        // }
     });
+    */
 }
 
 function buildExtras() {
