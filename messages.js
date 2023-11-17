@@ -454,7 +454,7 @@ function handleQuotedAuthorBlacklist(messageContent) {
 function findQuotedMessagesFromContent(messageContent) {
     const regex = new RegExp(/>\sLe\s(?<date>.*)\sà\s(?<hour>[0-9]+:[0-9]+:[0-9]+)\s(?<username>.*)\sa\sécrit\s:/, 'gmi');
     const matches = [...messageContent.matchAll(regex)];
-    if (!matches?.length) return;
+    if (!matches.length) return;
 
     const quotedMessages = matches.map(m => {
         return {
@@ -466,7 +466,7 @@ function findQuotedMessagesFromContent(messageContent) {
 
     quotedMessages.forEach(qm => {
         const messagesFromAuthor = [...document.querySelectorAll('.jvchat-author')].filter(e => e.textContent?.trim()?.toLowerCase() === qm.quoteUsername.toLowerCase());
-        if (!messagesFromAuthor?.length) return;
+        if (!messagesFromAuthor.length) return;
         const messageMatch = messagesFromAuthor.find(m => {
             const mDate = m.parentElement.querySelector('.jvchat-date');
             return (mDate.getAttribute('to-quote') === `${qm.quoteDate} à ${qm.quoteHour}`);

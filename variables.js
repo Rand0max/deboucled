@@ -104,6 +104,7 @@ let userPseudo = undefined;
 let currentTopicId = undefined;
 let currentTopicPageId = undefined;
 let currentTopicAuthor = undefined;
+let currentForumId = undefined;
 let forumFilteringIsDisabled = false;
 
 const domParser = new DOMParser();

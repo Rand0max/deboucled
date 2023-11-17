@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.49.0] (17/11/2023)
+
+- Affichage des topics tendances dans un tableau
+
 ## [2.48.7] (31/10/2023)
 
 - Prise en charge de JVChat pour les notifications de citation

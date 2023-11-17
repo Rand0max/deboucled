@@ -468,6 +468,7 @@ function addBadgeTag(badgeOpt) {
 }
 
 function markTopicPoc(nearElement, withHint = true) {
+    // Fais un don ou cancer
     const badgeOpt = {
         id: 'subject_poc',
         content: 'PoC',
@@ -1000,7 +1001,7 @@ async function buildHotTopics() {
         .filter(t => t.lastMessageDate >= minDate) // dernier message il y a moins de 15 minutes
         .sort((a, b) => (a.nbMessages > b.nbMessages) ? -1 : 1) // tri décroissant par nb messages
         .slice(0, 5) // sélection des 5 premiers
-        .map(t => t.id); // map uniquement l'id du topic
+        .map(t => ({ id: t.id, title: t.title, url: t.url, nbMessages: t.nbMessages }));
 
     return topTopics;
 }
@@ -1008,7 +1009,7 @@ async function buildHotTopics() {
 function isHotTopic(topic) {
     const topicId = getTopicId(topic);
     if (!topicId || !hotTopicsData?.length) return false;
-    return hotTopicsData.includes(parseInt(topicId));
+    return hotTopicsData.some(ht => ht.id === parseInt(topicId));
 }
 
 function initSmileyGifMap() {

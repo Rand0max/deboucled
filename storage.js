@@ -13,7 +13,7 @@ const localstorage_pendingMessageQuotes = 'deboucled_pendingMessageQuotes';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
 const storage_secret_displayed = 'deboucled_secret3_displayed', storage_secret_displayed_default = false;
-const storage_announcement_displayed = 'deboucled_announcement7_displayed', storage_announcement_displayed_default = false;
+const storage_announcement_displayed = 'deboucled_announcement8_displayed', storage_announcement_displayed_default = false;
 const storage_userId = 'deboucled_userId', storage_userId_default = '';
 const storage_lastUsedPseudo = 'deboucled_lastUsedPseudo', storage_lastUsedPseudo_default = '';
 const storage_preBoucles = 'deboucled_preBoucles', storage_preBoucles_default = '[]';
@@ -82,8 +82,8 @@ const storage_aiBoucledAuthorsData = 'deboucled_aiBoucledAuthorsData', storage_a
 const storage_aiBoucledAuthorsLastUpdate = 'deboucled_aiBoucledAuthorsLastUpdate';
 const storage_lastUpdateUser = 'deboucled_lastUpdateUser';
 const storage_DiagnosticLastUpdate = 'deboucled_DiagnosticLastUpdate';
-const storage_hotTopicsData = 'deboucled_hotTopicsData', storage_hotTopicsData_default = '[]';
-const storage_hotTopicsLastUpdate = 'deboucled_hotTopicsLastUpdate';
+const storage_hotTopicsData = 'deboucled_hotTopicsData2', storage_hotTopicsData_default = '[]';
+const storage_hotTopicsLastUpdate = 'deboucled_hotTopicsLastUpdate2';
 const storage_messageQuotesData = 'deboucled_messageQuotesData', storage_messageQuotesData_default = '{}';
 const storage_messageQuotesLastUpdate = 'deboucled_messageQuotesLastUpdate';
 

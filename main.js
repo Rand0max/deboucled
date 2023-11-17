@@ -35,7 +35,7 @@ async function suggestUpdate() {
 }
 
 function filteringIsDisabled(forumId = undefined) {
-    return disabledFilteringForumSet.has(forumId ?? getForumId());
+    return disabledFilteringForumSet.has(forumId ?? currentForumId);
 }
 
 function getUserPseudo() {
@@ -843,9 +843,8 @@ function handleError() {
         insertAfter(jvArchiveButton, homepageButton);
     }
 
-    const forumId = getForumId();
-    if (forumId) { // 410 d'un topic
-        const forumUrl = `/forums/0-${forumId}-0-1-0-1-0-forum.htm`;
+    if (currentForumId) { // 410 d'un topic
+        const forumUrl = `/forums/0-${currentForumId}-0-1-0-1-0-forum.htm`;
         homepageButton.textContent = 'Retour au forum';
         homepageButton.href = forumUrl;
 
@@ -875,6 +874,8 @@ async function updateCurrentUser() {
 
 async function init(currentPageType) {
     loadStyles();
+
+    currentForumId = getForumId();
 
     await updateCurrentUser();
 
@@ -918,6 +919,7 @@ async function entryPoint() {
                 if (!finalTopics || finalTopics.length < 2) break; // first is header
                 await handleTopicListOptions(finalTopics, topicOptions);
                 addRightBlocMatches();
+                addRightBlocHotTopics();
                 addRightBlocStats();
                 toggleTopicOverlay(false);
                 handlePrivateMessageNotifs();

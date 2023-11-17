@@ -223,3 +223,36 @@ function updateTopicHiddenAtDate() {
     store.set(storage_TopicStats, JSON.stringify([...deboucledTopicStatsMap]));
 }
 
+function addRightBlocHotTopics() {
+    let optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
+    if (!optionDisplayHotTopics || !hotTopicsData?.length || currentForumId !== 51) return; // JvArchive seulement pour le 18-25
+
+    const forumRightCol = document.querySelector('#forum-right-col');
+    if (!forumRightCol) return;
+
+    let html = '';
+    html += '<div class="card card-jv-forum card-forum-margin">'; // deboucled-fire-logo
+    html += `<div class="card-header">TOPICS TENDANCES<span class="deboucled-fire-logo cardtitle"></span></div>`;
+    html += '<div class="card-body">';
+    html += '<div class="scrollable">';
+    html += '<div class="scrollable-wrapper">';
+    html += '<div id="deboucled-hottopics-content" class="scrollable-content bloc-info-forum">';
+    html += '<ul class="liste-sous-forums">';
+    hotTopicsData.forEach(ht => {
+        html += `<li class="line-ellipsis deboucled-card-element-wrapper" data-id="${ht.id}">`;
+        html += '<i title="Topic hot" class="icon-topic-folder topic-folder2 topic-img deboucled-card-element-icon"></i>';
+        html += `<a href="${ht.url}" class="lien-jv deboucled-card-element-left">${ht.title}</a>`;
+        html += `<span class="deboucled-card-element-right">${ht.nbMessages}</span>`;
+        html += '</li>';
+    });
+    html += '</ul>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+
+    let card = document.createElement('div');
+    forumRightCol.append(card);
+    card.outerHTML = html;
+}

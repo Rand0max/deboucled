@@ -1076,7 +1076,7 @@ blockquote .deboucled-highlighted {
     0 no-repeat;
   width: 16px;
   height: 16px;
-  background-size: 16px;
+  background-size: cover;
   opacity: 0.9;
   vertical-align: top !important;
   display: inline-block !important;
@@ -1084,10 +1084,16 @@ blockquote .deboucled-highlighted {
 .deboucled-fire-logo.big {
   width: 24px;
   height: 24px;
-  background-size: 24px;
 }
 .deboucled-fire-logo:hover {
   opacity: 1;
+}
+.deboucled-fire-logo.cardtitle {
+  width: 17px;
+  height: 17px;
+  opacity: 0.8;
+  vertical-align: text-bottom !important;
+  margin-left: 0.5em;
 }
 .deboucled-smiley {
   vertical-align: text-bottom;
@@ -1378,6 +1384,27 @@ input[type="search"] {
   text-transform: uppercase;
   padding-right: 0.625rem;
   font-size: 0.875rem;
+  opacity: 0.8;
+}
+.deboucled-card-element-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  column-gap: 0.7em;
+}
+.deboucled-card-element-icon {
+  opacity: 0.7;
+  color: #ff4d39;
+}
+.deboucled-card-element-left {
+  width: 100%;
+}
+.deboucled-card-element-right {
+  margin-left: auto;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--jv-text-color);
   opacity: 0.8;
 }
 .deboucled-hide-wrapper {
