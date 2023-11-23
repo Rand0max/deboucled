@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.50.0] (23/11/2023)
+
+- Intégration des liens vocaroo
+
 ## [2.49.0] (17/11/2023)
 
 - Affichage des topics tendances dans un tableau

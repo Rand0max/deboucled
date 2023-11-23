@@ -370,6 +370,23 @@ function decensureTwitterLinks(messageContent) {
     });
 }
 
+function embedVocaroo(messageContent) {
+    if (!messageContent) return;
+
+    messageContent.querySelectorAll('a').forEach(a => {
+        const url = a.href;
+        const match = url.match(/^https:\/\/voca(?:roo\.com|\.ro)\/(?<id>.*)$/, 'i');
+        if (!match) return;
+        const iframe = document.createElement('iframe');
+        iframe.width = 300;
+        iframe.height = 60;
+        iframe.frameBorder = 0;
+        iframe.allow = 'autoplay';
+        iframe.src = `https://vocaroo.com/embed/${match.groups.id}?autoplay=0`;
+        a.replaceWith(iframe);
+    });
+}
+
 function handleLongMessages(allMessages) {
     allMessages.forEach(m => {
         const txtMsg = m.querySelector('.txt-msg.text-enrichi-forum');
