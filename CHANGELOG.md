@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.50.1] (13/12/2023)
+
+- Correction de l'affichage après la MàJ du site
+
 ## [2.50.0] (23/11/2023)
 
 - Intégration des liens vocaroo

@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.3.2
+@version        1.3.3
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -65,7 +65,7 @@
     display: none;
   }
   .icon-topic-folder::before {
-    content: "";
+    content: "";
   }
   .layout__videoFooter {
     display: none;
@@ -139,7 +139,7 @@
   .form-post-topic .form-control {
     font-size: 0.75rem;
   }
-  #header-profil .infos-pseudo h1 {
+  #header-profil .infos-pseudo-name h1 {
     font-size: 2.1rem;
     font-weight: 600;
   }
