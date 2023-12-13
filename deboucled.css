@@ -498,17 +498,15 @@ blockquote .deboucled-highlighted {
   display: inline-block;
   text-align: center;
   clear: both;
-  margin-top: 0;
   background: unset;
   padding: 0;
+  /* margin-top: 0; */
+  /* flex: 1 1 27%; */
 }
 #forum-main-col .bloc-pre-pagi-forum {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   flex: auto;
-}
-#forum-main-col .bloc-pre-pagi-forum .bloc-rech-forum {
-  flex: 1 1 27%;
 }
 #page-messages-forum #forum-main-col .bloc-pre-pagi-forum .bloc-pre-left {
   flex: 1 1 23%;
@@ -519,10 +517,10 @@ blockquote .deboucled-highlighted {
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-left,
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-right {
   display: flex;
-  align-items: flex-end;
+  /* align-items: flex-end; */
   row-gap: 0.3125rem;
   flex-wrap: wrap;
-  margin-top: auto;
+  margin-top: 0;
   position: relative;
   right: unset;
   left: unset;

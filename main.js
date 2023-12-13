@@ -834,7 +834,7 @@ function handleError() {
 
     function goToJvArchiveButton(pathUrl) {
         let jvArchiveButton = document.createElement('a');
-        jvArchiveButton.className = 'btn btn-primary';
+        jvArchiveButton.className = 'btn btn-primary mb-5';
         jvArchiveButton.href = `${jvarchiveUrl}${pathUrl}`;
         jvArchiveButton.alt = 'JvArchive';
         jvArchiveButton.target = '_blank';
