@@ -1623,7 +1623,7 @@ input[type="search"] {
   color: #b73636 !important;
   background-color: #eaecfb !important;
   border-color: #0004;
-  border-width: 0.1rem;
+  border-width: 0.05rem;
   border-style: solid;
   vertical-align: super;
   margin-top: 1rem;
@@ -1650,8 +1650,6 @@ input[type="search"] {
   color: #e8e6e3 !important;
   background-color: #7b3030 !important;
   border-color: #fff3;
-  border-width: 0.1rem;
-  border-style: solid;
 }
 .deboucled-badge-info.dark {
   color: #e8e6e3 !important;

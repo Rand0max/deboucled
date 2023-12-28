@@ -360,7 +360,7 @@ async function isVinzTopic(subject, author, topicUrl) {
         return false;
     }
 
-    const authorMayBeVinz = author.match(/^(vinz|farine|tchoupi|chicken|smash|garfield)/, 'i')
+    const authorMayBeVinz = author.match(/^(vinz|farine|tchoupi|chicken|smash|garfield|biscuit)/, 'i')
         || ((author.length >= 5 && author.length <= 7) && author.charAt(0) === 'v');
 
     const pureSubject = makeVinzSubjectPure(subject);

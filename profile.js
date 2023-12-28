@@ -179,20 +179,20 @@ function buildBlocProfile(parentElement, headerTitle, footerTitle, footerLink, e
     div.outerHTML = blocProfileHtml;
 }
 
-function createNewColMd6(parentElement) {
+function createNewColLg6(parentElement) {
     const newCol = document.createElement('div');
-    newCol.className = 'col-md-6';
+    newCol.className = 'col-lg-6';
     parentElement.appendChild(newCol);
     return newCol;
 }
 
 function getProfileColumnBlocs() {
-    let columnBlocs = [...document.querySelectorAll('.col-md-6')];
+    let columnBlocs = [...document.querySelectorAll('.col-lg-6')];
     if (!columnBlocs.length) {
         const rowElem = document.querySelector('div.row:not(.flex-column)');
         if (!rowElem) return;
-        columnBlocs.push(createNewColMd6(rowElem));
-        columnBlocs.push(createNewColMd6(rowElem));
+        columnBlocs.push(createNewColLg6(rowElem));
+        columnBlocs.push(createNewColLg6(rowElem));
     }
     return columnBlocs;
 }
