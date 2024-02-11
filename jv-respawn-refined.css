@@ -69,6 +69,10 @@ body.didomi-popup-open {
 .footer--bottom.footer {
   display: none;
 }
+.pagi-suivant-inactif,
+.pagi-precedent-inactif {
+  display: none;
+}
 
 /* Fix for JVC zoomed update */
 .bloc-message-forum {

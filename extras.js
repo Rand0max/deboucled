@@ -98,11 +98,10 @@ function displayAnnouncement() {
     if (!supportButton) return;
     supportButton.classList.add('blinking');
 
-    /*
     // eslint-disable-next-line no-undef
     Swal.fire({
         title: '<strong>Déboucled a besoin de vous !<strong>',
-        html: `<p>Après plus de deux ans de développement, nous faisons appel à votre aide pour la première fois.</p><p><b>Pour fonctionner, Déboucled a besoin d'une infrastructure couteuse, d'investissement personnel et de beaucoup de temps.</b></p><p><i>Avec votre soutien, nous pourrons continuer.<i/></p>
+        html: `<p>Après plus de deux ans de développement et d'améliorations de l'outil, nous faisons humblement appel à votre aide.</p><p><b>Pour fonctionner, Déboucled a besoin d'une infrastructure couteuse, d'investissement personnel et de beaucoup de temps.</b></p><p><i>Avec votre soutien, nous pourrons continuer.<i/></p>
         <img src="https://image.noelshack.com/fichiers/2022/22/7/1654433573-cavillax.png" alt="paz" width="100" height="75"></img>`,
         icon: 'info',
         showDenyButton: true,
@@ -120,7 +119,6 @@ function displayAnnouncement() {
         //     window.open('https://youtu.be/KkxZfUlNlDo', '_blank').focus();
         // }
     });
-    */
 }
 
 function buildExtras() {
