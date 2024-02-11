@@ -69,9 +69,11 @@ body.didomi-popup-open {
 .footer--bottom.footer {
   display: none;
 }
+.pagi-debut-inactif,
+.pagi-fin-inactif,
 .pagi-suivant-inactif,
 .pagi-precedent-inactif {
-  display: none;
+  display: none !important;
 }
 
 /* Fix for JVC zoomed update */

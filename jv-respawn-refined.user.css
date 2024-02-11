@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.3.4
+@version        1.3.5
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -76,9 +76,11 @@
   .footer--bottom.footer {
     display: none;
   }
+  .pagi-debut-inactif,
+  .pagi-fin-inactif,
   .pagi-suivant-inactif,
   .pagi-precedent-inactif {
-    display: none;
+    display: none !important;
   }
 
   /* Fix for JVC zoomed update */
