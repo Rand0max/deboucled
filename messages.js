@@ -339,7 +339,7 @@ function decensureTwitterLinks(messageContent) {
     const twitterDns = 'twitter.com';
     const newTwitterDns = 'x.com';
 
-    const newTwitterLinks = document.querySelectorAll(`a[href*="${newTwitterDns}/"][href*="/status/"]`);
+    const newTwitterLinks = messageContent.querySelectorAll(`a[href*="${newTwitterDns}/"][href*="/status/"]`);
     if (newTwitterLinks?.length) {
         newTwitterLinks.forEach(link => {
             link.href = link.href.replace(newTwitterDns, twitterDns);
@@ -348,10 +348,12 @@ function decensureTwitterLinks(messageContent) {
         });
     }
 
-    const twitterLinks = document.querySelectorAll(`a[href*="${twitterDns}/"][href*="/status/"]`);
+    const twitterLinks = messageContent.querySelectorAll(`a[href*="${twitterDns}/"][href*="/status/"]`);
     if (!twitterLinks?.length) return;
 
-    let currentTwitterScript = document.querySelector(`script[src="https://platform.${twitterDns}/widgets.js"]`);
+    const widjetUrl = `https://platform.${twitterDns}/widgets.js`;
+
+    let currentTwitterScript = document.querySelector(`script[src="${widjetUrl}"]`);
     if (currentTwitterScript) currentTwitterScript.remove();
 
     twitterLinks.forEach(link => {
@@ -360,12 +362,12 @@ function decensureTwitterLinks(messageContent) {
         let tweetElement = document.createElement('blockquote');
         tweetElement.setAttribute('class', 'twitter-tweet');
         tweetElement.innerHTML = `<blockquote class="twitter-tweet"><a href="${link}"></a></blockquote>`;
-        link.parentNode.replaceChild(tweetElement, link);
+        link.insertAdjacentElement('afterend', tweetElement);
 
         if (!currentTwitterScript) {
-            const newTwitterScript = document.createElement('script');
-            newTwitterScript.setAttribute('src', `https://platform.${twitterDns}/widgets.js`);
-            document.body.appendChild(newTwitterScript);
+            currentTwitterScript = document.createElement('script');
+            currentTwitterScript.setAttribute('src', widjetUrl);
+            document.body.appendChild(currentTwitterScript);
         }
     });
 }
@@ -383,7 +385,23 @@ function embedVocaroo(messageContent) {
         iframe.frameBorder = 0;
         iframe.allow = 'autoplay';
         iframe.src = `https://vocaroo.com/embed/${match.groups.id}?autoplay=0`;
-        a.replaceWith(iframe);
+        a.insertAdjacentElement('afterend', iframe);
+    });
+}
+
+function embedZupimages(messageContent) {
+    if (!messageContent) return;
+
+    messageContent.querySelectorAll('a').forEach(a => {
+        const url = a.href;
+        const match = url.match(/^https:\/\/(?:www\.)?zupimages\.net.*$/, 'i');
+        if (!match) return;
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = url;
+        img.height = 60;
+        a.innerHTML = '';
+        a.append(img);
     });
 }
 

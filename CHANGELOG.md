@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.51.0] (17/02/2024)
+
+- Intégration de Zupimages
+- Corrections mineures sur l'intégration twitter et vocaroo
+
 ## [2.50.1] (13/12/2023)
 
 - Correction de l'affichage après la MàJ du site
