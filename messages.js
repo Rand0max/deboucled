@@ -397,7 +397,7 @@ function embedZupimages(messageContent) {
         const match = url.match(/^https:\/\/(?:www\.)?zupimages\.net.*$/, 'i');
         if (!match) return;
         const img = document.createElement('img');
-        img.src = url;
+        img.src = url.replace('/viewer.php?id=', '/up/');
         img.alt = url;
         img.height = 60;
         a.innerHTML = '';
