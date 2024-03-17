@@ -360,7 +360,7 @@ function blacklistsIncludingEntity(entity, entityType, mustBeEnabled = true) {
     if (entityType == entityAuthor) normEntity = normEntity.toLowerCase();
 
     const userBlacklistRegex = getEntityRegex(entityType, false);
-    if (normEntity.match(userBlacklistRegex))
+    if (userBlacklistRegex && normEntity.match(userBlacklistRegex))
         blacklists.push({
             id: `custom_${entityType}`,
             description: `Liste noire ${getEntityTitle(entityType)}`,
