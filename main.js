@@ -835,11 +835,10 @@ function handleError() {
 
     function goToJvArchiveButton(pathUrl) {
         let jvArchiveButton = document.createElement('a');
-        jvArchiveButton.className = 'btn btn-primary mb-5';
+        jvArchiveButton.className = 'btn deboucled-goto-jvarchive btn-primary mb-5';
         jvArchiveButton.href = `${jvarchiveUrl}${pathUrl}`;
         jvArchiveButton.alt = 'JvArchive';
         jvArchiveButton.target = '_blank';
-        jvArchiveButton.style.marginLeft = '15px';
         jvArchiveButton.innerHTML = '<span class="deboucled-jvarchive-logo" style="margin-right:5px; vertical-align: sub;"></span>Consulter JvArchive';
 
         insertAfter(jvArchiveButton, homepageButton);

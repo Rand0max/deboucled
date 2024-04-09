@@ -407,6 +407,10 @@ blockquote .deboucled-highlighted {
 .deboucled-entity-message-hint:hover {
   opacity: 0.6;
 }
+.deboucled-goto-jvarchive {
+  margin-left: 15px;
+  color: #fff;
+}
 
 /* JVC fix */
 .profile-card .infos-pseudo-label {
