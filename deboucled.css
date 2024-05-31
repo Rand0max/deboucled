@@ -1619,6 +1619,15 @@ input[type="search"] {
   color: gray;
 }
 
+.deboucled-badge-blacklist,
+.deboucled-badge-neutral {
+  border-color: #0004;
+  border-width: 0.05rem;
+  border-style: solid;
+  vertical-align: super;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
 .deboucled-badge-neutral {
   color: #000 !important;
   background-color: #ddd !important;
@@ -1626,12 +1635,6 @@ input[type="search"] {
 .deboucled-badge-blacklist {
   color: #b73636 !important;
   background-color: #eaecfb !important;
-  border-color: #0004;
-  border-width: 0.05rem;
-  border-style: solid;
-  vertical-align: super;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
 }
 .deboucled-badge-info {
   color: #2643e9 !important;
