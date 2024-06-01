@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.52.0
+// @version     2.52.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -18,6 +18,7 @@
 // @match       http://www.jeuxvideo.com/sso/*
 // @match       https://www.jeuxvideo.com/sso/*
 // @connect     randomax.com
+// @connect     jvarchive.com
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
