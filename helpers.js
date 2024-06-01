@@ -404,6 +404,7 @@ async function fetchHtml(url, handle410 = false) {
         });
 }
 
+/*
 async function fetchJson(url, timeout = 1500) {
     return fetchWithTimeout(url, { timeout: timeout })
         .then(function (response) {
@@ -419,20 +420,50 @@ async function fetchJson(url, timeout = 1500) {
         });
 }
 
-async function fetchJsonWithParams(url, params, timeout = 1500) {
-    return fetchJson(url + '?' + new URLSearchParams(params), timeout);
-}
-
 async function fetchWithTimeout(resource, options = {}) {
     const { timeout = 8000 } = options;
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
-    const response = await fetch(resource, {
-        ...options,
-        signal: controller.signal
-    });
+    const response = await fetch(resource,
+        {
+            ...options,
+            signal: controller.signal
+        });
     clearTimeout(id);
     return response;
+}
+*/
+
+async function fetchJson(url, timeout = 1500) {
+    return fetchWithTimeout(url, { timeout: timeout })
+        .then(function (response) {
+            if (response.status !== 200) throw Error(response);
+            return response.responseText;
+        })
+        .then(function (text) {
+            return JSON.parse(text);
+        })
+        .catch(function (err) {
+            console.warn(err);
+            return undefined;
+        });
+}
+
+async function fetchJsonWithParams(url, params, timeout = 1500) {
+    return fetchJson(url + '?' + new URLSearchParams(params), timeout);
+}
+
+async function fetchWithTimeout(resource, timeout) {
+    let res;
+    await GM.xmlHttpRequest({
+        method: 'GET',
+        url: resource,
+        timeout: timeout,
+        onload: (response) => { res = response; },
+        onerror: (response) => { console.error('fetch error : %o', response); },
+        ontimeout: (response) => { console.warn('fetch timeout : %o', response); }
+    });
+    return res;
 }
 
 function formatDateToFrenchFormat(date, withSugar = false) {
