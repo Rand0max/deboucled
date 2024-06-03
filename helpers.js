@@ -435,10 +435,10 @@ async function fetchWithTimeout(resource, options = {}) {
 */
 
 async function fetchJson(url, timeout = 1500) {
-    return fetchWithTimeout(url, { timeout: timeout })
+    return fetchWithTimeout(url, timeout)
         .then(function (response) {
-            if (response.status !== 200) throw Error(response);
-            return response.responseText;
+            if (response?.status !== 200) throw Error(response);
+            return response?.responseText;
         })
         .then(function (text) {
             return JSON.parse(text);
@@ -460,8 +460,8 @@ async function fetchWithTimeout(resource, timeout) {
         url: resource,
         timeout: timeout,
         onload: (response) => { res = response; },
-        onerror: (response) => { console.error('fetch error : %o', response); },
-        ontimeout: (response) => { console.warn('fetch timeout : %o', response); }
+        onerror: (response) => { console.error('fetch error', response); },
+        ontimeout: (response) => { console.warn('fetch timeout', response); }
     });
     return res;
 }
