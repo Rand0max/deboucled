@@ -1630,11 +1630,11 @@ input[type="search"] {
 }
 .deboucled-badge-neutral {
   color: #000 !important;
-  background-color: #ddd !important;
+  background-color: #ddd8 !important;
 }
 .deboucled-badge-blacklist {
   color: #b73636 !important;
-  background-color: #eaecfb !important;
+  background-color: #fbeaea !important
 }
 .deboucled-badge-info {
   color: #2643e9 !important;
