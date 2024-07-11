@@ -2,3 +2,8 @@ FILES=deboucled.meta.debug.js variables.js helpers.js storage.js header.js prebo
 
 build:
 	type $(FILES) > deboucled.debug.js
+
+.PHONY: version
+version: 
+	node incrementVersion.js
+	
