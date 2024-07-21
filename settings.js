@@ -261,6 +261,9 @@ function buildSettingsPage() {
         const twitterLogo = '<span class="deboucled-twitter-logo"></span>';
         html += addToggleOption(`Intégrer <i>Twitter</i> ${twitterLogo} dans les messages`, storage_optionDecensureTwitter, storage_optionDecensureTwitter_default, 'Intègre automatiquement les miniatures de Tweet dans les messages. ⚠ Attention ⚠ certains bloqueurs de pub peuvent empêcher les tweets de s\'afficher.');
 
+        html += addToggleOption(`Intégrer les vidéos <i>Streamable</i> dans les messages`, storage_optionEmbedStreamable, storage_optionEmbedStreamable_default, 'Intègre automatiquement les vidéos Streamable dans les messages.');
+
+
         const quoteLogo = '<span class="deboucled-quote-logo"></span>';
         html += addToggleOption(`Améliorer les <i>citations</i> ${quoteLogo} des messages`, storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default, 'Améliore les citations avec plusieurs fonctionnalités :\n\n• Insère le pseudo du message cité\n• Citer une partie des messages en sélectionnant le texte\n• Citer et suggérer des pseudos en écrivant avec l\'arobase @ (conditions : connecté et minimum 3 lettres)\n• Mettre en couleur les pseudos lorsqu\'ils sont cités');
 
@@ -501,6 +504,7 @@ function addSettingEvents() {
     addToggleEvent(storage_optionDisplayTopicAvatar);
     addToggleEvent(storage_optionHideAvatarBorder);
     addToggleEvent(storage_optionDecensureTwitter);
+    addToggleEvent(storage_optionEmbedStreamable);
     addToggleEvent(storage_optionDisplayBadges);
     addToggleEvent(storage_optionGetMessageQuotes);
     addToggleEvent(storage_optionFilterHotTopics);
