@@ -113,8 +113,10 @@ async function buildQuoteMessage(messageElement, selection) {
         }, 600);
     }
 
-    messageQuotesPendingArray.push(prepareMessageQuoteInfo(messageElement));
-    await saveLocalStorage();
+    if (getAuthorFromMessageElem(messageElement).toLowerCase() !== userPseudo?.toLowerCase()) {
+        messageQuotesPendingArray.push(prepareMessageQuoteInfo(messageElement));
+        await saveLocalStorage();
+    }
 }
 
 async function suggestAuthors(authorHint) {
