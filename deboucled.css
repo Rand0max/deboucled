@@ -2435,3 +2435,8 @@ select.deboucled-dropdown::-ms-expand {
     font: 11px/14px sans-serif;
   }
 }
+
+.text-enrichi-forum .img-shack {
+  margin-right: -4px;
+  margin-bottom: -7px;
+}
