@@ -361,6 +361,9 @@ function decensureTwitterLinks(messageContent) {
 
         let tweetElement = document.createElement('blockquote');
         tweetElement.setAttribute('class', 'twitter-tweet');
+        if (preferDarkTheme()) {
+            tweetElement.setAttribute('data-theme', 'dark');
+        }
         tweetElement.innerHTML = `<blockquote class="twitter-tweet"><a href="${link}"></a></blockquote>`;
         link.insertAdjacentElement('afterend', tweetElement);
 
