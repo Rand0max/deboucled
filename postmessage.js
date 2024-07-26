@@ -337,19 +337,23 @@ function addAuthorSuggestionEvent() {
 // paste image noelshack
 
 const textArea = document.querySelector('#message_topic');
+const textAreaMP = document.querySelector('textarea#message');
+
+textArea?.addEventListener('drop', handleDrop);
+textArea?.addEventListener('paste', handlePaste);
+textAreaMP?.addEventListener('drop', handleDrop);
+textAreaMP?.addEventListener('paste', handlePaste);
 
 document.querySelector('.picto-msg-crayon')?.addEventListener('click', () => {
     setTimeout(() => {
         document.querySelectorAll('textarea[name="text_commentaire"]').forEach(function (el) {
             console.log(el)
             el.addEventListener('paste', handlePaste);
+            el.addEventListener('drop', handleDrop);
           });
     }, 100);
    
 });
-
-textArea?.addEventListener('drop', handleDrop);
-textArea?.addEventListener('paste', handlePaste);
 
 async function handleDrop(event) {
     const dataTransfer = event.dataTransfer;
