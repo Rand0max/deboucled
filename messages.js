@@ -405,43 +405,36 @@ function embedZupimages(messageContent) {
     });
 }
 
+function createAndInsertVideo(a, videoUrl) {
+    const video = document.createElement('video');
+    video.controls = true;
+    video.src = videoUrl;
+    video.style = "width:100%;height:100%; min-height:500px; max-width: 700px; max-height: 700px; display:block; margin: 0 auto;";
+    a.insertAdjacentElement('afterend', video);
+}
+
 function embedStreamable(messageContent) {
     if (!messageContent) return;
+
     messageContent.querySelectorAll('a[href*="streamable.com"]').forEach(a => {
         const url = a.href;
         const match = url.match(/^https:\/\/streamable\.com\/(?<id>.*)$/, 'i');
         if (!match) return;
         const videoUrl = `https://api-f.streamable.com/api/v1/videos/${match.groups.id}/mp4`;
-        const video = document.createElement('video');
-        video.controls = true;
-        video.src = videoUrl;
-        video.style = "width:100%;height:100%; min-height:500px; max-width: 700px; max-height: 700px; display:block; margin: 0 auto;";
-        a.insertAdjacentElement('afterend', video);
+        createAndInsertVideo(a, videoUrl);
     });
 
     messageContent.querySelectorAll('a[href*="webmshare.com"]').forEach(a => {
         const url = a.href;
         const match = url.match(/https:\/\/webmshare\.com\/(?:play\/)?(?<id>[\w]+)/i);
         if (!match) return;
-        const videoId = match.groups.id;
-        const videoUrl = `https://s1.webmshare.com/${videoId}.webm`;
-        const video = document.createElement('video');
-        video.controls = true;
-        video.src = videoUrl;
-        video.style = "width:100%;height:100%; min-height:500px; max-width: 700px; max-height: 700px; display:block; margin: 0 auto;";
-        a.insertAdjacentElement('afterend', video);
+        const videoUrl = `https://s1.webmshare.com/${match.groups.id}.webm`;
+        createAndInsertVideo(a, videoUrl);
     });
 
     messageContent.querySelectorAll('a[href*=".mp4"], a[href*=".webm"]').forEach(a => {
-        const url = a.href;
-        const videoUrl = url;
-        const video = document.createElement('video');
-        video.controls = true;
-        video.src = videoUrl;
-        video.style = "width:100%;height:100%; min-height:500px; max-width: 700px; max-height: 700px; display:block; margin: 0 auto;";
-        a.insertAdjacentElement('afterend', video);
+        createAndInsertVideo(a, a.href);
     });
-
 }
 
 function handleLongMessages(allMessages) {
