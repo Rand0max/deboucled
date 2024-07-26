@@ -261,7 +261,7 @@ function buildSettingsPage() {
         const twitterLogo = '<span class="deboucled-twitter-logo"></span>';
         html += addToggleOption(`Intégrer <i>Twitter</i> ${twitterLogo} dans les messages`, storage_optionDecensureTwitter, storage_optionDecensureTwitter_default, 'Intègre automatiquement les miniatures de Tweet dans les messages. ⚠ Attention ⚠ certains bloqueurs de pub peuvent empêcher les tweets de s\'afficher.');
 
-        html += addToggleOption(`Intégrer les vidéos <i>Streamable</i> dans les messages`, storage_optionEmbedStreamable, storage_optionEmbedStreamable_default, 'Intègre automatiquement les vidéos Streamable dans les messages.');
+        html += addToggleOption(`Intégrer les vidéos Streamable, webm dans les messages`, storage_optionEmbedStreamable, storage_optionEmbedStreamable_default, 'Intègre automatiquement les vidéos Streamable dans les messages.');
 
 
         const quoteLogo = '<span class="deboucled-quote-logo"></span>';
