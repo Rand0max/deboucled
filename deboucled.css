@@ -581,6 +581,7 @@ blockquote .deboucled-highlighted {
   margin-left: 0.4rem !important;
   white-space: normal;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   display: -webkit-box !important;
 }
