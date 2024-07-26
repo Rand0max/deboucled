@@ -40,8 +40,17 @@ function prepareMessageQuoteInfo(messageElement) {
     }
 }
 
+function fixNoelshackDirectUrl() {
+    let message = document.querySelector('#message_topic').value;
+    if (message.match(/https:\/\/www\.noelshack\.com\/\d+-\d+-\d+-.*\..*/i)) {
+        message = buildNoelshackDirectUrl(message);
+        document.querySelector('#message_topic').value = message      
+    }    
+}
+
 async function validatePendingMessageQuotes() {
-    const rawMessage = getRawTypedMessage();
+    fixNoelshackDirectUrl()
+    const rawMessage = getRawTypedMessage();    
     const newStatus = rawMessage?.length ? 'validated' : 'canceled'; // Citation vide
     messageQuotesPendingArray
         .filter(mqp =>

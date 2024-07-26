@@ -299,6 +299,12 @@ function buildNoelshackMiniUrl(noelshackUrl) {
     return noelshackUrl.replace(matchRegex, replacement);
 }
 
+function buildNoelshackDirectUrl(noelshackUrl) {
+    const matchRegex = new RegExp(/https:\/\/www\.noelshack\.com\/(\d+)-(\d+)-(\d+)-(.*)/, 'ig');
+    const replacement = 'https://image.noelshack.com/fichiers/$1/$2/$3/$4';
+    return noelshackUrl.replaceAll(matchRegex, replacement);
+}
+
 function fixMessageUrls(messageContent) {
     if (!messageContent) return;
 
@@ -331,6 +337,14 @@ function fixMessageUrls(messageContent) {
         messageContent,
         urlRegex,
         (m) => `<a class="xXx" href="${m}" title="${m}" target="_blank">${m}</a>`);
+    //replace noelshack direct link
+    messageContent.querySelectorAll('a').forEach(anchor => {
+        const href = anchor.getAttribute('href');
+        if (href && href.match(/https:\/\/www\.noelshack\.com\/\d+-\d+-\d+-.*\..*/i)) {
+            const newHref = buildNoelshackDirectUrl(href);
+            anchor.setAttribute('href', newHref);
+        }
+    });
 }
 
 function decensureTwitterLinks(messageContent) {
