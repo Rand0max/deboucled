@@ -409,7 +409,7 @@ function createAndInsertVideo(a, videoUrl) {
     const video = document.createElement('video');
     video.controls = true;
     video.src = videoUrl;
-    video.style = "width:100%;height:100%; min-height:500px; max-width: 700px; max-height: 700px; display:block; margin: 0 auto;";
+    video.style = "width:100%;height:auto;  max-width: 730px; max-height: 700px; display:block; margin: 0 auto;";
     a.insertAdjacentElement('afterend', video);
 }
 
