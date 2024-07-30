@@ -2436,3 +2436,8 @@ select.deboucled-dropdown::-ms-expand {
     font: 11px/14px sans-serif;
   }
 }
+
+
+.bloc-rech-forum .form-rech-forum {  
+  width: auto !important;
+} 
