@@ -347,7 +347,6 @@ textAreaMP?.addEventListener('paste', handlePaste);
 document.querySelector('.picto-msg-crayon')?.addEventListener('click', () => {
     setTimeout(() => {
         document.querySelectorAll('textarea[name="text_commentaire"]').forEach(function (el) {
-            console.log(el)
             el.addEventListener('paste', handlePaste);
             el.addEventListener('drop', handleDrop);
           });
