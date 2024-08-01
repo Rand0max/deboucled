@@ -1097,6 +1097,9 @@ function replacePaginationJvCare(inputHtml) {
 
 function autoRefreshPagination() {
     function refreshPaginationContent() {
+        if(!document.hasFocus()) {
+            return;
+        } 
         fetch(window.location.href)
             .then(response => response.text())
             .then(html => {
