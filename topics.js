@@ -1078,11 +1078,11 @@ function getSmileyImgHtml(smiley, big = false) {
     return `<img data-code="${smileyLower}" title="${smileyLower}" src="https://image.jeuxvideo.com/smileys_img/${gifCode}.gif" class="deboucled-smiley${big ? ' big' : ''}">`;
 }
 
- 
+
 function replacePaginationJvCare(inputHtml) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(inputHtml, 'text/html');
- 
+
     doc.querySelectorAll('.JvCare').forEach(span => {
         const decryptedHref = decryptJvCare(span.className);
         const newA = document.createElement('a');
@@ -1090,7 +1090,7 @@ function replacePaginationJvCare(inputHtml) {
         newA.className = 'xXx ' + span.className.split(' ').slice(2).join(' ');
         newA.innerHTML = span.innerHTML;
         span.parentNode.replaceChild(newA, span);
-    }); 
+    });
 
     return doc.body.innerHTML;
 }
@@ -1104,12 +1104,11 @@ function autoRefreshPagination() {
                 const doc = parser.parseFromString(html, 'text/html');
                 const newContent = doc.querySelector('div.bloc-pagi-default');
                 if (newContent) {
-                    const currentContent = document.querySelectorAll('div.bloc-pagi-default').forEach(e =>
-                        e.innerHTML = replacePaginationJvCare(newContent.innerHTML) 
-                        ); 
+                    document.querySelectorAll('div.bloc-pagi-default').forEach(e =>
+                        e.innerHTML = replacePaginationJvCare(newContent.innerHTML)
+                    );
                 }
             });
-    } 
-    refreshPaginationContent
+    }
     setInterval(refreshPaginationContent, 10000);
 }
