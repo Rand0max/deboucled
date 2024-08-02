@@ -32,8 +32,8 @@
 // @grant       GM.listValues
 // @grant       GM.getResourceText
 // @grant       GM.xmlHttpRequest
-// @resource    DEBOUCLED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/deboucled.css
-// @resource    JVRESPAWNREFINED_CSS https://raw.githubusercontent.com/Rand0max/deboucled/master/jv-respawn-refined.css
+// @resource    DEBOUCLED_CSS deboucled.css
+// @resource    JVRESPAWNREFINED_CSS jv-respawn-refined.css
 // @resource    CHARTS_CSS https://unpkg.com/charts.css@1.1.0/dist/charts.min.css
 // @resource    SWEETALERTDARK_CSS https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark/dark.css
 // @require     https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js
