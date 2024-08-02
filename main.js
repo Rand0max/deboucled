@@ -696,6 +696,8 @@ async function handleTopicMessages() {
 
     const postMessageElement = document.querySelector('.btn-poster-msg');
     prependEvent(postMessageElement, 'click', async () => await validatePendingMessageQuotes());
+
+    autoRefreshPagination();
 }
 
 async function handleSearch() {

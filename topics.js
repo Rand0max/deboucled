@@ -1078,3 +1078,40 @@ function getSmileyImgHtml(smiley, big = false) {
     return `<img data-code="${smileyLower}" title="${smileyLower}" src="https://image.jeuxvideo.com/smileys_img/${gifCode}.gif" class="deboucled-smiley${big ? ' big' : ''}">`;
 }
 
+
+function replacePaginationJvCare(inputHtml) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(inputHtml, 'text/html');
+
+    doc.querySelectorAll('.JvCare').forEach(span => {
+        const decryptedHref = decryptJvCare(span.className);
+        const newA = document.createElement('a');
+        newA.href = decryptedHref;
+        newA.className = 'xXx ' + span.className.split(' ').slice(2).join(' ');
+        newA.innerHTML = span.innerHTML;
+        span.parentNode.replaceChild(newA, span);
+    });
+
+    return doc.body.innerHTML;
+}
+
+function autoRefreshPagination() {
+    function refreshPaginationContent() {
+        if(!document.hasFocus()) {
+            return;
+        } 
+        fetch(window.location.href)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.querySelector('div.bloc-pagi-default');
+                if (newContent) {
+                    document.querySelectorAll('div.bloc-pagi-default').forEach(e =>
+                        e.innerHTML = replacePaginationJvCare(newContent.innerHTML)
+                    );
+                }
+            });
+    }
+    setInterval(refreshPaginationContent, 10000);
+}
