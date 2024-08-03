@@ -714,6 +714,18 @@ function handleTopicPictos(topics, optionDisplayBlackTopic, optionReplaceResolve
         else if (nbMessage >= 100 && optionDisplayBlackTopic) {
             buildBlackPicto(topicImg);
         }
+
+        //topic image click = open last page
+        const topicTitleElement = topic.querySelector('.topic-title');
+        if (!topicTitleElement) return;
+        const topicUrl = topicTitleElement.getAttribute('href');
+        const page = Math.ceil((nbMessage+1)/20);
+        const regex = /^(\/forums\/42-\d+-\d+)-(\d+)-(0-1-0-\d+\.htm)$/;    
+        const newUrl = topicUrl.replace(regex, (match, part1, part2, part3) => {
+            return `${part1}-${page}-${part3}`;
+        });
+        topicImg.onclick = () => window.location = newUrl
+        topicImg.style = 'cursor: pointer;';
     });
 }
 
