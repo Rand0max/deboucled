@@ -392,12 +392,11 @@ function buildSettingsPage() {
         return html;
     }
     function addChangelogSection(sectionIsActive) {
-        
         let html = '';
-        html += `<div id="changelog-section" class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">CHANGELOG</div>`;
+        html += `<div id="deboucled-changelog-section" class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">CHANGELOG</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
-        html += '<pre id="changelog" style=" white-space: pre-wrap; word-wrap: break-word;  max-width: 100%;">'; 
+        html += '<pre id="deboucled-changelog" style="white-space: pre-wrap; word-wrap: break-word; max-width: 100%;">';
         html += '</pre>';
         html += '</div>';
         html += '</div>';
@@ -433,25 +432,20 @@ function buildSettingsPage() {
     addChangeLogEvent()
 }
 
-let fetchedChangelog = false;
-
-function addChangeLogEvent(){
-    document.querySelector('#changelog-section').addEventListener('click', function() {
-        fetchChangelog();
-    });
+function addChangeLogEvent() {
+    document.querySelector('#deboucled-changelog-section').addEventListener('click', fetchChangelog);
 }
 
 function fetchChangelog() {
     if (fetchedChangelog) return;
-    fetchedChangelog = true;
     fetch('https://raw.githubusercontent.com/Rand0max/deboucled/master/CHANGELOG.md')
-    .then(response => response.text())
-    .then(data => { 
-        data = data.split('\n').slice(0, 50).join('\n');
-        document.querySelector('#changelog').innerHTML = data;
-    }); 
+        .then(response => response.text())
+        .then(data => {
+            data = data.split('\n').slice(0, 50).join('\n');
+            document.querySelector('#deboucled-changelog').innerHTML = data;
+            fetchedChangelog = true;
+        });
 }
-
 
 function addToggleEvent(id, setValue = true, callback = undefined) {
     const toggleSlider = document.querySelector('#' + id);

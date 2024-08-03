@@ -1,5 +1,12 @@
 # Changelog Déboucled
 
+## [2.53.0] (04/08/2024)
+
+- Ajout du changelog
+- Diverses corrections mineures
+- Twitter thème sombre (vitoo)
+- Lien direct noelshack au clic sur les images
+
 ## [2.51.0] (17/02/2024)
 
 - Intégration de Zupimages

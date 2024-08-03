@@ -106,6 +106,7 @@ let currentTopicPageId = undefined;
 let currentTopicAuthor = undefined;
 let currentForumId = undefined;
 let forumFilteringIsDisabled = false;
+let fetchedChangelog = false;
 
 const domParser = new DOMParser();
 
