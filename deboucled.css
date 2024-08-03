@@ -497,6 +497,9 @@ blockquote .deboucled-highlighted {
 #header-profil .bloc-option-profil {
   flex-wrap: wrap;
 }
+.bloc-rech-forum .form-rech-forum {
+  width: auto !important;
+}
 
 /* Bloc tool bar */
 #forum-main-col .bloc-pre-pagi-forum .bloc-rech-forum {
@@ -1636,7 +1639,7 @@ input[type="search"] {
 }
 .deboucled-badge-blacklist {
   color: #b73636 !important;
-  background-color: #fbeaea !important
+  background-color: #fbeaea !important;
 }
 .deboucled-badge-info {
   color: #2643e9 !important;
