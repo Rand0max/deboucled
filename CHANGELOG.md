@@ -5,7 +5,7 @@
 - Ajout du changelog
 - Diverses corrections mineures
 - Twitter thème sombre (vitoo)
-- Lien direct noelshack au clic sur les images
+- Lien direct noelshack au clic sur les images (vitoo)
 
 ## [2.51.0] (17/02/2024)
 
