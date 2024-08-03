@@ -345,3 +345,127 @@ function addAuthorSuggestionEvent() {
     });
 }
 
+
+// paste image noelshack
+
+const textArea = document.querySelector('#message_topic');
+const textAreaMP = document.querySelector('textarea#message');
+
+textArea?.addEventListener('drop', handleDrop);
+textArea?.addEventListener('paste', handlePaste);
+textAreaMP?.addEventListener('drop', handleDrop);
+textAreaMP?.addEventListener('paste', handlePaste);
+
+document.querySelector('.picto-msg-crayon')?.addEventListener('click', () => {
+    setTimeout(() => {
+        document.querySelectorAll('textarea[name="text_commentaire"]').forEach(function (el) {
+            el.addEventListener('paste', handlePaste);
+            el.addEventListener('drop', handleDrop);
+          });
+    }, 100);
+   
+});
+
+async function handleDrop(event) {
+    const dataTransfer = event.dataTransfer;
+    if (dataTransfer.types && Array.from(dataTransfer.types).includes('Files')) {
+        event.preventDefault();
+        event.stopPropagation();
+        const files = dataTransfer.files;
+        await uploadFiles(files, event.target);
+    }
+}
+
+async function handlePaste(event) {
+    const clipboardData = event.clipboardData;
+    if (clipboardData.types.includes('Files')) {
+        event.preventDefault();
+        const files = clipboardData.files;
+        await uploadFiles(files, event.target);
+    }
+}
+
+async function uploadFiles(files, element) {
+    for (let i = 0; i < files.length; i++) {
+        let file = files[i];
+        if (file.type.includes("image")) {
+            if (file.type === "image/webp") {
+                file = await convertWebPToJPEG(file);
+            }
+            const imageUrl = await uploadFile(file);
+            if (imageUrl) {
+                updateTextArea(imageUrl, element);
+            }
+            await new Promise(resolve => setTimeout(resolve, 200));
+            if (i >= 1) {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
+    }
+}
+
+async function uploadFile(file) {
+    const formData = new FormData();
+    formData.append('publication', '0');
+    formData.append('domain', 'https://www.jeuxvideo.com');
+    formData.append('fichier', file);
+
+    const response = await sendRequest(formData);
+
+    try {
+        const data = JSON.parse(response.responseText);
+        return data.url || null;
+    } catch (error) {
+        console.error("Error parsing JSON:", error);
+        return null;
+    }
+}
+
+function updateTextArea(imageUrl, element) {
+    imageUrl = " " + imageUrl + " ";
+    const position = element.selectionStart;
+    const before = element.value.substring(0, position);
+    console.log(before)
+    const after = element.value.substring(position, element.value.length);
+    element.value = before + imageUrl + after;
+    element.selectionStart = element.selectionEnd = position + imageUrl.length;
+    const changeEvent = new Event('change', { bubbles: true });
+    element.dispatchEvent(changeEvent);
+}
+
+async function convertWebPToJPEG(webpBlob) {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(webpBlob);
+
+    return new Promise((resolve) => {
+        img.onload = function () {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            canvas.toBlob((blob) => {
+                resolve(blob);
+            }, 'image/jpeg');
+        };
+    });
+}
+
+function sendRequest(formData) {
+    return new Promise((resolve, reject) => {
+        GM_xmlhttpRequest({
+            method: 'POST',
+            url: 'https://www.noelshack.com/webservice/envoi.json',
+            data: formData,
+            onload: function(response) {
+                resolve(response);
+            },
+            onerror: function(error) {
+                console.error(error);
+                reject(error);
+            }
+        });
+    });
+}
+

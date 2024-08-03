@@ -18,6 +18,7 @@
 // @match       http://www.jeuxvideo.com/sso/*
 // @match       https://www.jeuxvideo.com/sso/*
 // @connect     randomax.com
+// @connect     www.noelshack.com
 // @connect     jvarchive.com
 // @grant       GM_getValue
 // @grant       GM_setValue
