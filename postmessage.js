@@ -44,13 +44,25 @@ function fixNoelshackDirectUrl() {
     let message = document.querySelector('#message_topic').value;
     if (message.match(/https:\/\/www\.noelshack\.com\/\d+-\d+-\d+-.*\..*/i)) {
         message = buildNoelshackDirectUrl(message);
-        document.querySelector('#message_topic').value = message      
-    }    
+        document.querySelector('#message_topic').value = message
+    }
+}
+
+async function handlePostMessage() {
+    bypassTextCensorship();
+    await validatePendingMessageQuotes();
+}
+
+function bypassTextCensorship() {
+    const textArea = document.querySelector('#message_topic');
+    if (!textArea?.value?.length) return;
+    textArea.value = textArea.value.replaceAll(/d[e|é]boucled/gi, 'Déb0ucled');
+    textArea.value = textArea.value.replaceAll(/d[e|é]censured/gi, 'Déc3nsured');
 }
 
 async function validatePendingMessageQuotes() {
     fixNoelshackDirectUrl()
-    const rawMessage = getRawTypedMessage();    
+    const rawMessage = getRawTypedMessage();
     const newStatus = rawMessage?.length ? 'validated' : 'canceled'; // Citation vide
     messageQuotesPendingArray
         .filter(mqp =>

@@ -341,7 +341,8 @@ blockquote .deboucled-highlighted {
   min-width: 5.25rem;
   line-height: 1.6875rem;
   border-radius: 0.875rem;
-  border: none !important;
+  /* border: none !important; */
+  border: var(--jv-btn-border-width) solid #2073a4;
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
 }
 .deboucled-button:hover {
@@ -521,6 +522,7 @@ blockquote .deboucled-highlighted {
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-left,
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-right {
   display: flex;
+  overflow: visible !important;
   /* align-items: flex-end; */
   row-gap: 0.3125rem;
   flex-wrap: wrap;
@@ -530,7 +532,6 @@ blockquote .deboucled-highlighted {
   left: unset;
   top: unset;
   bottom: unset;
-  overflow: visible;
   flex: 1;
 }
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-left .group-one,
