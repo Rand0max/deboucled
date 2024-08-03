@@ -391,6 +391,18 @@ function buildSettingsPage() {
         html += '</div>';
         return html;
     }
+    function addChangelogSection(sectionIsActive) {
+        
+        let html = '';
+        html += `<div id="changelog-section" class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">CHANGELOG</div>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
+        html += '<div class="deboucled-setting-content">';
+        html += '<pre id="changelog" style=" white-space: pre-wrap; word-wrap: break-word;  max-width: 100%;">'; 
+        html += '</pre>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
 
     let settingsHtml = '';
     settingsHtml += addOptionsSection(false);
@@ -402,6 +414,7 @@ function buildSettingsPage() {
     settingsHtml += addEntitySettingSection(entityTopicId, 'LISTE NOIRE - TOPICS', 'TopicId', undefined, false);
     settingsHtml += addAdvancedOptionsSection(false);
     settingsHtml += addStatsSection(false);
+    settingsHtml += addChangelogSection(false);
 
     let settingsView = document.createElement('div');
     settingsView.setAttribute('id', 'deboucled-settings-view');
@@ -416,7 +429,29 @@ function buildSettingsPage() {
     addCollapsibleEvents();
 
     buildSettingEntities();
+
+    addChangeLogEvent()
 }
+
+let fetchedChangelog = false;
+
+function addChangeLogEvent(){
+    document.querySelector('#changelog-section').addEventListener('click', function() {
+        fetchChangelog();
+    });
+}
+
+function fetchChangelog() {
+    if (fetchedChangelog) return;
+    fetchedChangelog = true;
+    fetch('https://raw.githubusercontent.com/Rand0max/deboucled/master/CHANGELOG.md')
+    .then(response => response.text())
+    .then(data => { 
+        data = data.split('\n').slice(0, 50).join('\n');
+        document.querySelector('#changelog').innerHTML = data;
+    }); 
+}
+
 
 function addToggleEvent(id, setValue = true, callback = undefined) {
     const toggleSlider = document.querySelector('#' + id);
