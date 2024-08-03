@@ -259,7 +259,7 @@ function buildSettingsPage() {
         html += addToggleOption(`Afficher les <i>avatars</i> ${avatarLogo} des auteurs`, storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default, 'Afficher ou non les avatars des auteurs dans la liste des topics.');
 
         const twitterLogo = '<span class="deboucled-twitter-logo"></span>';
-        html += addToggleOption(`Intégrer <i>Twitter</i> ${twitterLogo} dans les messages`, storage_optionDecensureTwitter, storage_optionDecensureTwitter_default, 'Intègre automatiquement les miniatures de Tweet dans les messages. ⚠ Attention ⚠ certains bloqueurs de pub peuvent empêcher les tweets de s\'afficher.');
+        html += addToggleOption(`Intégrer <i>Twitter</i> ${twitterLogo} dans les messages`, storage_optionEmbedTwitter, storage_optionEmbedTwitter_default, 'Intègre automatiquement les miniatures de Tweet dans les messages. ⚠ Attention ⚠ certains bloqueurs de pub peuvent empêcher les tweets de s\'afficher.');
 
         const quoteLogo = '<span class="deboucled-quote-logo"></span>';
         html += addToggleOption(`Améliorer les <i>citations</i> ${quoteLogo} des messages`, storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default, 'Améliore les citations avec plusieurs fonctionnalités :\n\n• Insère le pseudo du message cité\n• Citer une partie des messages en sélectionnant le texte\n• Citer et suggérer des pseudos en écrivant avec l\'arobase @ (conditions : connecté et minimum 3 lettres)\n• Mettre en couleur les pseudos lorsqu\'ils sont cités');
@@ -529,7 +529,7 @@ function addSettingEvents() {
     addToggleEvent(storage_optionDisplayTitleSmileys);
     addToggleEvent(storage_optionDisplayTopicAvatar);
     addToggleEvent(storage_optionHideAvatarBorder);
-    addToggleEvent(storage_optionDecensureTwitter);
+    addToggleEvent(storage_optionEmbedTwitter);
     addToggleEvent(storage_optionDisplayBadges);
     addToggleEvent(storage_optionGetMessageQuotes);
     addToggleEvent(storage_optionFilterHotTopics);

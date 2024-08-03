@@ -347,7 +347,7 @@ function fixMessageUrls(messageContent) {
     });
 }
 
-function decensureTwitterLinks(messageContent) {
+function embedTwitterLinks(messageContent) {
     if (!messageContent) return;
 
     const twitterDns = 'twitter.com';
