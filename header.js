@@ -28,7 +28,7 @@ function buildHeaderNotifQuotes(markAllReadFn) {
 
     // Header icon
     const hqIcon = document.createElement('i');
-    hqIcon.className = `deboucled-quoteround-logo`;
+    hqIcon.className = `deboucled-quoteround-logo${preferDarkTheme() ? ' dark' : ''}`;
 
     hqMenu.append(hqIcon);
 

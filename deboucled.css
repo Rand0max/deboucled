@@ -1136,7 +1136,6 @@ blockquote .deboucled-highlighted {
   background-size: cover;
   width: 1em;
   height: 1em;
-  filter: invert(1);
 }
 .deboucled-quoteround-logo.settings {
   filter: invert(var(--deboucled-filter-invert));
@@ -1144,8 +1143,8 @@ blockquote .deboucled-highlighted {
   height: 1.5em;
   vertical-align: bottom;
 }
-.theme-light .deboucled-quoteround-logo {
-  filter: invert(0);
+.deboucled-quoteround-logo.dark {
+  filter: invert(1);
 }
 
 /* Quotes */
