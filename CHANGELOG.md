@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.54.0] (06/08/2024)
+
+- Optimisation du script
+
 ## [2.53.0] (04/08/2024)
 
 - Ajout du changelog
