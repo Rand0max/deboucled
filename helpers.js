@@ -189,6 +189,9 @@ function addStyles(enableJvRespawnRefinedTheme, hideAvatarBorder) {
         const avatarBorderHiddenCss = '.challenge-border-avatar { display: none; }';
         GM_addStyle(avatarBorderHiddenCss);
     }
+
+    const ytCss = GM_getResourceText('yt');
+    GM_addStyle(ytCss);
 }
 
 function addSvg(svgHtml) {

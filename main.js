@@ -495,6 +495,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
 
     if(messageOptions.optionEmbedStreamable) {
         embedStreamable(messageContent);
+        embedYoutube(messageContent);
     }    
 
     if (messageOptions.optionDecensureTwitter) {

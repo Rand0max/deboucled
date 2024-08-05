@@ -437,6 +437,21 @@ function embedStreamable(messageContent) {
     });
 }
 
+function embedYoutube(messageContent) {
+    if (!messageContent) return;
+
+    messageContent.querySelectorAll('a').forEach(a => {
+        const url = a.href;
+        const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([\w-]{11})/;
+        const match = url.match(regex);
+        if (!match) return;
+
+        const liteYoutube = document.createElement('lite-youtube');
+        liteYoutube.setAttribute('videoid', match[1]);
+        a.insertAdjacentElement('afterend', liteYoutube);
+    });
+}
+
 function handleLongMessages(allMessages) {
     allMessages.forEach(m => {
         const txtMsg = m.querySelector('.txt-msg.text-enrichi-forum');
