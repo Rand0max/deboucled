@@ -146,6 +146,14 @@ async function buildQuoteNotifications() {
         hqDropdownContainerContent.append(notifChildElement);
         notifChildElement.onmousedown = () => markQuoteNotifRead(notifChildElement, q.id);
     })
+
+    document.querySelector('.toggleTheme').addEventListener('click', function () {
+        document.querySelector('i.deboucled-quoteround-logo').classList.toggle('dark');
+
+        if (preferDarkTheme() !== document.querySelector("#deboucled_optionEnableDeboucledDarkTheme").checked) {
+            document.querySelector("#deboucled_optionEnableDeboucledDarkTheme").click();
+        }
+    });
 }
 
 async function markReadAllQuoteNotifications() {
