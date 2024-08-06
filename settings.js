@@ -745,7 +745,7 @@ function refreshAuthorKeys(filter = null) {
             refreshCollapsibleContentHeight(entityAuthor);
             clearSearchInputs();
         },
-        function (key, value) { return isEntityInPreboucles(entityAuthor, value) ? ' deboucled-entity-pre-element' : ''; },
+        (key, value) => isEntityInPreboucles(entityAuthor, value) ? ' deboucled-entity-pre-element' : '',
         sortCallback
     );
 }
