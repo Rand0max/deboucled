@@ -272,7 +272,7 @@ function buildSettingsPage() {
     function addPreBouclesSection(sectionIsActive) {
         let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">LISTES PRÉDÉFINIES</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-preboucles-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
 
         html += '<div class="deboucled-preboucle-header">';
@@ -324,7 +324,7 @@ function buildSettingsPage() {
     function addAdvancedOptionsSection(sectionIsActive) {
         let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">OPTIONS AVANCÉES</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-advancedoptions-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
         html += '<table class="deboucled-option-table">';
 
@@ -369,7 +369,7 @@ function buildSettingsPage() {
         }
         let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">STATISTIQUES</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-stats-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
         html += '<table class="deboucled-option-table">';
         let totalHiddenSubjects = store.get(storage_totalHiddenSubjects, '0');
@@ -394,7 +394,7 @@ function buildSettingsPage() {
     function addChangelogSection(sectionIsActive) {
         let html = '';
         html += `<div id="deboucled-changelog-section" class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">CHANGELOG</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-changelog-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
         html += '<pre id="deboucled-changelog" style="white-space: pre-wrap; word-wrap: break-word; max-width: 100%;">';
         html += '</pre>';
@@ -436,13 +436,14 @@ function addChangeLogEvent() {
     document.querySelector('#deboucled-changelog-section').addEventListener('click', fetchChangelog);
 }
 
-function fetchChangelog() {
+async function fetchChangelog() {
     if (fetchedChangelog) return;
-    fetch('https://raw.githubusercontent.com/Rand0max/deboucled/master/CHANGELOG.md')
+    await fetch('https://raw.githubusercontent.com/Rand0max/deboucled/master/CHANGELOG.md')
         .then(response => response.text())
         .then(data => {
             data = data.split('\n').slice(0, 50).join('\n');
             document.querySelector('#deboucled-changelog').innerHTML = data;
+            document.querySelector('#deboucled-changelog-collapsible-content').style.maxHeight = 'max-content';
             fetchedChangelog = true;
         });
 }

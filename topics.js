@@ -540,7 +540,7 @@ function buildBadgeContainer(parentElement, customClass) {
     return badgeContainer
 }
 
-function buildAuthorBlacklistBadges(author, parentElement, excludedLists, containerClass) {
+async function buildAuthorBlacklistBadges(author, parentElement, excludedLists, containerClass) {
     if (!parentElement) return;
 
     const blacklists = blacklistsIncludingEntity(author, entityAuthor, false);

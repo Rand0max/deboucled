@@ -55,9 +55,16 @@ async function handlePostMessage() {
 
 function bypassTextCensorship() {
     const textArea = document.querySelector('#message_topic');
-    if (!textArea?.value?.length) return;
-    textArea.value = textArea.value.replaceAll(/d[e|é]boucled/gi, 'Déb0ucled');
-    textArea.value = textArea.value.replaceAll(/d[e|é]censured/gi, 'Déc3nsured');
+    if (textArea?.value?.length) {
+        textArea.value = textArea.value.replaceAll(/d[e|é]boucled/gi, 'Déb0ucled');
+        textArea.value = textArea.value.replaceAll(/d[e|é]censured/gi, 'Déc3nsured');
+    }
+
+    const titleArea = document.querySelector('#titre_topic');
+    if (titleArea?.value?.length) {
+        titleArea.value = titleArea.value.replaceAll(/d[e|é]boucled/gi, 'Déb0ucled');
+        titleArea.value = titleArea.value.replaceAll(/d[e|é]censured/gi, 'Déc3nsured');
+    }
 }
 
 async function validatePendingMessageQuotes() {
