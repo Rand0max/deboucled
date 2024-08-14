@@ -192,6 +192,9 @@ function addStyles(enableJvRespawnRefinedTheme, hideAvatarBorder) {
         const avatarBorderHiddenCss = '.challenge-border-avatar { display: none; }';
         GM_addStyle(avatarBorderHiddenCss);
     }
+
+    const liteYoutubeCss = GM_getResourceText('LITEYOUTUBE_CSS');
+    GM_addStyle(liteYoutubeCss);
 }
 
 function addSvg(svgHtml) {
