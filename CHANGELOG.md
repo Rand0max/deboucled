@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.55.0] (14/08/2024)
+
+- Intégration des vidéos Streamable, Youtube etc (vitoo)
+
 ## [2.54.3] (14/08/2024)
 
 - Petit troll

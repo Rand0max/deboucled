@@ -55,7 +55,7 @@ const storage_optionHideLongMessages = 'deboucled_optionHideLongMessages', stora
 const storage_optionDisplayTitleSmileys = 'deboucled_optionDisplayTitleSmileys', storage_optionDisplayTitleSmileys_default = true;
 const storage_optionDisplayTopicAvatar = 'deboucled_optionDisplayTopicAvatar', storage_optionDisplayTopicAvatar_default = false;
 const storage_optionHideAvatarBorder = 'deboucled_optionHideAvatarBorder', storage_optionHideAvatarBorder_default = false;
-const storage_optionEmbedVideos = 'deboucled_optionEmbedVideos', storage_optionEmbedVideos_default = false;
+const storage_optionEmbedVideos = 'deboucled_optionEmbedVideos', storage_optionEmbedVideos_default = true;
 const storage_optionEmbedTwitter = 'deboucled_optionEmbedTwitter', storage_optionEmbedTwitter_default = false;
 const storage_optionDisplayBadges = 'deboucled_optionDisplayBadges', storage_optionDisplayBadges_default = true;
 const storage_optionGetMessageQuotes = 'deboucled_optionGetMessageQuotes', storage_optionGetMessageQuotes_default = true;
