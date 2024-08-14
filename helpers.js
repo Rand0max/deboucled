@@ -193,8 +193,8 @@ function addStyles(enableJvRespawnRefinedTheme, hideAvatarBorder) {
         GM_addStyle(avatarBorderHiddenCss);
     }
 
-    const ytCss = GM_getResourceText('yt');
-    GM_addStyle(ytCss);
+    const liteYoutubeCss = GM_getResourceText('LITEYOUTUBE_CSS');
+    GM_addStyle(liteYoutubeCss);
 }
 
 function addSvg(svgHtml) {
