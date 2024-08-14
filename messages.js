@@ -422,17 +422,17 @@ function embedZupimages(messageContent) {
     });
 }
 
-function createAndInsertVideo(a, videoUrl) {
-    const video = document.createElement('video');
-    video.controls = true;
-    video.src = videoUrl;
-    video.style = "width:100%;height:auto;  max-width: 730px; max-height: 700px; display:block; margin: 0 auto;";
-    a.insertAdjacentElement('afterend', video);
-}
-
 function embedStreamable(messageContent) {
     if (!messageContent) return;
 
+    function createAndInsertVideo(a, videoUrl) {
+        const video = document.createElement('video');
+        video.controls = true;
+        video.src = videoUrl;
+        video.style = "width:100%; height:auto; max-width:730px; max-height:700px; display:block; margin:0 auto;";
+        a.insertAdjacentElement('afterend', video);
+    }
+    
     messageContent.querySelectorAll('a[href*="streamable.com"]').forEach(a => {
         const url = a.href;
         const match = url.match(/^https:\/\/streamable\.com\/(?<id>.*)$/, 'i');
