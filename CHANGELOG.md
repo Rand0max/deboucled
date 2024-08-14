@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.54.3] (14/08/2024)
+
+- Petit troll
+- Correction graphique mineure (vitoo)
+
 ## [2.54.2] (14/08/2024)
 
 - Correction de l'affichage du changelog
