@@ -22,7 +22,7 @@ function loadPreBoucleRegexCache() {
 
 function isEntityInPreboucles(entityType, entity) {
     const entityLower = entity.toLowerCase();
-    const entities = [entityLower, `${entityLower}*`, `*${entityLower}`, `*${entityLower}*`];
+    const entities = [entityLower]; //[entityLower, `${entityLower}*`, `*${entityLower}`, `*${entityLower}*`];
     if (entityType === entitySubject) return entities.some(e => preBoucleSubjectEnabledArray.includes(e));
     else if (entityType === entityAuthor) return entities.some(e => preBoucleAuthorEnabledArray.includes(e));
 }

@@ -259,7 +259,7 @@ function buildSettingsPage() {
         html += addToggleOption(`Afficher les <i>avatars</i> ${avatarLogo} des auteurs`, storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default, 'Afficher ou non les avatars des auteurs dans la liste des topics.');
 
         const twitterLogo = '<span class="deboucled-twitter-logo"></span>';
-        html += addToggleOption(`Intégrer <i>Twitter</i> ${twitterLogo} dans les messages`, storage_optionDecensureTwitter, storage_optionDecensureTwitter_default, 'Intègre automatiquement les miniatures de Tweet dans les messages. ⚠ Attention ⚠ certains bloqueurs de pub peuvent empêcher les tweets de s\'afficher.');
+        html += addToggleOption(`Intégrer <i>Twitter</i> ${twitterLogo} dans les messages`, storage_optionEmbedTwitter, storage_optionEmbedTwitter_default, 'Intègre automatiquement les miniatures de Tweet dans les messages. ⚠ Attention ⚠ certains bloqueurs de pub peuvent empêcher les tweets de s\'afficher.');
 
         html += addToggleOption(`Intégrer les vidéos Streamable, youtube dans les messages`, storage_optionEmbedStreamable, storage_optionEmbedStreamable_default, 'Intègre automatiquement les vidéos Streamable, youtube dans les messages.');
 
@@ -275,7 +275,7 @@ function buildSettingsPage() {
     function addPreBouclesSection(sectionIsActive) {
         let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">LISTES PRÉDÉFINIES</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-preboucles-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
 
         html += '<div class="deboucled-preboucle-header">';
@@ -327,7 +327,7 @@ function buildSettingsPage() {
     function addAdvancedOptionsSection(sectionIsActive) {
         let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">OPTIONS AVANCÉES</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-advancedoptions-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
         html += '<table class="deboucled-option-table">';
 
@@ -372,7 +372,7 @@ function buildSettingsPage() {
         }
         let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">STATISTIQUES</div>`;
-        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-options-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-stats-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
         html += '<table class="deboucled-option-table">';
         let totalHiddenSubjects = store.get(storage_totalHiddenSubjects, '0');
@@ -394,6 +394,17 @@ function buildSettingsPage() {
         html += '</div>';
         return html;
     }
+    function addChangelogSection(sectionIsActive) {
+        let html = '';
+        html += `<div id="deboucled-changelog-section" class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">CHANGELOG</div>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-changelog-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
+        html += '<div class="deboucled-setting-content">';
+        html += '<pre id="deboucled-changelog" style="white-space: pre-wrap; word-wrap: break-word; max-width: 100%;">';
+        html += '</pre>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
 
     let settingsHtml = '';
     settingsHtml += addOptionsSection(false);
@@ -405,6 +416,7 @@ function buildSettingsPage() {
     settingsHtml += addEntitySettingSection(entityTopicId, 'LISTE NOIRE - TOPICS', 'TopicId', undefined, false);
     settingsHtml += addAdvancedOptionsSection(false);
     settingsHtml += addStatsSection(false);
+    settingsHtml += addChangelogSection(false);
 
     let settingsView = document.createElement('div');
     settingsView.setAttribute('id', 'deboucled-settings-view');
@@ -419,6 +431,24 @@ function buildSettingsPage() {
     addCollapsibleEvents();
 
     buildSettingEntities();
+
+    addChangeLogEvent()
+}
+
+function addChangeLogEvent() {
+    document.querySelector('#deboucled-changelog-section').addEventListener('click', fetchChangelog);
+}
+
+async function fetchChangelog() {
+    if (fetchedChangelog) return;
+    await fetch('https://raw.githubusercontent.com/Rand0max/deboucled/master/CHANGELOG.md')
+        .then(response => response.text())
+        .then(data => {
+            data = data.split('\n').slice(0, 50).join('\n');
+            document.querySelector('#deboucled-changelog').innerHTML = data;
+            document.querySelector('#deboucled-changelog-collapsible-content').style.maxHeight = 'max-content';
+            fetchedChangelog = true;
+        });
 }
 
 function addToggleEvent(id, setValue = true, callback = undefined) {
@@ -503,8 +533,8 @@ function addSettingEvents() {
     addToggleEvent(storage_optionDisplayTitleSmileys);
     addToggleEvent(storage_optionDisplayTopicAvatar);
     addToggleEvent(storage_optionHideAvatarBorder);
-    addToggleEvent(storage_optionDecensureTwitter);
     addToggleEvent(storage_optionEmbedStreamable);
+    addToggleEvent(storage_optionEmbedTwitter);
     addToggleEvent(storage_optionDisplayBadges);
     addToggleEvent(storage_optionGetMessageQuotes);
     addToggleEvent(storage_optionFilterHotTopics);
@@ -720,7 +750,7 @@ function refreshAuthorKeys(filter = null) {
             refreshCollapsibleContentHeight(entityAuthor);
             clearSearchInputs();
         },
-        function (key, value) { return isEntityInPreboucles(entityAuthor, value) ? ' deboucled-entity-pre-element' : ''; },
+        (key, value) => isEntityInPreboucles(entityAuthor, value) ? ' deboucled-entity-pre-element' : '',
         sortCallback
     );
 }

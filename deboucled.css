@@ -341,7 +341,8 @@ blockquote .deboucled-highlighted {
   min-width: 5.25rem;
   line-height: 1.6875rem;
   border-radius: 0.875rem;
-  border: none !important;
+  /* border: none !important; */
+  border: var(--jv-btn-border-width) solid #2073a4;
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
 }
 .deboucled-button:hover {
@@ -496,6 +497,9 @@ blockquote .deboucled-highlighted {
 #header-profil .bloc-option-profil {
   flex-wrap: wrap;
 }
+.bloc-rech-forum .form-rech-forum {
+  width: auto !important;
+}
 
 /* Bloc tool bar */
 #forum-main-col .bloc-pre-pagi-forum .bloc-rech-forum {
@@ -521,6 +525,7 @@ blockquote .deboucled-highlighted {
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-left,
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-right {
   display: flex;
+  overflow: visible !important;
   /* align-items: flex-end; */
   row-gap: 0.3125rem;
   flex-wrap: wrap;
@@ -530,7 +535,6 @@ blockquote .deboucled-highlighted {
   left: unset;
   top: unset;
   bottom: unset;
-  overflow: visible;
   flex: 1;
 }
 #forum-main-col .bloc-pre-pagi-forum .bloc-pre-left .group-one,
@@ -581,6 +585,7 @@ blockquote .deboucled-highlighted {
   margin-left: 0.4rem !important;
   white-space: normal;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   display: -webkit-box !important;
 }
@@ -1634,7 +1639,7 @@ input[type="search"] {
 }
 .deboucled-badge-blacklist {
   color: #b73636 !important;
-  background-color: #fbeaea !important
+  background-color: #fbeaea !important;
 }
 .deboucled-badge-info {
   color: #2643e9 !important;

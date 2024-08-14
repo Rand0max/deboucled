@@ -498,8 +498,8 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
         embedYoutube(messageContent);
     }    
 
-    if (messageOptions.optionDecensureTwitter) {
-        decensureTwitterLinks(messageContent);
+    if (messageOptions.optionEmbedTwitter) {
+        embedTwitterLinks(messageContent);
     }
 
     if (messageOptions.optionEnhanceQuotations) {
@@ -650,8 +650,8 @@ function prepareMessageOptions(isWhitelistedTopic) {
         optionSmoothScroll: store.get(storage_optionSmoothScroll, storage_optionSmoothScroll_default),
         optionHideLongMessages: store.get(storage_optionHideLongMessages, storage_optionHideLongMessages_default),
         optionDisplayTitleSmileys: store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default),
-        optionDecensureTwitter: store.get(storage_optionDecensureTwitter, storage_optionDecensureTwitter_default),
         optionEmbedStreamable: store.get(storage_optionEmbedStreamable, storage_optionEmbedStreamable_default),
+        optionEmbedTwitter: store.get(storage_optionEmbedTwitter, storage_optionEmbedTwitter_default),
         optionAntiLoopAiMode: store.get(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default),
         optionDisplayBadges: store.get(storage_optionDisplayBadges, storage_optionDisplayBadges_default),
         isWhitelistedTopic: isWhitelistedTopic
@@ -701,7 +701,7 @@ async function handleTopicMessages() {
     if (messageOptions.optionHideLongMessages) handleLongMessages(allMessages);
 
     const postMessageElement = document.querySelector('.btn-poster-msg');
-    prependEvent(postMessageElement, 'click', async () => await validatePendingMessageQuotes());
+    prependEvent(postMessageElement, 'click', async () => await handlePostMessage());
 }
 
 async function handleSearch() {
@@ -851,11 +851,21 @@ function handleError() {
     }
 
     if (currentForumId) { // 410 d'un topic
+        const censorTextElem = document.querySelector('div.col-md-12:nth-child(2) > strong:nth-child(1)');
+        if (censorTextElem && censorTextElem.textContent.includes('action de modération')) {
+            censorTextElem.textContent = 'Vous reprendrez bien un peu de censure avec votre censure ?';
+            censorTextElem.parentElement.style.marginBottom = '0.4rem';
+
+            const censorContactElem = document.querySelector('div.col-md-12:nth-child(4)');
+            if (censorContactElem) censorContactElem.innerHTML = 'Si le problème persiste, Webedia s\'en branle.';
+        }
+
         const forumUrl = `/forums/0-${currentForumId}-0-1-0-1-0-forum.htm`;
         homepageButton.textContent = 'Retour au forum';
         homepageButton.href = forumUrl;
 
         goToJvArchiveButton(window.location.pathname.slice(0, -4));
+
     }
     else { // 410 d'un message
         goToJvArchiveButton(window.location.pathname);

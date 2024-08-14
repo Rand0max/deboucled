@@ -40,7 +40,35 @@ function prepareMessageQuoteInfo(messageElement) {
     }
 }
 
+function fixNoelshackDirectUrl() {
+    let message = document.querySelector('#message_topic').value;
+    if (message.match(/https:\/\/www\.noelshack\.com\/\d+-\d+-\d+-.*\..*/i)) {
+        message = buildNoelshackDirectUrl(message);
+        document.querySelector('#message_topic').value = message
+    }
+}
+
+async function handlePostMessage() {
+    bypassTextCensorship();
+    await validatePendingMessageQuotes();
+}
+
+function bypassTextCensorship() {
+    const textArea = document.querySelector('#message_topic');
+    if (textArea?.value?.length) {
+        textArea.value = textArea.value.replaceAll(/d[e|é]boucled/gi, 'Déb0ucled');
+        textArea.value = textArea.value.replaceAll(/d[e|é]censured/gi, 'Déc3nsured');
+    }
+
+    const titleArea = document.querySelector('#titre_topic');
+    if (titleArea?.value?.length) {
+        titleArea.value = titleArea.value.replaceAll(/d[e|é]boucled/gi, 'Déb0ucled');
+        titleArea.value = titleArea.value.replaceAll(/d[e|é]censured/gi, 'Déc3nsured');
+    }
+}
+
 async function validatePendingMessageQuotes() {
+    fixNoelshackDirectUrl()
     const rawMessage = getRawTypedMessage();
     const newStatus = rawMessage?.length ? 'validated' : 'canceled'; // Citation vide
     messageQuotesPendingArray
@@ -113,8 +141,10 @@ async function buildQuoteMessage(messageElement, selection) {
         }, 600);
     }
 
-    messageQuotesPendingArray.push(prepareMessageQuoteInfo(messageElement));
-    await saveLocalStorage();
+    if (getAuthorFromMessageElem(messageElement).toLowerCase() !== userPseudo?.toLowerCase()) {
+        messageQuotesPendingArray.push(prepareMessageQuoteInfo(messageElement));
+        await saveLocalStorage();
+    }
 }
 
 async function suggestAuthors(authorHint) {

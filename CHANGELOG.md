@@ -1,5 +1,25 @@
 # Changelog Déboucled
 
+## [2.54.3] (14/08/2024)
+
+- Petit troll
+- Correction graphique mineure (vitoo)
+
+## [2.54.2] (14/08/2024)
+
+- Correction de l'affichage du changelog
+
+## [2.54.0] (06/08/2024)
+
+- Optimisation du script
+
+## [2.53.0] (04/08/2024)
+
+- Ajout du changelog
+- Diverses corrections mineures
+- Twitter thème sombre (vitoo)
+- Lien direct noelshack au clic sur les images (vitoo)
+
 ## [2.51.0] (17/02/2024)
 
 - Intégration de Zupimages

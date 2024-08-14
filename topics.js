@@ -304,14 +304,15 @@ function filterMatchResults(matches) {
         - on applati les tableaux dans un seul pour faciliter le filtrage
         - on filtre en ne gardant que les correspondances exactes (non-nulle) du groupe "expression" du regex
     */
-    return matches.map(r => r.slice(1)).flat().filter(r => r);
+    //return matches.map(r => r.slice(1)).flat().filter(r => r);
+    return matches.flat().filter(r => r);
 }
 
 function getSubjectBlacklistMatches(subject, regex = subjectsBlacklistReg) {
     if (!regex) return null;
     const normSubject = subject.normalizeDiacritic();
-    let matches = [...normSubject.matchAll(regex)];
-    let groupedMatches = filterMatchResults(matches);
+    const matches = [...normSubject.matchAll(regex)];
+    const groupedMatches = filterMatchResults(matches);
     return groupedMatches;
 }
 
@@ -539,7 +540,7 @@ function buildBadgeContainer(parentElement, customClass) {
     return badgeContainer
 }
 
-function buildAuthorBlacklistBadges(author, parentElement, excludedLists, containerClass) {
+async function buildAuthorBlacklistBadges(author, parentElement, excludedLists, containerClass) {
     if (!parentElement) return;
 
     const blacklists = blacklistsIncludingEntity(author, entityAuthor, false);
