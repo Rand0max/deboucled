@@ -126,3 +126,9 @@ function buildExtras() {
     buildSponsor();
 }
 
+function allowMobileZoom() {
+    let viewportMeta = document.getElementById('meta-viewport');
+    if (viewportMeta) {
+        viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0');
+    }
+}

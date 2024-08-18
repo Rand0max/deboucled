@@ -979,6 +979,7 @@ async function entryPoint() {
 
         updateUser();
         suggestUpdate();
+        allowMobileZoom();
 
         displaySecret();
         displayAnnouncement();
