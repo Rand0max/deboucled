@@ -496,7 +496,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     if(messageOptions.optionEmbedVideos) {
         embedStreamable(messageContent);
         embedYoutube(messageContent);
-    }    
+    }
 
     if (messageOptions.optionEmbedTwitter) {
         embedTwitterLinks(messageContent);
@@ -702,6 +702,8 @@ async function handleTopicMessages() {
 
     const postMessageElement = document.querySelector('.btn-poster-msg');
     prependEvent(postMessageElement, 'click', async () => await handlePostMessage());
+
+    setHdAvatar();
 }
 
 async function handleSearch() {
