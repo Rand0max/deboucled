@@ -751,7 +751,7 @@ function getLocationMessageId() {
 }
 */
 
-function setHdAvatar() {
+async function setHdAvatar() {
     let avatars = document.querySelectorAll('img.user-avatar-msg');
     avatars.forEach(img => {
         let url = img.src;
