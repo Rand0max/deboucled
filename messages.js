@@ -468,12 +468,15 @@ function embedYoutube(messageContent) {
 
     messageContent.querySelectorAll('a').forEach(a => {
         const url = a.href;
-        const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([\w-]{11})/;
+        const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([\w-]{11})(?:\S*?t=(\d+))?/;
         const match = url.match(regex);
         if (!match) return;
 
         const liteYoutube = document.createElement('lite-youtube');
         liteYoutube.setAttribute('videoid', match[1]);
+        if (match[2]) { // If the 't' parameter exists
+            liteYoutube.setAttribute('params', `start=${match[2]}`);
+        }
         a.insertAdjacentElement('afterend', liteYoutube);
     });
 }
