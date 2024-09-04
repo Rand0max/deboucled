@@ -924,6 +924,7 @@ function addDisableFilteringButton() {
         else disabledFilteringForumSet.add(forumId);
 
         store.set(storage_disabledFilteringForums, JSON.stringify([...disabledFilteringForumSet]));
+        location.reload();
     };
 }
 
