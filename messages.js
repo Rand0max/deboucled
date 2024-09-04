@@ -753,3 +753,12 @@ function getLocationMessageId() {
     return parseInt(match.groups?.id);
 }
 */
+
+async function setHdAvatar() {
+    let avatars = document.querySelectorAll('img.user-avatar-msg');
+    avatars.forEach(img => {
+        let url = img.src;
+        let newUrl = url.replace('/avatar-sm/', '/avatar-md/');
+        img.src = newUrl;
+    });
+}
