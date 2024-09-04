@@ -498,7 +498,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     embedZupimages(messageContent);
     embedVocaroo(messageContent);
 
-    if(messageOptions.optionEmbedVideos) {
+    if (messageOptions.optionEmbedVideos) {
         embedStreamable(messageContent);
         embedYoutube(messageContent);
     }

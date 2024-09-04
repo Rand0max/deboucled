@@ -468,7 +468,7 @@ function embedYoutube(messageContent) {
 
     messageContent.querySelectorAll('a').forEach(a => {
         const url = a.href;
-        const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([\w-]{11})(?:\S*?t=(\d+))?/;
+        const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([\w-]{11})(?:\S*?t=(\d+))?/i;
         const match = url.match(regex);
         if (!match) return;
 
@@ -755,10 +755,13 @@ function getLocationMessageId() {
 */
 
 async function setHdAvatar() {
-    let avatars = document.querySelectorAll('img.user-avatar-msg');
+    const avatars = document.querySelectorAll('img.user-avatar-msg');
     avatars.forEach(img => {
-        let url = img.src;
-        let newUrl = url.replace('/avatar-sm/', '/avatar-md/');
-        img.src = newUrl;
+        img.src = img.src.replace('/avatar-sm/', '/avatar-md/');
+        if (img.getAttribute('data-src')) {
+            const newUrl = img.getAttribute('data-src').replace('/avatar-sm/', '/avatar-md/');
+            img.removeAttribute('data-src');
+            img.src = newUrl;
+        }
     });
 }

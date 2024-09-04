@@ -1,5 +1,12 @@
 # Changelog Déboucled
 
+## [2.56.0] (05/09/2024)
+
+- Correction du timer youtube (vitoo)
+- Zoom de la page sur mobile (vitoo)
+- Affichage des avatars en HD (vitoo & Rand0max)
+- Affichage des messages modérés dans le profil avec JvArchive (vitoo)
+
 ## [2.55.0] (14/08/2024)
 
 - Intégration des vidéos Streamable, Youtube etc (vitoo)

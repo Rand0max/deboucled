@@ -287,11 +287,11 @@ async function showDeletedMessages() {
         const texteElement = message.querySelector('div.text-enrichi-forum');
         if (!texteElement) return;
 
-        if(!jvaMessage.texte.includes('<p>')){
+        if (!jvaMessage.texte.includes('<p>')) {
             jvaMessage.texte = '<p>' + jvaMessage.texte + '</p>';
         }
-        texteElement.innerHTML = jvaMessage.texte;       
-    } );
+        texteElement.innerHTML = jvaMessage.texte;
+    });
 
- 
+
 }
