@@ -116,6 +116,11 @@ function addSvgs() {
     addSvg(smoothScrollSvg);
 }
 
+function enableMobileZoom() {
+    const viewportMeta = document.querySelector('#meta-viewport');
+    if (viewportMeta) viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0');
+}
+
 function getCurrentPageType(url) {
     if (document.querySelector('.img-erreur') !== null) return 'error';
 
@@ -981,6 +986,7 @@ async function entryPoint() {
 
         updateUser();
         suggestUpdate();
+        enableMobileZoom();
 
         displaySecret();
         displayAnnouncement();
