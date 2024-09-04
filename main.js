@@ -813,6 +813,10 @@ async function handleProfile(profileTab) {
         await buildProfileStats(author);
         await buildProfileHistory(author);
     }
+
+    if (profileTab.match(/^\?mode=historique_forum/i)) {
+        await showDeletedMessages();
+    }
 }
 
 async function handlePrivateMessageNotifs() {

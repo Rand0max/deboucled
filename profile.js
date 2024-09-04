@@ -274,3 +274,24 @@ async function buildProfileHistory(author) {
     }
 }
 
+async function showDeletedMessages() {
+    const deletedMessages = document.querySelectorAll('.msg-supprime-gta, .msg-supprime');
+
+    deletedMessages.forEach(async (message) => {
+        const messageId = message.getAttribute('data-id');
+        if (!messageId) return;
+
+        const jvaMessage = await getJvArchiveMessage(messageId);
+        if (!jvaMessage?.texte) return;
+
+        const texteElement = message.querySelector('div.text-enrichi-forum');
+        if (!texteElement) return;
+
+        if(!jvaMessage.texte.includes('<p>')){
+            jvaMessage.texte = '<p>' + jvaMessage.texte + '</p>';
+        }
+        texteElement.innerHTML = jvaMessage.texte;       
+    } );
+
+ 
+}
