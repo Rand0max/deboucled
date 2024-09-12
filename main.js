@@ -693,6 +693,7 @@ async function handleTopicMessages() {
     if (messageOptions.optionEnhanceQuotations) {
         addMessagePartialQuoteEvents(allMessages);
         addAuthorSuggestionEvent();
+        addSmileySuggestionEvent();
     }
 
     const smoothScrollCallback = () => createSmoothScroll((m) => handleMessage(m, messageOptions));
