@@ -692,8 +692,7 @@ async function handleTopicMessages() {
     addMessageQuoteEvents(allMessages); // Always enhance standard quotes
     if (messageOptions.optionEnhanceQuotations) {
         addMessagePartialQuoteEvents(allMessages);
-        addAuthorSuggestionEvent();
-        addSmileySuggestionEvent();
+        addSuggestions();
     }
 
     const smoothScrollCallback = () => createSmoothScroll((m) => handleMessage(m, messageOptions));
@@ -952,6 +951,10 @@ async function entryPoint() {
                 addRightBlocStats();
                 toggleTopicOverlay(false);
                 handlePrivateMessageNotifs();
+                const messageOptions = prepareMessageOptions(false);
+                if (messageOptions.optionEnhanceQuotations) {
+                    addSuggestions();
+                }
                 break;
             }
             case 'topicmessages': {

@@ -229,12 +229,12 @@ function addMessageQuoteEvents(allMessages) {
 
 //suggestion author and smiley
 
-function addSuggestionEvent(type) {
-    const textArea = document.querySelector('#message_topic');
+function addSuggestionEvent(type, element) {
+    let textArea = element ? element : document.querySelector('#message_topic');
+
     if (!textArea) return;
 
     const toolbar = document.querySelector('.jv-editor-toolbar');
-    const risibank = document.querySelector('#risibank-container');
 
     // Création du container pour les suggestions
     const autocompleteElement = document.createElement('div');
@@ -308,6 +308,11 @@ function addSuggestionEvent(type) {
         const autocompleteTable = autocompleteElement.querySelector('.autocomplete-jv-list');
         if (!autocompleteTable) return;
 
+        let risibank;
+        if (textArea.id === 'message_topic') {
+            risibank = document.querySelector('#risibank-container');
+        }
+
         autocompleteTable.onclick = autocompleteOnClick;
 
         const clearCallback = () => clearAutocomplete(autocompleteTable);
@@ -341,16 +346,15 @@ function addSuggestionEvent(type) {
 
         // Position the suggestions box
         let caret = getCaretCoordinates(textArea, textArea.selectionEnd);
-        const sLeft = `left:${caret.left + 5}px !important;`;
+        let sLeft = `left:${caret.left + 5}px !important;`;
         let addSize = toolbar ? toolbar.scrollHeight + 15 : 50;
         if (risibank) addSize += risibank.scrollHeight;
-        const sTop = `top:${caret.top + addSize}px !important;`;
-        const sWidth = 'width: auto !important;';
+        let sTop = `top:${caret.top + addSize}px !important;`;
+        let sWidth = 'width: auto !important;';
 
         // Apply the positioning styles
         autocompleteElement.style = `${sLeft} ${sTop} ${sWidth}`;
         autocompleteElement.classList.toggle('on', true);
-
 
         if (!getFocusedChild(autocompleteTable)) focusTableChild(autocompleteTable.firstElementChild);
     });
@@ -396,11 +400,25 @@ function addSuggestionEvent(type) {
 }
 
 // Wrapper function to add both author and smiley suggestion events
-function addAuthorSuggestionEvent() {
-    addSuggestionEvent('author');
+function addAuthorSuggestionEvent(element) {
+    addSuggestionEvent('author', element);
 }
 
-function addSmileySuggestionEvent() {
-    addSuggestionEvent('smiley');
+function addSmileySuggestionEvent(element) {
+    addSuggestionEvent('smiley', element);
 }
+
+function addSuggestions(element = null) {
+    addAuthorSuggestionEvent(element);
+    addSmileySuggestionEvent(element);
+}
+
+//add suggestion for edit message
+document.querySelector('.picto-msg-crayon')?.addEventListener('click', () => {
+    setTimeout(() => {
+        document.querySelectorAll('textarea[name="text_commentaire"]').forEach(function (el) {
+            addSuggestions(el);
+        });
+    }, 200);
+});
 
