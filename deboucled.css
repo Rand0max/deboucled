@@ -2410,6 +2410,9 @@ select.deboucled-dropdown::-ms-expand {
   .deboucled-badge.close {
     margin: 0.4rem 0 0.8rem 0.2rem;
   }
+  .deboucled-preview-content { 
+    width: 90%;
+  }
 }
 @media (max-width: 558px) {
   .deboucled-overlay {
