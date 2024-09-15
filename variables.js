@@ -29,8 +29,8 @@ const apiMessageQuoteUrl = `${deboucledApiUrl}/message/quote`;
 const checkUpdateExpire = TimeSpan.FromHours(1);
 const checkUpdateDeferredExpire = TimeSpan.FromDays(5);
 const youtubeBlacklistRefreshExpire = TimeSpan.FromHours(1);
-const prebouclesRefreshExpire = TimeSpan.FromMinutes(30);
-const aiLoopsRefreshExpire = TimeSpan.FromMinutes(5);
+const prebouclesRefreshExpire = TimeSpan.FromMinutes(60);
+const aiLoopsRefreshExpire = TimeSpan.FromMinutes(10);
 const aiBoucledAuthorsRefreshExpire = TimeSpan.FromMinutes(30);
 const updateUserExpire = TimeSpan.FromHours(3);
 const diagnosticExpire = TimeSpan.FromHours(12);
@@ -69,6 +69,7 @@ let pocTopicMap = new Map();
 let topicAuthorMap = new Map();
 let authorAvatarMap = new Map();
 let topicFilteredAuthorMap = new Map();
+let entityBlacklistMatches = new Map();
 
 let hiddenTotalTopics = 0;
 let hiddenSubjects = 0;
@@ -107,6 +108,7 @@ let currentTopicAuthor = undefined;
 let currentForumId = undefined;
 let forumFilteringIsDisabled = false;
 let fetchedChangelog = false;
+let settingsLoaded = false;
 
 const domParser = new DOMParser();
 

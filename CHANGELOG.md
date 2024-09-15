@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.56.1] (15/09/2024)
+
+- Optimisations
+
 ## [2.56.0] (05/09/2024)
 
 - Correction du timer youtube (vitoo)

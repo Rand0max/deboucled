@@ -433,6 +433,8 @@ function buildSettingsPage() {
     buildSettingEntities();
 
     addChangeLogEvent()
+
+    settingsLoaded = true;
 }
 
 function addChangeLogEvent() {
@@ -867,17 +869,22 @@ function addSettingButton() {
 
     let optionOnclick = function (e) {
         e.preventDefault();
+        if (!settingsLoaded) buildSettingsPage();
         clearEntityInputs();
         showSettings();
     };
     document.querySelectorAll('#deboucled-option-button').forEach(e => { e.onclick = optionOnclick; });
 
     window.onclick = function (e) {
-        if (!document.querySelector('#deboucled-settings-bg-view').contains(e.target)) return;
+        const deboucledBg = document.querySelector('#deboucled-settings-bg-view');
+        if (!deboucledBg) return;
+        if (!deboucledBg.contains(e.target)) return;
         hideSettings();
     };
     window.onkeydown = function (e) {
-        if (!document.querySelector('#deboucled-settings-bg-view').contains(e.target) && e.key !== 'Escape') return;
+        const deboucledBg = document.querySelector('#deboucled-settings-bg-view');
+        if (!deboucledBg) return;
+        if (!deboucledBg.contains(e.target) && e.key !== 'Escape') return;
         hideSettings();
     };
 }
