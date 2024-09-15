@@ -651,8 +651,7 @@ function addPrevisualizeTopicEvent(topics) {
         if (!topicTitleElement) return;
         const topicUrl = topicTitleElement.getAttribute('href');
 
-        let anchor = document.createElement('a');
-        anchor.setAttribute('href', topicUrl);
+        let anchor = document.createElement('span');
         anchor.setAttribute('class', 'deboucled-topic-preview-col');
         anchor.innerHTML = '<svg viewBox="0 0 30 30" id="deboucled-preview-logo" class="deboucled-logo-preview"><use href="#previewlogo"/></svg>';
         let topicImg = topic.querySelector('.topic-img');
