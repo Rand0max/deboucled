@@ -258,7 +258,7 @@ function addSuggestionEvent(type, element) {
         if (type === 'author') {
             insertedText = `@${event.target.innerText} `;
         } else if (type === 'smiley') {
-            insertedText = `${event.target.innerText} `;
+            insertedText = `${event.target.innerText.trim()} `;
         }
 
         textArea.value = `${val.substring(0, bStart)}${insertedText}${val.substring(bEnd, val.length).trim()}`;
