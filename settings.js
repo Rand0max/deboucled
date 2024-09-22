@@ -694,7 +694,9 @@ function writeEntityKeys(entity, entries, filterCallback, removeCallback, entity
         html += `<td class="deboucled-entity-key deboucled-entity-element${cls}" id="${key}"><input type="submit" class="deboucled-${entity}-button-delete-key" value="X">${value}</td>`;
     });
     html += '</table>';
-    document.querySelector(`#deboucled-${entity}List`).innerHTML = html;
+
+    const deboucledEntityList = document.querySelector(`#deboucled-${entity}List`);
+    if (deboucledEntityList) deboucledEntityList.innerHTML = html;
 
     document.querySelectorAll(`.deboucled-${entity}-button-delete-key`).forEach(function (input) {
         input.onclick = function () { removeCallback(this.parentNode); };
