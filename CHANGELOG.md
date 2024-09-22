@@ -1,8 +1,13 @@
 # Changelog Déboucled
 
+## [2.56.2] (16/09/2024)
+
+- Corrections mineures : notifications de citation (Rand0max), aperçu des topics (vitoo), statistiques (Rand0max)
+- Meilleure présentation du Changelog (Rand0max)
+
 ## [2.56.1] (15/09/2024)
 
-- Optimisations
+- Optimisation globale du script (Rand0max)
 
 ## [2.56.0] (05/09/2024)
 
@@ -13,25 +18,25 @@
 
 ## [2.55.0] (14/08/2024)
 
-- Intégration des vidéos Streamable, Youtube etc (vitoo)
+- Intégration des vidéos Streamable, Youtube etc (vitoo & Rand0max)
 
 ## [2.54.3] (14/08/2024)
 
-- Petit troll
+- Petit troll (Rand0max)
 - Correction graphique mineure (vitoo)
 
 ## [2.54.2] (14/08/2024)
 
-- Correction de l'affichage du changelog
+- Correction de l'affichage du changelog (Rand0max)
 
 ## [2.54.0] (06/08/2024)
 
-- Optimisation du script
+- Optimisation du script (Rand0max)
 
 ## [2.53.0] (04/08/2024)
 
 - Ajout du changelog
-- Diverses corrections mineures
+- Diverses corrections mineures (Rand0max)
 - Twitter thème sombre (vitoo)
 - Lien direct noelshack au clic sur les images (vitoo)
 

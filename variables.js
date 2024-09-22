@@ -16,6 +16,7 @@ const avatarUseJvArchiveApi = false;
 
 const deboucledBackendUrl = 'https://deboucled.randomax.com';
 const deboucledApiUrl = `${deboucledBackendUrl}/api`;
+const apiChangelogUrl = `${deboucledApiUrl}/changelog`;
 const apiYoutubeBlacklistUrl = `${deboucledApiUrl}/youtubeblacklist`;
 const apiPrebouclesDataUrl = `${deboucledApiUrl}/preboucles`;
 const apiAiLoopsDataUrl = `${deboucledApiUrl}/loops/v2`;
@@ -30,7 +31,7 @@ const checkUpdateExpire = TimeSpan.FromHours(1);
 const checkUpdateDeferredExpire = TimeSpan.FromDays(5);
 const youtubeBlacklistRefreshExpire = TimeSpan.FromHours(1);
 const prebouclesRefreshExpire = TimeSpan.FromMinutes(60);
-const aiLoopsRefreshExpire = TimeSpan.FromMinutes(10);
+const aiLoopsRefreshExpire = TimeSpan.FromMinutes(5);
 const aiBoucledAuthorsRefreshExpire = TimeSpan.FromMinutes(30);
 const updateUserExpire = TimeSpan.FromHours(3);
 const diagnosticExpire = TimeSpan.FromHours(12);

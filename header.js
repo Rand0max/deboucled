@@ -106,7 +106,9 @@ function buildHeaderNotif(notifSeen, notifRead, notifTitle, notifId, notifUrl, n
     dropdownItemLabel.className = 'headerAccount__dropdownItemLabel stretched-link js-header-open-notif';
     dropdownItemLabel.href = notifUrl;
     dropdownItemLabel.title = notifUrlDescription;
+    dropdownItemLabel.target = '_blank';
     dropdownItemLabel.innerHTML = `<strong>${notifUrlDescription}</strong>`;
+    //dropdownItemLabel.onclick = () => window.open(notifUrl, '_blank');
     dropdownDetails.append(dropdownItemLabel);
 
     const dropdownSubInfoFooter = document.createElement('span');

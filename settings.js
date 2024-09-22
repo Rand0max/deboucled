@@ -443,10 +443,10 @@ function addChangeLogEvent() {
 
 async function fetchChangelog() {
     if (fetchedChangelog) return;
-    await fetch('https://raw.githubusercontent.com/Rand0max/deboucled/master/CHANGELOG.md')
+    await fetch(apiChangelogUrl)
         .then(response => response.text())
         .then(data => {
-            data = data.split('\n').slice(0, 50).join('\n');
+            //data = data.split('\n').slice(0, 100).join('\n');
             document.querySelector('#deboucled-changelog').innerHTML = data;
             document.querySelector('#deboucled-changelog-collapsible-content').style.maxHeight = 'max-content';
             fetchedChangelog = true;

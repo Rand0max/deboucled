@@ -9,6 +9,7 @@ tsconfig.json
 /package-lock.json
 /package.json
 *.debug.js
+*.make.js
 *.log
 *.ps1
 backend/**

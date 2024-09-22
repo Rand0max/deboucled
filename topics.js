@@ -651,28 +651,29 @@ function addPrevisualizeTopicEvent(topics) {
         if (!topicTitleElement) return;
         const topicUrl = topicTitleElement.getAttribute('href');
 
-        let anchor = document.createElement('a');
-        anchor.setAttribute('href', topicUrl);
-        anchor.setAttribute('class', 'deboucled-topic-preview-col');
-        anchor.innerHTML = '<svg viewBox="0 0 30 30" id="deboucled-preview-logo" class="deboucled-logo-preview"><use href="#previewlogo"/></svg>';
-        let topicImg = topic.querySelector('.topic-img');
-        insertAfter(anchor, topicImg);
+        // let anchor = document.createElement('a');
+        // anchor.setAttribute('href', topicUrl);
+        const previewRootElement = document.createElement('span');
+        previewRootElement.setAttribute('class', 'deboucled-topic-preview-col');
+        previewRootElement.innerHTML = '<svg viewBox="0 0 30 30" id="deboucled-preview-logo" class="deboucled-logo-preview"><use href="#previewlogo"/></svg>';
+        const topicImg = topic.querySelector('.topic-img');
+        insertAfter(previewRootElement, topicImg);
 
-        let previewDiv = document.createElement('div');
-        previewDiv.className = 'deboucled-preview-content bloc-message-forum';
-        previewDiv.innerHTML = '<span class="deboucled-preview-spinner deboucled-spinner active"/>';
-        previewDiv.onclick = (e) => e.preventDefault();
-        anchor.appendChild(previewDiv);
+        const previewSpinnerElement = document.createElement('div');
+        previewSpinnerElement.className = 'deboucled-preview-content bloc-message-forum';
+        previewSpinnerElement.innerHTML = '<span class="deboucled-preview-spinner deboucled-spinner active"/>';
+        previewSpinnerElement.onclick = (e) => e.preventDefault();
+        previewRootElement.appendChild(previewSpinnerElement);
 
-        const onPreviewStart = () => onPreviewHover(anchor, topicUrl, previewDiv);
-        const onPreviewEnd = () => anchor.classList.toggle('active', false);
+        const onPreviewStart = () => onPreviewHover(previewRootElement, topicUrl, previewSpinnerElement);
+        const onPreviewEnd = () => previewRootElement.classList.toggle('active', false);
 
         // For mobile
         topicImg.ontouchstart = onPreviewStart;
         topicImg.ontouchend = onPreviewEnd;
         // For everything else
-        anchor.onpointerenter = onPreviewStart;
-        anchor.onpointerleave = onPreviewEnd;
+        previewRootElement.onpointerenter = onPreviewStart;
+        previewRootElement.onpointerleave = onPreviewEnd;
     });
 }
 

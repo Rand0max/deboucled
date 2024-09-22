@@ -248,8 +248,8 @@ blockquote .deboucled-highlighted {
   left: 25px;
   top: 5px;
   z-index: 9;
-  width: 600px;
-  max-height: 500px;
+  width: 90%;
+  max-height: 400px;
   overflow-y: auto;
   display: none;
   margin-left: 10px;
@@ -326,6 +326,21 @@ blockquote .deboucled-highlighted {
 }
 .deboucled-decensured-message:hover {
   opacity: 1;
+}
+
+/* Changelog */
+#deboucled-changelog h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0;
+}
+#deboucled-changelog h2 {
+  font-size: 1rem;
+  margin-bottom: 0;
+}
+#deboucled-changelog ul {
+  line-height: 0.5rem;
+  margin-bottom: 0.2rem;
+  font-size: 1.1em;
 }
 
 /* Button */
