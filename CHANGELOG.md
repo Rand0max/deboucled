@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.56.4] (28/09/2024)
+
+- Stats de censure Webedia (Rand0max)
+
 ## [2.56.2] (16/09/2024)
 
 - Corrections mineures : notifications de citation (Rand0max), aperçu des topics (vitoo), statistiques (Rand0max)

@@ -7,6 +7,7 @@ const jvarchiveApiUrl = `${jvarchiveUrl}/api`;
 const jvarchiveApiTopicsUrl = `${jvarchiveApiUrl}/topics`;
 const jvarchiveApiAuteursUrl = `${jvarchiveApiUrl}/auteurs`;
 const jvarchiveMessagesUrl = `${jvarchiveApiUrl}/messages`;
+const jvarchiveApiStatsUrl = `${jvarchiveApiUrl}/stats`;
 
 const jvarchiveApiGetHotTopicsRoute = (itemsPerPage, timeInterval) => `${jvarchiveApiTopicsUrl}?page=1&itemsPerPage=${itemsPerPage}&orderBy=nb_messages&timeInterval=${timeInterval}&topicState=created`;
 const jvarchiveApiGetAuthorRoute = (author) => `${jvarchiveApiAuteursUrl}/${author}`;
@@ -14,12 +15,15 @@ const jvarchiveApiGetAuthorLastMessagesRoute = (author) => `${jvarchiveApiAuteur
 const jvarchiveApiGetAuthorLastTopicsRoute = (author, itemsPerPage) => `${jvarchiveApiTopicsUrl}/search?page=1&itemsPerPage=${itemsPerPage}&search=${author}&searchType=auteur_topic_exact`;
 const jvarchiveApiGetMessageRoute = (id) => `${jvarchiveMessagesUrl}/${id}`;
 
+const jvarchiveApiGetDeletedStatsRoute = (timeInterval) => `${jvarchiveApiStatsUrl}/topics/deletedStats?timeInterval=${timeInterval}`;
 
 const getJvArchiveHotTopics = async (itemsPerPage = 20, timeInterval = 'day') => fetchJson(jvarchiveApiGetHotTopicsRoute(itemsPerPage, timeInterval), 3000);
 const getJvArchiveAuthor = async (author) => fetchJson(jvarchiveApiGetAuthorRoute(author), 3000);
 const getJvArchiveAuthorLastMessages = async (author) => fetchJson(jvarchiveApiGetAuthorLastMessagesRoute(author), 3000);
 const getJvArchiveAuthorLastTopics = async (author, itemsPerPage = 5) => fetchJson(jvarchiveApiGetAuthorLastTopicsRoute(author, itemsPerPage), 3000);
 const getJvArchiveMessage = async (id) => fetchJson(jvarchiveApiGetMessageRoute(id), 3000);
+
+const getJvArchiveDeletedStats = async (timeInterval = 'day') => fetchJson(jvarchiveApiGetDeletedStatsRoute(timeInterval), 3000);
 
 
 const jvArchiveTop1Url = `${jvarchiveUrl}/_nuxt/img/1.24cfc48.svg`;
@@ -114,3 +118,20 @@ function parseJvArchiveTopicsResults(results) {
     });
 }
 
+function parseJvArchiveDeletedStatsResults(results) {
+    if (!results) return null;
+
+    return {
+        topicDeletedByModo: parseInt(results.count_modo),
+        topicDeletedByAuthor: parseInt(results.count_auteur),
+        topicDeletedTotal: parseInt(results.count_all),
+
+        messageAverageDeletedByModo: parseInt(results.avg_modo),
+        messageAverageDeletedByAuthor: parseInt(results.avg_auteur),
+        messageAverageDeletedTotal: parseInt(results.avg_all),
+
+        messageTotalDeletedByModo: parseInt(results.sum_modo),
+        messageTotalDeletedByAuthor: parseInt(results.sum_auteur),
+        messageTotalDeletedTotal: parseInt(results.sum_all)
+    };
+}

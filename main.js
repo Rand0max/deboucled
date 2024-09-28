@@ -853,7 +853,7 @@ async function handlePrivateMessageNotifs() {
     }
 }
 
-function handleError() {
+async function handleError() {
     let homepageButton = document.querySelector('.btn-secondary');
     if (!homepageButton) return;
 
@@ -871,11 +871,14 @@ function handleError() {
     if (currentForumId) { // 410 d'un topic
         const censorTextElem = document.querySelector('div.col-md-12:nth-child(2) > strong:nth-child(1)');
         if (censorTextElem && censorTextElem.textContent.includes('action de modération')) {
-            censorTextElem.textContent = 'Vous reprendrez bien un peu de censure avec votre censure ?';
+            const deletedStatsResults = await getJvArchiveDeletedStats('day');
+            const deletedStats = parseJvArchiveDeletedStatsResults(deletedStatsResults);
+
+            censorTextElem.textContent = `Topic censuré par la modération Webedia.`;
             censorTextElem.parentElement.style.marginBottom = '0.4rem';
 
             const censorContactElem = document.querySelector('div.col-md-12:nth-child(4)');
-            if (censorContactElem) censorContactElem.innerHTML = 'Si le problème persiste, Webedia s\'en branle.';
+            if (censorContactElem) censorContactElem.innerHTML = `${deletedStats.topicDeletedByModo} topics censurés aujourd'hui, et ${deletedStats.messageTotalDeletedByModo} messages perdus.`;
         }
 
         const forumUrl = `/forums/0-${currentForumId}-0-1-0-1-0-forum.htm`;
