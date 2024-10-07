@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.56.5] (07/10/2024)
+
+- Corrections mineures (Rand0max)
+
 ## [2.56.4] (28/09/2024)
 
 - Stats de censure Webedia (Rand0max)

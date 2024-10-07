@@ -857,7 +857,7 @@ async function handleError() {
     let homepageButton = document.querySelector('.btn-secondary');
     if (!homepageButton) return;
 
-    function goToJvArchiveButton(pathUrl) {
+    function buildGoToJvArchiveButton(pathUrl) {
         let jvArchiveButton = document.createElement('a');
         jvArchiveButton.className = 'btn deboucled-goto-jvarchive btn-primary mb-5';
         jvArchiveButton.href = `${jvarchiveUrl}${pathUrl}`;
@@ -869,27 +869,31 @@ async function handleError() {
     }
 
     if (currentForumId) { // 410 d'un topic
-        const censorTextElem = document.querySelector('div.col-md-12:nth-child(2) > strong:nth-child(1)');
-        if (censorTextElem && censorTextElem.textContent.includes('action de modération')) {
-            const deletedStatsResults = await getJvArchiveDeletedStats('day');
-            const deletedStats = parseJvArchiveDeletedStatsResults(deletedStatsResults);
-
-            censorTextElem.textContent = `Topic censuré par la modération Webedia.`;
-            censorTextElem.parentElement.style.marginBottom = '0.4rem';
-
-            const censorContactElem = document.querySelector('div.col-md-12:nth-child(4)');
-            if (censorContactElem) censorContactElem.innerHTML = `${deletedStats.topicDeletedByModo} topics censurés aujourd'hui, et ${deletedStats.messageTotalDeletedByModo} messages perdus.`;
-        }
-
         const forumUrl = `/forums/0-${currentForumId}-0-1-0-1-0-forum.htm`;
         homepageButton.textContent = 'Retour au forum';
         homepageButton.href = forumUrl;
 
-        goToJvArchiveButton(window.location.pathname.slice(0, -4));
+        buildGoToJvArchiveButton(window.location.pathname.slice(0, -4));
+
+        const censorTextElem = document.querySelector('div.col-md-12:nth-child(2) > strong:nth-child(1)');
+        if (censorTextElem && censorTextElem.textContent.includes('action de modération')) {
+            censorTextElem.textContent = `Topic censuré par la modération Webedia.`;
+            censorTextElem.parentElement.style.marginBottom = '0.4rem';
+
+            const censorContactElem = document.querySelector('div.col-md-12:nth-child(4)');
+            if (censorContactElem) {
+                censorContactElem.innerHTML = `? topics censurés aujourd'hui, et ? messages perdus.`;
+
+                const deletedStatsResults = await getJvArchiveDeletedStats('day');
+                const deletedStats = parseJvArchiveDeletedStatsResults(deletedStatsResults);
+
+                censorContactElem.innerHTML = `<b>${deletedStats.topicDeletedByModo}</b> topics censurés aujourd'hui, et <b>${deletedStats.messageTotalDeletedByModo}</b> messages perdus.`;
+            }
+        }
 
     }
     else { // 410 d'un message
-        goToJvArchiveButton(window.location.pathname);
+        buildGoToJvArchiveButton(window.location.pathname);
     }
 }
 
