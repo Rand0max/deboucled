@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.56.5
+// @version     2.57.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -46,21 +46,21 @@
 // @require     https://unpkg.com/@chocolateboy/uncommonjs@3.2.1/dist/polyfill.iife.min.js
 // @require     https://unpkg.com/fastest-levenshtein@1.0.16/mod.js
 // @require     https://cdn.jsdelivr.net/npm/lite-youtube-embed@0.3.2/src/lite-yt-embed.min.js
-// @require     variables.js
-// @require     helpers.js
-// @require     storage.js
-// @require     header.js
-// @require     preboucles.js
-// @require     apidata.js
-// @require     jvarchiveapi.js
-// @require     stats.js
-// @require     topics.js
-// @require     messages.js
-// @require     postmessage.js
-// @require     settings.js
-// @require     privatemessages.js
-// @require     profile.js
-// @require     extras.js
-// @require     main.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/variables.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/helpers.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/storage.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/header.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/preboucles.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/apidata.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/jvarchiveapi.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/stats.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/topics.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/messages.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/postmessage.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/settings.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/privatemessages.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/profile.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/extras.js
+// @require     https://raw.githubusercontent.com/Rand0max/deboucled/master/main.js
 // @run-at      document-body
 // ==/UserScript==

@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.57.0] (18/10/2024)
+
+- Correction d'un bug provoqué par la mise à jour Tampermonkey 5.3.1 (Rand0max)
+
 ## [2.56.5] (07/10/2024)
 
 - Corrections mineures (Rand0max)
