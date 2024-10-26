@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.57.1] (26/10/2024)
+
+- Intégration des vidéos uniquement sur les messages et pas la citations (Rand0max)
+
 ## [2.57.0] (18/10/2024)
 
 - Correction d'un bug provoqué par la mise à jour Tampermonkey 5.3.1 (Rand0max)

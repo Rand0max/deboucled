@@ -438,7 +438,7 @@ function embedStreamable(messageContent) {
         a.insertAdjacentElement('afterend', video);
     }
 
-    messageContent.querySelectorAll('a[href*="streamable.com"]').forEach(a => {
+    messageContent.querySelectorAll('div > p > a[href*="streamable.com"]').forEach(a => {
         const url = a.href;
         const match = url.match(/^https:\/\/streamable\.com\/(?<id>.*)$/, 'i');
         if (!match) return;
@@ -446,7 +446,7 @@ function embedStreamable(messageContent) {
         createAndInsertVideo(a, videoUrl, 'video/mp4');
     });
 
-    messageContent.querySelectorAll('a[href*="webmshare.com"]').forEach(a => {
+    messageContent.querySelectorAll('div > p > a[href*="webmshare.com"]').forEach(a => {
         const url = a.href;
         const match = url.match(/https:\/\/webmshare\.com\/(?:play\/)?(?<id>[\w]+)/i);
         if (!match) return;
@@ -454,11 +454,11 @@ function embedStreamable(messageContent) {
         createAndInsertVideo(a, videoUrl, 'video/webm');
     });
 
-    messageContent.querySelectorAll('a[href*=".mp4"]').forEach(a => {
+    messageContent.querySelectorAll('div > p > a[href*=".mp4"]').forEach(a => {
         createAndInsertVideo(a, a.href, 'video/mp4');
     });
 
-    messageContent.querySelectorAll('a[href*=".webm"]').forEach(a => {
+    messageContent.querySelectorAll('div > p > a[href*=".webm"]').forEach(a => {
         createAndInsertVideo(a, a.href, 'video/webm');
     });
 }
@@ -466,7 +466,7 @@ function embedStreamable(messageContent) {
 function embedYoutube(messageContent) {
     if (!messageContent) return;
 
-    messageContent.querySelectorAll('a').forEach(a => {
+    messageContent.querySelectorAll('div > p > a').forEach(a => {
         const url = a.href;
         const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([\w-]{11})(?:\S*?t=(\d+))?/i;
         const match = url.match(regex);
