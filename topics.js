@@ -651,8 +651,8 @@ function addPrevisualizeTopicEvent(topics) {
         if (!topicTitleElement) return;
         const topicUrl = topicTitleElement.getAttribute('href');
 
-        // let anchor = document.createElement('a');
-        // anchor.setAttribute('href', topicUrl);
+        // let previewRootElement = document.createElement('a');
+        // previewRootElement.setAttribute('href', topicUrl);
         const previewRootElement = document.createElement('span');
         previewRootElement.setAttribute('class', 'deboucled-topic-preview-col');
         previewRootElement.innerHTML = '<svg viewBox="0 0 30 30" id="deboucled-preview-logo" class="deboucled-logo-preview"><use href="#previewlogo"/></svg>';
@@ -1080,3 +1080,16 @@ function getSmileyImgHtml(smiley, big = false) {
     return `<img data-code="${smileyLower}" title="${smileyLower}" src="https://image.jeuxvideo.com/smileys_img/${gifCode}.gif" class="deboucled-smiley${big ? ' big' : ''}">`;
 }
 
+/*
+// Enable if smileys are broken again
+function fixSmileyGifs() {
+    const smileyCodes = [':rire:', ':fete:'];
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+        const dataCode = img.getAttribute('data-code');
+        if (smileyCodes.includes(dataCode)) {
+            img.setAttribute('src', `${jvarchiveUrl}/static/smileys/${dataCode}.gif`);
+        }
+    });
+}
+*/

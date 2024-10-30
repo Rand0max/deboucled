@@ -127,7 +127,7 @@ function buildSettingsPage() {
 
         /*
         const jvarchiveLogo = '<span class="deboucled-jvarchive-logo"></span>';
-        html += `<a class="deboucled-about-link-jvarchive" href="https://jvarchive.com/" target="_blank" title="JvArchive">${jvarchiveLogo}</a>`;
+        html += `<a class="deboucled-about-link-jvarchive" href="${jvarchiveUrl}" target="_blank" title="JvArchive">${jvarchiveLogo}</a>`;
         */
 
         const stylishLogo = '<span class="deboucled-stylish-logo"></span>';

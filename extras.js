@@ -22,7 +22,7 @@ function buildSponsor() {
     const layoutContentAside = document.querySelector('div.layout__contentAside');
     if (layoutContentAside) {
         const sponsorDiv = document.createElement('div');
-        sponsorDiv.innerHTML = `Sponsorisé par <a href="https://jvarchive.com" target="_blank" title="JvArchive">JvArchive</a>`;
+        sponsorDiv.innerHTML = `Sponsorisé par <a href="${jvarchiveUrl}" target="_blank" title="JvArchive">JvArchive</a>`;
         sponsorDiv.className = 'deboucled-sponsor';
         layoutContentAside.appendChild(sponsorDiv);
     }

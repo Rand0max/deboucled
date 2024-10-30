@@ -353,7 +353,8 @@ function embedTwitterLinks(messageContent) {
     const twitterDns = 'twitter.com';
     const newTwitterDns = 'x.com';
 
-    const newTwitterLinks = messageContent.querySelectorAll(`a[href*="${newTwitterDns}/"][href*="/status/"]`);
+    // Replace all X links to Twitter. Otherwise widgets.js does not work in despite of ent.
+    const newTwitterLinks = messageContent.querySelectorAll(`div > p > a[href*="${newTwitterDns}/"][href*="/status/"]`);
     if (newTwitterLinks?.length) {
         newTwitterLinks.forEach(link => {
             link.href = link.href.replace(newTwitterDns, twitterDns);
@@ -362,7 +363,7 @@ function embedTwitterLinks(messageContent) {
         });
     }
 
-    const twitterLinks = messageContent.querySelectorAll(`a[href*="${twitterDns}/"][href*="/status/"]`);
+    const twitterLinks = messageContent.querySelectorAll(`div > p > a[href*="${twitterDns}/"][href*="/status/"]`);
     if (!twitterLinks?.length) return;
 
     const widjetUrl = `https://platform.${twitterDns}/widgets.js`;

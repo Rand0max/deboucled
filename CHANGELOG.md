@@ -1,8 +1,12 @@
 # Changelog Déboucled
 
+## [2.57.2] (30/10/2024)
+
+- Intégration des liens twitter uniquement sur les messages et pas les citations (Rand0max)
+
 ## [2.57.1] (26/10/2024)
 
-- Intégration des vidéos uniquement sur les messages et pas la citations (Rand0max)
+- Intégration des vidéos uniquement sur les messages et pas les citations (Rand0max)
 
 ## [2.57.0] (18/10/2024)
 
