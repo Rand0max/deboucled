@@ -157,6 +157,13 @@ async function suggestAuthors(authorHint) {
     return suggestions ? [...suggestions.alias.map(s => s.pseudo)] : undefined;
 }
 
+async function suggestSmiley(hint) {
+    const filteredSmileys = Array.from(fullSmileyGifMap)
+        .filter(([key, value]) => key.startsWith(hint.trim().toLowerCase()));
+
+    return filteredSmileys;
+}
+
 function getTextSelection() {
     return window.getSelection ? window.getSelection() : document.selection;
 }
@@ -220,68 +227,91 @@ function addMessageQuoteEvents(allMessages) {
     });
 }
 
-function addAuthorSuggestionEvent() {
-    const textArea = document.querySelector('#message_topic');
+//suggestion author and smiley
+
+function addSuggestionEvent(type, element) {
+    let textArea = element ? element : document.querySelector('#message_topic');
+
     if (!textArea) return;
 
     const toolbar = document.querySelector('.jv-editor-toolbar');
 
     // Création du container pour les suggestions
     const autocompleteElement = document.createElement('div');
-    autocompleteElement.id = 'deboucled-author-autocomplete';
+    autocompleteElement.id = `deboucled-${type}-autocomplete`;
     autocompleteElement.className = 'autocomplete-jv';
     autocompleteElement.innerHTML = '<ul class="autocomplete-jv-list"></ul>';
     textArea.parentElement.appendChild(autocompleteElement);
 
-    // Vide et masque les suggestions
+    // Clear autocomplete suggestions
     const clearAutocomplete = (elem) => {
         elem.innerHTML = '';
         elem.parentElement.classList.toggle('on', false);
     };
 
-    // Choix d'une suggestion dans la liste
+    // Handle selection of a suggestion
     function autocompleteOnClick(event) {
         let val = textArea.value;
         const [bStart, bEnd] = getWordBoundsAtPosition(val, textArea.selectionEnd);
-        const choosedAuthor = `@${event.target.innerText} `;
-        textArea.value = `${val.substring(0, bStart)}${choosedAuthor}${val.substring(bEnd, val.length).trim()}`;
+
+        let insertedText;
+        if (type === 'author') {
+            insertedText = `@${event.target.innerText} `;
+        } else if (type === 'smiley') {
+            insertedText = `${event.target.innerText.trim()} `;
+        }
+
+        textArea.value = `${val.substring(0, bStart)}${insertedText}${val.substring(bEnd, val.length).trim()}`;
         clearAutocomplete(this);
         textArea.focus();
-        textArea.selectionStart = bStart + choosedAuthor.length;
+        textArea.selectionStart = bStart + insertedText.length;
         textArea.selectionEnd = textArea.selectionStart;
     }
 
-    // Récupère le mot au curseur
+    // Get word at caret
     function getWordAtCaret(clearCallback) {
         const [bStart, bEnd] = getWordBoundsAtPosition(textArea.value, textArea.selectionEnd);
         let wordAtCaret = textArea.value.substring(bStart, bEnd)?.trim();
-        if (!wordAtCaret?.startsWith('@')) {
-            clearCallback();
-            return undefined;
+
+        if (type === 'author') {
+            if (!wordAtCaret?.startsWith('@')) {
+                clearCallback();
+                return undefined;
+            }
+            wordAtCaret = wordAtCaret.substring(1); // Remove '@' for author search
+        } else if (type === 'smiley') {
+            if (!wordAtCaret?.startsWith(':')) {
+                clearCallback();
+                return undefined;
+            }
         }
-        wordAtCaret = wordAtCaret.substring(1); // on vire l'arobase pour la recherche
         return wordAtCaret;
     }
 
-    // Efface la sélection de suggestion
+    // Clear the selection of suggestions
     function unselectSuggestions(container) {
-        container.querySelectorAll('.deboucled-author-suggestion.selected')
+        container.querySelectorAll('.deboucled-suggestion.selected')
             .forEach(s => s?.classList.toggle('selected', false));
     }
 
-    // Sélection d'une suggestion
+    // Focus a specific suggestion
     function focusTableChild(element) {
         if (!element) return;
         element.focus();
         element.classList.toggle('selected', true);
     }
 
-    const getFocusedChild = (table) => table.querySelector('.deboucled-author-suggestion.selected');
+    const getFocusedChild = (table) => table.querySelector('.deboucled-suggestion.selected');
 
-    // Afficher les suggestions pendant la saisie
+    // Handle input event for both author and smiley suggestions
     textArea.addEventListener('input', async () => {
         const autocompleteTable = autocompleteElement.querySelector('.autocomplete-jv-list');
         if (!autocompleteTable) return;
+
+        let risibank;
+        if (textArea.id === 'message_topic') {
+            risibank = document.querySelector('#risibank-container');
+        }
 
         autocompleteTable.onclick = autocompleteOnClick;
 
@@ -290,29 +320,46 @@ function addAuthorSuggestionEvent() {
         const wordAtCaret = getWordAtCaret(clearCallback);
         if (!wordAtCaret?.length) { clearCallback(); return; }
 
-        const suggestions = await suggestAuthors(wordAtCaret);
+        let suggestions;
+        if (type === 'author') {
+            suggestions = await suggestAuthors(wordAtCaret);
+        } else if (type === 'smiley') {
+            suggestions = await suggestSmiley(wordAtCaret);
+        }
+
         if (!suggestions?.length) { clearCallback(); return; }
 
-        // On construit les éléments de la table avec les suggestions
-        autocompleteTable.innerHTML = suggestions.map(s => `<li class="deboucled-author-suggestion">${s}</li>`).join('');
-        autocompleteTable.querySelectorAll('.deboucled-author-suggestion')
+        // Create suggestions list
+        autocompleteTable.innerHTML = suggestions.map(s => {
+            if (type === 'smiley') {
+                return `<li class="deboucled-suggestion">${getFullSmileyImgHtml(s[0], true)} &nbsp;  ${s[0]}</li>`;
+            } else {
+                return `<li class="deboucled-suggestion">${s}</li>`;
+            }
+        }).join('');
+
+        autocompleteTable.querySelectorAll('.deboucled-suggestion')
             .forEach(s => s.onpointerover = () => {
                 unselectSuggestions(autocompleteTable);
                 focusTableChild(s);
             });
 
-        // On place correctement la table
+        // Position the suggestions box
         let caret = getCaretCoordinates(textArea, textArea.selectionEnd);
-        const sLeft = `left:${caret.left + 3}px !important;`;
-        const sTop = `top:${caret.top + (toolbar ? toolbar.scrollHeight + 15 : 50)}px !important;`;
-        const sWidth = 'width: auto !important;';
+        let sLeft = `left:${caret.left + 5}px !important;`;
+        let addSize = toolbar ? toolbar.scrollHeight + 15 : 50;
+        if (risibank) addSize += risibank.scrollHeight;
+        let sTop = `top:${caret.top + addSize}px !important;`;
+        let sWidth = 'width: auto !important;';
+
+        // Apply the positioning styles
         autocompleteElement.style = `${sLeft} ${sTop} ${sWidth}`;
         autocompleteElement.classList.toggle('on', true);
 
         if (!getFocusedChild(autocompleteTable)) focusTableChild(autocompleteTable.firstElementChild);
     });
 
-    // Gestion des flèches haut/bas pour changer la sélection et entrée/tab pour valider
+    // Handle keyboard navigation
     textArea.addEventListener('keydown', (e) => {
         if (!autocompleteElement.classList.contains('on')) return;
 
@@ -342,7 +389,7 @@ function addAuthorSuggestionEvent() {
         }
     });
 
-    // Pour changer la sélection de la suggestion au toucher
+    // Handle touch events
     autocompleteElement.addEventListener('touchmove', (e) => {
         if (!autocompleteElement.classList.contains('on')) return;
         const autocompleteTable = autocompleteElement.querySelector('.autocomplete-jv-list');
@@ -351,4 +398,27 @@ function addAuthorSuggestionEvent() {
         focusTableChild(e.target);
     });
 }
+
+// Wrapper function to add both author and smiley suggestion events
+function addAuthorSuggestionEvent(element) {
+    addSuggestionEvent('author', element);
+}
+
+function addSmileySuggestionEvent(element) {
+    addSuggestionEvent('smiley', element);
+}
+
+function addSuggestions(element = null) {
+    addAuthorSuggestionEvent(element);
+    addSmileySuggestionEvent(element);
+}
+
+//add suggestion for edit message
+document.querySelector('.picto-msg-crayon')?.addEventListener('click', () => {
+    setTimeout(() => {
+        document.querySelectorAll('textarea[name="text_commentaire"]').forEach(function (el) {
+            addSuggestions(el);
+        });
+    }, 200);
+});
 
