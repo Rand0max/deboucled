@@ -502,6 +502,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     handleMessageAssignTopicAuthor(author, authorElement);
     buildAuthorBadges(authorElement, author, messageOptions, title);
     fixMessageUrls(messageContent);
+    fixSmileyGifs(messageContent);
     embedZupimages(messageContent);
     embedVocaroo(messageContent);
 

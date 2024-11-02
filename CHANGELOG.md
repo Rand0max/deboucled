@@ -3,6 +3,7 @@
 ## [2.57.2] (30/10/2024)
 
 - Intégration des liens twitter uniquement sur les messages et pas les citations (Rand0max)
+- Correction des gifs :rire: et :fete: (Rand0max)
 
 ## [2.57.1] (26/10/2024)
 

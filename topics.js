@@ -1066,30 +1066,26 @@ function initSmileyGifMap() {
         [':pf:', 'pf'],
         [':siffle:', 'siffle'],
         [':globe:', '6'],
-        [':mac:', '16']
+        [':mac:', '16'],
+        [':fete:', '66']
     ]);
+    brokenSmileyGifArray = [':fete:', ':rire:'];
+
     let regexMap = [...smileyGifMap.keys()].map((e) => e.escapeRegexPatterns());
     smileyGifRegex = new RegExp(`(${regexMap.join('|')})`, 'g');
 }
 
-function getSmileyImgHtml(smiley, big = false) {
-    if (!smiley?.length) return smiley;
-    const smileyLower = smiley.toLowerCase();
-    const gifCode = smileyGifMap.get(smileyLower);
-    if (!gifCode?.length) return smiley;
-    return `<img data-code="${smileyLower}" title="${smileyLower}" src="https://image.jeuxvideo.com/smileys_img/${gifCode}.gif" class="deboucled-smiley${big ? ' big' : ''}">`;
+function buildSmileyUrl(smileyCode) {
+    if (brokenSmileyGifArray.includes(smileyCode)) return `${jvarchiveUrl}/static/smileys/${smileyCode}.gif`;
+
+    const gifCode = smileyGifMap.get(smileyCode);
+    if (!gifCode?.length) return smileyCode;
+    return `https://image.jeuxvideo.com/smileys_img/${smileyCode}.gif`;
 }
 
-/*
-// Enable if smileys are broken again
-function fixSmileyGifs() {
-    const smileyCodes = [':rire:', ':fete:'];
-    const images = document.querySelectorAll('img');
-    images.forEach(img => {
-        const dataCode = img.getAttribute('data-code');
-        if (smileyCodes.includes(dataCode)) {
-            img.setAttribute('src', `${jvarchiveUrl}/static/smileys/${dataCode}.gif`);
-        }
-    });
+function getSmileyImgHtml(smileyCode, big = false) {
+    if (!smileyCode?.length) return smileyCode;
+    const smileyLower = smileyCode.toLowerCase();
+    return `<img data-code="${smileyLower}" title="${smileyLower}" src="${buildSmileyUrl(smileyLower)}" class="deboucled-smiley${big ? ' big' : ''}">`;
 }
-*/
+
