@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.57.3] (03/11/2024)
+
+- Correction des smileys (Rand0max)
+
 ## [2.57.2] (30/10/2024)
 
 - Intégration des liens twitter uniquement sur les messages et pas les citations (Rand0max)

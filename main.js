@@ -613,7 +613,7 @@ function buildTopicHeaderBadges() {
 function createTopicHeaderSmileys() {
     const titleElement = document.querySelector('#bloc-title-forum');
     if (!titleElement) return;
-    titleElement.innerHTML = titleElement.innerHTML.replace(smileyGifRegex, (e) => getSmileyImgHtml(e, true));
+    titleElement.innerHTML = titleElement.innerHTML.replaceAll(smileyGifRegex, (e) => getSmileyImgHtml(e, true));
 }
 
 function handleTopicHeader(messageOptions) {
