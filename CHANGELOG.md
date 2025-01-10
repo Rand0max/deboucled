@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.57.4] (10/01/2025)
+
+- Bascule sur le nouveau domaine jvarchive.st (Rand0max)
+
 ## [2.57.3] (03/11/2024)
 
 - Correction des smileys (Rand0max)

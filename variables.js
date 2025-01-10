@@ -11,7 +11,7 @@ const entitySubject = 'subject';
 const entityAuthor = 'author';
 const entityTopicId = 'topicid';
 
-const jvarchiveUrl = 'https://jvarchive.com';
+const jvarchiveUrl = 'https://jvarchive.st';
 const avatarUseJvArchiveApi = false;
 
 const deboucledBackendUrl = 'https://deboucled.randomax.com';
