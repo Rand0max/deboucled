@@ -58,7 +58,7 @@ body.didomi-popup-open {
   display: none;
 }
 .icon-topic-folder::before {
-  content: "";
+  content: "";
 }
 .layout__videoFooter {
   display: none;
