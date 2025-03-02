@@ -2458,3 +2458,8 @@ select.deboucled-dropdown::-ms-expand {
     flex: 2;
   }
 }
+
+.text-enrichi-forum .img-shack {
+  margin-right: -4px;
+  margin-bottom: -7px;
+}
