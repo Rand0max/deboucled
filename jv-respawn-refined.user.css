@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.3.8
+@version        1.3.9
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -80,7 +80,7 @@
   .pagi-fin-inactif,
   .pagi-suivant-inactif,
   .pagi-precedent-inactif {
-    display: none !important;
+    visibility: hidden !important;
   }
 
   /* Fix for JVC zoomed update */
@@ -133,8 +133,8 @@
     font-weight: 600;
   }
   .titre-bloc-forum {
-    font-size: 1.125rem;
-    line-height: 1.3em;
+    font-size: 1rem;
+    line-height: 1em;
   }
   .topic-list {
     border-spacing: 0;

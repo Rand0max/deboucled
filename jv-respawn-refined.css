@@ -73,7 +73,7 @@ body.didomi-popup-open {
 .pagi-fin-inactif,
 .pagi-suivant-inactif,
 .pagi-precedent-inactif {
-  display: none !important;
+  visibility: hidden !important;
 }
 
 /* Fix for JVC zoomed update */
@@ -126,8 +126,8 @@ body.didomi-popup-open {
   font-weight: 600;
 }
 .titre-bloc-forum {
-  font-size: 1.125rem;
-  line-height: 1.3em;
+  font-size: 1rem;
+  line-height: 1em;
 }
 .topic-list {
   border-spacing: 0;
