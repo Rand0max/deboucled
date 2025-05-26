@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.57.9] (26/05/2025)
+
+- Correction du thème JV Respawn Refined suite à la màj JVC (Rand0max)
+
 ## [2.57.4] (10/01/2025)
 
 - Bascule sur le nouveau domaine jvarchive.st (Rand0max)

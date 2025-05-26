@@ -19,6 +19,12 @@ input {
 .layout__adHeader {
   display: none;
 }
+.topicTitle__title,
+.survey__addSurvey,
+.messageEditor__edit,
+.topicTitle__input {
+  font-size: 0.8rem;
+}
 .topic-list .topic-subject {
   font-weight: 700;
   font-size: 0.9375em;
@@ -58,11 +64,12 @@ body.didomi-popup-open {
   display: none;
 }
 .icon-topic-folder::before {
-  content: "";
+  content: "";
 }
 .layout__videoFooter {
   display: none;
 }
+.messageEditor__topInfo,
 .form-harassment {
   display: none;
 }
