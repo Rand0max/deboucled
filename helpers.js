@@ -512,3 +512,10 @@ function prependEvent(element, event, fn) {
     if (!element) return;
     element.addEventListener(event, fn, { capture: true });
 }
+
+function setTextAreaValue(textarea, value) {
+    const prototype = Object.getPrototypeOf(textarea);
+    const nativeSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
+    nativeSetter.call(textarea, value);
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+}

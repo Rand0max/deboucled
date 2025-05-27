@@ -22,7 +22,9 @@ input {
 .topicTitle__title,
 .survey__addSurvey,
 .messageEditor__edit,
-.topicTitle__input {
+.topicTitle__input,
+.messageEditor__containerEdit,
+.messageEditor__containerPreview {
   font-size: 0.8rem;
 }
 .topic-list .topic-subject {

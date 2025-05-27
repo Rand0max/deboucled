@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.58.0] (26/05/2025)
+
+- Correction de certaines régressions suite à la màj JVC (Rand0max)
+
 ## [2.57.9] (26/05/2025)
 
 - Correction du thème JV Respawn Refined suite à la màj JVC (Rand0max)
