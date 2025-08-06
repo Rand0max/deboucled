@@ -295,9 +295,11 @@ blockquote .deboucled-highlighted {
 .deboucled-topic-folder-black {
   color: var(--deboucled-topic-folder3);
 }
+/*
 .input-on-off {
   visibility: hidden;
 }
+*/
 .conteneur-messages-pagi .bloc-message-forum {
   overflow: visible;
 }
