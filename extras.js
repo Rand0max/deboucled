@@ -26,16 +26,6 @@ function buildSponsor() {
         sponsorDiv.className = 'deboucled-sponsor';
         layoutContentAside.appendChild(sponsorDiv);
     }
-
-    /*
-    const forumRightCol = document.querySelector('div#forum-right-col');
-    if (forumRightCol && !decensuredActive) {
-        const decensuredLink = `<a href="${decensuredUrl}" target="_blank"><b>Décensured</b> <span class="deboucled-sponsoring-decensured-logo"></span></a>`;
-        const decensuredCardHtml = `<div class="deboucled-sponsoring"><div style="font-weight: 800;">Marre des bans et des 410 intempestifs ?</div><div>Découvrez ${decensuredLink} le script anti-censure !</div></div>`;
-        const decensuredCard = buildCardForum('Déboucled présente', '', 'deboucled-sponsoring-decensured', decensuredCardHtml, 'card-header-decensured');
-        forumRightCol.appendChild(decensuredCard);
-    }
-    */
 }
 
 function buildSupport() {
@@ -100,13 +90,12 @@ function displayAnnouncement() {
 
     // eslint-disable-next-line no-undef
     Swal.fire({
-        title: '<strong>Déboucled a besoin de vous !<strong>',
-        html: `<p>Après plus de deux ans de développement et d'améliorations de l'outil, nous faisons humblement appel à votre aide.</p><p><b>Pour fonctionner, Déboucled a besoin d'une infrastructure couteuse, d'investissement personnel et de beaucoup de temps.</b></p><p><i>Avec votre soutien, nous pourrons continuer.<i/></p>
-        <img src="https://image.noelshack.com/fichiers/2022/22/7/1654433573-cavillax.png" alt="paz" width="100" height="75"></img>`,
+        title: '<strong>Décensured est de retour !<strong>',
+        html: `<p>Après plus de trois ans d'absence, l'extension <b>anti-censure</b> fait son grand retour pour <b>pazifier une fois de plus Webedia</b> et sa clique de dictateurs de la pensée.</p><p><b><a href="https://jvflux.fr/D%C3%A9censured" target="_blank">Décensured</a></b> a été nativement intégré à Déboucled pour atteindre un plus grand nombre d'utilisateurs, et ainsi en finir avec la censure sur ce forum.</p><p>D'autres fonctionnalités arriveront au fur et à mesure, soyez patients les clés (<i>pas 3 ans, promis</i>).<p/><p>Pour toute question n'hésitez pas à envoyer un email ou créer une <i>Issue</i> sur <a href="https://github.com/Rand0max/deboucled" target="_blank">GitHub</a>.</p><img src="https://image.noelshack.com/fichiers/2022/22/7/1654433573-cavillax.png" alt="paz" width="133" height="100"></img>`,
         icon: 'info',
         showDenyButton: true,
-        confirmButtonText: 'Je souhaite aider',
-        denyButtonText: 'Non merci',
+        confirmButtonText: 'Paz sur Webedia',
+        denyButtonText: 'Ent',
         footer: '<a href="mailto:rand0max@protonmail.com">Nous contacter</a>',
         customClass: {
             confirmButton: 'deboucled-bold'

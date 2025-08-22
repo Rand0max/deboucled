@@ -104,7 +104,7 @@ function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklis
     let isSelf = messageElement.querySelector('span.picto-msg-croix');
     if (isSelf) return;
 
-    let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload(); });
+    let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { window.location.reload(); });
 
     let jvcBlacklistButton = messageElement.querySelector('span.picto-msg-tronche');
     let logged = (jvcBlacklistButton !== null);
@@ -242,25 +242,25 @@ function handleJvChatAndTopicLive(messageOptions) {
 
 function enableJvChatAndTopicLiveEvents(newMessageCallback, postMessageCallback) {
     // JvChat
-    addEventListener('jvchat:newmessage', function (event) {
+    window.addEventListener('jvchat:newmessage', function (event) {
         const messageElement = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
         const authorElement = messageElement.querySelector('h5.jvchat-author');
         if (!authorElement) return;
         newMessageCallback(messageElement, authorElement);
     });
-    addEventListener('jvchat:activation', function () {
+    window.addEventListener('jvchat:activation', function () {
         hiddenMessages = 0;
         hiddenAuthorArray.clear();
         updateMessagesHeader();
     });
-    addEventListener('jvchat:postmessage', function (event) {
+    window.addEventListener('jvchat:postmessage', function (event) {
         if (!event.detail) return;
         const postedMessageDetail = { messageId: event.detail.id, messageContent: event.detail.content, messageUsername: event.detail.username };
         postMessageCallback(postedMessageDetail);
     });
 
     // TopicLive
-    addEventListener('topiclive:newmessage', function (event) {
+    window.addEventListener('topiclive:newmessage', function (event) {
         const messageElement = document.querySelector(`.bloc-message-forum[data-id="${event.detail.id}"]`);
         if (!messageElement) return;
         const authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
@@ -268,17 +268,6 @@ function enableJvChatAndTopicLiveEvents(newMessageCallback, postMessageCallback)
         newMessageCallback(messageElement, authorElement, event);
     });
 }
-
-/*
-function enableDecensuredEvents() {
-    addEventListener('decensured:active', () => {
-        decensuredActive = true;
-        document.querySelectorAll('p.deboucled-decensured-message').forEach(e => e.remove());
-        const decensuredSponsoring = document.querySelector('#card-header-decensured');
-        if (decensuredSponsoring) decensuredSponsoring.remove();
-    });
-}
-*/
 
 function getParagraphChildren(element, allowBlockQuote = false) {
     if (!element?.children?.length) return [];

@@ -49,6 +49,11 @@ function fixNoelshackDirectUrl() {
 }
 
 async function handlePostMessage() {
+    const decensuredToggle = document.querySelector('#decensured-toggle');
+    if (decensuredToggle && decensuredToggle.checked) {
+        return;
+    }
+    
     bypassTextCensorship();
     await validatePendingMessageQuotes();
 }
@@ -107,7 +112,7 @@ async function postNewMessage() {
     let checkRes;
     await GM.xmlHttpRequest({
         method: 'POST',
-        url: location.href,
+        url: window.location.href,
         data: formData,
         headers: { 'Content-Type': 'application/json' },
         onload: (response) => { checkRes = response.responseText; },

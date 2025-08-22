@@ -85,15 +85,15 @@ function getTopicTitle() {
 }
 
 function getCurrentTopicId() {
-    /*
-    const urlRegex = /^\/forums\/(42|1)-[0-9]+-(?<topicid>[0-9]+)-[0-9]+-0-1-0-.*\.htm$/gi;
-    const matches = urlRegex.exec(window.location.pathname);
-    if (!matches?.groups?.topicid) return;
-    return parseInt(matches.groups.topicid);
-    */
     const blocFormulaireElem = document.querySelector('#bloc-formulaire-forum');
-    if (!blocFormulaireElem) return undefined;
-    return blocFormulaireElem.getAttribute('data-topic-id');
+    if (blocFormulaireElem) {
+        const topicId = blocFormulaireElem.getAttribute('data-topic-id');
+        if (topicId) return topicId;
+    }
+    
+    const currentUrl = window.location.href;
+    const match = currentUrl.match(/\/forums\/\d+-\d+-(\d+)-/);
+    return match ? match[1] : null;
 }
 
 function getTopicId(topicElement) {

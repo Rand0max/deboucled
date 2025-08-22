@@ -117,11 +117,6 @@ function buildSettingsPage() {
         html += `<a class="deboucled-about-link-jvc" href="https://www.jeuxvideo.com/messages-prives/nouveau.php?all_dest=Rand0max4" target="_blank" title="Me contacter par MP">${jvcLogo}</a>`;
         */
 
-        /*
-        const decensuredLogo = '<span class="deboucled-decensured-logo"></span>';
-        html += `<a class="deboucled-about-link-github" href="${decensuredUrl}" target="_blank" title="Décensured le script anti-censure">${decensuredLogo}</a>`;
-        */
-
         const githubLogo = '<span class="deboucled-svg-github"><svg width="20px" viewBox="0 0 16 16" id="deboucled-github-logo"><use href="#githublogo"/></svg></span>';
         html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/deboucled" target="_blank" title="Github officiel Déboucled">${githubLogo}</a>`;
 
@@ -272,6 +267,30 @@ function buildSettingsPage() {
         html += '</div>';
         return html;
     }
+    function addDecensuredSection(sectionIsActive) {
+        let html = '';
+        html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">MESSAGES MASQUÉS</div>`;
+        html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-decensured-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
+        html += '<div class="deboucled-setting-content">';
+
+        html += '<table class="deboucled-option-table">';
+
+        const lockLogo = '🔓';
+        html += addToggleOption(`Activer les <i>messages masqués</i> ${lockLogo}`, storage_optionEnableDecensured, storage_optionEnableDecensured_default, 'Active les fonctionnalités de messages chiffrés et masqués. Permet de poster des messages visibles uniquement par les utilisateurs de Déboucled qui ont cette option activée.');
+
+        let optionEnableDecensured = store.get(storage_optionEnableDecensured, storage_optionEnableDecensured_default);
+
+        const badgeLogo = '🏷️';
+        html += addToggleOption(`Afficher les ${badgeLogo} utilisateurs Décensured`, storage_optionEnableDecensuredBadges, storage_optionEnableDecensuredBadges_default, 'Affiche un petit badge à côté du pseudo des utilisateurs qui utilisent aussi Déboucled pour les messages masqués.', optionEnableDecensured, true);
+
+        const autoLogo = '⚡';
+        html += addToggleOption(`Déchiffrement ${autoLogo} automatique`, storage_optionAutoDecryptMessages, storage_optionAutoDecryptMessages_default, 'Déchiffre automatiquement les messages masqués lors du chargement de la page.', optionEnableDecensured, true);
+
+        html += '</table>';
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
     function addPreBouclesSection(sectionIsActive) {
         let html = '';
         html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">LISTES PRÉDÉFINIES</div>`;
@@ -410,6 +429,7 @@ function buildSettingsPage() {
     settingsHtml += addOptionsSection(false);
     settingsHtml += addCustomisationSection(false);
     settingsHtml += addEnhancementSection(false);
+    settingsHtml += addDecensuredSection(false);
     settingsHtml += addPreBouclesSection(firstLaunch);
     settingsHtml += addEntitySettingSection(entitySubject, 'LISTE NOIRE - SUJETS', 'Mot-clé', 'Utilisez le caractère étoile * pour remplacer n\'importe quelle expression.', !firstLaunch);
     settingsHtml += addEntitySettingSection(entityAuthor, 'LISTE NOIRE - AUTEURS', 'Pseudo', undefined, false);
@@ -540,6 +560,22 @@ function addSettingEvents() {
     addToggleEvent(storage_optionDisplayBadges);
     addToggleEvent(storage_optionGetMessageQuotes);
     addToggleEvent(storage_optionFilterHotTopics);
+
+    addToggleEvent(storage_optionEnableDecensured, undefined, function () {
+        const decensuredSubOptions = [
+            `${storage_optionEnableDecensuredBadges}-container`,
+            `${storage_optionAutoDecryptMessages}-container`
+        ];
+
+        decensuredSubOptions.forEach(optionId => {
+            document.querySelectorAll(`[id="${optionId}"]`).forEach(function (el) {
+                el.classList.toggle('deboucled-disabled');
+            });
+        });
+    });
+
+    addToggleEvent(storage_optionEnableDecensuredBadges);
+    addToggleEvent(storage_optionAutoDecryptMessages);
 
     addPrebouclesEvents();
 }
@@ -905,7 +941,7 @@ function addSearchFilterToggle() {
 
     document.querySelector('#deboucled-search-filter-toggle').oninput = (e) => {
         store.set(storage_optionFilterResearch, e.currentTarget.checked);
-        location.reload();
+        window.location.reload();
     };
 
     return optionFilterResearch;
@@ -933,7 +969,7 @@ function addDisableFilteringButton() {
         else disabledFilteringForumSet.add(forumId);
 
         store.set(storage_disabledFilteringForums, JSON.stringify([...disabledFilteringForumSet]));
-        location.reload();
+        window.location.reload();
     };
 }
 

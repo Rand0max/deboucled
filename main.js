@@ -25,7 +25,7 @@ async function suggestUpdate() {
     if (updateRes?.length && mustRefresh(storage_lastUpdateDeferredCheck, checkUpdateDeferredExpire)) {
         if (confirm('Nouvelle version de Déboucled disponible. Voulez-vous l\'installer ?')) {
             toggleDeferUpdate(false);
-            document.location.href = updateRes;
+            window.location.href = updateRes;
             //window.open(updateRes, '_blank').focus();
         }
         else {
@@ -574,7 +574,7 @@ function handleTopicWhitelist() {
         if (isWhitelisted) topicIdWhitelistArray.splice(topicIdIndex, 1);
         else topicIdWhitelistArray.push(currentTopicId);
         await saveStorage();
-        location.reload();
+        window.location.reload();
     };
     titleBlocElement.prepend(whitelistButtonElement);
 
@@ -811,7 +811,7 @@ async function handleProfile(profileTab) {
         highlightBlacklistedAuthor(undefined, infosPseudoElement.firstElementChild ?? infosPseudoElement, false);
     }
     else if (!userPseudo || userPseudo.toLowerCase() !== author.toLowerCase()) {
-        let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { location.reload(); }, 'deboucled-blacklist-profil-button');
+        let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { window.location.reload(); }, 'deboucled-blacklist-profil-button');
         blocOptionProfil.append(dbcBlacklistButton);
     }
 
@@ -940,13 +940,15 @@ async function init(currentPageType) {
 
     handlePendingMessageQuotes();
 
+    await initDecensured();
+
     buildExtras();
 }
 
 async function entryPoint() {
     while (!document.body) await sleep(50);
 
-    let start = performance.now();
+    let start = window.performance.now();
     try {
         const currentPageType = getCurrentPageType(`${window.location.pathname}${window.location.search}`);
         if (currentPageType === 'unknown') return;
@@ -995,7 +997,7 @@ async function entryPoint() {
 
         console.log('Déboucled loaded');
 
-        const elapsed = performance.now() - start;
+        const elapsed = window.performance.now() - start;
         //console.log(`Déboucled load : totaltime = ${elapsed}ms`);
 
         if (elapsed >= 3000) {
@@ -1010,7 +1012,7 @@ async function entryPoint() {
         displaySecret();
         displayAnnouncement();
     } catch (error) {
-        const elapsed = performance.now() - start;
+        const elapsed = window.performance.now() - start;
         console.error(error);
         sendDiagnostic(elapsed, error);
     }
@@ -1022,5 +1024,5 @@ async function entryPoint() {
 if (document.readyState === 'interactive' || document.readyState === 'complete') {
     entryPoint();
 } else {
-    addEventListener('DOMContentLoaded', entryPoint);
+    window.addEventListener('DOMContentLoaded', entryPoint);
 }

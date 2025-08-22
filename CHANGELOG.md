@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.60.0] (23/08/2025)
+
+- Retour de Décensured ! (Rand0max)
+
 ## [2.58.0] (26/05/2025)
 
 - Correction de certaines régressions suite à la màj JVC (Rand0max)
