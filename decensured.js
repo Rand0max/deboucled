@@ -640,13 +640,10 @@ async function getDecensuredMessages(topicId) {
 // Interface utilisateur
 ///////////////////////////////////////////////////////////////////////////////////////
 
-function buildDecensuredBadge(username) {
+function buildDecensuredBadge() {
     const badge = document.createElement('span');
-    badge.className = 'deboucled-decensured-badge';
-    badge.innerHTML = '🔒';
-
-    const displayUsername = username || 'Utilisateur';
-    badge.title = `${displayUsername} utilise Déboucled (messages chiffrés)`;
+    badge.className = 'deboucled-decensured-badge deboucled-decensured-premium-logo';
+    badge.setAttribute('deboucled-data-tooltip', `Membre d'élite Décensured`);
     return badge;
 }
 
@@ -891,12 +888,17 @@ function addDecensuredBadge(msgElement, decensuredMsg) {
         return;
     }
 
+    const userLevelElement = msgElement.querySelector('.bloc-user-level');
+    if (userLevelElement) {
+        const badge = buildDecensuredBadge();
+        userLevelElement.appendChild(badge);
+        return;
+    }
+
     const pseudoLink = msgElement.querySelector('.bloc-pseudo-msg');
     if (!pseudoLink) return;
 
-    const username = decensuredMsg.message_username || decensuredMsg.username || 'Utilisateur';
-    const badge = buildDecensuredBadge(username);
-
+    const badge = buildDecensuredBadge();
     pseudoLink.insertAdjacentElement('afterend', badge);
 }
 
