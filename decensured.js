@@ -9,6 +9,7 @@ const DECENSURED_CONFIG = {
     RETRY_TIMEOUT: 10 * 60 * 1000,
     NOTIFICATION_DURATION: 5000,
     POST_TIMEOUT: 20000,
+    USERS_REFRESH_INTERVAL: 3 * 60 * 1000,
 
     URLS: {
         POST_MESSAGE: '/forums/message/add'
@@ -132,10 +133,10 @@ function cleanupTimers() {
 }
 
 function handleApiError(error, context, showNotification = false) {
-    console.error(`[Déboucled Décensuré] ${context}:`, error);
+    console.error(`[Déboucled Décensured] ${context}:`, error);
 
     if (typeof sendDiagnostic === 'function') {
-        sendDiagnostic(0, `Décensuré: ${context} - ${error.message}`);
+        sendDiagnostic(0, `Décensured: ${context} - ${error.message}`);
     }
 
     if (showNotification) {
@@ -976,6 +977,72 @@ async function decryptMessages() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
+// Gestion du compteur d'utilisateurs dans le header
+///////////////////////////////////////////////////////////////////////////////////////
+
+function createDecensuredUsersHeader() {
+    if (document.querySelector('#deboucled-header-decensured')) return;
+
+    const headerNotif = document.querySelector('.headerAccount--notif');
+    if (!headerNotif) return;
+
+    const headerDecensured = document.createElement('div');
+    headerDecensured.className = 'headerAccount headerAccount--decensured';
+    headerDecensured.id = 'deboucled-header-decensured';
+
+    headerNotif.insertAdjacentElement('afterend', headerDecensured);
+
+    const decensuredButton = document.createElement('span');
+    decensuredButton.className = 'headerAccount__notif js-header-decensured';
+    decensuredButton.setAttribute('data-val', '0');
+    decensuredButton.title = 'Utilisateurs Décensured connectés';
+
+    const icon = document.createElement('i');
+    icon.className = 'icon-people';
+
+    decensuredButton.appendChild(icon);
+    headerDecensured.appendChild(decensuredButton);
+
+    return decensuredButton;
+}
+
+function updateDecensuredUsersCount(count) {
+    const button = document.querySelector('.js-header-decensured');
+    if (!button) return;
+
+    button.setAttribute('data-val', count);
+
+    button.classList.toggle('headerAccount__notif--hasNotif', count > 0);
+}
+
+async function loadDecensuredUsersData() {
+    try {
+        const response = await fetchDecensuredApi(apiDecensuredStatsUrl);
+        if (response && response.nb) {
+            const onlineCount = parseInt(response.nb) || 0;
+            updateDecensuredUsersCount(onlineCount);
+        } else {
+            updateDecensuredUsersCount(0);
+        }
+    } catch (error) {
+        handleApiError(error, 'Chargement utilisateurs Décensured');
+        updateDecensuredUsersCount(0);
+    }
+}
+
+function startDecensuredUsersMonitoring() {
+    loadDecensuredUsersData();
+
+    setInterval(loadDecensuredUsersData, DECENSURED_CONFIG.USERS_REFRESH_INTERVAL);
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            loadDecensuredUsersData();
+        }
+    });
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
 // Initialisation
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -1005,11 +1072,14 @@ async function initDecensured() {
 
     buildDecensuredInputUI();
 
+    createDecensuredUsersHeader();
+    startDecensuredUsersMonitoring();
+
     await decryptMessages();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// Posting de messages décensurés
+// Posting de messages Decensured
 ///////////////////////////////////////////////////////////////////////////////////////
 
 async function handleDecensuredPost() {

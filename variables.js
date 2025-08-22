@@ -126,6 +126,7 @@ const decensuredApiUrl = `${decensuredBackendUrl}/decensured/api`;
 const apiDecensuredMessagesUrl = `${decensuredApiUrl}/message`;
 const apiDecensuredUsersUrl = `${decensuredApiUrl}/user`;
 const apiDecensuredCreateMessageUrl = `${decensuredApiUrl}/message/create`;
+const apiDecensuredStatsUrl = `${decensuredApiUrl}/stats/online`;
 
 const decensuredPingInterval = 1000 * 60 * 2; // every 2 minutes
 

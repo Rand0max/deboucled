@@ -1,6 +1,10 @@
 # Changelog Déboucled
 
-## [2.60.0] (23/08/2025)
+## [2.60.3] (23/08/2025)
+
+- Corrections graphiques et nombre d'utilisateurs Décensured connectés (Rand0max)
+ 
+## [2.60.0] (22/08/2025)
 
 - Retour de Décensured ! (Rand0max)
 
