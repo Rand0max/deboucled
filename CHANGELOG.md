@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.61.2] (25/08/2025)
+
+- Utilisateurs Décensured en ligne (Rand0max)
+
 ## [2.61.1] (25/08/2025)
 
 - Corrections diverses Décensured (Rand0max)

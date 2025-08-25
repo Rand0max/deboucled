@@ -518,3 +518,28 @@ function setTextAreaValue(textarea, value) {
     nativeSetter.call(textarea, value);
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
 }
+
+function formatTimeAgo(dateString) {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now - date;
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+    if (diffMinutes < 1) {
+        return 'à l\'instant';
+    } else if (diffMinutes < 60) {
+        return `il y a ${diffMinutes} min`;
+    } else if (diffHours < 24) {
+        return `il y a ${diffHours}h`;
+    } else {
+        const diffDays = Math.floor(diffHours / 24);
+        return `il y a ${diffDays}j`;
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}

@@ -442,15 +442,9 @@ function formatStrikethrough(text) {
 }
 
 function formatImages(text) {
-    return text.replace(/https:\/\/(?:www\.noelshack\.com\/(\d+)-(\d+)-(\d+)-(.+)|image\.noelshack\.com\/fichiers\/(\d+)\/(\d+)\/(\d+)\/(.+))\.(png|jpg|jpeg|gif|webp)/gi, (match, y1, w1, d1, name1, y2, w2, d2, name2, ext) => {
-        let imageUrl, miniUrl;
-        if (y1) {
-            imageUrl = `https://image.noelshack.com/fichiers/${y1}/${w1}/${d1}/${name1}.${ext}`;
-            miniUrl = `https://image.noelshack.com/minis/${y1}/${w1}/${d1}/${name1}.${ext}`;
-        } else {
-            imageUrl = match;
-            miniUrl = match.replace('/fichiers/', '/minis/');
-        }
+    return text.replace(/https:\/\/(?:www\.|image\.)?noelshack\.com\/[^\s<>"']+\.(png|jpg|jpeg|gif|webp)/gi, (match) => {
+        const imageUrl = match;
+        const miniUrl = match.replace('/fichiers/', '/minis/').replace('www.noelshack.com/', 'image.noelshack.com/minis/');
 
         return `<a href="${imageUrl}" target="_blank" rel="noreferrer"><img class="img-shack" src="${miniUrl}" width="68" height="51" alt="${imageUrl}"></a>`;
     });
@@ -1168,12 +1162,34 @@ function injectDecensuredTopicUI(elements) {
     topicDecensuredState.toggleHandlers = setupToggleHandlers(container, 'topic', (isActive) => {
         if (isActive) {
             replaceTopicPostButtonWithDecensured();
+            setupTopicTextareaForDecensured(elements.messageTextarea);
         } else {
             restoreOriginalTopicPostButton();
+            restoreTopicTextareaFromDecensured(elements.messageTextarea);
         }
     });
 
     setTimeout(() => setupTabOrder(), 100);
+}
+
+function setupTopicTextareaForDecensured(textarea) {
+    if (!textarea) return;
+    
+    // Définir le nouveau placeholder pour le mode Décensured
+    textarea.placeholder = 'Votre véritable message, chiffré et visible uniquement par les utilisateurs Déboucled.';
+    
+    // Ajouter la classe pour le style visuel
+    textarea.classList.add('deboucled-decensured-textarea-active');
+}
+
+function restoreTopicTextareaFromDecensured(textarea) {
+    if (!textarea) return;
+    
+    // Laisser le placeholder vide au lieu de restaurer l'ancien
+    textarea.placeholder = '';
+    
+    // Retirer la classe de style
+    textarea.classList.remove('deboucled-decensured-textarea-active');
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -1227,6 +1243,24 @@ function replaceTopicPostButtonWithDecensured() {
     setTimeout(() => setupTabOrder(), 50);
 }
 
+function restoreOriginalTopicPostButton() {
+    const postButton = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_ORIGINAL_TOPIC_POST_BUTTON);
+    if (!postButton || !postButton.hasAttribute('data-decensured-topic-original')) return;
+
+    postButton.style.display = '';
+
+    const decensuredButton = document.getElementById('deboucled-decensured-topic-post-button');
+    if (decensuredButton) {
+        decensuredButton.remove();
+    }
+
+    postButton.removeAttribute('data-decensured-topic-original');
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+// CRÉATION DE TOPICS
+///////////////////////////////////////////////////////////////////////////////////////
+
 async function handleTopicDecensuredCreationFlow() {
     try {
         await handleDecensuredTopicCreation();
@@ -1252,24 +1286,6 @@ function triggerNativeTopicCreation() {
         }, 50);
     }
 }
-
-function restoreOriginalTopicPostButton() {
-    const postButton = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_ORIGINAL_TOPIC_POST_BUTTON);
-    if (!postButton || !postButton.hasAttribute('data-decensured-topic-original')) return;
-
-    postButton.style.display = '';
-
-    const decensuredButton = document.getElementById('deboucled-decensured-topic-post-button');
-    if (decensuredButton) {
-        decensuredButton.remove();
-    }
-
-    postButton.removeAttribute('data-decensured-topic-original');
-}
-
-///////////////////////////////////////////////////////////////////////////////////////
-// CRÉATION DE TOPICS
-///////////////////////////////////////////////////////////////////////////////////////
 
 async function handleDecensuredTopicCreation() {
     const elements = getTopicFormElements();
@@ -1887,7 +1903,8 @@ function createDecensuredUsersHeader() {
     decensuredButton.className = 'headerAccount__notif js-header-decensured';
     decensuredButton.id = 'deboucled-users-counter';
     decensuredButton.setAttribute('data-val', '0');
-    decensuredButton.title = 'Utilisateurs Décensured connectés';
+    decensuredButton.title = 'Cliquer pour voir les utilisateurs Décensured connectés';
+    decensuredButton.style.cursor = 'pointer';
 
     const icon = document.createElement('i');
     icon.className = 'icon-people';
@@ -1896,7 +1913,142 @@ function createDecensuredUsersHeader() {
     decensuredButton.appendChild(icon);
     headerDecensured.appendChild(decensuredButton);
 
+    decensuredButton.addEventListener('click', showDecensuredUsersModal);
+
     return decensuredButton;
+}
+
+async function showDecensuredUsersModal() {
+    try {
+        const usersData = await fetchDecensuredApi(apiDecensuredUsersOnlineUrl, { method: 'GET' });
+
+        if (usersData && usersData.users) {
+            createAndShowUsersModal(usersData.users, usersData.count);
+        } else {
+            addAlertbox('warning', 'Aucun utilisateur Décensured trouvé');
+        }
+    } catch (error) {
+        console.error('Erreur lors du chargement des utilisateurs:', error);
+        addAlertbox('error', 'Impossible de charger la liste des utilisateurs');
+    }
+}
+
+function createAndShowUsersModal(users, totalCount) {
+    const existingModal = document.querySelector('.deboucled-users-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'deboucled-users-modal';
+
+    const sortedUsers = [...users].sort((a, b) => new Date(b.lastActiveDate) - new Date(a.lastActiveDate));
+
+    const USERS_PER_PAGE = 15;
+    let currentPage = 0;
+    let isLoading = false;
+
+    function loadMoreUsers() {
+        const startIndex = currentPage * USERS_PER_PAGE;
+        const endIndex = Math.min(startIndex + USERS_PER_PAGE, sortedUsers.length);
+        const usersToShow = sortedUsers.slice(startIndex, endIndex);
+
+        if (usersToShow.length === 0) return;
+
+        const modalBody = modal.querySelector('.deboucled-users-modal-body');
+        const userContainer = modalBody.querySelector('.deboucled-users-container');
+
+        if (!userContainer) return;
+
+        usersToShow.forEach(user => {
+            const userItem = document.createElement('div');
+            userItem.className = 'deboucled-user-item';
+            userItem.innerHTML = `
+                <a href="https://www.jeuxvideo.com/profil/${encodeURIComponent(user.username)}?mode=infos" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="deboucled-user-pseudo">${escapeHtml(user.username)}</a>
+                <span class="deboucled-user-status">Actif ${formatTimeAgo(user.lastActiveDate)}</span>
+            `;
+            userContainer.appendChild(userItem);
+        });
+
+        currentPage++;
+
+        if (endIndex >= sortedUsers.length) {
+            const loader = modalBody.querySelector('.deboucled-users-loader');
+            if (loader) loader.style.display = 'none';
+        }
+    }
+
+    modal.innerHTML = `
+        <div class="deboucled-users-modal-content">
+            <div class="deboucled-users-modal-header">
+                <h3>🔒 Utilisateurs Décensured en ligne (${totalCount})</h3>
+                <button class="deboucled-users-modal-close">×</button>
+            </div>
+            <div class="deboucled-users-modal-body">
+                ${sortedUsers.length === 0 ?
+            '<div class="deboucled-no-users">Aucun utilisateur connecté</div>' :
+            `<div class="deboucled-users-container"></div>
+                     <div class="deboucled-users-loader">
+                         <div class="deboucled-loading-text">Chargement...</div>
+                     </div>`
+        }
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const modalBody = modal.querySelector('.deboucled-users-modal-body');
+    const loader = modal.querySelector('.deboucled-users-loader');
+
+    if (loader) {
+        loader.style.display = sortedUsers.length > USERS_PER_PAGE ? 'block' : 'none';
+    }
+
+    if (sortedUsers.length > 0) {
+        loadMoreUsers();
+    }
+
+    if (modalBody && sortedUsers.length > USERS_PER_PAGE) {
+        modalBody.addEventListener('scroll', () => {
+            if (isLoading) return;
+
+            const { scrollTop, scrollHeight, clientHeight } = modalBody;
+            const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+            const isNearBottom = scrollPercentage >= 0.8;
+
+            if (isNearBottom && currentPage * USERS_PER_PAGE < sortedUsers.length) {
+                isLoading = true;
+
+                if (loader) loader.style.display = 'block';
+
+                setTimeout(() => {
+                    loadMoreUsers();
+                    isLoading = false;
+                }, 500);
+            }
+        });
+    }
+
+    const closeButton = modal.querySelector('.deboucled-users-modal-close');
+    if (closeButton) {
+        closeButton.addEventListener('click', () => modal.remove());
+    }
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
 }
 
 function toggleDecensuredUsersCountDisplay() {
@@ -2262,6 +2414,10 @@ function handleFormResponse(response, formulaire, textarea, resolve, reject) {
     }
 }
 
+function getMessageTextarea() {
+    return findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA);
+}
+
 function replacePostButtonWithDecensured() {
     const postButton = findElement(DECENSURED_CONFIG.SELECTORS.POST_BUTTON);
     if (!postButton) return;
@@ -2316,10 +2472,6 @@ function restoreOriginalPostButton() {
     newButton.removeAttribute('data-decensured-message-original');
 
     setTimeout(() => setupTabOrder(), 50);
-}
-
-function getMessageTextarea() {
-    return findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA);
 }
 
 function getPayloadFromScripts(doc) {
