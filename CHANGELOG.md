@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.61.0] (25/08/2025)
+
+- Création et affichage de topic Décensured (Rand0max)
+- Option pour afficher/masquer le nombre d'utilisateurs (Rand0max)
+
 ## [2.60.3] (23/08/2025)
 
 - Corrections graphiques et nombre d'utilisateurs Décensured connectés (Rand0max)

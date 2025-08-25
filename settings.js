@@ -269,22 +269,28 @@ function buildSettingsPage() {
     }
     function addDecensuredSection(sectionIsActive) {
         let html = '';
-        html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">MESSAGES MASQUÉS</div>`;
+        html += `<div class="deboucled-bloc-header deboucled-collapsible${sectionIsActive ? ' deboucled-collapsible-active' : ''}">DÉCENSURED</div>`;
         html += `<div class="deboucled-bloc deboucled-collapsible-content" id="deboucled-decensured-collapsible-content" ${sectionIsActive ? collapsibleMaxHeight : ''}>`;
         html += '<div class="deboucled-setting-content">';
 
         html += '<table class="deboucled-option-table">';
 
         const lockLogo = '🔓';
-        html += addToggleOption(`Activer les <i>messages masqués</i> ${lockLogo}`, storage_optionEnableDecensured, storage_optionEnableDecensured_default, 'Active les fonctionnalités de messages chiffrés et masqués. Permet de poster des messages visibles uniquement par les utilisateurs de Déboucled qui ont cette option activée.');
+        html += addToggleOption(`Activer <i>Décensured</i> ${lockLogo}`, storage_optionEnableDecensured, storage_optionEnableDecensured_default, 'Active les fonctionnalités de messages chiffrés et masqués. Permet de poster des messages visibles uniquement par les utilisateurs de Déboucled qui ont cette option activée.');
 
         let optionEnableDecensured = store.get(storage_optionEnableDecensured, storage_optionEnableDecensured_default);
 
-        const badgeLogo = '🏷️';
-        html += addToggleOption(`Afficher les ${badgeLogo} utilisateurs Décensured`, storage_optionEnableDecensuredBadges, storage_optionEnableDecensuredBadges_default, 'Affiche un petit badge à côté du pseudo des utilisateurs qui utilisent aussi Déboucled pour les messages masqués.', optionEnableDecensured, true);
-
         const autoLogo = '⚡';
         html += addToggleOption(`Déchiffrement ${autoLogo} automatique`, storage_optionAutoDecryptMessages, storage_optionAutoDecryptMessages_default, 'Déchiffre automatiquement les messages masqués lors du chargement de la page.', optionEnableDecensured, true);
+
+        const topicLogo = '📋';
+        html += addToggleOption(`Activer les ${topicLogo} topics masqués`, storage_optionEnableDecensuredTopics, storage_optionEnableDecensuredTopics_default, 'Active la possibilité de créer des topics avec des messages masqués et de les mettre en évidence.', optionEnableDecensured, true);
+
+        const peopleLogo = '👥';
+        html += addToggleOption(`Afficher le ${peopleLogo} nombre de connectés`, storage_optionDisplayDecensuredUsersCount, storage_optionDisplayDecensuredUsersCount_default, 'Affiche dans le header le nombre d\'utilisateurs Décensured actuellement connectés.', optionEnableDecensured, true);
+
+        const badgeLogo = '<span class="deboucled-decensured-premium-logo settings"></span>';
+        html += addToggleOption(`Afficher les ${badgeLogo} utilisateurs Décensured`, storage_optionEnableDecensuredBadges, storage_optionEnableDecensuredBadges_default, 'Affiche un petit badge à côté du pseudo des utilisateurs qui utilisent aussi Déboucled pour les messages masqués.', optionEnableDecensured, true);
 
         html += '</table>';
         html += '</div>';
@@ -564,7 +570,9 @@ function addSettingEvents() {
     addToggleEvent(storage_optionEnableDecensured, undefined, function () {
         const decensuredSubOptions = [
             `${storage_optionEnableDecensuredBadges}-container`,
-            `${storage_optionAutoDecryptMessages}-container`
+            `${storage_optionAutoDecryptMessages}-container`,
+            `${storage_optionDisplayDecensuredUsersCount}-container`,
+            `${storage_optionEnableDecensuredTopics}-container`
         ];
 
         decensuredSubOptions.forEach(optionId => {
@@ -574,8 +582,14 @@ function addSettingEvents() {
         });
     });
 
-    addToggleEvent(storage_optionEnableDecensuredBadges);
+    addToggleEvent(storage_optionEnableDecensuredBadges, undefined, function () {
+        toggleDecensuredBadgesDisplay();
+    });
     addToggleEvent(storage_optionAutoDecryptMessages);
+    addToggleEvent(storage_optionDisplayDecensuredUsersCount, undefined, function () {
+        toggleDecensuredUsersCountDisplay();
+    });
+    addToggleEvent(storage_optionEnableDecensuredTopics);
 
     addPrebouclesEvents();
 }

@@ -3,7 +3,7 @@
 // STORAGE
 ///////////////////////////////////////////////////////////////////////////////////////
 
-const store = new GMStorage(); // eslint-disable-line no-undef
+const store = new GMStorage();
 
 const localstorage_pocTopics = 'deboucled_pocTopics';
 const localstorage_topicAuthors = 'deboucled_topicAuthors';
@@ -64,7 +64,10 @@ const storage_optionFilterHotTopics = 'deboucled_optionFilterHotTopics', storage
 const storage_optionEnableDecensured = 'deboucled_optionEnableDecensured', storage_optionEnableDecensured_default = true;
 const storage_optionEnableDecensuredBadges = 'deboucled_optionEnableDecensuredBadges', storage_optionEnableDecensuredBadges_default = true;
 const storage_optionAutoDecryptMessages = 'deboucled_optionAutoDecryptMessages', storage_optionAutoDecryptMessages_default = true;
+const storage_optionDisplayDecensuredUsersCount = 'deboucled_optionDisplayDecensuredUsersCount', storage_optionDisplayDecensuredUsersCount_default = true;
+const storage_optionEnableDecensuredTopics = 'deboucled_optionEnableDecensuredTopics', storage_optionEnableDecensuredTopics_default = true;
 const storage_decensuredLastPing = 'deboucled_decensuredLastPing';
+const storage_pendingDecensuredTopic = 'deboucled_pendingDecensuredTopic', storage_pendingDecensuredTopic_default = null;
 
 const storage_disabledFilteringForums = 'deboucled_disabledFilteringForums', storage_disabledFilteringForums_default = '[]';
 
@@ -94,7 +97,7 @@ const storage_messageQuotesData = 'deboucled_messageQuotesData', storage_message
 const storage_messageQuotesLastUpdate = 'deboucled_messageQuotesLastUpdate';
 
 
-const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_blacklistedShadows, storage_whitelistedTopicIds, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_optionAntiSpam, storage_optionSmoothScroll, storage_optionAntiLoopAiMode, storage_optionDisplayHotTopics, storage_optionHideLongMessages, storage_optionDisplayTitleSmileys, storage_optionDisplayTopicAvatar, storage_optionHideAvatarBorder, storage_optionEmbedTwitter, storage_optionEmbedVideos, storage_optionDisplayBadges, storage_optionGetMessageQuotes, storage_optionFilterHotTopics, storage_optionEnableDecensured, storage_optionEnableDecensuredBadges, storage_optionAutoDecryptMessages, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_totalHiddenSpammers, storage_TopicStats];
+const storage_Keys = [storage_init, storage_lastUsedPseudo, storage_preBoucles, storage_blacklistedTopicIds, storage_blacklistedSubjects, storage_blacklistedAuthors, storage_blacklistedShadows, storage_whitelistedTopicIds, storage_optionEnableJvRespawnRefinedTheme, storage_optionEnableDeboucledDarkTheme, storage_optionBoucledUseJvarchive, storage_optionHideMessages, storage_optionAllowDisplayThreshold, storage_optionDisplayThreshold, storage_optionDisplayBlacklistTopicButton, storage_optionShowJvcBlacklistButton, storage_optionFilterResearch, storage_optionDetectPocMode, storage_optionPrevisualizeTopic, storage_optionDisplayBlackTopic, storage_optionDisplayTopicCharts, storage_optionDisplayTopicMatches, storage_optionClickToShowTopicMatches, storage_optionRemoveUselessTags, storage_optionMaxTopicCount, storage_optionAntiVinz, storage_optionBlAuthorIgnoreMp, storage_optionBlSubjectIgnoreMessages, storage_optionEnableTopicMsgCountThreshold, storage_optionTopicMsgCountThreshold, storage_optionReplaceResolvedPicto, storage_optionDisplayTopicIgnoredCount, storage_optionEnhanceQuotations, storage_optionAntiSpam, storage_optionSmoothScroll, storage_optionAntiLoopAiMode, storage_optionDisplayHotTopics, storage_optionHideLongMessages, storage_optionDisplayTitleSmileys, storage_optionDisplayTopicAvatar, storage_optionHideAvatarBorder, storage_optionEmbedTwitter, storage_optionEmbedVideos, storage_optionDisplayBadges, storage_optionGetMessageQuotes, storage_optionFilterHotTopics, storage_optionEnableDecensured, storage_optionEnableDecensuredBadges, storage_optionAutoDecryptMessages, storage_optionDisplayDecensuredUsersCount, storage_optionEnableDecensuredTopics, storage_pendingDecensuredTopic, storage_disabledFilteringForums, storage_totalHiddenTopicIds, storage_totalHiddenSubjects, storage_totalHiddenAuthors, storage_totalHiddenMessages, storage_totalHiddenPrivateMessages, storage_totalHiddenSpammers, storage_TopicStats];
 
 const storage_excluded_user_Keys = [storage_TopicStats];
 

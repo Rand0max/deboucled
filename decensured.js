@@ -6,15 +6,38 @@ let decensuredInitialized = false;
 let decensuredPingTimer = null;
 
 const DECENSURED_CONFIG = {
+    // === TIMING CONFIGURATION ===
+    INIT_DELAY: 1000,
     RETRY_TIMEOUT: 10 * 60 * 1000,
-    NOTIFICATION_DURATION: 5000,
-    POST_TIMEOUT: 20000,
+    POST_TIMEOUT: 40000,
     USERS_REFRESH_INTERVAL: 3 * 60 * 1000,
 
-    URLS: {
-        POST_MESSAGE: '/forums/message/add'
+    // === UI CONFIGURATION ===
+    NOTIFICATION_DURATION: 5000,
+    NOTIFICATION_ICONS: {
+        'success': '✅',
+        'warning': '⚠️',
+        'danger': '❌',
+        'error': '❌',
+        'info': 'ℹ️',
+        'primary': 'ℹ️'
     },
 
+    // === API ENDPOINTS ===
+    URLS: {
+        POST_MESSAGE: '/forums/message/add',
+        CREATE_TOPIC: '/forums/topic/add'
+    },
+
+    // === TOPICS SPECIFIC CONFIGURATION ===
+    TOPICS: {
+        MIN_VALID_TOPIC_ID: 70000000,
+        FORM_OBSERVER_TIMEOUT: 500,
+        CHECK_DELAY: 500,
+        HIGHLIGHT_DELAY: 1500
+    },
+
+    // === DOM SELECTORS ===
     SELECTORS: {
         MESSAGE_TEXTAREA: [
             '#message_topic',
@@ -25,8 +48,8 @@ const DECENSURED_CONFIG = {
             'textarea[placeholder*="message"]'
         ],
         POST_BUTTON: [
-            '.btn-poster-msg',
             '.postMessage',
+            '.btn-poster-msg',
             'button[type="submit"]'
         ],
         MESSAGE_FORM: [
@@ -47,16 +70,64 @@ const DECENSURED_CONFIG = {
             '.msg-report-btn',
             '[title*="signaler"]',
             '[aria-label*="signaler"]'
-        ]
-    },
-
-    NOTIFICATION_ICONS: {
-        'success': '✅',
-        'warning': '⚠️',
-        'danger': '❌',
-        'error': '❌',
-        'info': 'ℹ️',
-        'primary': 'ℹ️'
+        ],
+        TOPIC_TITLE_INPUT: [
+            '#input-topic-title',
+            'input[name="input-topic-title"]',
+            '#topicTitle',
+            'input[name="topicTitle"]',
+            'input[name="topic_title"]',
+            'input[placeholder*="titre"]',
+            'input[placeholder*="Titre"]',
+            '#titre_topic',
+            '.topic-title-input',
+            'input[name="titre"]',
+            '#sujet',
+            'input[name="sujet"]'
+        ],
+        TOPIC_FORM: [
+            '#forums-post-topic-editor form',
+            '#bloc-formulaire-forum form',
+            'form[action*="topic/add"]',
+            'form[action*="/forums/topic/add"]',
+            '.form-topic-add',
+            'form[action*="sujet"]',
+            '.formulaire-nouveau-topic',
+            'form.topic-form',
+            'form[method="post"]',
+            '.form-post-topic'
+        ],
+        // === DÉCENSURED ELEMENTS ===
+        DECENSURED_MESSAGE_TOGGLE: '#decensured-message-toggle',
+        DECENSURED_MESSAGE_FAKE: '#decensured-message-fake-message',
+        DECENSURED_TOPIC_TOGGLE: '#decensured-topic-toggle',
+        DECENSURED_TOPIC_FAKE: '#decensured-topic-fake-message',
+        DECENSURED_CONTAINER: '.deboucled-decensured-input',
+        DECENSURED_POST_BUTTON_MESSAGE: 'button[title*="Publier le message"]',
+        DECENSURED_POST_BUTTON_TOPIC: 'button[title*="Publier le topic"]',
+        // === DÉBOUCLED SPECIFIC IDS ===
+        DEBOUCLED_DECENSURED_TOPIC_POST_BUTTON: '#deboucled-decensured-topic-post-button',
+        DEBOUCLED_DECENSURED_MESSAGE_POST_BUTTON: '#deboucled-decensured-message-post-button',
+        DEBOUCLED_ORIGINAL_TOPIC_POST_BUTTON: 'button[data-decensured-topic-original="true"]',
+        DEBOUCLED_ORIGINAL_MESSAGE_POST_BUTTON: 'button[data-decensured-message-original="true"]',
+        // === DÉBOUCLED CONTAINERS AND ELEMENTS ===
+        DEBOUCLED_DECENSURED_MESSAGE_CONTAINER: '#deboucled-decensured-message-container',
+        DEBOUCLED_DECENSURED_TOPIC_CONTAINER: '#deboucled-decensured-topic-container',
+        DEBOUCLED_DECENSURED_MESSAGE_TOGGLE: '#deboucled-decensured-message-toggle',
+        DEBOUCLED_DECENSURED_TOPIC_TOGGLE: '#deboucled-decensured-topic-toggle',
+        DEBOUCLED_DECENSURED_MESSAGE_FAKE_TEXTAREA: '#deboucled-decensured-message-fake-textarea',
+        DEBOUCLED_DECENSURED_TOPIC_FAKE_TEXTAREA: '#deboucled-decensured-topic-fake-textarea',
+        DEBOUCLED_DECENSURED_MESSAGE_FAKE_CONTAINER: '#deboucled-decensured-message-fake-container',
+        DEBOUCLED_DECENSURED_TOPIC_FAKE_CONTAINER: '#deboucled-decensured-topic-fake-container',
+        DEBOUCLED_DECENSURED_MESSAGE_FAKE_LABEL: '#deboucled-decensured-message-fake-label',
+        DEBOUCLED_DECENSURED_TOPIC_FAKE_LABEL: '#deboucled-decensured-topic-fake-label',
+        // === DYNAMIC ELEMENTS ===
+        DEBOUCLED_DECENSURED_NOTIFICATION: '.deboucled-decensured-notification',
+        DEBOUCLED_DECENSURED_BADGE: '.deboucled-decensured-badge',
+        DEBOUCLED_DECENSURED_INDICATOR: '.deboucled-decensured-indicator',
+        DEBOUCLED_DECENSURED_CONTENT: '.deboucled-decensured-content',
+        DEBOUCLED_HEADER_DECENSURED: '#deboucled-header-decensured',
+        DEBOUCLED_USERS_COUNTER: '#deboucled-users-counter'
     }
 };
 
@@ -130,6 +201,7 @@ function cleanupTimers() {
         clearInterval(window.deboucledCardTimer);
         window.deboucledCardTimer = null;
     }
+    cleanupTopicDecensuredState();
 }
 
 function handleApiError(error, context, showNotification = false) {
@@ -145,7 +217,7 @@ function handleApiError(error, context, showNotification = false) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// Helpers intégrés
+// Helpers
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function getMessageId(messageElement) {
@@ -207,6 +279,7 @@ function getRandomPlatitudeMessage() {
 function addAlertbox(type, message, duration = DECENSURED_CONFIG.NOTIFICATION_DURATION) {
     const notification = document.createElement('div');
     notification.className = `deboucled-decensured-notification deboucled-notification-${type}`;
+    notification.id = `deboucled-notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     const icon = DECENSURED_CONFIG.NOTIFICATION_ICONS[type] || DECENSURED_CONFIG.NOTIFICATION_ICONS['info'];
 
@@ -216,7 +289,7 @@ function addAlertbox(type, message, duration = DECENSURED_CONFIG.NOTIFICATION_DU
         <button class="deboucled-decensured-notification-close" onclick="this.parentNode.remove()">×</button>
     `;
 
-    const existingNotifications = document.querySelectorAll('.deboucled-decensured-notification');
+    const existingNotifications = document.querySelectorAll(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_NOTIFICATION);
     if (existingNotifications.length > 0) {
         const topOffset = 20 + (existingNotifications.length * 80);
         notification.style.top = `${topOffset}px`;
@@ -255,7 +328,7 @@ async function fetchDecensuredApi(endpoint, options = {}) {
             }
             return data;
         } else {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 GM.xmlHttpRequest({
                     method: method,
                     url: endpoint,
@@ -269,7 +342,7 @@ async function fetchDecensuredApi(endpoint, options = {}) {
                         if (response.status >= 200 && response.status < 300) {
                             try {
                                 resolve(JSON.parse(response.responseText));
-                            } catch (e) {
+                            } catch {
                                 resolve({ success: true });
                             }
                         } else {
@@ -281,7 +354,7 @@ async function fetchDecensuredApi(endpoint, options = {}) {
                         console.error('fetchDecensuredApi erreur réseau :', response);
                         resolve(null);
                     },
-                    ontimeout: (response) => {
+                    ontimeout: () => {
                         console.warn('fetchDecensuredApi timeout :', endpoint);
                         resolve(null);
                     }
@@ -312,27 +385,21 @@ function cleanTopicUrl(url) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// Chiffrement/Déchiffrement moderne (utilise l'API au lieu de l'ancien btoa/atob)
+// Traitement du contenu des messages
 ///////////////////////////////////////////////////////////////////////////////////////
 
-async function encryptContent(message, fakeMessage = '') {
+async function processContent(message, fakeMessage = '') {
     try {
-        const encrypted = btoa(unescape(encodeURIComponent(message)));
-        return {
-            encrypted: encrypted,
-            fake: fakeMessage || getRandomPlatitudeMessage()
-        };
-    } catch (error) {
-        logDecensuredError(error, 'encryptMessage');
-        return null;
-    }
-}
+        const finalFake = fakeMessage || getRandomPlatitudeMessage();
 
-function decryptContent(encryptedContent) {
-    try {
-        return decodeURIComponent(escape(atob(encryptedContent)));
+        const result = {
+            real: message,
+            fake: finalFake
+        };
+
+        return result;
     } catch (error) {
-        logDecensuredError(error, 'decryptContent');
+        logDecensuredError(error, 'processContent');
         return null;
     }
 }
@@ -359,13 +426,13 @@ function formatInlineCode(text) {
 }
 
 function formatBoldText(text) {
-    text = text.replace(/\*\*([^\*\n]+)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
     text = text.replace(/__([^_\n]+)__/g, '<strong>$1</strong>');
     return text;
 }
 
 function formatItalicText(text) {
-    text = text.replace(/\B\*([^\*\n]+)\*\B/g, '<em>$1</em>');
+    text = text.replace(/\B\*([^*\n]+)\*\B/g, '<em>$1</em>');
     text = text.replace(/\b_([^_\n]+)_\b/g, '<em>$1</em>');
     return text;
 }
@@ -378,11 +445,9 @@ function formatImages(text) {
     return text.replace(/https:\/\/(?:www\.noelshack\.com\/(\d+)-(\d+)-(\d+)-(.+)|image\.noelshack\.com\/fichiers\/(\d+)\/(\d+)\/(\d+)\/(.+))\.(png|jpg|jpeg|gif|webp)/gi, (match, y1, w1, d1, name1, y2, w2, d2, name2, ext) => {
         let imageUrl, miniUrl;
         if (y1) {
-            // Format www.noelshack.com
             imageUrl = `https://image.noelshack.com/fichiers/${y1}/${w1}/${d1}/${name1}.${ext}`;
             miniUrl = `https://image.noelshack.com/minis/${y1}/${w1}/${d1}/${name1}.${ext}`;
         } else {
-            // Format image.noelshack.com
             imageUrl = match;
             miniUrl = match.replace('/fichiers/', '/minis/');
         }
@@ -393,17 +458,14 @@ function formatImages(text) {
 
 function formatLinks(text) {
     return text.replace(/(https?:\/\/[^\s<>"']+)/g, (url, match, offset) => {
-        // Vérifier si cette URL est déjà dans une balise HTML
         const beforeUrl = text.substring(Math.max(0, offset - 50), offset);
         const afterUrl = text.substring(offset + url.length, Math.min(text.length, offset + url.length + 50));
 
-        // Si l'URL est déjà dans href="" ou src="", on ne la modifie pas
         if (beforeUrl.includes('href="') || beforeUrl.includes('src="') ||
             afterUrl.startsWith('"') || beforeUrl.endsWith('="')) {
             return url;
         }
 
-        // Ne pas traiter les URLs NoelShack qui sont déjà converties en images
         if (url.includes('image.noelshack.com')) {
             return url;
         }
@@ -583,7 +645,7 @@ async function pingDecensuredApi() {
 // Gestion des messages
 ///////////////////////////////////////////////////////////////////////////////////////
 
-async function createDecensuredMessage(messageId, username, messageUrl, encryptedContent, realContent, topicId, topicUrl, topicTitle) {
+async function createDecensuredMessage(messageId, username, messageUrl, fakeContent, realContent, topicId, topicUrl, topicTitle) {
     try {
         const currentUserId = userId || '0';
 
@@ -594,7 +656,7 @@ async function createDecensuredMessage(messageId, username, messageUrl, encrypte
             messageid: messageId,
             username: username,
             messageurl: messageUrl,
-            encryptedcontent: encryptedContent,
+            fakecontent: fakeContent,
             realcontent: realContent,
             topicid: topicId,
             topicurl: cleanedTopicUrl,
@@ -608,8 +670,8 @@ async function createDecensuredMessage(messageId, username, messageUrl, encrypte
             }
         }
 
-        if (parseInt(topicId) < 70000000) {
-            console.error(`TopicId trop petit: ${topicId} < 70000000`);
+        if (!isValidTopicId(topicId)) {
+            console.error(`TopicId invalide: ${topicId} < ${DECENSURED_CONFIG.TOPICS.MIN_VALID_TOPIC_ID}`);
         }
 
         const response = await fetchDecensuredApi(apiDecensuredCreateMessageUrl, {
@@ -638,12 +700,93 @@ async function getDecensuredMessages(topicId) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
+// Gestion des topics
+///////////////////////////////////////////////////////////////////////////////////////
+
+async function createDecensuredTopic(topicData) {
+    try {
+        const username = getUserPseudo() || 'Unknown';
+
+        const topicApiData = {
+            topicid: topicData.topic_id,
+            topicname: topicData.title,
+            topicurl: topicData.jvc_topic_url,
+            topicauthor: username,
+            creationdate: new Date().toISOString()
+        };
+
+        for (const [key, value] of Object.entries(topicApiData)) {
+            if (!value || !value.toString().length) {
+                console.warn(`⚠️ Champ manquant ou vide pour topic: ${key} = ${value}`);
+            }
+        }
+
+        const topicResponse = await fetchDecensuredApi(apiDecensuredCreateTopicUrl, {
+            method: 'POST',
+            body: JSON.stringify(topicApiData)
+        });
+
+        const success = topicResponse !== null;
+
+        return success;
+    } catch (error) {
+        console.error('💥 Erreur dans createDecensuredTopic:', error);
+        logDecensuredError(error, 'createDecensuredTopic');
+        return false;
+    }
+}
+
+async function createDecensuredTopicMessage(topicId, messageId, topicUrl, topicTitle, fakeContent, realContent) {
+    try {
+        const username = getUserPseudo() || 'Unknown';
+
+        const messageApiData = {
+            userid: userId || '0',
+            messageid: messageId,
+            username: username,
+            messageurl: topicUrl + '#message' + messageId,
+            fakecontent: fakeContent,
+            realcontent: realContent,
+            topicid: topicId,
+            topicurl: topicUrl,
+            topictitle: topicTitle,
+            creationdate: new Date().toISOString()
+        };
+
+
+        for (const [key, value] of Object.entries(messageApiData)) {
+            if (!value || !value.toString().length) {
+                console.warn(`⚠️ Champ manquant ou vide pour message: ${key} = ${value}`);
+            }
+        }
+
+
+        const messageResponse = await fetchDecensuredApi(apiDecensuredCreateMessageUrl, {
+            method: 'POST',
+            body: JSON.stringify(messageApiData)
+        });
+
+
+
+        const success = messageResponse !== null;
+
+
+        return success;
+    } catch (error) {
+        console.error('💥 Erreur dans createDecensuredTopicMessage:', error);
+        logDecensuredError(error, 'createDecensuredTopicMessage');
+        return false;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
 // Interface utilisateur
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function buildDecensuredBadge() {
     const badge = document.createElement('span');
     badge.className = 'deboucled-decensured-badge deboucled-decensured-premium-logo';
+    badge.id = `deboucled-badge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     badge.setAttribute('deboucled-data-tooltip', `Membre d'élite Décensured`);
     return badge;
 }
@@ -661,46 +804,17 @@ function buildDecensuredInputUI() {
     } else if (traditionalTextarea) {
         container = traditionalTextarea.parentElement;
     } else {
-        setTimeout(buildDecensuredInputUI, 1000);
+        setTimeout(() => {
+            buildDecensuredInputUI();
+            buildDecensuredTopicInputUI();
+            setTimeout(highlightDecensuredTopics, DECENSURED_CONFIG.TOPICS.HIGHLIGHT_DELAY);
+        }, DECENSURED_CONFIG.INIT_DELAY);
         return;
     }
 
-    if (!container || container.querySelector('.deboucled-decensured-input')) return;
+    if (!container || document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_MESSAGE_CONTAINER)) return;
 
-    const decensuredContainer = document.createElement('div');
-    decensuredContainer.className = 'deboucled-decensured-input';
-
-    const toggleButton = document.createElement('button');
-    toggleButton.type = 'button';
-    toggleButton.id = 'decensured-toggle';
-    toggleButton.className = 'deboucled-decensured-toggle btn btn-primary';
-    toggleButton.innerHTML = '🔒 Message masqué';
-    toggleButton.title = 'Activer le mode message masqué';
-
-    const fakeMessageContainer = document.createElement('div');
-    fakeMessageContainer.className = 'deboucled-decensured-fake-message-container';
-
-    const fakeMessageLabel = document.createElement('label');
-    fakeMessageLabel.textContent = 'Message visible par tous (optionnel) :';
-    fakeMessageLabel.className = 'form-label deboucled-decensured-fake-message-label';
-
-    const fakeMessageInput = document.createElement('textarea');
-    fakeMessageInput.id = 'decensured-fake-message';
-    fakeMessageInput.className = 'form-control deboucled-decensured-fake-message-input';
-    fakeMessageInput.placeholder = 'Ce message sera affiché pour ceux qui n\'ont pas Déboucled. Si aucun message n\'est fourni, un message aléatoire sera généré.';
-    fakeMessageInput.rows = 3;
-
-    fakeMessageInput.addEventListener('input', () => {
-        if (fakeMessageInput.classList.contains('auto-generated')) {
-            fakeMessageInput.classList.remove('auto-generated');
-        }
-    });
-
-    fakeMessageContainer.appendChild(fakeMessageLabel);
-    fakeMessageContainer.appendChild(fakeMessageInput);
-
-    decensuredContainer.appendChild(toggleButton);
-    decensuredContainer.appendChild(fakeMessageContainer);
+    const decensuredContainer = createDecensuredContainer('message');
 
     if (modernEditor) {
         modernEditor.parentElement.insertBefore(decensuredContainer, modernEditor);
@@ -708,20 +822,9 @@ function buildDecensuredInputUI() {
         traditionalTextarea.parentElement.insertBefore(decensuredContainer, traditionalTextarea);
     }
 
-    let decensuredMode = false;
-
-    toggleButton.addEventListener('click', () => {
-        decensuredMode = !decensuredMode;
-        toggleButton.checked = decensuredMode;
-
-        if (decensuredMode) {
-            toggleButton.innerHTML = '🔓 Message normal';
-            toggleButton.className = 'deboucled-decensured-toggle btn btn-secondary';
-            toggleButton.title = 'Désactiver le mode message masqué';
-            fakeMessageContainer.classList.add('deboucled-decensured-visible');
-
+    setupToggleHandlers(decensuredContainer, 'message', (isActive) => {
+        if (isActive) {
             replacePostButtonWithDecensured();
-
             const textarea = getMessageTextarea();
             if (textarea) {
                 textarea.classList.add('deboucled-decensured-textarea-active');
@@ -730,13 +833,7 @@ function buildDecensuredInputUI() {
                 }
             }
         } else {
-            toggleButton.innerHTML = '🔒 Message masqué';
-            toggleButton.className = 'deboucled-decensured-toggle btn btn-primary';
-            toggleButton.title = 'Activer le mode message masqué';
-            fakeMessageContainer.classList.remove('deboucled-decensured-visible');
-
             restoreOriginalPostButton();
-
             const textarea = getMessageTextarea();
             if (textarea) {
                 textarea.classList.remove('deboucled-decensured-textarea-active');
@@ -746,6 +843,780 @@ function buildDecensuredInputUI() {
             }
         }
     });
+
+    setTimeout(() => setupTabOrder(), 100);
+}
+
+let tabOrderSetupInProgress = false;
+
+function setupTabOrder() {
+    if (tabOrderSetupInProgress) return;
+    tabOrderSetupInProgress = true;
+
+    const currentPage = getCurrentPageType(window.location.pathname);
+
+    try {
+        if (currentPage === 'topicmessages') {
+            setupMessageFormTabOrder(document);
+        } else if (currentPage === 'topiclist') {
+            const topicForm = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_FORM);
+            if (topicForm) {
+                setupTopicFormTabOrder(topicForm);
+            }
+        }
+    } finally {
+        tabOrderSetupInProgress = false;
+    }
+}
+
+function setupMessageFormTabOrder(context) {
+    // Ordre logique : Toggle Décensured → Fake Message → Textarea principal → Bouton Post
+    // Utiliser des tabindex élevés (100+) pour éviter les conflits avec JVC
+    let tabIndex = 100;
+
+    const currentPage = getCurrentPageType(window.location.pathname);
+    if (currentPage !== 'topicmessages') return;
+
+    // 1. Toggle button Décensured
+    const toggleButton = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_MESSAGE_TOGGLE);
+    if (toggleButton) {
+        toggleButton.tabIndex = tabIndex++;
+    }
+
+    // 2. Fake message textarea (si visible)
+    const fakeTextarea = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_MESSAGE_FAKE_TEXTAREA);
+    if (fakeTextarea) {
+        fakeTextarea.tabIndex = tabIndex++;
+    }
+
+    // 3. Textarea principal du message
+    const mainTextarea = findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA, context);
+    if (mainTextarea) {
+        mainTextarea.tabIndex = tabIndex++;
+    }
+
+    // 4. Bouton de post (original ou Décensured)
+    const postButton = findElement(DECENSURED_CONFIG.SELECTORS.POST_BUTTON, context);
+    if (postButton && postButton.style.display !== 'none') {
+        postButton.tabIndex = tabIndex++;
+    }
+
+    // Bouton Décensured s'il existe
+    const decensuredPostButton = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_MESSAGE_POST_BUTTON);
+    if (decensuredPostButton) {
+        decensuredPostButton.tabIndex = tabIndex++;
+    }
+}
+
+function setupTopicFormTabOrder(form) {
+    // Ordre logique : Titre → Toggle Décensured → Fake Message → Textarea → Bouton Post
+    // Utiliser des tabindex élevés (200+) pour éviter les conflits avec JVC
+    let tabIndex = 200;
+
+    const currentPage = getCurrentPageType(window.location.pathname);
+    if (currentPage !== 'topiclist') return;
+
+    // 1. Input du titre du topic
+    const titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT, form);
+    if (titleInput) {
+        titleInput.tabIndex = tabIndex++;
+    }
+
+    // 2. Toggle button Décensured
+    const toggleButton = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_TOGGLE);
+    if (toggleButton) {
+        toggleButton.tabIndex = tabIndex++;
+    }
+
+    // 3. Fake message textarea (si visible)
+    const fakeTextarea = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_FAKE_TEXTAREA);
+    if (fakeTextarea) {
+        fakeTextarea.tabIndex = tabIndex++;
+    }
+
+    // 4. Textarea principal du message
+    const mainTextarea = findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA, form);
+    if (mainTextarea) {
+        mainTextarea.tabIndex = tabIndex++;
+    }
+
+    // 5. Bouton de post (original ou Décensured)
+    const postButton = findElement(DECENSURED_CONFIG.SELECTORS.POST_BUTTON, form);
+    if (postButton && postButton.style.display !== 'none') {
+        postButton.tabIndex = tabIndex++;
+    }
+
+    // Bouton Décensured s'il existe
+    const decensuredPostButton = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_POST_BUTTON);
+    if (decensuredPostButton) {
+        decensuredPostButton.tabIndex = tabIndex++;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Utilitaires pour l'interface Décensured
+///////////////////////////////////////////////////////////////////////////////////////
+
+function createDecensuredContainer(type = 'message') {
+    const container = document.createElement('div');
+    container.className = 'deboucled-decensured-input';
+    container.id = `deboucled-decensured-${type}-container`;
+
+    const toggleButton = document.createElement('button');
+    toggleButton.type = 'button';
+    toggleButton.id = `deboucled-decensured-${type}-toggle`;
+    toggleButton.className = 'deboucled-decensured-toggle btn btn-primary';
+    toggleButton.innerHTML = `🔒 ${type === 'topic' ? 'Topic' : 'Message'} masqué`;
+    toggleButton.title = `Activer le mode ${type} masqué`;
+
+    const fakeContainer = document.createElement('div');
+    fakeContainer.className = 'deboucled-decensured-fake-message-container';
+    fakeContainer.id = `deboucled-decensured-${type}-fake-container`;
+
+    const label = document.createElement('label');
+    label.textContent = 'Message visible par tous (optionnel) :';
+    label.className = 'form-label deboucled-decensured-fake-message-label';
+    label.id = `deboucled-decensured-${type}-fake-label`;
+
+    const input = document.createElement('textarea');
+    input.id = `deboucled-decensured-${type}-fake-textarea`;
+    input.className = 'form-control deboucled-decensured-fake-message-input';
+    input.placeholder = 'Ce message sera affiché pour ceux qui n\'ont pas Déboucled. Si aucun message n\'est fourni, un message aléatoire sera généré.';
+    input.rows = 3;
+
+    if (type === 'message') {
+        input.addEventListener('input', () => {
+            if (input.classList.contains('auto-generated')) {
+                input.classList.remove('auto-generated');
+                input.style.fontStyle = 'normal';
+            }
+        });
+    }
+
+    fakeContainer.appendChild(label);
+    fakeContainer.appendChild(input);
+    container.appendChild(toggleButton);
+    container.appendChild(fakeContainer);
+
+    return container;
+}
+
+function setupToggleHandlers(container, type, onToggle) {
+    const toggleButton = document.getElementById(`deboucled-decensured-${type}-toggle`);
+    const fakeContainer = document.getElementById(`deboucled-decensured-${type}-fake-container`);
+
+    let isActive = false;
+
+    toggleButton.addEventListener('click', () => {
+        isActive = !isActive;
+        toggleButton.checked = isActive;
+
+        if (isActive) {
+            toggleButton.innerHTML = '🔓 Mode normal';
+            toggleButton.title = `Désactiver le mode ${type} masqué`;
+
+            fakeContainer.classList.remove('deboucled-decensured-hiding');
+            fakeContainer.classList.add('deboucled-decensured-visible');
+        } else {
+            toggleButton.innerHTML = `🔒 ${type === 'topic' ? 'Topic' : 'Message'} masqué`;
+            toggleButton.title = `Activer le mode ${type} masqué`;
+
+            if (fakeContainer.classList.contains('deboucled-decensured-visible')) {
+                fakeContainer.classList.remove('deboucled-decensured-visible');
+                fakeContainer.classList.add('deboucled-decensured-hiding');
+
+                setTimeout(() => {
+                    if (!isActive) {
+                        fakeContainer.classList.remove('deboucled-decensured-hiding');
+                    }
+                }, 200);
+            }
+        }
+
+        if (onToggle) onToggle(isActive);
+
+        setTimeout(() => setupTabOrder(), 50);
+    });
+
+    return { toggleButton, fakeContainer, isActive: () => isActive };
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+// GESTION DES TOPICS
+///////////////////////////////////////////////////////////////////////////////////////
+
+const topicDecensuredState = {
+    isObservingForm: false,
+    currentObserver: null,
+    formElements: null,
+    toggleHandlers: null
+};
+
+function isTopicsDecensuredEnabled() {
+    return store.get(storage_optionEnableDecensuredTopics, storage_optionEnableDecensuredTopics_default);
+}
+
+function extractTopicIdFromUrl(pathname) {
+    const match = pathname.match(/\/forums\/\d+-\d+-(\d+)-/);
+    return match ? parseInt(match[1]) : null;
+}
+
+function isValidTopicId(topicId) {
+    return topicId && parseInt(topicId) >= DECENSURED_CONFIG.TOPICS.MIN_VALID_TOPIC_ID;
+}
+
+function cleanupTopicDecensuredState() {
+    if (topicDecensuredState.currentObserver) {
+        topicDecensuredState.currentObserver.disconnect();
+        topicDecensuredState.currentObserver = null;
+    }
+    Object.assign(topicDecensuredState, {
+        isObservingForm: false,
+        formElements: null,
+        toggleHandlers: null
+    });
+}
+
+function getTopicFormElements() {
+    if (topicDecensuredState.formElements) {
+        const isValid = topicDecensuredState.formElements.titleInput &&
+            document.contains(topicDecensuredState.formElements.titleInput);
+        if (isValid) return topicDecensuredState.formElements;
+    }
+
+    const elements = {
+        titleInput: findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT),
+        messageTextarea: findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA),
+        fakeMessageInput: document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_FAKE_TEXTAREA),
+        form: findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_FORM)
+    };
+
+    if (elements.titleInput && elements.messageTextarea && elements.form) {
+        topicDecensuredState.formElements = elements;
+    }
+
+    return elements;
+}
+
+function buildDecensuredTopicInputUI() {
+    if (!isTopicsDecensuredEnabled()) return;
+
+    const currentPage = getCurrentPageType(window.location.pathname);
+
+    if (currentPage === 'topicmessages') {
+        const pendingTopicJson = store.get(storage_pendingDecensuredTopic, storage_pendingDecensuredTopic_default);
+        if (!pendingTopicJson) {
+            setTimeout(verifyCurrentTopicDecensured, DECENSURED_CONFIG.TOPICS.CHECK_DELAY);
+        }
+        return;
+    }
+
+    if (currentPage !== 'topiclist') return;
+
+    const elements = getTopicFormElements();
+
+    if (!elements.form || !elements.titleInput || !elements.messageTextarea) {
+        setupTopicFormObserver();
+        return;
+    }
+
+    injectDecensuredTopicUI(elements);
+}
+
+function setupTopicFormObserver() {
+    if (topicDecensuredState.isObservingForm) return;
+
+    const blocFormulaire = document.querySelector('#bloc-formulaire-forum');
+    if (!blocFormulaire) return;
+
+    topicDecensuredState.isObservingForm = true;
+
+    const checkAndInject = () => {
+        const elements = getTopicFormElements();
+        if (elements.form && elements.titleInput && elements.messageTextarea) {
+            if (!document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_CONTAINER)) {
+                injectDecensuredTopicUI(elements);
+            }
+            cleanupTopicDecensuredState();
+            return true;
+        }
+        return false;
+    };
+
+    if (checkAndInject()) return;
+
+    const observer = new MutationObserver(() => {
+        checkAndInject();
+    });
+
+    topicDecensuredState.currentObserver = observer;
+    observer.observe(blocFormulaire, { childList: true, subtree: true });
+
+    setTimeout(checkAndInject, DECENSURED_CONFIG.TOPICS.FORM_OBSERVER_TIMEOUT);
+}
+
+function injectDecensuredTopicUI(elements) {
+    const { messageTextarea } = elements;
+
+    if (document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_CONTAINER)) return;
+
+    const container = createDecensuredContainer('topic');
+    messageTextarea.parentElement.insertBefore(container, messageTextarea);
+
+    topicDecensuredState.toggleHandlers = setupToggleHandlers(container, 'topic', (isActive) => {
+        if (isActive) {
+            replaceTopicPostButtonWithDecensured();
+        } else {
+            restoreOriginalTopicPostButton();
+        }
+    });
+
+    setTimeout(() => setupTabOrder(), 100);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+// GESTION DES BOUTONS DE CRÉATION DE TOPICS DÉCENSURED
+///////////////////////////////////////////////////////////////////////////////////////
+
+let isProcessingTopicCreation = false;
+
+function replaceTopicPostButtonWithDecensured() {
+    const postButton = findElement(DECENSURED_CONFIG.SELECTORS.POST_BUTTON);
+    if (!postButton) return;
+
+    if (postButton.hasAttribute('data-decensured-topic-original')) return;
+
+    postButton.style.display = 'none';
+    postButton.setAttribute('data-decensured-topic-original', 'true');
+
+    const decensuredButton = document.createElement('button');
+    decensuredButton.id = 'deboucled-decensured-topic-post-button';
+    decensuredButton.className = postButton.className;
+    decensuredButton.innerHTML = '🔒 Publier le topic masqué';
+    decensuredButton.title = 'Publier le topic avec chiffrement Déboucled';
+    decensuredButton.type = 'button';
+
+    postButton.parentElement.insertBefore(decensuredButton, postButton);
+
+    decensuredButton.addEventListener('click', async (event) => {
+        if (isProcessingTopicCreation) {
+            return false;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        try {
+            isProcessingTopicCreation = true;
+            await handleTopicDecensuredCreationFlow();
+        } catch (error) {
+            console.error('❌ Erreur lors de la création du topic Décensured:', error);
+            addAlertbox('danger', 'Erreur lors de la création du topic masqué: ' + error.message);
+        } finally {
+            setTimeout(() => {
+                isProcessingTopicCreation = false;
+            }, 500);
+        }
+
+        return false;
+    });
+
+    setTimeout(() => setupTabOrder(), 50);
+}
+
+async function handleTopicDecensuredCreationFlow() {
+    try {
+        await handleDecensuredTopicCreation();
+
+        setTimeout(() => {
+            triggerNativeTopicCreation();
+        }, 100);
+    } catch (error) {
+        console.error('❌ Erreur dans handleTopicDecensuredCreationFlow:', error);
+        throw error;
+    }
+}
+
+function triggerNativeTopicCreation() {
+    const originalPostButton = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_ORIGINAL_TOPIC_POST_BUTTON);
+    if (originalPostButton) {
+        originalPostButton.style.visibility = 'hidden';
+        originalPostButton.style.display = '';
+        originalPostButton.click();
+        setTimeout(() => {
+            originalPostButton.style.display = 'none';
+            originalPostButton.style.visibility = '';
+        }, 50);
+    }
+}
+
+function restoreOriginalTopicPostButton() {
+    const postButton = findElement(DECENSURED_CONFIG.SELECTORS.POST_BUTTON);
+    if (!postButton || !postButton.hasAttribute('data-decensured-topic-original')) return;
+
+    postButton.style.display = '';
+
+    const decensuredButton = document.getElementById('deboucled-decensured-topic-post-button');
+    if (decensuredButton) {
+        decensuredButton.remove();
+    }
+
+    postButton.removeAttribute('data-decensured-topic-original');
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+// CRÉATION DE TOPICS
+///////////////////////////////////////////////////////////////////////////////////////
+
+async function handleDecensuredTopicCreation() {
+    const elements = getTopicFormElements();
+    if (!elements.titleInput || !elements.messageTextarea) {
+        throw new Error('Impossible de trouver les éléments du formulaire');
+    }
+
+    const fakeMessageInput = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_FAKE_TEXTAREA);
+
+    const initialTopicTitle = elements.titleInput.value.trim();
+    const initialRealMessage = elements.messageTextarea.value.trim();
+    const initialFakeMessage = fakeMessageInput ? fakeMessageInput.value.trim() : '';
+
+    if (!initialTopicTitle || !initialRealMessage) {
+        throw new Error('Le titre et le message sont obligatoires');
+    }
+
+    const finalFakeMessage = initialFakeMessage.length > 0 ? initialFakeMessage : getRandomPlatitudeMessage();
+
+    const processedContent = await processContent(initialRealMessage, finalFakeMessage);
+
+    const topicData = {
+        title: initialTopicTitle,
+        realMessage: initialRealMessage,
+        processedContent: processedContent,
+        timestamp: Date.now()
+    };
+
+    await store.set(storage_pendingDecensuredTopic, JSON.stringify(topicData));
+
+    setTextAreaValue(elements.messageTextarea, finalFakeMessage);
+
+    return { success: true, fakeMessage: finalFakeMessage };
+}
+
+async function processNewTopicCreation() {
+    const pendingTopicJson = await store.get(storage_pendingDecensuredTopic, storage_pendingDecensuredTopic_default);
+    if (!pendingTopicJson) return;
+
+    let pendingTopic;
+    try {
+        pendingTopic = JSON.parse(pendingTopicJson);
+    } catch (error) {
+        console.error('Erreur parsing pendingTopic:', error);
+        await store.delete(storage_pendingDecensuredTopic);
+        return;
+    }
+
+    const timeElapsed = Date.now() - pendingTopic.timestamp;
+    if (timeElapsed > 30000) {
+        await store.delete(storage_pendingDecensuredTopic);
+        return;
+    }
+
+    const topicId = extractTopicIdFromUrl(window.location.pathname);
+    const topicUrl = cleanTopicUrl(window.location.href);
+    const username = getUserPseudo();
+
+    if (!topicId || !username) return;
+
+    const messages = document.querySelectorAll('.conteneur-messages-pagi > div.bloc-message-forum');
+    if (messages.length !== 1) return;
+
+    const firstMessage = messages[0];
+    const authorElement = firstMessage.querySelector('.text-user, .bloc-pseudo-msg');
+    const authorName = authorElement ? authorElement.textContent.trim() : '';
+
+    if (authorName !== username) return;
+
+    const success = await createTopicAndMessage(topicId, topicUrl, pendingTopic, firstMessage);
+
+    if (success) {
+        addAlertbox('success', 'Topic Décensured créé avec succès !');
+
+        const decensuredMsg = {
+            message_real_content: pendingTopic.realMessage
+        };
+        await applyDecensuredFormattingToNewTopic(firstMessage, decensuredMsg);
+        highlightCurrentTopicAsDecensured();
+    } else {
+        addAlertbox('warning', 'Topic créé sur JVC mais échec de l\'enregistrement Décensured');
+    }
+
+    await store.delete(storage_pendingDecensuredTopic);
+}
+
+async function createTopicAndMessage(topicId, topicUrl, pendingTopic, messageElement) {
+    const topicApiResult = await createDecensuredTopic({
+        topic_id: topicId,
+        title: pendingTopic.title,
+        jvc_topic_url: topicUrl
+    });
+
+    if (!topicApiResult) return false;
+
+    const messageId = getMessageId(messageElement);
+
+    if (messageId) {
+        const messageApiResult = await createDecensuredTopicMessage(
+            topicId, messageId, topicUrl, pendingTopic.title,
+            pendingTopic.processedContent.fake, pendingTopic.realMessage
+        );
+
+        if (messageApiResult) {
+            await applyDecensuredFormattingToNewTopic(messageElement, {
+                message_real_content: pendingTopic.realMessage
+            });
+        }
+
+        return messageApiResult;
+    }
+
+    return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+// DÉTECTION ET TRAITEMENT DES NOUVEAUX TOPICS CRÉÉS
+///////////////////////////////////////////////////////////////////////////////////////
+
+async function checkAndProcessNewTopic() {
+    const currentPage = getCurrentPageType(window.location.pathname);
+    if (currentPage !== 'topicmessages') return;
+
+    await processNewTopicCreation();
+}
+
+async function applyDecensuredFormattingToNewTopic(messageElement, decensuredMsg) {
+    processDecensuredMessage(messageElement, decensuredMsg);
+
+    const topicTitleElement = document.querySelector('.topic-title, h1, #bloc-title-forum');
+    if (topicTitleElement && !topicTitleElement.querySelector('.deboucled-decensured-topic-indicator')) {
+        const indicator = document.createElement('span');
+        indicator.className = 'deboucled-decensured-topic-indicator';
+        indicator.innerHTML = ' 🔒';
+        indicator.title = 'Topic Décensured';
+        topicTitleElement.appendChild(indicator);
+    }
+}
+
+function highlightCurrentTopicAsDecensured() {
+    const mainContent = document.querySelector('.main-content, .topic-content, body');
+    if (mainContent) {
+        mainContent.classList.add('deboucled-current-topic-decensured');
+
+    }
+
+    const topicTitleElement = document.querySelector('#bloc-title-forum');
+    if (topicTitleElement && !topicTitleElement.querySelector('.deboucled-decensured-topic-indicator')) {
+        const indicator = document.createElement('span');
+        indicator.className = 'deboucled-decensured-topic-indicator';
+        indicator.textContent = 'DÉCENSURED';
+        indicator.title = 'Ce topic contient des messages Décensured';
+        topicTitleElement.appendChild(indicator);
+    }
+}
+
+async function verifyCurrentTopicDecensured() {
+    const currentPage = getCurrentPageType(window.location.pathname);
+    if (currentPage !== 'topicmessages') {
+        return;
+    }
+
+    const topicId = extractTopicIdFromUrl(window.location.pathname);
+    if (!topicId) {
+        return;
+    }
+
+    try {
+        const topicData = await getDecensuredTopic(topicId);
+        if (topicData) {
+            highlightCurrentTopicAsDecensured();
+            await decryptMessages();
+        }
+    } catch (error) {
+        console.error('❌ Erreur lors de la vérification du topic:', error);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+// GESTION DE LA VÉRIFICATION BATCH DES TOPICS DÉCENSURED
+///////////////////////////////////////////////////////////////////////////////////////
+
+async function getDecensuredTopic(topicId) {
+    try {
+        if (!topicId) {
+            return null;
+        }
+
+        const response = await fetchDecensuredApi(`${apiDecensuredTopicByIdUrl}/${topicId}`, {
+            method: 'GET'
+        });
+
+        return response;
+    } catch (error) {
+        console.error('Erreur lors de la récupération du topic:', error);
+        return null;
+    }
+}
+
+async function getDecensuredTopicsBatch(topicIds) {
+    try {
+        if (!topicIds || topicIds.length === 0) {
+            return [];
+        }
+
+        const response = await fetchDecensuredApi(apiDecensuredTopicsByIdsUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ topicIds })
+        });
+
+        if (Array.isArray(response)) {
+
+            return response;
+        }
+
+        return [];
+    } catch (error) {
+        console.error('Erreur lors de la récupération batch des topics:', error);
+        return [];
+    }
+}
+
+function highlightDecensuredTopics() {
+    if (!store.get(storage_optionEnableDecensuredTopics, storage_optionEnableDecensuredTopics_default)) {
+        return;
+    }
+
+    const currentPage = getCurrentPageType(window.location.pathname);
+    if (currentPage !== 'topiclist') {
+        return;
+    }
+
+    const allTopics = document.querySelectorAll('.topic-list > li:not(.dfp__atf):not(.message)');
+
+    if (allTopics.length === 0) {
+        return;
+    }
+
+    const topicsToCheck = Array.from(allTopics).filter(topic => {
+        const hasBeenChecked = topic.classList.contains('deboucled-decensured-checked');
+        const titleLink = topic.querySelector('.topic-title, .lien-jv.topic-title');
+        const hasValidLink = titleLink && titleLink.href;
+
+        return !hasBeenChecked && hasValidLink;
+    });
+
+    if (topicsToCheck.length === 0) {
+        return;
+    }
+
+    const topicIds = [];
+    const linksByTopicId = new Map();
+
+    topicsToCheck.forEach(topic => {
+        topic.classList.add('deboucled-decensured-checked');
+
+        const titleLink = topic.querySelector('.topic-title, .lien-jv.topic-title');
+        const topicUrl = titleLink.href;
+        const dataId = topic.getAttribute('data-id');
+
+        let topicId = dataId;
+
+        if (!topicId) {
+            const topicIdMatch = topicUrl.match(/\/forums\/\d+-\d+-(\d+)-/);
+            topicId = topicIdMatch ? topicIdMatch[1] : null;
+        }
+
+        if (topicId) {
+            topicIds.push(topicId);
+            linksByTopicId.set(topicId, titleLink);
+        }
+    });
+
+    if (topicIds.length === 0) {
+
+        return;
+    }
+
+    getDecensuredTopicsBatch(topicIds).then(topicsData => {
+        topicsData.forEach(topicData => {
+            const topicId = topicData.topic_id.toString();
+            const link = linksByTopicId.get(topicId);
+
+            if (link) {
+                const topicListItem = link.closest('li');
+                if (topicListItem) {
+                    topicListItem.classList.add('deboucled-topic-decensured');
+                }
+            }
+        });
+    });
+}
+
+function setupDynamicTopicHighlighting() {
+    let highlightTimer = null;
+
+    const observer = new MutationObserver((mutations) => {
+        let hasNewTopics = false;
+
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        const topicLinks = node.querySelectorAll ?
+                            node.querySelectorAll('a[href*="/topics/"]:not(.deboucled-decensured-checked)') : [];
+
+                        if (topicLinks.length > 0 ||
+                            (node.matches && node.matches('a[href*="/topics/"]:not(.deboucled-decensured-checked)'))) {
+                            hasNewTopics = true;
+                        }
+                    }
+                });
+            }
+        });
+
+        if (hasNewTopics) {
+            if (highlightTimer) {
+                clearTimeout(highlightTimer);
+            }
+
+            highlightTimer = setTimeout(() => {
+                highlightDecensuredTopics();
+            }, 500);
+        }
+    });
+
+    const targetNode = document.body || document.documentElement;
+    if (targetNode) {
+        observer.observe(targetNode, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    return observer;
+}
+
+function setupTopicRedirectionListener() {
+    window.addEventListener('pageshow', () => {
+        if (window.location.pathname.includes('/topics/') &&
+            document.referrer.includes('/forums/topic/add')) {
+            setTimeout(() => {
+                buildDecensuredInputUI();
+                buildDecensuredTopicInputUI();
+            }, 1000);
+        }
+    });
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -753,21 +1624,20 @@ function buildDecensuredInputUI() {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function getMessageElements() {
-    let messageElements = document.querySelectorAll(DECENSURED_CONFIG.SELECTORS.MESSAGE_ELEMENTS.slice(0, 2).join(', '));
+    let messageElements = document.querySelectorAll('.conteneur-messages-pagi > div.bloc-message-forum');
 
     if (messageElements.length === 0) {
-        messageElements = document.querySelectorAll(DECENSURED_CONFIG.SELECTORS.MESSAGE_ELEMENTS.slice(2).join(', '));
+
+        for (const selector of DECENSURED_CONFIG.SELECTORS.MESSAGE_ELEMENTS) {
+            messageElements = document.querySelectorAll(selector);
+
+            if (messageElements.length > 0) {
+                break;
+            }
+        }
     }
 
-    if (messageElements.length === 0) {
-        const allMsgs = document.querySelectorAll('.msg');
-        messageElements = Array.from(allMsgs).filter(el =>
-            !el.classList.contains('deboucled-quote-notif') &&
-            !el.closest('.headerAccount__dropdown')
-        );
-    }
-
-    return messageElements;
+    return Array.from(messageElements);
 }
 
 function createMessageIndex(decensuredMessages) {
@@ -804,6 +1674,7 @@ function createToggleButton(originalContent, realContentDiv) {
 
     const decensuredIndicator = document.createElement('button');
     decensuredIndicator.className = 'deboucled-decensured-indicator showing-fake';
+    decensuredIndicator.id = `deboucled-indicator-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     decensuredIndicator.innerHTML = SWITCH_TO_ORIGINAL_TITLE;
     decensuredIndicator.title = 'Cliquer pour basculer entre le message original et le message dissimulé';
     decensuredIndicator.style.cursor = 'pointer';
@@ -884,8 +1755,12 @@ function removeReportButton(msgElement) {
     }
 }
 
-function addDecensuredBadge(msgElement, decensuredMsg) {
-    if (msgElement.querySelector('.deboucled-decensured-badge')) {
+function addDecensuredBadge(msgElement) {
+    if (!store.get(storage_optionEnableDecensuredBadges, storage_optionEnableDecensuredBadges_default)) {
+        return;
+    }
+
+    if (msgElement.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_BADGE)) {
         return;
     }
 
@@ -907,6 +1782,10 @@ function processDecensuredMessage(msgElement, decensuredMsg) {
     const realContent = decensuredMsg.message_real_content;
     if (!realContent) return;
 
+    if (msgElement.classList.contains('deboucled-decensured-processed')) {
+        return;
+    }
+
     const contentElement = msgElement.querySelector('.message-content, .text-enrichi-forum');
     if (!contentElement) return;
 
@@ -914,6 +1793,7 @@ function processDecensuredMessage(msgElement, decensuredMsg) {
 
     const realContentDiv = document.createElement('div');
     realContentDiv.className = 'deboucled-decensured-content';
+    realContentDiv.id = `deboucled-content-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     realContentDiv.innerHTML = formatMessageContent(realContent);
 
     const decensuredIndicator = createToggleButton(originalContent, realContentDiv);
@@ -927,9 +1807,11 @@ function processDecensuredMessage(msgElement, decensuredMsg) {
 
     initializeSpoilerHandlers(realContentDiv);
 
-    addDecensuredBadge(msgElement, decensuredMsg);
+    addDecensuredBadge(msgElement);
 
     removeReportButton(msgElement);
+
+    msgElement.classList.add('deboucled-decensured-processed');
 
     const quoteButton = msgElement.querySelector('.picto-msg-quote');
     if (quoteButton) {
@@ -981,7 +1863,7 @@ async function decryptMessages() {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function createDecensuredUsersHeader() {
-    if (document.querySelector('#deboucled-header-decensured')) return;
+    if (document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_HEADER_DECENSURED)) return;
 
     const headerNotif = document.querySelector('.headerAccount--notif');
     if (!headerNotif) return;
@@ -994,11 +1876,13 @@ function createDecensuredUsersHeader() {
 
     const decensuredButton = document.createElement('span');
     decensuredButton.className = 'headerAccount__notif js-header-decensured';
+    decensuredButton.id = 'deboucled-users-counter';
     decensuredButton.setAttribute('data-val', '0');
     decensuredButton.title = 'Utilisateurs Décensured connectés';
 
     const icon = document.createElement('i');
     icon.className = 'icon-people';
+    icon.id = 'deboucled-users-counter-icon';
 
     decensuredButton.appendChild(icon);
     headerDecensured.appendChild(decensuredButton);
@@ -1006,8 +1890,26 @@ function createDecensuredUsersHeader() {
     return decensuredButton;
 }
 
+function toggleDecensuredUsersCountDisplay() {
+    const headerElement = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_HEADER_DECENSURED);
+    const isEnabled = store.get(storage_optionDisplayDecensuredUsersCount, storage_optionDisplayDecensuredUsersCount_default);
+
+    if (headerElement) {
+        headerElement.style.display = isEnabled ? '' : 'none';
+    }
+}
+
+function toggleDecensuredBadgesDisplay() {
+    const isEnabled = store.get(storage_optionEnableDecensuredBadges, storage_optionEnableDecensuredBadges_default);
+    const badges = document.querySelectorAll(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_BADGE);
+
+    badges.forEach(badge => {
+        badge.style.display = isEnabled ? '' : 'none';
+    });
+}
+
 function updateDecensuredUsersCount(count) {
-    const button = document.querySelector('.js-header-decensured');
+    const button = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_USERS_COUNTER);
     if (!button) return;
 
     button.setAttribute('data-val', count);
@@ -1031,6 +1933,10 @@ async function loadDecensuredUsersData() {
 }
 
 function startDecensuredUsersMonitoring() {
+    if (!store.get(storage_optionDisplayDecensuredUsersCount, storage_optionDisplayDecensuredUsersCount_default)) {
+        return;
+    }
+
     loadDecensuredUsersData();
 
     setInterval(loadDecensuredUsersData, DECENSURED_CONFIG.USERS_REFRESH_INTERVAL);
@@ -1071,11 +1977,18 @@ async function initDecensured() {
     }
 
     buildDecensuredInputUI();
+    buildDecensuredTopicInputUI();
 
     createDecensuredUsersHeader();
+    toggleDecensuredUsersCountDisplay();
     startDecensuredUsersMonitoring();
 
     await decryptMessages();
+    highlightDecensuredTopics();
+    setupTopicRedirectionListener();
+    setupDynamicTopicHighlighting();
+
+    await checkAndProcessNewTopic();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -1086,13 +1999,10 @@ async function handleDecensuredPost() {
     const textarea = getMessageTextarea();
     if (!textarea) return;
 
-    const decensuredToggle = document.querySelector('#decensured-toggle');
-    if (!decensuredToggle || !decensuredToggle.checked) return;
-
     const realMessage = textarea.value.trim();
     if (!realMessage) return;
 
-    const fakeMessageInput = document.querySelector('#decensured-fake-message');
+    const fakeMessageInput = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_MESSAGE_FAKE_TEXTAREA);
     let fakeMessage = fakeMessageInput ? fakeMessageInput.value.trim() : '';
 
     if (!fakeMessage) {
@@ -1104,17 +2014,17 @@ async function handleDecensuredPost() {
     }
 
     try {
-        const encrypted = await encryptContent(realMessage, fakeMessage);
-        if (!encrypted) {
-            handleApiError(new Error('Échec du chiffrement'), 'handleDecensuredPost', true);
+        const processedContent = await processContent(realMessage, fakeMessage);
+        if (!processedContent) {
+            handleApiError(new Error('Échec du traitement du contenu'), 'handleDecensuredPost', true);
             return;
         }
 
-        const jvcResponse = await postDecensuredMessageToJvc(encrypted.fake);
+        const jvcResponse = await postDecensuredMessageToJvc(processedContent.fake);
         const messageId = extractMessageId(jvcResponse);
 
         if (messageId && jvcResponse.redirectUrl) {
-            const success = await saveToDecensuredApi(messageId, realMessage, encrypted.fake);
+            const success = await saveToDecensuredApi(messageId, realMessage, processedContent.fake);
 
             const redirectUrl = jvcResponse.redirectUrl.startsWith('http')
                 ? jvcResponse.redirectUrl
@@ -1158,7 +2068,7 @@ function performRedirection(redirectUrl) {
     window.location.reload();
 }
 
-async function saveToDecensuredApi(messageId, realMessage, encryptedContent) {
+async function saveToDecensuredApi(messageId, realMessage, fakeContent) {
     const topicId = getCurrentTopicId();
     const username = getUserPseudo();
     const messageUrl = `${window.location.origin}/forums/message/${messageId}`;
@@ -1169,7 +2079,7 @@ async function saveToDecensuredApi(messageId, realMessage, encryptedContent) {
         messageId,
         username,
         messageUrl,
-        encryptedContent,
+        fakeContent,
         realMessage,
         topicId,
         topicUrl,
@@ -1338,7 +2248,7 @@ function handleFormResponse(response, formulaire, textarea, resolve, reject) {
 
         resolve(res);
 
-    } catch (e) {
+    } catch {
         reject(new Error('Erreur parsing réponse: ' + response.responseText));
     }
 }
@@ -1347,16 +2257,15 @@ function replacePostButtonWithDecensured() {
     const postButton = findElement(DECENSURED_CONFIG.SELECTORS.POST_BUTTON);
     if (!postButton) return;
 
-    const decensuredToggle = document.querySelector('#decensured-toggle');
-    if (!decensuredToggle || !decensuredToggle.checked) return;
-
     if (!postButton.dataset.deboucledOriginal) {
         postButton.dataset.deboucledOriginal = 'true';
         postButton.dataset.deboucledOriginalOnclick = postButton.onclick ? postButton.onclick.toString() : '';
         postButton.dataset.deboucledOriginalType = postButton.type || 'button';
+        postButton.setAttribute('data-decensured-message-original', 'true');
     }
 
     const newButton = postButton.cloneNode(true);
+    newButton.id = 'deboucled-decensured-message-post-button';
     postButton.parentNode.replaceChild(newButton, postButton);
 
     newButton.onclick = async (e) => {
@@ -1368,13 +2277,16 @@ function replacePostButtonWithDecensured() {
     newButton.type = "button";
     newButton.classList.add('deboucled-decensured-post-button-active');
     newButton.title = 'Poster le message masqué';
+
+    setTimeout(() => setupTabOrder(), 50);
 }
 
 function restoreOriginalPostButton() {
-    const postButton = findElement(DECENSURED_CONFIG.SELECTORS.POST_BUTTON);
+    const postButton = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_ORIGINAL_MESSAGE_POST_BUTTON);
     if (!postButton || !postButton.dataset.deboucledOriginal) return;
 
     const newButton = postButton.cloneNode(true);
+    newButton.removeAttribute('id');
     postButton.parentNode.replaceChild(newButton, postButton);
 
     newButton.type = postButton.dataset.deboucledOriginalType || 'submit';
@@ -1392,6 +2304,9 @@ function restoreOriginalPostButton() {
     delete newButton.dataset.deboucledOriginal;
     delete newButton.dataset.deboucledOriginalOnclick;
     delete newButton.dataset.deboucledOriginalType;
+    newButton.removeAttribute('data-decensured-message-original');
+
+    setTimeout(() => setupTabOrder(), 50);
 }
 
 function getMessageTextarea() {

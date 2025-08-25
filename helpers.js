@@ -267,7 +267,6 @@ function replaceNumbersSimilarToCharacters(str) {
 }
 
 function calcStringDistanceScore(str1, str2) {
-    // eslint-disable-next-line no-undef
     let result = 100 - 100 * distance(str1, str2) / Math.max(str1.length, str2.length);
     return Math.round(result);
 }

@@ -27,6 +27,7 @@ export default [
         XMLHttpRequest: 'readonly',
 
         // Greasemonkey/Tampermonkey globals
+        GMStorage: 'readonly',
         GM: 'readonly',
         GM_setValue: 'readonly',
         GM_getValue: 'readonly',
@@ -51,7 +52,7 @@ export default [
         Event: 'readonly',
         CustomEvent: 'readonly',
         dispatchEvent: 'readonly',
-        
+
         // APIs manquantes identifiées par ESLint
         DOMParser: 'readonly',
         TimeSpan: 'readonly',
@@ -60,7 +61,7 @@ export default [
         FileReader: 'readonly',
         IntersectionObserver: 'readonly',
         removeEventListener: 'readonly',
-        
+
         // Autres APIs du navigateur courantes
         Image: 'readonly',
         Audio: 'readonly',
@@ -84,21 +85,21 @@ export default [
         close: 'readonly',
         focus: 'readonly',
         blur: 'readonly',
-        
+
         // APIs de stockage et base de données
         indexedDB: 'readonly',
         caches: 'readonly',
-        
+
         // APIs de géolocalisation et permissions
         geolocation: 'readonly',
         permissions: 'readonly',
-        
+
         // APIs de notification
         Notification: 'readonly',
-        
+
         // APIs de clipboard
         ClipboardEvent: 'readonly',
-        
+
         // Types de données
         ArrayBuffer: 'readonly',
         DataView: 'readonly',
@@ -113,36 +114,37 @@ export default [
         Float64Array: 'readonly',
         BigInt64Array: 'readonly',
         BigUint64Array: 'readonly',
-        
+
         // APIs de streaming et données
         ReadableStream: 'readonly',
         WritableStream: 'readonly',
         TransformStream: 'readonly',
         TextEncoder: 'readonly',
         TextDecoder: 'readonly',
-        
+
         // Canvas et WebGL
         CanvasRenderingContext2D: 'readonly',
         WebGLRenderingContext: 'readonly',
         WebGL2RenderingContext: 'readonly',
         ImageData: 'readonly',
         OffscreenCanvas: 'readonly',
-        
+
         // APIs réseau avancées
         AbortController: 'readonly',
         AbortSignal: 'readonly',
         Headers: 'readonly',
         Request: 'readonly',
         Response: 'readonly',
-        
+
         // APIs Web modernes
         ResizeObserver: 'readonly',
         PerformanceObserver: 'readonly',
-        
+
         // Bibliothèques tierces potentielles
-        distance: 'readonly', // mentionné dans le code
-        InfiniteScroll: 'readonly', // utilisé dans le code
-        ShowMore: 'readonly' // utilisé dans le code
+        distance: 'readonly',
+        Swal: 'readonly',
+        InfiniteScroll: 'readonly',
+        ShowMore: 'readonly'
       }
     },
     rules: {

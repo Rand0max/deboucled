@@ -90,7 +90,7 @@ function getCurrentTopicId() {
         const topicId = blocFormulaireElem.getAttribute('data-topic-id');
         if (topicId) return topicId;
     }
-    
+
     const currentUrl = window.location.href;
     const match = currentUrl.match(/\/forums\/\d+-\d+-(\d+)-/);
     return match ? match[1] : null;
@@ -332,7 +332,7 @@ function isContentYoutubeBlacklisted(messageContentElement) {
 async function isVinzTopic(subject, author, topicUrl) {
     // TODO : implémenter du cache comme pour les poc
 
-    if (typeof distance === 'undefined') return; // eslint-disable-line no-undef
+    if (typeof distance === 'undefined') return;
 
     let topicContent = undefined;
 
@@ -942,7 +942,6 @@ function createSmoothScroll(handleMessageCallback) {
         if (lastPageId && nextPageId <= lastPageId) return buildTopicNewPageUri(nextPageId);
     }
 
-    // eslint-disable-next-line no-undef
     let infScroll = new InfiniteScroll('.conteneur-messages-pagi', {
         // debug: true,
         //hideNav: '.bloc-pagi-default:nth-of-type(2n)',

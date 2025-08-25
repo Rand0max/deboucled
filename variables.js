@@ -26,7 +26,6 @@ const apiUpdateUserUrl = `${deboucledApiUrl}/user`;
 const apiDiagnosticUrl = `${deboucledApiUrl}/diagnostic`;
 const apiMessageQuoteUrl = `${deboucledApiUrl}/message/quote`;
 
-/* eslint-disable no-undef */
 const checkUpdateExpire = TimeSpan.FromHours(1);
 const checkUpdateDeferredExpire = TimeSpan.FromDays(5);
 const youtubeBlacklistRefreshExpire = TimeSpan.FromHours(1);
@@ -38,7 +37,6 @@ const diagnosticExpire = TimeSpan.FromHours(12);
 const hotTopicsRefreshExpire = TimeSpan.FromMinutes(15);
 const messageQuotesRefreshExpire = TimeSpan.FromMinutes(2);
 const pendingMessageQuoteExpire = TimeSpan.FromDays(3);
-/* eslint-enable no-undef */
 
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
@@ -126,6 +124,9 @@ const decensuredApiUrl = `${decensuredBackendUrl}/decensured/api`;
 const apiDecensuredMessagesUrl = `${decensuredApiUrl}/message`;
 const apiDecensuredUsersUrl = `${decensuredApiUrl}/user`;
 const apiDecensuredCreateMessageUrl = `${decensuredApiUrl}/message/create`;
+const apiDecensuredCreateTopicUrl = `${decensuredApiUrl}/topic/create`;
+const apiDecensuredTopicByIdUrl = `${decensuredApiUrl}/topic/id`;
+const apiDecensuredTopicsByIdsUrl = `${decensuredApiUrl}/topic/ids`;
 const apiDecensuredStatsUrl = `${decensuredApiUrl}/stats/online`;
 
 const decensuredPingInterval = 1000 * 60 * 2; // every 2 minutes

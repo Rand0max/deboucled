@@ -6,10 +6,10 @@
 function getCurrentScriptVersion() {
     try {
         return GM_info.script.version;
-    } catch (error) {
+    } catch {
         try {
             return GM.info.script.version;
-        } catch (error) {
+        } catch {
             return '0.0.0';
         }
     }
@@ -502,7 +502,6 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     handleMessageAssignTopicAuthor(author, authorElement);
     buildAuthorBadges(authorElement, author, messageOptions, title);
     fixMessageUrls(messageContent);
-    //fixSmileyGifs(messageContent);
     embedZupimages(messageContent);
     embedVocaroo(messageContent);
 

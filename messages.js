@@ -336,18 +336,6 @@ function fixMessageUrls(messageContent) {
     });
 }
 
-function fixSmileyGifs(messageContent) {
-    if (!messageContent) return;
-
-    const images = messageContent.querySelectorAll('img');
-    images.forEach(img => {
-        const dataCode = img.getAttribute('data-code');
-        if (dataCode && brokenSmileyGifArray.includes(dataCode)) {
-            img.setAttribute('src', buildSmileyUrl(dataCode));
-        }
-    });
-}
-
 function embedTwitterLinks(messageContent) {
     if (!messageContent) return;
 
@@ -508,7 +496,6 @@ function handleLongMessages(allMessages) {
     const saveconsolelog = console.log;
     console.log = function () { };
 
-    // eslint-disable-next-line no-undef
     new ShowMore('.deboucled-message-content-wrapper', {
         /*
         regex: {
