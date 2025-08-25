@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.61.1] (25/08/2025)
+
+- Corrections diverses Décensured (Rand0max)
+
 ## [2.61.0] (25/08/2025)
 
 - Création et affichage de topic Décensured (Rand0max)

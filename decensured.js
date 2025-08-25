@@ -1014,12 +1014,14 @@ function setupToggleHandlers(container, type, onToggle) {
         if (isActive) {
             toggleButton.innerHTML = '🔓 Mode normal';
             toggleButton.title = `Désactiver le mode ${type} masqué`;
+            toggleButton.classList.add('deboucled-decensured-toggle-active');
 
             fakeContainer.classList.remove('deboucled-decensured-hiding');
             fakeContainer.classList.add('deboucled-decensured-visible');
         } else {
             toggleButton.innerHTML = `🔒 ${type === 'topic' ? 'Topic' : 'Message'} masqué`;
             toggleButton.title = `Activer le mode ${type} masqué`;
+            toggleButton.classList.remove('deboucled-decensured-toggle-active');
 
             if (fakeContainer.classList.contains('deboucled-decensured-visible')) {
                 fakeContainer.classList.remove('deboucled-decensured-visible');
@@ -1192,7 +1194,8 @@ function replaceTopicPostButtonWithDecensured() {
     const decensuredButton = document.createElement('button');
     decensuredButton.id = 'deboucled-decensured-topic-post-button';
     decensuredButton.className = postButton.className;
-    decensuredButton.innerHTML = '🔒 Publier le topic masqué';
+    decensuredButton.innerHTML = postButton.innerHTML;
+    decensuredButton.classList.add('deboucled-decensured-post-button-active');
     decensuredButton.title = 'Publier le topic avec chiffrement Déboucled';
     decensuredButton.type = 'button';
 
@@ -1251,7 +1254,7 @@ function triggerNativeTopicCreation() {
 }
 
 function restoreOriginalTopicPostButton() {
-    const postButton = findElement(DECENSURED_CONFIG.SELECTORS.POST_BUTTON);
+    const postButton = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_ORIGINAL_TOPIC_POST_BUTTON);
     if (!postButton || !postButton.hasAttribute('data-decensured-topic-original')) return;
 
     postButton.style.display = '';
@@ -1498,7 +1501,7 @@ function highlightDecensuredTopics() {
     }
 
     const currentPage = getCurrentPageType(window.location.pathname);
-    if (currentPage !== 'topiclist') {
+    if (currentPage !== 'topiclist' && currentPage !== 'search') {
         return;
     }
 
@@ -1557,6 +1560,12 @@ function highlightDecensuredTopics() {
                 const topicListItem = link.closest('li');
                 if (topicListItem) {
                     topicListItem.classList.add('deboucled-topic-decensured');
+
+                    const folderIcon = topicListItem.querySelector('.icon-topic-folder, .topic-img');
+                    if (folderIcon) {
+                        folderIcon.classList.add('deboucled-decensured-topic-icon');
+                        folderIcon.title = 'Topic Décensured';
+                    }
                 }
             }
         });

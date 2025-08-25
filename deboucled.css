@@ -354,6 +354,16 @@ blockquote .deboucled-highlighted {
   color: #fff;
 }
 
+.deboucled-decensured-toggle-active {
+  background-color: var(--jv-text-secondary) !important;
+  border-color: var(--jv-text-secondary) !important;
+}
+
+.deboucled-decensured-toggle-active:hover {
+  background-color: var(--jv-text-hover-secondary) !important;
+  border-color: var(--jv-text-hover-secondary) !important;
+}
+
 .deboucled-decensured-indicator {
   background: #0990c6;
   color: white;
@@ -419,6 +429,11 @@ blockquote .deboucled-highlighted {
 
 .deboucled-topic-decensured .topic-subject {
   margin-left: -4px !important;
+}
+
+.deboucled-decensured-topic-icon.icon-topic-folder::before {
+  content: "\EA19";
+  color: #21a0d3;
 }
 
 .deboucled-decensured-topic-indicator {
@@ -2904,7 +2919,7 @@ del {
 .form-control::placeholder {
   color: var(--jv-input-text-color);
   opacity: 0.6;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
 }
 
 .headerAccount--decensured {
