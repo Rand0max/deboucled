@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.4.2
+@version        1.4.3
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -12,7 +12,10 @@
     font: 12px/16px sans-serif;
   }
   .header {
-    position: absolute;
+    position: static;
+  }
+  .layout--forum {
+    margin-top: 0px;
   }
   .header__bottom {
     height: 0;

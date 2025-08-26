@@ -5,7 +5,10 @@ input {
   font: 12px/16px sans-serif;
 }
 .header {
-  position: absolute;
+  position: static;
+}
+.layout--forum {
+  margin-top: 0px;
 }
 .header__bottom {
   height: 0;

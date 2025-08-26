@@ -1,8 +1,10 @@
 # Changelog Déboucled
 
-## [2.61.2] (25/08/2025)
+## [2.62.0] (26/08/2025)
 
 - Utilisateurs Décensured en ligne (Rand0max)
+- Bouton de génération de message de couverture aléatoire (Rand0max)
+- Widget des derniers topics Décensured (Rand0max)
 
 ## [2.61.1] (25/08/2025)
 

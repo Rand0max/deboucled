@@ -4,6 +4,8 @@
 
 let decensuredInitialized = false;
 let decensuredPingTimer = null;
+let tabOrderSetupInProgress = false;
+let isProcessingTopicCreation = false;
 
 const DECENSURED_CONFIG = {
     // === TIMING CONFIGURATION ===
@@ -27,6 +29,13 @@ const DECENSURED_CONFIG = {
     URLS: {
         POST_MESSAGE: '/forums/message/add',
         CREATE_TOPIC: '/forums/topic/add'
+    },
+
+    // === FLOATING WIDGET CONFIGURATION ===
+    FLOATING_WIDGET: {
+        MAX_TOPICS: 15,
+        REFRESH_INTERVAL: 5 * 60 * 1000, // 5 minutes
+        ANIMATION_DURATION: 300
     },
 
     // === TOPICS SPECIFIC CONFIGURATION ===
@@ -127,7 +136,14 @@ const DECENSURED_CONFIG = {
         DEBOUCLED_DECENSURED_INDICATOR: '.deboucled-decensured-indicator',
         DEBOUCLED_DECENSURED_CONTENT: '.deboucled-decensured-content',
         DEBOUCLED_HEADER_DECENSURED: '#deboucled-header-decensured',
-        DEBOUCLED_USERS_COUNTER: '#deboucled-users-counter'
+        DEBOUCLED_USERS_COUNTER: '#deboucled-users-counter',
+        // === HEADER ELEMENTS ===
+        HEADER_ACCOUNT_CONNECTED: [
+            '.headerAccount--pm',
+            '.headerAccount--connect'
+        ],
+        // === FLOATING WIDGET ===
+        DEBOUCLED_FLOATING_WIDGET: '#deboucled-floating-widget'
     }
 };
 
@@ -444,7 +460,22 @@ function formatStrikethrough(text) {
 function formatImages(text) {
     return text.replace(/https:\/\/(?:www\.|image\.)?noelshack\.com\/[^\s<>"']+\.(png|jpg|jpeg|gif|webp)/gi, (match) => {
         const imageUrl = match;
-        const miniUrl = match.replace('/fichiers/', '/minis/').replace('www.noelshack.com/', 'image.noelshack.com/minis/');
+        let miniUrl;
+
+        // Vérifier si c'est déjà une miniature (contient /minis/)
+        if (match.includes('/minis/')) {
+            // C'est déjà une miniature, l'utiliser telle quelle
+            miniUrl = imageUrl;
+        } else if (match.includes('/fichiers/')) {
+            // Remplacer /fichiers/ par /minis/ et changer l'extension vers .png
+            miniUrl = match.replace('/fichiers/', '/minis/').replace(/\.(jpg|jpeg|gif|webp)$/i, '.png');
+        } else if (match.includes('www.noelshack.com/')) {
+            // Pour les anciennes URLs www.noelshack.com
+            miniUrl = match.replace('www.noelshack.com/', 'image.noelshack.com/minis/').replace(/\.(jpg|jpeg|gif|webp)$/i, '.png');
+        } else {
+            // Fallback - essayer de générer une miniature
+            miniUrl = match.replace('noelshack.com/', 'noelshack.com/minis/').replace(/\.(jpg|jpeg|gif|webp)$/i, '.png');
+        }
 
         return `<a href="${imageUrl}" target="_blank" rel="noreferrer"><img class="img-shack" src="${miniUrl}" width="68" height="51" alt="${imageUrl}"></a>`;
     });
@@ -816,7 +847,7 @@ function buildDecensuredInputUI() {
         traditionalTextarea.parentElement.insertBefore(decensuredContainer, traditionalTextarea);
     }
 
-    setupToggleHandlers(decensuredContainer, 'message', (isActive) => {
+    setupToggleHandlers('message', (isActive) => {
         if (isActive) {
             replacePostButtonWithDecensured();
             const textarea = getMessageTextarea();
@@ -840,8 +871,6 @@ function buildDecensuredInputUI() {
 
     setTimeout(() => setupTabOrder(), 100);
 }
-
-let tabOrderSetupInProgress = false;
 
 function setupTabOrder() {
     if (tabOrderSetupInProgress) return;
@@ -959,8 +988,8 @@ function createDecensuredContainer(type = 'message') {
     const toggleButton = document.createElement('button');
     toggleButton.type = 'button';
     toggleButton.id = `deboucled-decensured-${type}-toggle`;
-    toggleButton.className = 'deboucled-decensured-toggle btn btn-primary';
-    toggleButton.innerHTML = `🔒 ${type === 'topic' ? 'Topic' : 'Message'} masqué`;
+    toggleButton.className = 'deboucled-decensured-toggle icon-topic-lock btn btn-primary';
+    toggleButton.innerHTML = `${type === 'topic' ? 'Topic' : 'Message'} masqué`;
     toggleButton.title = `Activer le mode ${type} masqué`;
 
     const fakeContainer = document.createElement('div');
@@ -972,11 +1001,34 @@ function createDecensuredContainer(type = 'message') {
     label.className = 'form-label deboucled-decensured-fake-message-label';
     label.id = `deboucled-decensured-${type}-fake-label`;
 
+    const inputGroup = document.createElement('div');
+    inputGroup.className = 'deboucled-fake-input-group';
+
     const input = document.createElement('textarea');
     input.id = `deboucled-decensured-${type}-fake-textarea`;
     input.className = 'form-control deboucled-decensured-fake-message-input';
     input.placeholder = 'Ce message sera affiché pour ceux qui n\'ont pas Déboucled. Si aucun message n\'est fourni, un message aléatoire sera généré.';
     input.rows = 3;
+
+    const diceButton = document.createElement('button');
+    diceButton.type = 'button';
+    diceButton.className = 'deboucled-dice-button btn btn-secondary';
+    diceButton.innerHTML = '<span class="deboucled-dice-icon deboucled-decensured-dice-logo"></span>';
+    diceButton.setAttribute('deboucled-data-tooltip', 'Générer un message de couverture aléatoire');
+    diceButton.setAttribute('data-tooltip-location', 'left');
+
+    diceButton.addEventListener('click', () => {
+        const randomMessage = getRandomPlatitudeMessage();
+        input.value = randomMessage;
+        input.classList.remove('auto-generated');
+        input.style.fontStyle = 'normal';
+
+        const diceIcon = diceButton.querySelector('.deboucled-dice-icon');
+        diceIcon.classList.add('rotating');
+        setTimeout(() => {
+            diceIcon.classList.remove('rotating');
+        }, 500);
+    });
 
     if (type === 'message') {
         input.addEventListener('input', () => {
@@ -987,15 +1039,18 @@ function createDecensuredContainer(type = 'message') {
         });
     }
 
+    inputGroup.appendChild(input);
+    inputGroup.appendChild(diceButton);
+
     fakeContainer.appendChild(label);
-    fakeContainer.appendChild(input);
+    fakeContainer.appendChild(inputGroup);
     container.appendChild(toggleButton);
     container.appendChild(fakeContainer);
 
     return container;
 }
 
-function setupToggleHandlers(container, type, onToggle) {
+function setupToggleHandlers(type, onToggle) {
     const toggleButton = document.getElementById(`deboucled-decensured-${type}-toggle`);
     const fakeContainer = document.getElementById(`deboucled-decensured-${type}-fake-container`);
 
@@ -1006,14 +1061,14 @@ function setupToggleHandlers(container, type, onToggle) {
         toggleButton.checked = isActive;
 
         if (isActive) {
-            toggleButton.innerHTML = '🔓 Mode normal';
+            toggleButton.innerHTML = 'Mode normal';
             toggleButton.title = `Désactiver le mode ${type} masqué`;
             toggleButton.classList.add('deboucled-decensured-toggle-active');
 
             fakeContainer.classList.remove('deboucled-decensured-hiding');
             fakeContainer.classList.add('deboucled-decensured-visible');
         } else {
-            toggleButton.innerHTML = `🔒 ${type === 'topic' ? 'Topic' : 'Message'} masqué`;
+            toggleButton.innerHTML = `${type === 'topic' ? 'Topic' : 'Message'} masqué`;
             toggleButton.title = `Activer le mode ${type} masqué`;
             toggleButton.classList.remove('deboucled-decensured-toggle-active');
 
@@ -1159,7 +1214,7 @@ function injectDecensuredTopicUI(elements) {
     const container = createDecensuredContainer('topic');
     messageTextarea.parentElement.insertBefore(container, messageTextarea);
 
-    topicDecensuredState.toggleHandlers = setupToggleHandlers(container, 'topic', (isActive) => {
+    topicDecensuredState.toggleHandlers = setupToggleHandlers('topic', (isActive) => {
         if (isActive) {
             replaceTopicPostButtonWithDecensured();
             setupTopicTextareaForDecensured(elements.messageTextarea);
@@ -1174,29 +1229,23 @@ function injectDecensuredTopicUI(elements) {
 
 function setupTopicTextareaForDecensured(textarea) {
     if (!textarea) return;
-    
-    // Définir le nouveau placeholder pour le mode Décensured
+
     textarea.placeholder = 'Votre véritable message, chiffré et visible uniquement par les utilisateurs Déboucled.';
-    
-    // Ajouter la classe pour le style visuel
+
     textarea.classList.add('deboucled-decensured-textarea-active');
 }
 
 function restoreTopicTextareaFromDecensured(textarea) {
     if (!textarea) return;
-    
-    // Laisser le placeholder vide au lieu de restaurer l'ancien
+
     textarea.placeholder = '';
-    
-    // Retirer la classe de style
+
     textarea.classList.remove('deboucled-decensured-textarea-active');
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // GESTION DES BOUTONS DE CRÉATION DE TOPICS DÉCENSURED
 ///////////////////////////////////////////////////////////////////////////////////////
-
-let isProcessingTopicCreation = false;
 
 function replaceTopicPostButtonWithDecensured() {
     const postButton = findElement(DECENSURED_CONFIG.SELECTORS.POST_BUTTON);
@@ -1418,8 +1467,8 @@ async function applyDecensuredFormattingToNewTopic(messageElement, decensuredMsg
     const topicTitleElement = document.querySelector('.topic-title, h1, #bloc-title-forum');
     if (topicTitleElement && !topicTitleElement.querySelector('.deboucled-decensured-topic-indicator')) {
         const indicator = document.createElement('span');
-        indicator.className = 'deboucled-decensured-topic-indicator';
-        indicator.innerHTML = ' 🔒';
+        indicator.className = 'deboucled-decensured-topic-indicator icon-topic-lock';
+        indicator.innerHTML = '';
         indicator.title = 'Topic Décensured';
         topicTitleElement.appendChild(indicator);
     }
@@ -1694,11 +1743,11 @@ function animateContentTransition(fromElement, toElement, onComplete) {
 }
 
 function createToggleButton(originalContent, realContentDiv) {
-    const SWITCH_TO_ORIGINAL_TITLE = '🔓 Afficher le message original';
-    const SWITCH_TO_DECENSURED_TITLE = '🔒 Afficher le message dissimulé';
+    const SWITCH_TO_ORIGINAL_TITLE = 'Afficher le message original';
+    const SWITCH_TO_DECENSURED_TITLE = 'Afficher le message dissimulé';
 
     const decensuredIndicator = document.createElement('button');
-    decensuredIndicator.className = 'deboucled-decensured-indicator showing-fake';
+    decensuredIndicator.className = 'deboucled-decensured-indicator showing-fake icon-topic-lock';
     decensuredIndicator.id = `deboucled-indicator-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     decensuredIndicator.innerHTML = SWITCH_TO_ORIGINAL_TITLE;
     decensuredIndicator.title = 'Cliquer pour basculer entre le message original et le message dissimulé';
@@ -1890,14 +1939,14 @@ async function decryptMessages() {
 function createDecensuredUsersHeader() {
     if (document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_HEADER_DECENSURED)) return;
 
-    const headerNotif = document.querySelector('.headerAccount--notif');
-    if (!headerNotif) return;
+    const headerAccount = findElement(DECENSURED_CONFIG.SELECTORS.HEADER_ACCOUNT_CONNECTED);
+    if (!headerAccount) return;
 
     const headerDecensured = document.createElement('div');
     headerDecensured.className = 'headerAccount headerAccount--decensured';
     headerDecensured.id = 'deboucled-header-decensured';
 
-    headerNotif.insertAdjacentElement('afterend', headerDecensured);
+    headerAccount.insertAdjacentElement('afterend', headerDecensured);
 
     const decensuredButton = document.createElement('span');
     decensuredButton.className = 'headerAccount__notif js-header-decensured';
@@ -1919,6 +1968,11 @@ function createDecensuredUsersHeader() {
 }
 
 async function showDecensuredUsersModal() {
+    if (!userPseudo) {
+        addAlertbox('info', 'Vous devez être connecté pour voir la liste des utilisateurs Décensured en ligne.');
+        return;
+    }
+
     try {
         const usersData = await fetchDecensuredApi(apiDecensuredUsersOnlineUrl, { method: 'GET' });
 
@@ -1984,7 +2038,7 @@ function createAndShowUsersModal(users, totalCount) {
     modal.innerHTML = `
         <div class="deboucled-users-modal-content">
             <div class="deboucled-users-modal-header">
-                <h3>🔒 Utilisateurs Décensured en ligne (${totalCount})</h3>
+                <h3><span class="deboucled-decensured-premium-logo users"></span> Utilisateurs Décensured en ligne (${totalCount})</h3>
                 <button class="deboucled-users-modal-close">×</button>
             </div>
             <div class="deboucled-users-modal-body">
@@ -2028,7 +2082,7 @@ function createAndShowUsersModal(users, totalCount) {
                 setTimeout(() => {
                     loadMoreUsers();
                     isLoading = false;
-                }, 500);
+                }, 300);
             }
         });
     }
@@ -2067,6 +2121,22 @@ function toggleDecensuredBadgesDisplay() {
     badges.forEach(badge => {
         badge.style.display = isEnabled ? '' : 'none';
     });
+}
+
+function toggleDecensuredFloatingWidget() {
+    const isEnabled = store.get(storage_optionDisplayDecensuredTopics, storage_optionDisplayDecensuredTopics_default);
+
+    if (isEnabled) {
+        if (!document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET)) {
+            createDecensuredFloatingWidget();
+            startFloatingWidgetMonitoring();
+        }
+    } else {
+        const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
+        if (widget) {
+            widget.remove();
+        }
+    }
 }
 
 function updateDecensuredUsersCount(count) {
@@ -2110,6 +2180,284 @@ function startDecensuredUsersMonitoring() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
+// Widget flottant des topics Décensured
+///////////////////////////////////////////////////////////////////////////////////////
+
+function createDecensuredFloatingWidget() {
+    if (document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET)) return;
+
+    const widget = document.createElement('div');
+    widget.id = 'deboucled-floating-widget';
+    widget.className = 'deboucled-floating-widget';
+
+    widget.innerHTML = `
+        <div class="deboucled-floating-widget-header">
+            <h4 class="deboucled-floating-widget-title">
+                <span class="deboucled-decensured-premium-logo widget"></span> 
+                <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2;">
+                    <span style="font-size: 18px; font-weight: 700;">Décensured</span>
+                    <span style="font-size: 13px; font-weight: 400; opacity: 0.9;">Topics récents</span>
+                </div>
+            </h4>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="deboucled-floating-widget-refresh" id="deboucled-floating-widget-refresh" title="Actualiser">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                        <path d="M21 3v5h-5"/>
+                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                        <path d="M3 21v-5h5"/>
+                    </svg>
+                </button>
+                <button class="deboucled-floating-widget-close" id="deboucled-floating-widget-close">×</button>
+            </div>
+        </div>
+        <div class="deboucled-floating-widget-content">
+            <div class="deboucled-floating-widget-loading">
+                <div class="deboucled-spinner active"></div>
+            </div>
+            <div class="deboucled-floating-widget-topics" id="deboucled-floating-widget-topics"></div>
+        </div>
+    `;
+
+    if (preferDarkTheme()) {
+        widget.classList.add('dark-theme');
+    }
+
+    document.body.appendChild(widget);
+
+    setupFloatingWidgetEvents();
+
+    loadFloatingWidgetTopics();
+
+    return widget;
+}
+
+function setupFloatingWidgetEvents() {
+    const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
+    const close = document.getElementById('deboucled-floating-widget-close');
+    const refresh = document.getElementById('deboucled-floating-widget-refresh');
+
+    if (!widget) return;
+
+    let hoverTimeout;
+    let isManuallyVisible = false;
+
+    if (window.innerWidth > 768) {
+        widget.addEventListener('mouseenter', () => {
+            clearTimeout(hoverTimeout);
+            if (!isManuallyVisible) {
+                showFloatingWidget();
+            }
+        });
+
+        widget.addEventListener('mouseleave', () => {
+            if (!isManuallyVisible) {
+                hoverTimeout = setTimeout(() => {
+                    hideFloatingWidget();
+                }, 300);
+            }
+        });
+    }
+
+    if (window.innerWidth <= 768) {
+        let startX, currentX;
+        let isDragging = false;
+
+        widget.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+        });
+
+        widget.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+
+            currentX = e.touches[0].clientX;
+            const deltaX = currentX - startX;
+
+            if (deltaX > 50) {
+                showFloatingWidget();
+                isManuallyVisible = true;
+            }
+        });
+
+        widget.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+    }
+
+    if (close) {
+        close.addEventListener('click', () => {
+            hideFloatingWidget();
+            isManuallyVisible = false;
+        });
+    }
+
+    if (refresh) {
+        refresh.addEventListener('click', () => {
+            refresh.classList.add('spinning');
+            loadFloatingWidgetTopics().finally(() => {
+                setTimeout(() => refresh.classList.remove('spinning'), 500);
+            });
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!widget.contains(e.target) && !widget.classList.contains('hidden')) {
+            hideFloatingWidget();
+            isManuallyVisible = false;
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        setupFloatingWidgetEvents();
+    });
+
+    setupThemeToggleListener();
+}
+
+function setupThemeToggleListener() {
+    const themeToggleButton = document.querySelector('.toggleTheme');
+
+    if (themeToggleButton) {
+        themeToggleButton.addEventListener('click', () => {
+            setTimeout(() => {
+                updateFloatingWidgetTheme();
+            }, 100);
+        });
+    }
+}
+
+function updateFloatingWidgetTheme() {
+    const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
+    if (!widget) return;
+
+    if (preferDarkTheme()) {
+        widget.classList.add('dark-theme');
+    } else {
+        widget.classList.remove('dark-theme');
+    }
+}
+
+function showFloatingWidget() {
+    const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
+    if (!widget) return;
+
+    widget.classList.remove('hidden');
+    widget.classList.add('visible');
+
+    if (!widget.hasAttribute('data-loaded')) {
+        loadFloatingWidgetTopics();
+        widget.setAttribute('data-loaded', 'true');
+    }
+
+    if (window.innerWidth <= 768) {
+        widget.classList.add('mobile-mode');
+    }
+}
+
+function hideFloatingWidget() {
+    const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
+    if (!widget) return;
+
+    widget.classList.remove('visible', 'mobile-mode');
+    widget.classList.add('hidden');
+}
+
+async function loadFloatingWidgetTopics() {
+    const topicsContainer = document.getElementById('deboucled-floating-widget-topics');
+    const loadingContainer = document.querySelector('.deboucled-floating-widget-loading');
+    const refreshButton = document.getElementById('deboucled-floating-widget-refresh');
+
+    if (!topicsContainer) return;
+
+    if (loadingContainer) {
+        loadingContainer.classList.add('active');
+    }
+    if (refreshButton) refreshButton.disabled = true;
+
+    try {
+        const response = await fetchDecensuredApi(`${apiDecensuredTopicsLatestUrl}/${DECENSURED_CONFIG.FLOATING_WIDGET.MAX_TOPICS}`);
+
+        if (!response || !Array.isArray(response)) {
+            throw new Error('Réponse API invalide');
+        }
+
+        renderFloatingWidgetTopics(response);
+    } catch (error) {
+        console.error('Erreur lors du chargement des topics:', error);
+        const errorClass = preferDarkTheme() ? 'deboucled-floating-error dark-theme' : 'deboucled-floating-error';
+        topicsContainer.innerHTML = `
+            <div class="${errorClass}">
+                <i class="icon-warning"></i>
+                <span>Erreur de chargement</span>
+                <button onclick="loadFloatingWidgetTopics()">Réessayer</button>
+            </div>
+        `;
+    } finally {
+        if (loadingContainer) {
+            loadingContainer.classList.remove('active');
+        }
+        if (refreshButton) refreshButton.disabled = false;
+    }
+}
+
+function renderFloatingWidgetTopics(topics) {
+    const topicsContainer = document.getElementById('deboucled-floating-widget-topics');
+    if (!topicsContainer) return;
+
+    if (!topics || topics.length === 0) {
+        const emptyClass = preferDarkTheme() ? 'deboucled-floating-widget-empty dark-theme' : 'deboucled-floating-widget-empty';
+        topicsContainer.innerHTML = `
+            <div class="${emptyClass}">
+                <i class="icon-info"></i>
+                <span>Aucun topic Décensured récent</span>
+            </div>
+        `;
+        return;
+    }
+
+    const html = topics.map(topic => {
+        const timeAgo = formatTimeAgo(topic.creation_date);
+        const messageCount = topic.nb_message || 1;
+        const authorProfileUrl = `https://www.jeuxvideo.com/profil/${encodeURIComponent(topic.topic_author.toLowerCase())}?mode=infos`;
+
+        return `
+            <div class="deboucled-floating-widget-topic" data-topic-id="${topic.topic_id}">
+                <div class="deboucled-floating-widget-topic-header">
+                    <i class="deboucled-decensured-topic-icon icon-topic-folder deboucled-floating-widget-topic-icon" title="Topic Décensured"></i>
+                    <span class="deboucled-floating-widget-topic-time">${timeAgo}</span>
+                </div>
+                <a href="${topic.topic_url}" class="deboucled-floating-widget-topic-title" title="${escapeHtml(topic.topic_name)}">
+                    ${escapeHtml(topic.topic_name)}
+                </a>
+                <div class="deboucled-floating-widget-topic-meta">
+                    <a href="${authorProfileUrl}" class="deboucled-floating-widget-topic-author" target="_blank" rel="noopener noreferrer" title="Voir le profil de ${escapeHtml(topic.topic_author)}">
+                        par ${escapeHtml(topic.topic_author)}
+                    </a>
+                    <span class="deboucled-floating-widget-topic-messages">${messageCount} msg</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    topicsContainer.innerHTML = html;
+
+}
+
+function startFloatingWidgetMonitoring() {
+    if (!store.get(storage_optionDisplayDecensuredTopics, storage_optionDisplayDecensuredTopics_default)) {
+        return;
+    }
+
+    setInterval(() => {
+        const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
+        if (widget && !widget.classList.contains('hidden') && widget.hasAttribute('data-loaded')) {
+            loadFloatingWidgetTopics();
+        }
+    }, DECENSURED_CONFIG.FLOATING_WIDGET.REFRESH_INTERVAL);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
 // Initialisation
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -2143,6 +2491,8 @@ async function initDecensured() {
     createDecensuredUsersHeader();
     toggleDecensuredUsersCountDisplay();
     startDecensuredUsersMonitoring();
+
+    toggleDecensuredFloatingWidget();
 
     await decryptMessages();
     highlightDecensuredTopics();

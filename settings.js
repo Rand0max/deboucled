@@ -289,6 +289,9 @@ function buildSettingsPage() {
         const peopleLogo = '👥';
         html += addToggleOption(`Afficher le ${peopleLogo} nombre de connectés`, storage_optionDisplayDecensuredUsersCount, storage_optionDisplayDecensuredUsersCount_default, 'Affiche dans le header le nombre d\'utilisateurs Décensured actuellement connectés.', optionEnableDecensured, true);
 
+        const widgetLogo = '📑';
+        html += addToggleOption(`Afficher le widget ${widgetLogo} topics récents`, storage_optionDisplayDecensuredTopics, storage_optionDisplayDecensuredTopics_default, 'Affiche un widget flottant avec les derniers topics Décensured créés.', optionEnableDecensured, true);
+
         const badgeLogo = '<span class="deboucled-decensured-premium-logo settings"></span>';
         html += addToggleOption(`Afficher les ${badgeLogo} utilisateurs Décensured`, storage_optionEnableDecensuredBadges, storage_optionEnableDecensuredBadges_default, 'Affiche un petit badge à côté du pseudo des utilisateurs qui utilisent aussi Déboucled pour les messages masqués.', optionEnableDecensured, true);
 
@@ -572,6 +575,7 @@ function addSettingEvents() {
             `${storage_optionEnableDecensuredBadges}-container`,
             `${storage_optionAutoDecryptMessages}-container`,
             `${storage_optionDisplayDecensuredUsersCount}-container`,
+            `${storage_optionDisplayDecensuredTopics}-container`,
             `${storage_optionEnableDecensuredTopics}-container`
         ];
 
@@ -588,6 +592,9 @@ function addSettingEvents() {
     addToggleEvent(storage_optionAutoDecryptMessages);
     addToggleEvent(storage_optionDisplayDecensuredUsersCount, undefined, function () {
         toggleDecensuredUsersCountDisplay();
+    });
+    addToggleEvent(storage_optionDisplayDecensuredTopics, undefined, function () {
+        toggleDecensuredFloatingWidget();
     });
     addToggleEvent(storage_optionEnableDecensuredTopics);
 
