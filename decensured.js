@@ -662,6 +662,11 @@ function formatLinks(text) {
     });
 }
 
+function formatSmileys(text) {
+    if (!text) return text;
+    return text.replaceAll(smileyGifRegex, (e) => getSmileyImgHtml(e, false));
+}
+
 function processParagraphContent(paragraph) {
     const lines = paragraph.split('\n');
     let processedLines = [];
@@ -776,6 +781,7 @@ function formatMessageContent(rawText) {
 
     text = formatImages(text);
     text = formatLinks(text);
+    text = formatSmileys(text);
 
     return formatParagraphs(text);
 }

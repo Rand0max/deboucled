@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.63.1] (27/08/2025)
+
+- Prise en charge des smileys dans les messages Décensured (Rand0max)
+
 ## [2.63.0] (27/08/2025)
 
 - Optimisations multiples Décensured (Rand0max)
