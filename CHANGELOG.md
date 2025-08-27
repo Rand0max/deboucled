@@ -1,5 +1,11 @@
 # Changelog Déboucled
 
+## [2.63.0] (27/08/2025)
+
+- Optimisations multiples Décensured (Rand0max)
+- Corrections multiples Décensured (Rand0max)
+- Prise en charge des messages Décensured unitaires (Rand0max)
+
 ## [2.62.0] (26/08/2025)
 
 - Utilisateurs Décensured en ligne (Rand0max)

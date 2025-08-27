@@ -122,6 +122,7 @@ const deboucledTopics = ['67697509', '68410257', '68982055', '70029449', '715969
 const decensuredBackendUrl = 'https://deboucled.randomax.com';
 const decensuredApiUrl = `${decensuredBackendUrl}/decensured/api`;
 const apiDecensuredMessagesUrl = `${decensuredApiUrl}/message`;
+const apiDecensuredSingleMessageUrl = `${decensuredApiUrl}/message/single`;
 const apiDecensuredUsersUrl = `${decensuredApiUrl}/user`;
 const apiDecensuredCreateMessageUrl = `${decensuredApiUrl}/message/create`;
 const apiDecensuredCreateTopicUrl = `${decensuredApiUrl}/topic/create`;

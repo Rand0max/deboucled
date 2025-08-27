@@ -130,6 +130,9 @@ function getCurrentPageType(url) {
     let topicMessagesRegex = /^\/forums\/(42|1)-[0-9]+-[0-9]+-[0-9]+-0-1-0-.*\.htm$/i;
     if (url.match(topicMessagesRegex)) return 'topicmessages';
 
+    let singleMessageRegex = /^\/forums\/message\/[0-9]+$/i;
+    if (url.match(singleMessageRegex)) return 'singlemessage';
+
     let searchRegex = /^\/recherche\/forums\/0-[0-9]+-0-1-0-[0-9]+-0-.*/i;
     if (url.match(searchRegex)) return 'search';
 

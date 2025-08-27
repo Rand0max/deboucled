@@ -6,6 +6,19 @@ let decensuredInitialized = false;
 let decensuredPingTimer = null;
 let tabOrderSetupInProgress = false;
 let isProcessingTopicCreation = false;
+const domCache = new Map();
+let messageElementsCache = null;
+let messageElementsCacheTime = 0;
+
+// Versions debounced et throttled des fonctions critiques
+const debouncedHighlightDecensuredTopics = debounce(highlightDecensuredTopics, 500);
+const debouncedDecryptMessages = debounce(decryptMessages, 300);
+const debouncedLoadFloatingWidgetTopics = debounce(loadFloatingWidgetTopics, 1000);
+
+// Versions throttled pour les events frequents
+const throttledSetupTabOrder = throttle(setupTabOrder, 250);
+const throttledClearDomCache = throttle(clearDomCache, 2000);
+const throttledHighlightDecensuredTopics = throttle(highlightDecensuredTopics, 1000);
 
 const DECENSURED_CONFIG = {
     // === TIMING CONFIGURATION ===
@@ -13,6 +26,38 @@ const DECENSURED_CONFIG = {
     RETRY_TIMEOUT: 10 * 60 * 1000,
     POST_TIMEOUT: 40000,
     USERS_REFRESH_INTERVAL: 3 * 60 * 1000,
+
+    // === PERFORMANCE CONFIGURATION ===
+    CACHE_TTL: 5000, // 5 secondes
+    MESSAGE_CACHE_TTL: 3000, // 3 secondes
+
+    // === FORMATTING REGEX ===
+    FORMATTING_REGEX: {
+        // JVC native formats
+        jvcBold: /'''([^'\n]+)'''/g,
+        jvcItalic: /''([^'\n]+)''/g,
+        jvcUnderline: /<u>([^<\n]+)<\/u>/g,
+        jvcStrikethrough: /<s>([^<\n]+)<\/s>/g,
+        jvcCode: /<code>([\s\S]*?)<\/code>/g,
+        jvcSpoiler: /<spoil>([\s\S]*?)<\/spoil>/g,
+
+        // Listes JVC
+        bulletList: /^(\*\s+.+(?:\n\*\s+.*)*)/gm,
+        numberedList: /^(#\s+.+(?:\n#\s+.*)*)/gm,
+
+        // Citations JVC
+        blockquote: /^(>\s*.+(?:\n>\s*.*)*)/gm,
+
+        // Markdown compatibility (existing)
+        spoilers: /\[spoil\](.*?)\[\/spoil\]/gs,
+        codeBlocks: /```([\s\S]*?)```/g,
+        inlineCode: /`([^`\n]+)`/g,
+        images: /https:\/\/(?:www\.|image\.)?noelshack\.com\/[^\s<>"']+\.(png|jpg|jpeg|gif|webp)/gi,
+        links: /(https?:\/\/[^\s<>"']+)/g,
+        strikethrough: /~~([^~\n]+)~~/g,
+        // Regex combinee pour formatage gras et italique (markdown)
+        combined: /(\*\*([^*\n]+)\*\*)|(__([^_\n]+)__)|(\B\*([^*\n]+)\*\B)|(\b_([^_\n]+)_\b)/g
+    },
 
     // === UI CONFIGURATION ===
     NOTIFICATION_DURATION: 5000,
@@ -191,12 +236,65 @@ const platitudeMessages = [
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
+// Cache et utilitaires de performance
+///////////////////////////////////////////////////////////////////////////////////////
+
+function getCachedElement(selector, context = document, ttl = DECENSURED_CONFIG.CACHE_TTL) {
+    const cacheKey = `${selector}:${context === document ? 'document' : context.id || 'context'}`;
+    const cached = domCache.get(cacheKey);
+
+    if (cached && Date.now() - cached.timestamp < ttl) {
+        return cached.element;
+    }
+
+    const element = context.querySelector(selector);
+    domCache.set(cacheKey, { element, timestamp: Date.now() });
+    return element;
+}
+
+function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+function throttle(func, delay) {
+    let lastCall = 0;
+    return function (...args) {
+        const now = Date.now();
+        if (now - lastCall >= delay) {
+            lastCall = now;
+            return func.apply(this, args);
+        }
+    };
+}
+
+function clearDomCache() {
+    domCache.clear();
+}
+
+setInterval(() => {
+    const now = Date.now();
+    for (const [key, value] of domCache.entries()) {
+        if (now - value.timestamp > DECENSURED_CONFIG.CACHE_TTL * 2) {
+            domCache.delete(key);
+        }
+    }
+}, DECENSURED_CONFIG.CACHE_TTL);
+
+///////////////////////////////////////////////////////////////////////////////////////
 // Utilitaires DOM helpers
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function findElement(selectors, context = document) {
+    if (typeof selectors === 'string') {
+        return getCachedElement(selectors, context);
+    }
+
     for (const selector of selectors) {
-        const element = context.querySelector(selector);
+        const element = getCachedElement(selector, context);
         if (element && element.offsetParent !== null) {
             return element;
         }
@@ -217,6 +315,10 @@ function cleanupTimers() {
         clearInterval(window.deboucledCardTimer);
         window.deboucledCardTimer = null;
     }
+
+    clearDomCache();
+    invalidateMessageElementsCache();
+
     cleanupTopicDecensuredState();
 }
 
@@ -337,46 +439,49 @@ async function fetchDecensuredApi(endpoint, options = {}) {
     try {
         const method = options.method || 'GET';
 
-        if (method === 'GET') {
-            const data = await fetchJson(endpoint, options.timeout || 5000);
-            if (data === undefined) {
-                return null;
+        return new Promise((resolve) => {
+            const headers = {
+                'Referer': window.location.href,
+                ...options.headers
+            };
+
+            // Pour les requêtes POST, ajouter Content-Type
+            if (method !== 'GET') {
+                headers['Content-Type'] = 'application/json';
             }
-            return data;
-        } else {
-            return new Promise((resolve) => {
-                GM.xmlHttpRequest({
-                    method: method,
-                    url: endpoint,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...options.headers
-                    },
-                    data: options.body || null,
-                    timeout: options.timeout || 5000,
-                    onload: (response) => {
-                        if (response.status >= 200 && response.status < 300) {
-                            try {
-                                resolve(JSON.parse(response.responseText));
-                            } catch {
+
+            GM.xmlHttpRequest({
+                method: method,
+                url: endpoint,
+                headers: headers,
+                data: options.body || null,
+                timeout: options.timeout || 2000,
+                onload: (response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        try {
+                            resolve(JSON.parse(response.responseText));
+                        } catch {
+                            if (method === 'GET') {
+                                resolve(null);
+                            } else {
                                 resolve({ success: true });
                             }
-                        } else {
-                            console.error('fetchDecensuredApi erreur HTTP :', response.status, response.statusText);
-                            resolve(null);
                         }
-                    },
-                    onerror: (response) => {
-                        console.error('fetchDecensuredApi erreur réseau :', response);
-                        resolve(null);
-                    },
-                    ontimeout: () => {
-                        console.warn('fetchDecensuredApi timeout :', endpoint);
+                    } else {
+                        console.error('fetchDecensuredApi erreur HTTP :', response.status, response.statusText);
                         resolve(null);
                     }
-                });
+                },
+                onerror: (response) => {
+                    console.error('fetchDecensuredApi erreur réseau :', response);
+                    resolve(null);
+                },
+                ontimeout: () => {
+                    console.warn('fetchDecensuredApi timeout :', endpoint);
+                    resolve(null);
+                }
             });
-        }
+        });
     } catch (error) {
         console.error('fetchDecensuredApi exception :', error);
         return null;
@@ -425,36 +530,90 @@ async function processContent(message, fakeMessage = '') {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function formatSpoilers(text) {
-    return text.replace(/\[spoil\](.*?)\[\/spoil\]/gs, (match, content) => {
+    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.spoilers, (match, content) => {
         return `<span class="JvCare JvCare--masked" data-tooltip="Cliquer pour révéler"><span class="JvCare-content">${content.trim()}</span></span>`;
     });
 }
 
 function formatCodeBlocks(text) {
-    return text.replace(/```([\s\S]*?)```/g, (match, content) => {
+    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.codeBlocks, (match, content) => {
         const cleanContent = content.trim().replace(/\n/g, '\n');
-        return `<pre class="jv-code-block"><code>${cleanContent}</code></pre>`;
+        return `<pre class="pre-jv"><code class="code-jv">${cleanContent}</code></pre>`;
     });
 }
 
 function formatInlineCode(text) {
-    return text.replace(/`([^`\n]+)`/g, '<code class="jv-code">$1</code>');
+    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.inlineCode, '<code class="jv-code">$1</code>');
 }
 
-function formatBoldText(text) {
-    text = text.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
-    text = text.replace(/__([^_\n]+)__/g, '<strong>$1</strong>');
+function formatJvcBold(text) {
+    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.jvcBold, '<strong>$1</strong>');
+}
+
+function formatJvcItalic(text) {
+    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.jvcItalic, '<em>$1</em>');
+}
+
+function formatJvcUnderline(text) {
+    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.jvcUnderline, '<u>$1</u>');
+}
+
+function formatJvcStrikethrough(text) {
+    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.jvcStrikethrough, '<s>$1</s>');
+}
+
+function formatJvcCode(text) {
+    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.jvcCode, '<code>$1</code>');
+}
+
+function formatJvcSpoiler(text) {
+    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.jvcSpoiler, (match, content) => {
+        const spoilerId = Math.random().toString(36).substr(2, 32);
+        return `<div class="bloc-spoil-jv"><input type="checkbox" id="${spoilerId}" class="open-spoil"><label class="barre-head" for="${spoilerId}"><span class="txt-spoil">Spoil</span><span class="aff-spoil">Afficher</span><span class="masq-spoil">Masquer</span></label><div class="contenu-spoil"><p>${content}</p></div></div>`;
+    });
+}
+
+function formatJvcLists(text) {
+    // Listes à puces avec *
+    text = text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.bulletList, (match, items) => {
+        const listItems = items.split('\n').filter(line => line.trim().startsWith('*')).map(line => {
+            const content = line.trim().substring(1).trim();
+            return `  <li>${content}</li>`;
+        }).join('\n');
+        return `<ul class="liste-default-jv">\n${listItems}\n</ul>`;
+    });
+
+    // Listes numérotées avec #
+    text = text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.numberedList, (match, items) => {
+        const listItems = items.split('\n').filter(line => line.trim().startsWith('#')).map(line => {
+            const content = line.trim().substring(1).trim();
+            return `  <li>${content}</li>`;
+        }).join('\n');
+        return `<ol class="liste-default-jv">\n${listItems}\n</ol>`;
+    });
+
     return text;
 }
 
-function formatItalicText(text) {
-    text = text.replace(/\B\*([^*\n]+)\*\B/g, '<em>$1</em>');
-    text = text.replace(/\b_([^_\n]+)_\b/g, '<em>$1</em>');
-    return text;
+function formatJvcBlockquotes(text) {
+    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.blockquote, (match, quote) => {
+        const quotedText = quote.split('\n').map(line => line.trim().substring(1).trim()).join('<br>');
+        return `<blockquote class="blockquote-jv"><p>${quotedText}</p></blockquote>`;
+    });
+}
+
+function formatBoldAndItalicText(text) {
+    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.combined, (match, bold1, boldContent1, bold2, boldContent2, italic1, italicContent1, italic2, italicContent2) => {
+        if (bold1) return `<strong>${boldContent1}</strong>`;
+        if (bold2) return `<strong>${boldContent2}</strong>`;
+        if (italic1) return `<em>${italicContent1}</em>`;
+        if (italic2) return `<em>${italicContent2}</em>`;
+        return match;
+    });
 }
 
 function formatStrikethrough(text) {
-    return text.replace(/~~([^~\n]+)~~/g, '<del>$1</del>');
+    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.strikethrough, '<del>$1</del>');
 }
 
 function formatImages(text) {
@@ -462,22 +621,26 @@ function formatImages(text) {
         const imageUrl = match;
         let miniUrl;
 
-        // Vérifier si c'est déjà une miniature (contient /minis/)
         if (match.includes('/minis/')) {
-            // C'est déjà une miniature, l'utiliser telle quelle
             miniUrl = imageUrl;
         } else if (match.includes('/fichiers/')) {
-            // Remplacer /fichiers/ par /minis/ et changer l'extension vers .png
             miniUrl = match.replace('/fichiers/', '/minis/').replace(/\.(jpg|jpeg|gif|webp)$/i, '.png');
+        } else if (match.includes('www.noelshack.com/') && match.match(/\/\d{4}-\d{2}-\d-\d+-/)) {
+            const urlParts = match.match(/https:\/\/www\.noelshack\.com\/(\d{4})-(\d{2})-(\d)-(\d+-)(.+)\.(png|jpg|jpeg|gif|webp)/i);
+            if (urlParts) {
+                const [, year, week, day, timestamp, fileName, extension] = urlParts;
+                const fichiersUrl = `https://image.noelshack.com/fichiers/${year}/${week}/${day}/${timestamp}${fileName}.${extension}`;
+                miniUrl = fichiersUrl.replace('/fichiers/', '/minis/').replace(/\.(jpg|jpeg|gif|webp)$/i, '.png');
+            } else {
+                miniUrl = imageUrl;
+            }
         } else if (match.includes('www.noelshack.com/')) {
-            // Pour les anciennes URLs www.noelshack.com
             miniUrl = match.replace('www.noelshack.com/', 'image.noelshack.com/minis/').replace(/\.(jpg|jpeg|gif|webp)$/i, '.png');
         } else {
-            // Fallback - essayer de générer une miniature
             miniUrl = match.replace('noelshack.com/', 'noelshack.com/minis/').replace(/\.(jpg|jpeg|gif|webp)$/i, '.png');
         }
 
-        return `<a href="${imageUrl}" target="_blank" rel="noreferrer"><img class="img-shack" src="${miniUrl}" width="68" height="51" alt="${imageUrl}"></a>`;
+        return `<a href="${imageUrl}" target="_blank" class="xXx "><img class="img-shack" width="68" height="51" src="${miniUrl}" alt="${imageUrl}"></a>`;
     });
 }
 
@@ -594,12 +757,23 @@ function formatMessageContent(rawText) {
 
     let text = rawText;
 
+    // Formatage JVC natif en priorité
+    text = formatJvcBold(text);
+    text = formatJvcItalic(text);
+    text = formatJvcUnderline(text);
+    text = formatJvcStrikethrough(text);
+    text = formatJvcCode(text);
+    text = formatJvcSpoiler(text);
+    text = formatJvcLists(text);
+    text = formatJvcBlockquotes(text);
+
+    // Formatage Markdown pour compatibilité
     text = formatSpoilers(text);
     text = formatCodeBlocks(text);
     text = formatInlineCode(text);
-    text = formatBoldText(text);
-    text = formatItalicText(text);
+    text = formatBoldAndItalicText(text);
     text = formatStrikethrough(text);
+
     text = formatImages(text);
     text = formatLinks(text);
 
@@ -609,8 +783,8 @@ function formatMessageContent(rawText) {
 function initializeSpoilerHandlers(container) {
     if (!container) return;
 
-    const spoilers = container.querySelectorAll('.JvCare--masked');
-    spoilers.forEach(spoiler => {
+    const markdownSpoilers = container.querySelectorAll('.JvCare--masked');
+    markdownSpoilers.forEach(spoiler => {
         spoiler.addEventListener('click', function () {
             this.classList.remove('JvCare--masked');
             this.classList.add('JvCare--revealed');
@@ -869,7 +1043,7 @@ function buildDecensuredInputUI() {
         }
     });
 
-    setTimeout(() => setupTabOrder(), 100);
+    setTimeout(() => throttledSetupTabOrder(), 100);
 }
 
 function setupTabOrder() {
@@ -1086,7 +1260,7 @@ function setupToggleHandlers(type, onToggle) {
 
         if (onToggle) onToggle(isActive);
 
-        setTimeout(() => setupTabOrder(), 50);
+        setTimeout(() => throttledSetupTabOrder(), 50);
     });
 
     return { toggleButton, fakeContainer, isActive: () => isActive };
@@ -1114,6 +1288,15 @@ function extractTopicIdFromUrl(pathname) {
 
 function isValidTopicId(topicId) {
     return topicId && parseInt(topicId) >= DECENSURED_CONFIG.TOPICS.MIN_VALID_TOPIC_ID;
+}
+
+function extractMessageIdFromUrl(pathname) {
+    const match = pathname.match(/\/forums\/message\/(\d+)$/);
+    return match ? parseInt(match[1]) : null;
+}
+
+function getCurrentMessageIdFromUrl() {
+    return extractMessageIdFromUrl(window.location.pathname);
 }
 
 function cleanupTopicDecensuredState() {
@@ -1224,7 +1407,7 @@ function injectDecensuredTopicUI(elements) {
         }
     });
 
-    setTimeout(() => setupTabOrder(), 100);
+    setTimeout(() => throttledSetupTabOrder(), 100);
 }
 
 function setupTopicTextareaForDecensured(textarea) {
@@ -1289,7 +1472,7 @@ function replaceTopicPostButtonWithDecensured() {
         return false;
     });
 
-    setTimeout(() => setupTabOrder(), 50);
+    setTimeout(() => throttledSetupTabOrder(), 50);
 }
 
 function restoreOriginalTopicPostButton() {
@@ -1660,15 +1843,41 @@ function setupDynamicTopicHighlighting() {
         });
 
         if (hasNewTopics) {
+            throttledClearDomCache();
+            invalidateMessageElementsCache();
+
             if (highlightTimer) {
                 clearTimeout(highlightTimer);
             }
 
             highlightTimer = setTimeout(() => {
-                highlightDecensuredTopics();
+                throttledHighlightDecensuredTopics();
             }, 500);
         }
     });
+
+    // Observer initial des topics existants avec Intersection Observer
+    const setupIntersectionObserver = () => {
+        const topicObserver = new IntersectionObserver((entries) => {
+            const visibleTopics = entries
+                .filter(entry => entry.isIntersecting && !entry.target.classList.contains('deboucled-decensured-checked'))
+                .map(entry => entry.target);
+
+            if (visibleTopics.length > 0) {
+                throttledHighlightDecensuredTopics();
+            }
+        }, {
+            rootMargin: '200px', // Charger avant que l'élément soit visible
+            threshold: 0.1
+        });
+
+        const existingTopics = document.querySelectorAll('.topic-list > li:not(.dfp__atf):not(.message)');
+        existingTopics.forEach(topic => topicObserver.observe(topic));
+
+        return topicObserver;
+    };
+
+    const intersectionObserver = setupIntersectionObserver();
 
     const targetNode = document.body || document.documentElement;
     if (targetNode) {
@@ -1678,7 +1887,7 @@ function setupDynamicTopicHighlighting() {
         });
     }
 
-    return observer;
+    return { mutationObserver: observer, intersectionObserver };
 }
 
 function setupTopicRedirectionListener() {
@@ -1698,20 +1907,32 @@ function setupTopicRedirectionListener() {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function getMessageElements() {
+    const now = Date.now();
+
+    if (messageElementsCache && (now - messageElementsCacheTime) < DECENSURED_CONFIG.MESSAGE_CACHE_TTL) {
+        return messageElementsCache;
+    }
+
     let messageElements = document.querySelectorAll('.conteneur-messages-pagi > div.bloc-message-forum');
 
     if (messageElements.length === 0) {
-
         for (const selector of DECENSURED_CONFIG.SELECTORS.MESSAGE_ELEMENTS) {
             messageElements = document.querySelectorAll(selector);
-
             if (messageElements.length > 0) {
                 break;
             }
         }
     }
 
-    return Array.from(messageElements);
+    messageElementsCache = Array.from(messageElements);
+    messageElementsCacheTime = now;
+
+    return messageElementsCache;
+}
+
+function invalidateMessageElementsCache() {
+    messageElementsCache = null;
+    messageElementsCacheTime = 0;
 }
 
 function createMessageIndex(decensuredMessages) {
@@ -1904,8 +2125,14 @@ async function decryptMessages() {
     }
 
     const currentPage = getCurrentPageType(window.location.pathname);
-    if (currentPage !== 'topicmessages') return;
+    if (currentPage === 'topicmessages') {
+        await decryptTopicMessages();
+    } else if (currentPage === 'singlemessage') {
+        await decryptSingleMessage();
+    }
+}
 
+async function decryptTopicMessages() {
     const topicId = getCurrentTopicId();
     if (!topicId) return;
 
@@ -1926,9 +2153,34 @@ async function decryptMessages() {
 
             processDecensuredMessage(msgElement, decensuredMsg);
         });
+    } catch (error) {
+        handleApiError(error, 'Erreur lors du déchiffrement des messages du topic');
+    }
+}
+
+async function decryptSingleMessage() {
+    const messageId = getCurrentMessageIdFromUrl();
+    if (!messageId) return;
+
+    try {
+        const apiResponse = await fetchDecensuredApi(`${apiDecensuredSingleMessageUrl}/${messageId}`);
+
+        const decensuredMsg = Array.isArray(apiResponse) && apiResponse.length > 0 ? apiResponse[0] : null;
+
+        if (!decensuredMsg || !decensuredMsg.message_real_content) return;
+
+        const messageElements = getMessageElements();
+        const messageElement = messageElements.find(elem => {
+            const elemMessageId = getMessageId(elem);
+            return elemMessageId && elemMessageId.toString() === messageId.toString();
+        });
+
+        if (messageElement) {
+            processDecensuredMessage(messageElement, decensuredMsg);
+        }
 
     } catch (error) {
-        console.error('Erreur lors du déchiffrement des messages :', error);
+        handleApiError(error, `Erreur lors du déchiffrement du message unique ${messageId}`);
     }
 }
 
@@ -2364,11 +2616,16 @@ function hideFloatingWidget() {
 }
 
 async function loadFloatingWidgetTopics() {
+    const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
     const topicsContainer = document.getElementById('deboucled-floating-widget-topics');
     const loadingContainer = document.querySelector('.deboucled-floating-widget-loading');
     const refreshButton = document.getElementById('deboucled-floating-widget-refresh');
 
     if (!topicsContainer) return;
+
+    if (!widget || !widget.classList.contains('visible')) {
+        return;
+    }
 
     if (loadingContainer) {
         loadingContainer.classList.add('active');
@@ -2451,8 +2708,8 @@ function startFloatingWidgetMonitoring() {
 
     setInterval(() => {
         const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
-        if (widget && !widget.classList.contains('hidden') && widget.hasAttribute('data-loaded')) {
-            loadFloatingWidgetTopics();
+        if (widget && widget.classList.contains('visible') && widget.hasAttribute('data-loaded')) {
+            debouncedLoadFloatingWidgetTopics();
         }
     }, DECENSURED_CONFIG.FLOATING_WIDGET.REFRESH_INTERVAL);
 }
@@ -2494,8 +2751,8 @@ async function initDecensured() {
 
     toggleDecensuredFloatingWidget();
 
-    await decryptMessages();
-    highlightDecensuredTopics();
+    debouncedDecryptMessages();
+    debouncedHighlightDecensuredTopics();
     setupTopicRedirectionListener();
     setupDynamicTopicHighlighting();
 
