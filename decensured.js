@@ -4,6 +4,8 @@
 
 let decensuredInitialized = false;
 let decensuredPingTimer = null;
+let decensuredUsersTimer = null;
+let decensuredUsersLoading = false;
 let tabOrderSetupInProgress = false;
 let isProcessingTopicCreation = false;
 const domCache = new Map();
@@ -25,7 +27,7 @@ const DECENSURED_CONFIG = {
     INIT_DELAY: 1000,
     RETRY_TIMEOUT: 10 * 60 * 1000,
     POST_TIMEOUT: 40000,
-    USERS_REFRESH_INTERVAL: 3 * 60 * 1000,
+    USERS_REFRESH_INTERVAL: 4 * 60 * 1000,
 
     // === PERFORMANCE CONFIGURATION ===
     CACHE_TTL: 5000, // 5 secondes
@@ -306,6 +308,10 @@ function cleanupTimers() {
     if (decensuredPingTimer) {
         clearInterval(decensuredPingTimer);
         decensuredPingTimer = null;
+    }
+    if (decensuredUsersTimer) {
+        clearInterval(decensuredUsersTimer);
+        decensuredUsersTimer = null;
     }
     if (window.deboucledStatsTimer) {
         clearInterval(window.deboucledStatsTimer);
@@ -2407,6 +2413,9 @@ function updateDecensuredUsersCount(count) {
 }
 
 async function loadDecensuredUsersData() {
+    if (decensuredUsersLoading) return;
+    decensuredUsersLoading = true;
+
     try {
         const response = await fetchDecensuredApi(apiDecensuredStatsUrl);
         if (response && response.nb) {
@@ -2418,6 +2427,8 @@ async function loadDecensuredUsersData() {
     } catch (error) {
         handleApiError(error, 'Chargement utilisateurs Décensured');
         updateDecensuredUsersCount(0);
+    } finally {
+        decensuredUsersLoading = false;
     }
 }
 
@@ -2425,16 +2436,11 @@ function startDecensuredUsersMonitoring() {
     if (!store.get(storage_optionDisplayDecensuredUsersCount, storage_optionDisplayDecensuredUsersCount_default)) {
         return;
     }
+    if (decensuredUsersTimer) return;
 
     loadDecensuredUsersData();
 
-    setInterval(loadDecensuredUsersData, DECENSURED_CONFIG.USERS_REFRESH_INTERVAL);
-
-    document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-            loadDecensuredUsersData();
-        }
-    });
+    decensuredUsersTimer = setInterval(loadDecensuredUsersData, DECENSURED_CONFIG.USERS_REFRESH_INTERVAL);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
