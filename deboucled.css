@@ -3656,3 +3656,8 @@ body.dark .deboucled-loading-text::after {
   font-family: "Courier New", Courier, monospace;
   font-size: 0.9em;
 }
+
+.text-enrichi-forum .img-shack {
+  margin-right: -4px;
+  margin-bottom: -7px;
+}
