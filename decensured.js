@@ -995,7 +995,7 @@ async function createDecensuredTopicMessage(topicId, messageId, topicUrl, topicT
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function buildDecensuredBadge() {
-    const badge = document.createElement('span');
+    const badge = document.createElement('div');
     badge.className = 'deboucled-decensured-badge deboucled-decensured-premium-logo';
     badge.id = `deboucled-badge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     badge.setAttribute('deboucled-data-tooltip', `Membre d'élite Décensured`);
@@ -2074,7 +2074,7 @@ function addDecensuredBadge(msgElement) {
     const userLevelElement = msgElement.querySelector('.bloc-user-level');
     if (userLevelElement) {
         const badge = buildDecensuredBadge();
-        userLevelElement.appendChild(badge);
+        userLevelElement.insertAdjacentElement('afterend', badge);
         return;
     }
 
@@ -2497,83 +2497,53 @@ function createDecensuredFloatingWidget() {
 }
 
 function setupFloatingWidgetEvents() {
-    const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
-    const close = document.getElementById('deboucled-floating-widget-close');
-    const refresh = document.getElementById('deboucled-floating-widget-refresh');
+    const widgetElem = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
+    const closeWidgetButton = document.getElementById('deboucled-floating-widget-close');
+    const refreshWidgetButton = document.getElementById('deboucled-floating-widget-refresh');
 
-    if (!widget) return;
+    if (!widgetElem) return;
 
     let hoverTimeout;
-    let isManuallyVisible = false;
 
-    if (window.innerWidth > 768) {
-        widget.addEventListener('mouseenter', () => {
+    widgetElem.addEventListener('click', () => {
+        clearTimeout(hoverTimeout);
+        showFloatingWidget();
+    });
+
+    if (window.innerWidth > 950) { // not smartphone
+        widgetElem.addEventListener('mouseenter', () => {
             clearTimeout(hoverTimeout);
-            if (!isManuallyVisible) {
-                showFloatingWidget();
-            }
+            showFloatingWidget();
         });
 
-        widget.addEventListener('mouseleave', () => {
-            if (!isManuallyVisible) {
-                hoverTimeout = setTimeout(() => {
-                    hideFloatingWidget();
-                }, 300);
-            }
+        widgetElem.addEventListener('mouseleave', () => {
+            hoverTimeout = setTimeout(() => {
+                hideFloatingWidget();
+            }, 300);
         });
     }
 
-    if (window.innerWidth <= 768) {
-        let startX, currentX;
-        let isDragging = false;
-
-        widget.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-            isDragging = true;
-        });
-
-        widget.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-
-            currentX = e.touches[0].clientX;
-            const deltaX = currentX - startX;
-
-            if (deltaX > 50) {
-                showFloatingWidget();
-                isManuallyVisible = true;
-            }
-        });
-
-        widget.addEventListener('touchend', () => {
-            isDragging = false;
-        });
-    }
-
-    if (close) {
-        close.addEventListener('click', () => {
+    if (closeWidgetButton) {
+        closeWidgetButton.addEventListener('click', (e) => {
+            e.stopPropagation();
             hideFloatingWidget();
-            isManuallyVisible = false;
         });
     }
 
-    if (refresh) {
-        refresh.addEventListener('click', () => {
-            refresh.classList.add('spinning');
+    if (refreshWidgetButton) {
+        refreshWidgetButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            refreshWidgetButton.classList.add('spinning');
             loadFloatingWidgetTopics().finally(() => {
-                setTimeout(() => refresh.classList.remove('spinning'), 500);
+                setTimeout(() => refreshWidgetButton.classList.remove('spinning'), 500);
             });
         });
     }
 
     document.addEventListener('click', (e) => {
-        if (!widget.contains(e.target) && !widget.classList.contains('hidden')) {
+        if (!widgetElem.contains(e.target) && !widgetElem.classList.contains('hidden')) {
             hideFloatingWidget();
-            isManuallyVisible = false;
         }
-    });
-
-    window.addEventListener('resize', () => {
-        setupFloatingWidgetEvents();
     });
 
     setupThemeToggleListener();

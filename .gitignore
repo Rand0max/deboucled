@@ -5,9 +5,6 @@ resources/**
 .vscode/**
 tampermonkey-module.d.ts
 tampermonkey-reference.d.ts
-tsconfig.json
-/package-lock.json
-/package.json
 *.debug.js
 *.make.js
 *.log

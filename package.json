@@ -1,0 +1,11 @@
+{
+  "type": "module",
+  "devDependencies": {
+    "eslint": "^9.34.0",
+    "isomorphic-dompurify": "^2.26.0",
+    "marked": "^14.1.4"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}

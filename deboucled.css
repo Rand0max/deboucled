@@ -568,6 +568,7 @@ blockquote .deboucled-highlighted {
   flex: 1;
 }
 
+/* Dice Button */
 .deboucled-dice-button {
   padding: 8px 12px;
   border: 1px solid #ccc;
@@ -650,12 +651,13 @@ body.deboucled-dark-theme .deboucled-dice-button:active {
   background: #6c757d;
 }
 
+/* Floating Widget */
 .deboucled-floating-widget {
   position: fixed;
   z-index: 10000;
   width: 350px;
   height: 500px;
-  right: -330px;
+  right: -350px;
   top: 50%;
   transform: translateY(-50%);
   background: #ffffff;
@@ -664,7 +666,7 @@ body.deboucled-dark-theme .deboucled-dice-button:active {
   box-shadow: rgba(0, 0, 0, 0.15) 0 3px 8px;
   font-family: inherit;
   transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  overflow: hidden;
+  opacity: 0.95;
 }
 
 .deboucled-floating-widget.dark-theme {
@@ -678,22 +680,45 @@ body.deboucled-dark-theme .deboucled-dice-button:active {
 }
 
 .deboucled-floating-widget::before {
-  content: "";
+  content: "<";
   position: absolute;
-  left: 0;
-  top: 0;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 30px;
-  height: 100%;
-  background: rgba(33, 160, 211, 0.8);
+  height: 65px;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(33, 160, 211, 0.7);
+  border: solid rgba(16, 49, 62, 0.3) 1px;
+  text-shadow: 0 1px 2px rgba(16, 49, 62, 0.6);
   border-radius: 8px 0 0 8px;
   cursor: pointer;
-  z-index: 1;
+  z-index: 10001;
   opacity: 1;
   transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  animation: deboucled-widget-intro 1s ease-in-out 1s 2;
+  will-change: transform;
 }
 
 .deboucled-floating-widget.dark-theme::before {
-  background: rgba(16, 49, 62, 0.8);
+  color: rgba(64, 172, 214, 0.7);
+  background: rgba(25, 74, 93, 0.7);
+}
+
+@keyframes deboucled-widget-intro {
+  0%,
+  100% {
+    transform: translate3d(0, -50%, 0);
+  }
+  50% {
+    transform: translate3d(-4px, -50%, 0);
+  }
 }
 
 .deboucled-floating-widget.visible::before {
@@ -728,8 +753,8 @@ body.deboucled-dark-theme .deboucled-dice-button:active {
   cursor: pointer;
   padding: 6px 8px;
   border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 1.3rem;
+  font-weight: 500;
   line-height: 1;
   transition: all 0.3s ease;
 }
@@ -966,23 +991,9 @@ body.deboucled-dark-theme .deboucled-dice-button:active {
   }
 }
 
-@media (max-width: 768px) {
-  .deboucled-floating-widget {
-    width: calc(100vw - 20px);
-    max-width: 350px;
-    height: 400px;
-    right: -340px;
-    left: auto;
-    border-radius: 8px 0 0 8px;
-  }
-
-  .deboucled-floating-widget.visible {
-    right: 0;
-  }
-
-  .deboucled-floating-widget::before {
-    width: 20px;
-    background: rgba(16, 49, 62, 0.9);
+@media (max-width: 999px) {
+  .deboucled-floating-container {
+    right: 50px;
   }
 }
 
@@ -1866,6 +1877,9 @@ body.deboucled-dark-theme .deboucled-dice-button:active {
   margin-right: 0;
   width: 1.5em;
   height: 1.5em;
+}
+.deboucled-decensured-badge.deboucled-decensured-premium-logo {
+  margin-right: 0;
 }
 .deboucled-decensured-premium-logo.users {
   margin-right: 0.3rem;
@@ -3041,9 +3055,6 @@ select.deboucled-dropdown::-ms-expand {
   }
   [deboucled-data-tooltip]::before {
     max-width: 50vw;
-  }
-  .deboucled-floating-container {
-    right: 50px;
   }
   #header-profil .user-level {
     margin-top: calc(var(--profile-card-gap));
