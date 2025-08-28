@@ -1880,6 +1880,7 @@ body.deboucled-dark-theme .deboucled-dice-button:active {
 }
 .deboucled-decensured-badge.deboucled-decensured-premium-logo {
   margin-right: 0;
+  margin-left: 0.3rem;
 }
 .deboucled-decensured-premium-logo.users {
   margin-right: 0.3rem;

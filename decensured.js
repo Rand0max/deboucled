@@ -2074,7 +2074,7 @@ function addDecensuredBadge(msgElement) {
     const userLevelElement = msgElement.querySelector('.bloc-user-level');
     if (userLevelElement) {
         const badge = buildDecensuredBadge();
-        userLevelElement.insertAdjacentElement('afterend', badge);
+        userLevelElement.appendChild(badge);
         return;
     }
 
