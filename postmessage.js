@@ -53,7 +53,7 @@ async function handlePostMessage() {
     if (decensuredToggle && decensuredToggle.checked) {
         return;
     }
-    
+
     bypassTextCensorship();
     await validatePendingMessageQuotes();
 }
@@ -67,8 +67,8 @@ function bypassTextCensorship() {
 
     const titleArea = document.querySelector('#input-topic-title');
     if (titleArea?.value?.length) {
-        titleArea.value = titleArea.value.replaceAll(/d[e|é]boucled/gi, 'Déb0ucled');
-        titleArea.value = titleArea.value.replaceAll(/d[e|é]censured/gi, 'Déc3nsured');
+        setTextAreaValue(titleArea, titleArea.value.replaceAll(/d[e|é]boucled/gi, 'Déb0ucled'));
+        setTextAreaValue(titleArea, titleArea.value.replaceAll(/d[e|é]censured/gi, 'Déc3nsured'));
     }
 }
 

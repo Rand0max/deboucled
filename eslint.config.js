@@ -172,7 +172,7 @@ export default [
       "profile.js",
       "extras.js",
       "decensured.js",
-      "decensured-helpers.js",
+      "decensured-variables.js",
       "main.js"
     ]
   }

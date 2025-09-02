@@ -2,241 +2,6 @@
 // DÉCENSURED
 ///////////////////////////////////////////////////////////////////////////////////////
 
-let decensuredInitialized = false;
-let decensuredPingTimer = null;
-let decensuredUsersTimer = null;
-let decensuredUsersLoading = false;
-let tabOrderSetupInProgress = false;
-let isProcessingTopicCreation = false;
-const domCache = new Map();
-let messageElementsCache = null;
-let messageElementsCacheTime = 0;
-
-// Versions debounced et throttled des fonctions critiques
-const debouncedHighlightDecensuredTopics = debounce(highlightDecensuredTopics, 500);
-const debouncedDecryptMessages = debounce(decryptMessages, 300);
-const debouncedLoadFloatingWidgetTopics = debounce(loadFloatingWidgetTopics, 1000);
-
-// Versions throttled pour les events frequents
-const throttledSetupTabOrder = throttle(setupTabOrder, 250);
-const throttledClearDomCache = throttle(clearDomCache, 2000);
-const throttledHighlightDecensuredTopics = throttle(highlightDecensuredTopics, 1000);
-
-const DECENSURED_CONFIG = {
-    // === TIMING CONFIGURATION ===
-    INIT_DELAY: 1000,
-    RETRY_TIMEOUT: 10 * 60 * 1000,
-    POST_TIMEOUT: 40000,
-    USERS_REFRESH_INTERVAL: 4 * 60 * 1000,
-
-    // === PERFORMANCE CONFIGURATION ===
-    CACHE_TTL: 5000, // 5 secondes
-    MESSAGE_CACHE_TTL: 3000, // 3 secondes
-
-    // === FORMATTING REGEX ===
-    FORMATTING_REGEX: {
-        // JVC native formats
-        jvcBold: /'''([^'\n]+)'''/g,
-        jvcItalic: /''([^'\n]+)''/g,
-        jvcUnderline: /<u>([^<\n]+)<\/u>/g,
-        jvcStrikethrough: /<s>([^<\n]+)<\/s>/g,
-        jvcCode: /<code>([\s\S]*?)<\/code>/g,
-        jvcSpoiler: /<spoil>([\s\S]*?)<\/spoil>/g,
-
-        // Listes JVC
-        bulletList: /^(\*\s+.+(?:\n\*\s+.*)*)/gm,
-        numberedList: /^(#\s+.+(?:\n#\s+.*)*)/gm,
-
-        // Citations JVC
-        blockquote: /^(>\s*.+(?:\n>\s*.*)*)/gm,
-
-        // Markdown compatibility (existing)
-        spoilers: /\[spoil\](.*?)\[\/spoil\]/gs,
-        codeBlocks: /```([\s\S]*?)```/g,
-        inlineCode: /`([^`\n]+)`/g,
-        images: /https:\/\/(?:www\.|image\.)?noelshack\.com\/[^\s<>"']+\.(png|jpg|jpeg|gif|webp)/gi,
-        links: /(https?:\/\/[^\s<>"']+)/g,
-        strikethrough: /~~([^~\n]+)~~/g,
-        // Regex combinee pour formatage gras et italique (markdown)
-        combined: /(\*\*([^*\n]+)\*\*)|(__([^_\n]+)__)|(\B\*([^*\n]+)\*\B)|(\b_([^_\n]+)_\b)/g
-    },
-
-    // === UI CONFIGURATION ===
-    NOTIFICATION_DURATION: 5000,
-    NOTIFICATION_ICONS: {
-        'success': '✅',
-        'warning': '⚠️',
-        'danger': '❌',
-        'error': '❌',
-        'info': 'ℹ️',
-        'primary': 'ℹ️'
-    },
-
-    // === API ENDPOINTS ===
-    URLS: {
-        POST_MESSAGE: '/forums/message/add',
-        CREATE_TOPIC: '/forums/topic/add'
-    },
-
-    // === FLOATING WIDGET CONFIGURATION ===
-    FLOATING_WIDGET: {
-        MAX_TOPICS: 15,
-        REFRESH_INTERVAL: 5 * 60 * 1000, // 5 minutes
-        ANIMATION_DURATION: 300
-    },
-
-    // === TOPICS SPECIFIC CONFIGURATION ===
-    TOPICS: {
-        MIN_VALID_TOPIC_ID: 70000000,
-        FORM_OBSERVER_TIMEOUT: 500,
-        CHECK_DELAY: 500,
-        HIGHLIGHT_DELAY: 1500
-    },
-
-    // === DOM SELECTORS ===
-    SELECTORS: {
-        MESSAGE_TEXTAREA: [
-            '#message_topic',
-            'textarea[name="message_topic"]',
-            '#forums-post-message-editor textarea',
-            '.message-editor textarea',
-            '[data-input-name="message_topic"]',
-            'textarea[placeholder*="message"]'
-        ],
-        POST_BUTTON: [
-            '.postMessage',
-            '.btn-poster-msg',
-            'button[type="submit"]'
-        ],
-        MESSAGE_FORM: [
-            '#forums-post-message-editor > form',
-            '#bloc-formulaire-forum'
-        ],
-        MESSAGE_ELEMENTS: [
-            '.conteneur-message .msg',
-            '.bloc-message-forum .msg',
-            '.bloc-message-forum',
-            '.message-topic',
-            '[id^="message"]',
-            '.post-content'
-        ],
-        REPORT_BUTTON: [
-            '.picto-msg-exclam',
-            '[class*="picto-msg-exclam"]',
-            '.msg-report-btn',
-            '[title*="signaler"]',
-            '[aria-label*="signaler"]'
-        ],
-        TOPIC_TITLE_INPUT: [
-            '#input-topic-title',
-            'input[name="input-topic-title"]',
-            '#topicTitle',
-            'input[name="topicTitle"]',
-            'input[name="topic_title"]',
-            'input[placeholder*="titre"]',
-            'input[placeholder*="Titre"]',
-            '#titre_topic',
-            '.topic-title-input',
-            'input[name="titre"]',
-            '#sujet',
-            'input[name="sujet"]'
-        ],
-        TOPIC_FORM: [
-            '#forums-post-topic-editor form',
-            '#bloc-formulaire-forum form',
-            'form[action*="topic/add"]',
-            'form[action*="/forums/topic/add"]',
-            '.form-topic-add',
-            'form[action*="sujet"]',
-            '.formulaire-nouveau-topic',
-            'form.topic-form',
-            'form[method="post"]',
-            '.form-post-topic'
-        ],
-        // === DÉCENSURED ELEMENTS ===
-        DECENSURED_MESSAGE_TOGGLE: '#decensured-message-toggle',
-        DECENSURED_MESSAGE_FAKE: '#decensured-message-fake-message',
-        DECENSURED_TOPIC_TOGGLE: '#decensured-topic-toggle',
-        DECENSURED_TOPIC_FAKE: '#decensured-topic-fake-message',
-        DECENSURED_CONTAINER: '.deboucled-decensured-input',
-        DECENSURED_POST_BUTTON_MESSAGE: 'button[title*="Publier le message"]',
-        DECENSURED_POST_BUTTON_TOPIC: 'button[title*="Publier le topic"]',
-        // === DÉBOUCLED SPECIFIC IDS ===
-        DEBOUCLED_DECENSURED_TOPIC_POST_BUTTON: '#deboucled-decensured-topic-post-button',
-        DEBOUCLED_DECENSURED_MESSAGE_POST_BUTTON: '#deboucled-decensured-message-post-button',
-        DEBOUCLED_ORIGINAL_TOPIC_POST_BUTTON: 'button[data-decensured-topic-original="true"]',
-        DEBOUCLED_ORIGINAL_MESSAGE_POST_BUTTON: 'button[data-decensured-message-original="true"]',
-        // === DÉBOUCLED CONTAINERS AND ELEMENTS ===
-        DEBOUCLED_DECENSURED_MESSAGE_CONTAINER: '#deboucled-decensured-message-container',
-        DEBOUCLED_DECENSURED_TOPIC_CONTAINER: '#deboucled-decensured-topic-container',
-        DEBOUCLED_DECENSURED_MESSAGE_TOGGLE: '#deboucled-decensured-message-toggle',
-        DEBOUCLED_DECENSURED_TOPIC_TOGGLE: '#deboucled-decensured-topic-toggle',
-        DEBOUCLED_DECENSURED_MESSAGE_FAKE_TEXTAREA: '#deboucled-decensured-message-fake-textarea',
-        DEBOUCLED_DECENSURED_TOPIC_FAKE_TEXTAREA: '#deboucled-decensured-topic-fake-textarea',
-        DEBOUCLED_DECENSURED_MESSAGE_FAKE_CONTAINER: '#deboucled-decensured-message-fake-container',
-        DEBOUCLED_DECENSURED_TOPIC_FAKE_CONTAINER: '#deboucled-decensured-topic-fake-container',
-        DEBOUCLED_DECENSURED_MESSAGE_FAKE_LABEL: '#deboucled-decensured-message-fake-label',
-        DEBOUCLED_DECENSURED_TOPIC_FAKE_LABEL: '#deboucled-decensured-topic-fake-label',
-        // === DYNAMIC ELEMENTS ===
-        DEBOUCLED_DECENSURED_NOTIFICATION: '.deboucled-decensured-notification',
-        DEBOUCLED_DECENSURED_BADGE: '.deboucled-decensured-badge',
-        DEBOUCLED_DECENSURED_INDICATOR: '.deboucled-decensured-indicator',
-        DEBOUCLED_DECENSURED_CONTENT: '.deboucled-decensured-content',
-        DEBOUCLED_HEADER_DECENSURED: '#deboucled-header-decensured',
-        DEBOUCLED_USERS_COUNTER: '#deboucled-users-counter',
-        // === HEADER ELEMENTS ===
-        HEADER_ACCOUNT_CONNECTED: [
-            '.headerAccount--pm',
-            '.headerAccount--connect'
-        ],
-        // === FLOATING WIDGET ===
-        DEBOUCLED_FLOATING_WIDGET: '#deboucled-floating-widget'
-    }
-};
-
-const platitudeMessages = [
-    "J'apprécie ce forum", "Je ne sais pas quoi en penser", "Je te retourne la question", "Cette communauté est incroyable", "Que pensez-vous de l'actualité ?",
-    "A titre personnel j'hésite", "Oui et non", "C'est étonnant", "Ma réaction à chaud ? ent", "C'est un peu décevant", "Je garde la tête haute", "Pourquoi ?",
-    "Je préfère m'abstenir", "Que répondre à ça !", "Dans la vie c'est tout ou rien", "Je préfère en rire", "Il vaut mieux rester concentré et attentif",
-    "Il faut se battre pour réussir", "La roue finira par tourner pour tout le monde !", "La chance peut te sourire à n'importe quel moment", "plus flou stp",
-    "Je ne sais pas trop de quel côté me ranger", "ça reste à débattre nonobstant.", "En dépit des mesures sanitaires je reste vigilant", "Une de perdue dix de retrouvées",
-    "Mieux vaut tard que jamais", "ça reste à confirmer", "Je condamne fermement", "Pourquoi tu dis ça ?", "Le destin en décidera.", "Tout est relatif tu sais...",
-    "Chacun fait ce qu'il veut", "Le pollen gratte les yeux en ce moment", "Un week-end de 3 jours ça fait toujours du bien", "C'est dur le lundi :(",
-    "Les prix de l'essence aident pas à se détendre non plus", "Je ronge trop souvent mes ongles", "beaucoup de monde à la pompe à essence ce matin !",
-    "Il y a des chances qu'on soit pas seul dans l'univers selon moi !", "Mon eau préférée c'est la cristalline et vous ?", "Y'a plus de saisons de toute manière...",
-    "On vit en démocratie ne l'oubliez pas les kheys !", "la politique ne m'intéresse pas trop de toute facon", "C'est peu ou prou la même chose", "ça a de la gueule",
-    "l'important c'est de participer", "Il pleut vraiment très souvent en ce moment vous trouvez pas ?", "C'est comme chiens et chats", "bientôt mon anniversaire faut le savoir",
-    "Les goûts et les couleurs hein...", "Savoir rester ouvert d'esprit c'est le plus important", "Quel temps il va faire demain déjà ?", "J'aime bien Star Wars persoent",
-    "Drôle d'idée !", "Selon toi il faudrait faire quoi ?", "Peut-être pas aujourd'hui mais à réfléchir", "ta reacprout ?", "ça marche", "d'accord", "la je vois pas",
-    "L'amour te tombera dessus au moment où tu t'y attendras le moins crois moi", "Garde l'oeil ouvert, et le bon !", "Protégez-vous les kheys", "La pluie c'est déprimant",
-    "Prenez soin de vos proches les kheys", "Les bouchons près de Paris on en parle ?", "Le principal c'est de protéger les autres avant soi-même", "Oula c'est quoi ce topic",
-    "le week-end est passé tellement vite", "C'est lequel votre sticker préféré ? Moi c'est ", "Franchement je préfère pas y penser", "ça veut dire quoi pnj ?",
-    "Son point de vue est à considérer, mais restons prudents", "up", "je up", "hophophop on up le topic", "perso ça m'est égal", "peut-être pas qui sait",
-    "Le travail paie", "Mangez 5 fruits et légumes par jour les kheys", "La musique de nos jours tu sais", "Ca parait peu probable en dépit de", "Faut voir",
-    "A voir", "Ca permet de respirer j'avoue", "Le mieux étant de rester nuancé", "J'hésite à le dire mais bon", "Sérieux ?", "Sérieusement ?", "Non mais allo quoi",
-    "Pfff de toute manière c'est inévitable khey", "Peut être un jour oui mais la j'ai la flemme", "Honnêtement c'est pas si simple", "Plus compliqué que ça",
-    "Ca me rappelle Zizou en 98 ça", "D'accord mais qui l'a dit ?", "J'en reviens pas si nofake", "Je re, je dois aller manger", " Aidez moi pour mes devoirs en MP svp",
-    "Faut aller voter c'est important pour la démocratie", "Allez les bleus !", "Mon voisin me regarde pas la fenêtre chelou non ?", "Rien de nouveau, toujours le boulot",
-    "Votre youtubeur préféré c'est qui ? J'aime bien Squeezie", "J'ai renversé mon café l'autre jour", "Le ciel est grisatre aujourd'hui non ?", "Les oiseaux chantent ou crient ?",
-    "J'aimerais bien voir ça", "Plutôt deux fois qu'une", "Le lièvre ou la tortue ?", "Petit à petit quoi", "Boucle", "Boucled", "Malaise", "Gros malaise", "Enorme malaise",
-    "Ok khey", "Depuis quand ?", "Y'a pas à dire l'evian est délicieuse", "Harry Potter vous aimez ?", "Je préfère être sur téléphone perso", "Je préfère être sur pc perso",
-    "Y'a pas à dire, Zidane il était bon hein", ":(", ":ouch:", ":ouch2:", ":-(", ":noel:", ":play:", "Je go toilettes attendez moi", "Le topic bug non ?", "J'aurais pas dit ça moi",
-    "si tu le dis...", "personne te croit mais bon...", "c'est pas si sûr", "explique un peu plus si tu veux nous convaincre", "je ne sais pas quoi en penser",
-    "ça se tente", "Il faut toujours croire en ses rêves", "Tellement content d'être ici", "Vive la république !", "Profitez bien de la vie les kheys", "Le temps passe",
-    "du coup je ne sais pas qui écouter", "Ce topic est étonnant", "Je dis ça je dis rien", "Restons courtois svp", "Attendez j'écris un gros pavé pour expliquer",
-    "Source ?", "Ca a été debunk y'a longtemps", "Euh pardon ?", "Pffff même pas", "Rien compris", "Rien compris l'op", "rien compris à ton message", "qui me cite la ?",
-    "Tant qu'il y a de la vie il y a de l'espoir", "Ouaip faisons comme ça", "Sélection naturelle", "Naturelle", "ent", "pas faux", "je ne me positionne pas",
-    "ça n'en vaut pas la peine", "Après l'heure, c'est plus l'heure", "J'ai rencontré quelqu'un", "Plutôt l'un que l'autre si tu veux mon avis", "Honnêtement je ne sais pas",
-    "C'est en cours d'étude khey", "Hé oui le temps passe", "Jamais deux sans trois j'ai envie de dire", "En parlant du loup...", "Pas de sophismes svp",
-    "ca vient de quel journal ?", "Mon pied a failli faire déco ma box ahiii", "Ayaaaaaaa", "Ahiiii", "Ahi", "Ayaaa", "oulaaa qu'est ce que tu n'as pas dit la ?",
-    "Rien à voir mais vous savez pourquoi y'a pas la formule 1 ce week-end ?", "On se retrouve sur le topic M6 kheyou", "Salut les quilles je viens d'arriver, j'ai raté quoi ?",
-    "a plus tard les kheys, je dois me déco là", "Plutôt pour ou contre ? chaud", "chaud", "abusé j'ai lu quoi la ?", "mouais bof", "malaise", "qui a dit ca en fait ?",
-    "A bon entendeur...", "A méditer...", "Sur quoi tu te bases pour dire ça ?", "Sur quelle base au juste ?", "Je fais mon trou en dépit de", "Faut il repasser ses slips ?",
-    "On va faire comme si on avait rien lu", "Faut il repasser ses chaussettes ?", "Faut il repasser ses t-shirts ?", "Faut il repasser ses jeans ?", "Je suis troublé",
-    "Rien compris", "Quelqu'un comprend l'auteur ?", "Quelqu'un a compris ?", "Comprend pas là", "Mais il parle de quoi lui ?", "Complètement H.S nonobstant",
-    "Moi tu vois, je vis pour le moment présent, je me casse pas la tête", "Et sinon tu bosses dans quoi ?", "Après je prétend pas avoir la vérité absolue", "Ah ça..."];
-
-
 ///////////////////////////////////////////////////////////////////////////////////////
 // Cache et utilitaires de performance
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -287,6 +52,182 @@ setInterval(() => {
 }, DECENSURED_CONFIG.CACHE_TTL);
 
 ///////////////////////////////////////////////////////////////////////////////////////
+// Sequence Helpers
+///////////////////////////////////////////////////////////////////////////////////////
+
+function getRandomPlatitudeMessage() {
+    initAllPlatitudeSequences();
+    const messageIndex = getNextIndexFromSequence(platitudeMessageSequenceData, platitudeMessages.length);
+    return platitudeMessages[messageIndex];
+}
+
+function getRandomPlatitudeTitle() {
+    initAllPlatitudeSequences();
+    const topicIndex = getNextIndexFromSequence(platitudeTopicSequenceData, platitudeTopics.length);
+    return platitudeTopics[topicIndex].title;
+}
+
+function createShuffledSequence(length) {
+    const sequence = Array.from({ length }, (_, i) => i);
+    // Algorithme de Fisher-Yates
+    for (let i = sequence.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [sequence[i], sequence[j]] = [sequence[j], sequence[i]];
+    }
+    return sequence;
+}
+
+function getNextIndexFromSequence(sequenceData, totalLength) {
+    if (!sequenceData.sequence || sequenceData.currentIndex >= sequenceData.sequence.length) {
+        sequenceData.sequence = createShuffledSequence(totalLength);
+        sequenceData.currentIndex = 0;
+    }
+
+    const index = sequenceData.sequence[sequenceData.currentIndex];
+    sequenceData.currentIndex++;
+    return index;
+}
+
+function initAllSequences() {
+    platitudeTopicSequenceData = {
+        sequence: createShuffledSequence(platitudeTopics.length),
+        currentIndex: 0
+    };
+
+    platitudeMessageSequenceData = {
+        sequence: createShuffledSequence(platitudeMessages.length),
+        currentIndex: 0
+    };
+
+    topicWithMessagesIndexSequences.clear();
+    platitudeTopics.forEach(topic => {
+        topicWithMessagesIndexSequences.set(topic.title, {
+            sequence: createShuffledSequence(topic.messages.length),
+            currentIndex: 0
+        });
+    });
+}
+
+function initAllPlatitudeSequences() {
+    if (!sequencesInitialized) {
+        initAllSequences();
+        sequencesInitialized = true;
+    }
+}
+
+function getRandomTopicWithMessage() {
+    initAllPlatitudeSequences();
+
+    const topicIndex = getNextIndexFromSequence(platitudeTopicSequenceData, platitudeTopics.length);
+    const selectedTopic = platitudeTopics[topicIndex];
+
+    const messageSequenceData = topicWithMessagesIndexSequences.get(selectedTopic.title);
+    const messageIndex = getNextIndexFromSequence(messageSequenceData, selectedTopic.messages.length);
+
+    return {
+        title: selectedTopic.title,
+        message: selectedTopic.messages[messageIndex]
+    };
+}
+
+function getRandomMessageForTitle(title) {
+    const messageSequenceData = topicWithMessagesIndexSequences.get(title);
+    if (messageSequenceData) {
+        initAllPlatitudeSequences();
+
+        const matchingTopic = platitudeTopics.find(topic => topic.title === title);
+        const messageIndex = getNextIndexFromSequence(messageSequenceData, matchingTopic.messages.length);
+
+        return matchingTopic.messages[messageIndex];
+    }
+    return getRandomPlatitudeMessage();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Utilitaires pour les titres de topics décensured
+///////////////////////////////////////////////////////////////////////////////////////
+
+function getTopicTitleElement() {
+    const selectors = ['#bloc-title-forum', '.topic-title', 'h1'];
+
+    for (const selector of selectors) {
+        const element = document.querySelector(selector);
+        if (element) {
+            return element;
+        }
+    }
+    return null;
+}
+
+function updateTopicTitle(realTitle, fakeTitle = null) {
+    const topicTitleElement = getTopicTitleElement();
+    if (!topicTitleElement || !realTitle) {
+        return false;
+    }
+
+    const originalTitle = topicTitleElement.textContent;
+    topicTitleElement.textContent = realTitle;
+
+    const fakeTitleForTooltip = fakeTitle || originalTitle;
+    if (fakeTitleForTooltip !== realTitle) {
+        topicTitleElement.title = `Titre réel : ${realTitle}\nTitre de couverture : ${fakeTitleForTooltip}`;
+    }
+
+    return true;
+}
+
+function addTopicDecensuredIndicator(indicatorType = 'default') {
+    const topicTitleElement = getTopicTitleElement();
+    if (!topicTitleElement || topicTitleElement.querySelector('.deboucled-decensured-topic-indicator')) {
+        return false;
+    }
+
+    const indicator = document.createElement('span');
+    indicator.className = 'deboucled-decensured-topic-indicator';
+
+    if (indicatorType === 'lock') {
+        indicator.className += ' icon-topic-lock';
+        indicator.innerHTML = '';
+        indicator.title = 'Topic Décensured';
+    } else {
+        indicator.textContent = 'DÉCENSURED';
+        indicator.title = 'Ce topic contient des messages Décensured';
+    }
+
+    topicTitleElement.appendChild(indicator);
+    return true;
+}
+
+function formatTopicAsDecensured(realTitle = null, fakeTitle = null, options = {}) {
+    const {
+        updateTitle = true,
+        addIndicator = true,
+        indicatorType = 'default',
+        highlightPage = true
+    } = options;
+
+    let success = true;
+
+    if (updateTitle && realTitle) {
+        success = updateTopicTitle(realTitle, fakeTitle) && success;
+    }
+
+    if (addIndicator) {
+        addTopicDecensuredIndicator(indicatorType);
+    }
+
+    if (highlightPage) {
+        const mainContent = document.querySelector('.main-content, .topic-content, body');
+        if (mainContent) {
+            mainContent.classList.add('deboucled-current-topic-decensured');
+        }
+    }
+
+    return success;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
 // Utilitaires DOM helpers
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -329,7 +270,7 @@ function cleanupTimers() {
 }
 
 function handleApiError(error, context, showNotification = false) {
-    console.error(`[Déboucled Décensured] ${context}:`, error);
+    console.error(`[Décensured] ${context}:`, error);
 
     if (typeof sendDiagnostic === 'function') {
         sendDiagnostic(0, `Décensured: ${context} - ${error.message}`);
@@ -371,14 +312,17 @@ function getMessageId(messageElement) {
 }
 
 function getTitleFromTopicPage() {
-    const titleSelectors = [
-        '.topic-title',
-        'h1',
+    const titleElement = getTopicTitleElement();
+    if (titleElement) {
+        return titleElement.textContent.trim();
+    }
+
+    const additionalSelectors = [
         '.bloc-title h1',
         '.titre-topic'
     ];
 
-    for (const selector of titleSelectors) {
+    for (const selector of additionalSelectors) {
         const titleElement = document.querySelector(selector);
         if (titleElement) {
             return titleElement.textContent.trim();
@@ -390,10 +334,6 @@ function getTitleFromTopicPage() {
 
 function logDecensuredError(error, context = '') {
     handleApiError(error, context);
-}
-
-function getRandomPlatitudeMessage() {
-    return platitudeMessages[Math.floor(Math.random() * platitudeMessages.length)];
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -451,7 +391,6 @@ async function fetchDecensuredApi(endpoint, options = {}) {
                 ...options.headers
             };
 
-            // Pour les requêtes POST, ajouter Content-Type
             if (method !== 'GET') {
                 headers['Content-Type'] = 'application/json';
             }
@@ -517,7 +456,17 @@ function cleanTopicUrl(url) {
 
 async function processContent(message, fakeMessage = '') {
     try {
-        const finalFake = fakeMessage || getRandomPlatitudeMessage();
+        let finalFake = fakeMessage;
+
+        if (!finalFake) {
+            const titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT);
+            if (titleInput && titleInput.value.trim()) {
+                const currentTitle = titleInput.value.trim();
+                finalFake = getRandomMessageForTitle(currentTitle);
+            } else {
+                finalFake = getRandomPlatitudeMessage();
+            }
+        }
 
         const result = {
             real: message,
@@ -916,13 +865,12 @@ async function getDecensuredMessages(topicId) {
 
 async function createDecensuredTopic(topicData) {
     try {
-        const username = getUserPseudo() || 'Unknown';
-
         const topicApiData = {
             topicid: topicData.topic_id,
-            topicname: topicData.title,
+            topicnamefake: topicData.fake_title,
+            topicnamereal: topicData.real_title,
             topicurl: topicData.jvc_topic_url,
-            topicauthor: username,
+            topicauthor: getUserPseudo() || 'Unknown',
             creationdate: new Date().toISOString()
         };
 
@@ -938,7 +886,6 @@ async function createDecensuredTopic(topicData) {
         });
 
         const success = topicResponse !== null;
-
         return success;
     } catch (error) {
         console.error('💥 Erreur dans createDecensuredTopic:', error);
@@ -949,12 +896,10 @@ async function createDecensuredTopic(topicData) {
 
 async function createDecensuredTopicMessage(topicId, messageId, topicUrl, topicTitle, fakeContent, realContent) {
     try {
-        const username = getUserPseudo() || 'Unknown';
-
         const messageApiData = {
             userid: userId || '0',
             messageid: messageId,
-            username: username,
+            username: getUserPseudo() || 'Unknown',
             messageurl: topicUrl + '#message' + messageId,
             fakecontent: fakeContent,
             realcontent: realContent,
@@ -964,24 +909,18 @@ async function createDecensuredTopicMessage(topicId, messageId, topicUrl, topicT
             creationdate: new Date().toISOString()
         };
 
-
         for (const [key, value] of Object.entries(messageApiData)) {
             if (!value || !value.toString().length) {
                 console.warn(`⚠️ Champ manquant ou vide pour message: ${key} = ${value}`);
             }
         }
 
-
         const messageResponse = await fetchDecensuredApi(apiDecensuredCreateMessageUrl, {
             method: 'POST',
             body: JSON.stringify(messageApiData)
         });
 
-
-
         const success = messageResponse !== null;
-
-
         return success;
     } catch (error) {
         console.error('💥 Erreur dans createDecensuredTopicMessage:', error);
@@ -1016,6 +955,7 @@ function buildDecensuredInputUI() {
         container = traditionalTextarea.parentElement;
     } else {
         setTimeout(() => {
+            initAllPlatitudeSequences();
             buildDecensuredInputUI();
             buildDecensuredTopicInputUI();
             setTimeout(highlightDecensuredTopics, DECENSURED_CONFIG.TOPICS.HIGHLIGHT_DELAY);
@@ -1040,8 +980,9 @@ function buildDecensuredInputUI() {
             if (textarea) {
                 textarea.classList.add('deboucled-decensured-textarea-active');
                 if (textarea.placeholder !== undefined) {
-                    textarea.placeholder = 'Votre véritable message, chiffré et visible uniquement par les utilisateurs Déboucled.';
+                    textarea.placeholder = 'Message Décensured';
                 }
+                moveMainTextareaToContainer('message', textarea);
             }
         } else {
             restoreOriginalPostButton();
@@ -1051,9 +992,12 @@ function buildDecensuredInputUI() {
                 if (textarea.placeholder !== undefined) {
                     textarea.placeholder = '';
                 }
+                restoreMainTextareaFromContainer('message', textarea);
             }
         }
     });
+
+    addUXHints('message');
 
     setTimeout(() => throttledSetupTabOrder(), 100);
 }
@@ -1079,7 +1023,7 @@ function setupTabOrder() {
 }
 
 function setupMessageFormTabOrder(context) {
-    // Ordre logique : Toggle Décensured → Fake Message → Textarea principal → Bouton Post
+    // Ordre logique : Toggle → Message réel → Message fake → Bouton Post
     // Utiliser des tabindex élevés (100+) pour éviter les conflits avec JVC
     let tabIndex = 100;
 
@@ -1092,16 +1036,16 @@ function setupMessageFormTabOrder(context) {
         toggleButton.tabIndex = tabIndex++;
     }
 
-    // 2. Fake message textarea (si visible)
+    // 2. Textarea principal du message réel
+    const mainTextarea = findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA, document);
+    if (mainTextarea) {
+        mainTextarea.tabIndex = tabIndex++;
+    }
+
+    // 3. Message fake (si visible)
     const fakeTextarea = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_MESSAGE_FAKE_TEXTAREA);
     if (fakeTextarea) {
         fakeTextarea.tabIndex = tabIndex++;
-    }
-
-    // 3. Textarea principal du message
-    const mainTextarea = findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA, context);
-    if (mainTextarea) {
-        mainTextarea.tabIndex = tabIndex++;
     }
 
     // 4. Bouton de post (original ou Décensured)
@@ -1118,38 +1062,44 @@ function setupMessageFormTabOrder(context) {
 }
 
 function setupTopicFormTabOrder(form) {
-    // Ordre logique : Titre → Toggle Décensured → Fake Message → Textarea → Bouton Post
-    // Utiliser des tabindex élevés (200+) pour éviter les conflits avec JVC
+    // Ordre logique UX : 
+    // 1. Toggle → 2. Titre réel → 3. Titre fake → 4. Message réel → 5. Message fake → 6. Post
     let tabIndex = 200;
 
     const currentPage = getCurrentPageType(window.location.pathname);
     if (currentPage !== 'topiclist') return;
 
-    // 1. Input du titre du topic
-    const titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT, form);
-    if (titleInput) {
-        titleInput.tabIndex = tabIndex++;
-    }
-
-    // 2. Toggle button Décensured
+    // 1. Toggle button Décensured (point d'entrée)
     const toggleButton = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_TOGGLE);
     if (toggleButton) {
         toggleButton.tabIndex = tabIndex++;
     }
 
-    // 3. Fake message textarea (si visible)
+    // 2. Input du vrai titre
+    const realTitleInput = document.querySelector('#deboucled-decensured-topic-real-title');
+    if (realTitleInput) {
+        realTitleInput.tabIndex = tabIndex++;
+    }
+
+    // 3. Input du titre JVC (titre de camouflage)
+    const titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT, form);
+    if (titleInput) {
+        titleInput.tabIndex = tabIndex++;
+    }
+
+    // 4. Textarea principal du message réel
+    const mainTextarea = findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA, document);
+    if (mainTextarea) {
+        mainTextarea.tabIndex = tabIndex++;
+    }
+
+    // 5. Message de camouflage
     const fakeTextarea = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_FAKE_TEXTAREA);
     if (fakeTextarea) {
         fakeTextarea.tabIndex = tabIndex++;
     }
 
-    // 4. Textarea principal du message
-    const mainTextarea = findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA, form);
-    if (mainTextarea) {
-        mainTextarea.tabIndex = tabIndex++;
-    }
-
-    // 5. Bouton de post (original ou Décensured)
+    // 6. Bouton de post (original ou Décensured)
     const postButton = findElement(DECENSURED_CONFIG.SELECTORS.POST_BUTTON, form);
     if (postButton && postButton.style.display !== 'none') {
         postButton.tabIndex = tabIndex++;
@@ -1171,19 +1121,52 @@ function createDecensuredContainer(type = 'message') {
     container.className = 'deboucled-decensured-input';
     container.id = `deboucled-decensured-${type}-container`;
 
+    // 1. Toggle Décensured (point d'entrée)
     const toggleButton = document.createElement('button');
     toggleButton.type = 'button';
     toggleButton.id = `deboucled-decensured-${type}-toggle`;
     toggleButton.className = 'deboucled-decensured-toggle icon-topic-lock btn btn-primary';
     toggleButton.innerHTML = `${type === 'topic' ? 'Topic' : 'Message'} masqué`;
-    toggleButton.title = `Activer le mode ${type} masqué`;
+    toggleButton.title = `Activer le mode ${type} masqué Décensured`;
 
+    container.appendChild(toggleButton);
+
+    // 2. Pour les topics : Titre réel (contenu principal)
+    if (type === 'topic') {
+        const titleContainers = createTopicTitleContainers();
+        titleContainers.forEach(titleContainer => {
+            container.appendChild(titleContainer);
+        });
+    }
+
+    // 3. Conteneur pour le message réel (sera rempli dynamiquement)
+    const realMessageContainer = document.createElement('div');
+    realMessageContainer.className = 'deboucled-decensured-fake-message-container';
+    realMessageContainer.id = `deboucled-decensured-${type}-real-container`;
+    realMessageContainer.style.display = 'none';
+
+    const realMessageLabel = document.createElement('label');
+    realMessageLabel.textContent = '🔒 Votre véritable message (visible uniquement par les utilisateurs Décensured) :';
+    realMessageLabel.className = 'form-label deboucled-decensured-fake-message-label';
+    realMessageLabel.id = `deboucled-decensured-${type}-real-label`;
+
+    realMessageContainer.appendChild(realMessageLabel);
+
+    // Placeholder pour la textarea et ses boutons (sera rempli par moveMainTextareaToContainer)
+    const textareaWrapper = document.createElement('div');
+    textareaWrapper.id = `deboucled-textarea-wrapper-${type}`;
+    textareaWrapper.className = 'deboucled-textarea-wrapper';
+    realMessageContainer.appendChild(textareaWrapper);
+
+    container.appendChild(realMessageContainer);
+
+    // 4. Message de camouflage (maintenant à la fin)
     const fakeContainer = document.createElement('div');
     fakeContainer.className = 'deboucled-decensured-fake-message-container';
     fakeContainer.id = `deboucled-decensured-${type}-fake-container`;
 
     const label = document.createElement('label');
-    label.textContent = 'Message visible par tous (optionnel) :';
+    label.textContent = '💬 Message de camouflage (visible par les tous les autres) :';
     label.className = 'form-label deboucled-decensured-fake-message-label';
     label.id = `deboucled-decensured-${type}-fake-label`;
 
@@ -1193,18 +1176,26 @@ function createDecensuredContainer(type = 'message') {
     const input = document.createElement('textarea');
     input.id = `deboucled-decensured-${type}-fake-textarea`;
     input.className = 'form-control deboucled-decensured-fake-message-input';
-    input.placeholder = 'Ce message sera affiché pour ceux qui n\'ont pas Déboucled. Si aucun message n\'est fourni, un message aléatoire sera généré.';
+    input.placeholder = 'Optionnel, laissez vide pour génération automatique';
     input.rows = 3;
 
     const diceButton = document.createElement('button');
     diceButton.type = 'button';
     diceButton.className = 'deboucled-dice-button btn btn-secondary';
     diceButton.innerHTML = '<span class="deboucled-dice-icon deboucled-decensured-dice-logo"></span>';
-    diceButton.setAttribute('deboucled-data-tooltip', 'Générer un message de couverture aléatoire');
-    diceButton.setAttribute('data-tooltip-location', 'left');
+    diceButton.title = 'Générer automatiquement un message de camouflage';
 
     diceButton.addEventListener('click', () => {
-        const randomMessage = getRandomPlatitudeMessage();
+        let randomMessage;
+
+        const titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT);
+        if (titleInput && titleInput.value.trim()) {
+            const currentTitle = titleInput.value.trim();
+            randomMessage = getRandomMessageForTitle(currentTitle);
+        } else {
+            randomMessage = getRandomPlatitudeMessage();
+        }
+
         input.value = randomMessage;
         input.classList.remove('auto-generated');
         input.style.fontStyle = 'normal';
@@ -1230,17 +1221,175 @@ function createDecensuredContainer(type = 'message') {
 
     fakeContainer.appendChild(label);
     fakeContainer.appendChild(inputGroup);
-    container.appendChild(toggleButton);
     container.appendChild(fakeContainer);
 
     return container;
 }
 
+function createTopicTitleContainers() {
+    const titleContainer = document.createElement('div');
+    titleContainer.className = 'deboucled-decensured-fake-message-container';
+    titleContainer.id = 'deboucled-decensured-topic-titles-container';
+    titleContainer.style.display = 'none';
+
+    const realTitleLabel = document.createElement('label');
+    realTitleLabel.textContent = '🔒 Titre réel (visible uniquement par les utilisateurs Décensured) :';
+    realTitleLabel.className = 'form-label deboucled-decensured-fake-message-label';
+    realTitleLabel.setAttribute('for', 'deboucled-decensured-topic-real-title');
+
+    const realTitleInput = document.createElement('input');
+    realTitleInput.type = 'text';
+    realTitleInput.id = 'deboucled-decensured-topic-real-title';
+    realTitleInput.name = 'deboucled-topic-real-title';
+    realTitleInput.className = 'form-control deboucled-decensured-fake-message-input';
+    realTitleInput.placeholder = 'Titre Décensured';
+    realTitleInput.required = true;
+
+    titleContainer.appendChild(realTitleLabel);
+    titleContainer.appendChild(realTitleInput);
+
+    const spacer = document.createElement('div');
+    spacer.style.marginTop = '15px';
+    titleContainer.appendChild(spacer);
+
+    const fakeTitleWrapper = document.createElement('div');
+    fakeTitleWrapper.id = 'deboucled-fake-title-wrapper';
+    fakeTitleWrapper.style.display = 'none';
+
+    const fakeTitleLabel = document.createElement('label');
+    fakeTitleLabel.textContent = '💬 Titre de camouflage (visible par tous les autres) :';
+    fakeTitleLabel.className = 'form-label deboucled-decensured-fake-message-label';
+    fakeTitleLabel.setAttribute('for', 'input-topic-title');
+
+    const inputGroup = document.createElement('div');
+    inputGroup.className = 'deboucled-fake-input-group';
+
+    const diceButton = document.createElement('button');
+    diceButton.type = 'button';
+    diceButton.className = 'deboucled-dice-button btn btn-secondary deboucled-jvc-dice-button';
+    diceButton.innerHTML = '<span class="deboucled-dice-icon deboucled-decensured-dice-logo"></span>';
+    diceButton.title = 'Générer un titre de couverture aléatoire';
+    diceButton.style.display = 'none';
+
+    inputGroup.appendChild(diceButton);
+
+    fakeTitleWrapper.appendChild(fakeTitleLabel);
+    fakeTitleWrapper.appendChild(inputGroup);
+    titleContainer.appendChild(fakeTitleWrapper);
+
+    return [titleContainer];
+}
+
+function moveMainTextareaToContainer(type, textarea) {
+    const textareaWrapper = document.getElementById(`deboucled-textarea-wrapper-${type}`);
+    if (!textareaWrapper || !textarea) return;
+
+    const originalTabIndex = textarea.tabIndex;
+
+    const editButtons = textarea.parentElement.querySelector('.messageEditor__buttonEdit') ||
+        textarea.parentElement.querySelector('[class*="messageEditor"]') ||
+        textarea.nextElementSibling;
+
+    const previewContainer = document.querySelector('.messageEditor__containerPreview');
+
+    textareaWrapper.appendChild(textarea);
+
+    if (editButtons) {
+        textareaWrapper.appendChild(editButtons);
+    }
+
+    if (previewContainer) {
+        textareaWrapper.appendChild(previewContainer);
+    }
+
+    if (originalTabIndex > 0) {
+        textarea.tabIndex = originalTabIndex;
+    }
+
+    textarea.placeholder = 'Message Décensured';
+}
+
+function restoreMainTextareaFromContainer(type, textarea) {
+    if (!textarea) return;
+    const textAreaParent = document.querySelector(DECENSURED_CONFIG.SELECTORS.MESSAGE_EDITOR_CONTAINER);
+    if (!textAreaParent) return;
+    const textareaWrapper = document.getElementById(`deboucled-textarea-wrapper-${type}`);
+    if (textareaWrapper) {
+        const elements = Array.from(textareaWrapper.children);
+        elements.forEach(element => {
+            textAreaParent.appendChild(element);
+        });
+    }
+    textarea.placeholder = '';
+}
+
+function addUXHints(type) {
+    const container = document.getElementById(`deboucled-decensured-${type}-container`);
+    if (!container) return;
+
+    const helpDiv = document.createElement('div');
+    helpDiv.className = 'deboucled-ux-help';
+    helpDiv.innerHTML = `
+        <div class="deboucled-help-text">
+            💡 <strong>Mode ${type} masqué :</strong> 
+            ${type === 'topic' ?
+            'Votre vrai titre et message ne seront visibles que par les utilisateurs Décensured. Le titre et message de camouflage seront vus par tous les autres.' :
+            'Votre vrai message ne sera visible que par les utilisateurs Décensured. Le message de camouflage sera vu par tous les autres.'
+        }
+        </div>
+    `;
+    helpDiv.style.display = 'none';
+
+    container.appendChild(helpDiv);
+
+    const toggleButton = document.getElementById(`deboucled-decensured-${type}-toggle`);
+    if (toggleButton) {
+        toggleButton.addEventListener('click', () => {
+            setTimeout(() => {
+                const isActive = toggleButton.classList.contains('deboucled-decensured-toggle-active');
+                if (isActive) {
+                    helpDiv.style.display = 'block';
+                    helpDiv.style.animation = 'none';
+                    helpDiv.offsetHeight; // Force reflow
+                    helpDiv.style.animation = 'fadeIn 0.4s ease-in-out forwards';
+                } else {
+                    helpDiv.style.display = 'none';
+                }
+            }, 100);
+        });
+    }
+}
+
 function setupToggleHandlers(type, onToggle) {
     const toggleButton = document.getElementById(`deboucled-decensured-${type}-toggle`);
     const fakeContainer = document.getElementById(`deboucled-decensured-${type}-fake-container`);
+    const realContainer = document.getElementById(`deboucled-decensured-${type}-real-container`);
+
+    const titlesContainer = type === 'topic' ? document.getElementById('deboucled-decensured-topic-titles-container') : null;
 
     let isActive = false;
+
+    function toggleVisibility(container, show) {
+        if (!container) return;
+
+        if (show) {
+            container.style.display = 'block';
+            container.classList.remove('deboucled-decensured-hiding');
+            container.classList.add('deboucled-decensured-visible');
+        } else {
+            if (container.classList.contains('deboucled-decensured-visible')) {
+                container.classList.remove('deboucled-decensured-visible');
+                container.classList.add('deboucled-decensured-hiding');
+
+                setTimeout(() => {
+                    if (!isActive) {
+                        container.classList.remove('deboucled-decensured-hiding');
+                        container.style.display = 'none';
+                    }
+                }, 200);
+            }
+        }
+    }
 
     toggleButton.addEventListener('click', () => {
         isActive = !isActive;
@@ -1248,25 +1397,31 @@ function setupToggleHandlers(type, onToggle) {
 
         if (isActive) {
             toggleButton.innerHTML = 'Mode normal';
-            toggleButton.title = `Désactiver le mode ${type} masqué`;
+            toggleButton.title = `Désactiver le mode ${type} masqué Décensured`;
             toggleButton.classList.add('deboucled-decensured-toggle-active');
 
-            fakeContainer.classList.remove('deboucled-decensured-hiding');
-            fakeContainer.classList.add('deboucled-decensured-visible');
+            toggleVisibility(realContainer, true);
+            toggleVisibility(fakeContainer, true);
+            if (type === 'topic') {
+                toggleVisibility(titlesContainer, true);
+
+                const realTitleInput = document.querySelector('#deboucled-decensured-topic-real-title');
+                if (realTitleInput) {
+                    setTimeout(() => {
+                        realTitleInput.focus();
+                        realTitleInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                }
+            }
         } else {
             toggleButton.innerHTML = `${type === 'topic' ? 'Topic' : 'Message'} masqué`;
-            toggleButton.title = `Activer le mode ${type} masqué`;
+            toggleButton.title = `Activer le mode ${type} masqué Décensured`;
             toggleButton.classList.remove('deboucled-decensured-toggle-active');
 
-            if (fakeContainer.classList.contains('deboucled-decensured-visible')) {
-                fakeContainer.classList.remove('deboucled-decensured-visible');
-                fakeContainer.classList.add('deboucled-decensured-hiding');
-
-                setTimeout(() => {
-                    if (!isActive) {
-                        fakeContainer.classList.remove('deboucled-decensured-hiding');
-                    }
-                }, 200);
+            toggleVisibility(realContainer, false);
+            toggleVisibility(fakeContainer, false);
+            if (type === 'topic') {
+                toggleVisibility(titlesContainer, false);
             }
         }
 
@@ -1275,19 +1430,18 @@ function setupToggleHandlers(type, onToggle) {
         setTimeout(() => throttledSetupTabOrder(), 50);
     });
 
-    return { toggleButton, fakeContainer, isActive: () => isActive };
+    return {
+        toggleButton,
+        fakeContainer,
+        realContainer,
+        titlesContainer,
+        isActive: () => isActive
+    };
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // GESTION DES TOPICS
 ///////////////////////////////////////////////////////////////////////////////////////
-
-const topicDecensuredState = {
-    isObservingForm: false,
-    currentObserver: null,
-    formElements: null,
-    toggleHandlers: null
-};
 
 function isTopicsDecensuredEnabled() {
     return store.get(storage_optionEnableDecensuredTopics, storage_optionEnableDecensuredTopics_default);
@@ -1324,17 +1478,38 @@ function cleanupTopicDecensuredState() {
 }
 
 function getTopicFormElements() {
+
     if (topicDecensuredState.formElements) {
         const isValid = topicDecensuredState.formElements.titleInput &&
             document.contains(topicDecensuredState.formElements.titleInput);
         if (isValid) return topicDecensuredState.formElements;
     }
 
+    const form = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_FORM);
+
+    let titleInput, messageTextarea;
+
+    if (form) {
+        titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT, form);
+        messageTextarea = findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA, form);
+
+        if (!titleInput) {
+            titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT);
+        }
+        if (!messageTextarea) {
+            messageTextarea = findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA);
+        }
+    } else {
+        titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT);
+        messageTextarea = findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA);
+    }
+
     const elements = {
-        titleInput: findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT),
-        messageTextarea: findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA),
+        titleInput: titleInput,
+        realTitleInput: document.querySelector('#deboucled-decensured-topic-real-title'),
+        messageTextarea: messageTextarea,
         fakeMessageInput: document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_FAKE_TEXTAREA),
-        form: findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_FORM)
+        form: form
     };
 
     if (elements.titleInput && elements.messageTextarea && elements.form) {
@@ -1345,7 +1520,10 @@ function getTopicFormElements() {
 }
 
 function buildDecensuredTopicInputUI() {
-    if (!isTopicsDecensuredEnabled()) return;
+
+    if (!isTopicsDecensuredEnabled()) {
+        return;
+    }
 
     const currentPage = getCurrentPageType(window.location.pathname);
 
@@ -1357,7 +1535,9 @@ function buildDecensuredTopicInputUI() {
         return;
     }
 
-    if (currentPage !== 'topiclist') return;
+    if (currentPage !== 'topiclist') {
+        return;
+    }
 
     const elements = getTopicFormElements();
 
@@ -1370,22 +1550,35 @@ function buildDecensuredTopicInputUI() {
 }
 
 function setupTopicFormObserver() {
-    if (topicDecensuredState.isObservingForm) return;
 
-    const blocFormulaire = document.querySelector('#bloc-formulaire-forum');
-    if (!blocFormulaire) return;
+    if (topicDecensuredState.isObservingForm) {
+        return;
+    }
+
+    const formContainer = document.querySelector('#forums-post-topic-editor');
+    if (!formContainer) return;
 
     topicDecensuredState.isObservingForm = true;
 
     const checkAndInject = () => {
+        const contentLength = formContainer.innerHTML ? formContainer.innerHTML.length : 0;
+
+        if (contentLength < 100) {
+            return false;
+        }
+
         const elements = getTopicFormElements();
+
         if (elements.form && elements.titleInput && elements.messageTextarea) {
-            if (!document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_CONTAINER)) {
+            const existingContainer = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_CONTAINER);
+
+            if (!existingContainer) {
                 injectDecensuredTopicUI(elements);
             }
             cleanupTopicDecensuredState();
             return true;
         }
+
         return false;
     };
 
@@ -1396,7 +1589,7 @@ function setupTopicFormObserver() {
     });
 
     topicDecensuredState.currentObserver = observer;
-    observer.observe(blocFormulaire, { childList: true, subtree: true });
+    observer.observe(formContainer, { childList: true, subtree: true });
 
     setTimeout(checkAndInject, DECENSURED_CONFIG.TOPICS.FORM_OBSERVER_TIMEOUT);
 }
@@ -1404,29 +1597,82 @@ function setupTopicFormObserver() {
 function injectDecensuredTopicUI(elements) {
     const { messageTextarea } = elements;
 
-    if (document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_CONTAINER)) return;
+    const existingContainer = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_CONTAINER);
+    if (existingContainer) {
+        return;
+    }
 
     const container = createDecensuredContainer('topic');
-    messageTextarea.parentElement.insertBefore(container, messageTextarea);
+
+    if (messageTextarea && messageTextarea.parentElement) {
+        messageTextarea.parentElement.insertBefore(container, messageTextarea);
+    } else {
+        console.error('[Décensured] Impossible d\'insérer le container - textarea ou parent manquant');
+        return;
+    }
 
     topicDecensuredState.toggleHandlers = setupToggleHandlers('topic', (isActive) => {
         if (isActive) {
             replaceTopicPostButtonWithDecensured();
             setupTopicTextareaForDecensured(elements.messageTextarea);
+            setupTopicTitleInputForDecensured(elements.titleInput);
+            moveMainTextareaToContainer('topic', elements.messageTextarea);
+            reorderTopicFormElements(elements);
         } else {
             restoreOriginalTopicPostButton();
             restoreTopicTextareaFromDecensured(elements.messageTextarea);
+            restoreTopicTitleInputFromDecensured(elements.titleInput);
+            restoreMainTextareaFromContainer('topic', elements.messageTextarea);
         }
     });
 
+    addUXHints('topic');
+
     setTimeout(() => throttledSetupTabOrder(), 100);
+}
+
+function reorderTopicFormElements(elements) {
+    const existingWrapper = document.querySelector('#deboucled-fake-title-wrapper');
+    if (!existingWrapper) return;
+
+    const titleInput = elements.titleInput;
+    if (!titleInput) return;
+
+    existingWrapper.style.display = 'block';
+
+    if (!titleInput.hasAttribute('data-original-position')) {
+        const titleOriginalParent = titleInput.parentElement;
+        titleInput.setAttribute('data-original-parent-class', titleOriginalParent.className || 'form-parent');
+        titleInput.setAttribute('data-original-position', 'saved');
+    }
+
+    if (existingWrapper.contains(titleInput)) {
+        titleInput.className = 'form-control deboucled-decensured-fake-message-input';
+        return;
+    }
+
+    const inputGroup = existingWrapper.querySelector('.deboucled-fake-input-group');
+    if (!inputGroup) {
+        titleInput.className = 'form-control deboucled-decensured-fake-message-input';
+        return;
+    }
+
+    const diceButton = inputGroup.querySelector('.deboucled-jvc-dice-button');
+    const existingContainer = titleInput.parentElement;
+    const isContainerValid = existingContainer?.classList.contains('deboucled-title-input-container');
+
+    const elementToInsert = isContainerValid ? existingContainer : titleInput;
+    const insertMethod = diceButton ? 'insertBefore' : 'appendChild';
+    const insertArgs = diceButton ? [elementToInsert, diceButton] : [elementToInsert];
+
+    inputGroup[insertMethod](...insertArgs);
+    titleInput.className = 'form-control deboucled-decensured-fake-message-input';
 }
 
 function setupTopicTextareaForDecensured(textarea) {
     if (!textarea) return;
 
-    textarea.placeholder = 'Votre véritable message, chiffré et visible uniquement par les utilisateurs Déboucled.';
-
+    textarea.placeholder = 'Message Décensured';
     textarea.classList.add('deboucled-decensured-textarea-active');
 }
 
@@ -1434,8 +1680,145 @@ function restoreTopicTextareaFromDecensured(textarea) {
     if (!textarea) return;
 
     textarea.placeholder = '';
-
     textarea.classList.remove('deboucled-decensured-textarea-active');
+}
+
+function setupTopicTitleInputForDecensured(titleInput) {
+    if (!titleInput) return;
+
+    const originalPlaceholder = titleInput.placeholder;
+    titleInput.setAttribute('data-original-placeholder', originalPlaceholder);
+    titleInput.placeholder = 'Optionnel, laissez vide pour génération automatique';
+    titleInput.classList.add('deboucled-decensured-title-active');
+
+    const existingDiceButton = document.querySelector('#deboucled-fake-title-wrapper .deboucled-jvc-dice-button');
+    if (!existingDiceButton) return;
+
+    existingDiceButton.style.display = 'inline-block';
+
+    if (existingDiceButton.hasAttribute('data-listener-added')) return;
+
+    existingDiceButton.setAttribute('data-listener-added', 'true');
+    existingDiceButton.addEventListener('click', () => {
+        const randomTopicData = getRandomTopicWithMessage();
+        titleInput.value = randomTopicData.title;
+        titleInput.focus();
+
+        const fakeTextarea = document.querySelector('#deboucled-decensured-topic-fake-textarea');
+        const diceIcon = existingDiceButton.querySelector('.deboucled-dice-icon');
+
+        fakeTextarea && (fakeTextarea.value = randomTopicData.message);
+
+        diceIcon?.classList.add('rotating');
+        setTimeout(() => diceIcon?.classList.remove('rotating'), 500);
+    });
+}
+
+function restoreTopicTitleInputFromDecensured(titleInput) {
+    if (!titleInput) return;
+
+    const originalPlaceholder = titleInput.getAttribute('data-original-placeholder');
+    titleInput.placeholder = originalPlaceholder || '';
+    originalPlaceholder && titleInput.removeAttribute('data-original-placeholder');
+    titleInput.classList.remove('deboucled-decensured-title-active');
+
+    if (!titleInput.hasAttribute('data-original-position')) {
+        document.querySelectorAll('.deboucled-title-input-container:empty, .deboucled-title-wrapper:empty')
+            .forEach(container => container.remove());
+
+        document.querySelectorAll('.deboucled-jvc-dice-button:not(#deboucled-fake-title-wrapper .deboucled-jvc-dice-button)')
+            .forEach(button => {
+                const container = button.closest('.deboucled-title-input-container');
+                if (container) {
+                    const input = container.querySelector('input');
+                    input && container.parentElement?.insertBefore(input, container);
+                    container.remove();
+                } else {
+                    button.remove();
+                }
+            });
+        return;
+    }
+
+    const topicTitleContainer = document.querySelector(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_CONTAINER);
+    if (topicTitleContainer) {
+        titleInput.className = 'topicTitle__input';
+        titleInput.id = 'input-topic-title';
+
+        const fakeWrapper = document.querySelector('#deboucled-fake-title-wrapper');
+        if (fakeWrapper) {
+            fakeWrapper.style.display = 'none';
+            const diceButton = fakeWrapper.querySelector('.deboucled-jvc-dice-button');
+            diceButton && (diceButton.style.display = 'none');
+        }
+
+        topicTitleContainer.appendChild(titleInput);
+        titleInput.removeAttribute('data-original-position');
+        titleInput.removeAttribute('data-original-parent-class');
+
+        document.querySelectorAll('.deboucled-title-input-container:empty, .deboucled-title-wrapper:empty')
+            .forEach(container => container.remove());
+
+        document.querySelectorAll('.deboucled-jvc-dice-button:not(#deboucled-fake-title-wrapper .deboucled-jvc-dice-button)')
+            .forEach(button => {
+                const container = button.closest('.deboucled-title-input-container');
+                if (container) {
+                    const input = container.querySelector('input');
+                    input && container.parentElement?.insertBefore(input, container);
+                    container.remove();
+                } else {
+                    button.remove();
+                }
+            });
+        return;
+    }
+
+    const formParent = document.querySelector('.panel-container .panel-form') ||
+        document.querySelector('.form-nouvelle-liste') ||
+        document.querySelector('form');
+
+    if (!formParent) {
+        titleInput.removeAttribute('data-original-position');
+        titleInput.removeAttribute('data-original-parent-class');
+        return;
+    }
+
+    const messageTextarea = formParent.querySelector('textarea[name="message"]') ||
+        formParent.querySelector('#message');
+
+    if (!messageTextarea) {
+        titleInput.removeAttribute('data-original-position');
+        titleInput.removeAttribute('data-original-parent-class');
+        return;
+    }
+
+    titleInput.className = 'form-control';
+
+    const fakeWrapper = document.querySelector('#deboucled-fake-title-wrapper');
+    if (fakeWrapper) {
+        fakeWrapper.style.display = 'none';
+        const diceButton = fakeWrapper.querySelector('.deboucled-jvc-dice-button');
+        diceButton && (diceButton.style.display = 'none');
+    }
+
+    formParent.insertBefore(titleInput, messageTextarea);
+    titleInput.removeAttribute('data-original-position');
+    titleInput.removeAttribute('data-original-parent-class');
+
+    document.querySelectorAll('.deboucled-title-input-container:empty, .deboucled-title-wrapper:empty')
+        .forEach(container => container.remove());
+
+    document.querySelectorAll('.deboucled-jvc-dice-button:not(#deboucled-fake-title-wrapper .deboucled-jvc-dice-button)')
+        .forEach(button => {
+            const container = button.closest('.deboucled-title-input-container');
+            if (container) {
+                const input = container.querySelector('input');
+                input && container.parentElement?.insertBefore(input, container);
+                container.remove();
+            } else {
+                button.remove();
+            }
+        });
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -1456,7 +1839,7 @@ function replaceTopicPostButtonWithDecensured() {
     decensuredButton.className = postButton.className;
     decensuredButton.innerHTML = postButton.innerHTML;
     decensuredButton.classList.add('deboucled-decensured-post-button-active');
-    decensuredButton.title = 'Publier le topic avec chiffrement Déboucled';
+    decensuredButton.title = 'Publier le topic Décensured';
     decensuredButton.type = 'button';
 
     postButton.parentElement.insertBefore(decensuredButton, postButton);
@@ -1509,26 +1892,43 @@ async function handleTopicDecensuredCreationFlow() {
     try {
         await handleDecensuredTopicCreation();
 
-        setTimeout(() => {
-            triggerNativeTopicCreation();
-        }, 100);
+        setTimeout(async () => {
+            await triggerNativeTopicCreation();
+        }, 300);
     } catch (error) {
         console.error('❌ Erreur dans handleTopicDecensuredCreationFlow:', error);
         throw error;
     }
 }
 
-function triggerNativeTopicCreation() {
+async function triggerNativeTopicCreation() {
     const originalPostButton = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_ORIGINAL_TOPIC_POST_BUTTON);
-    if (originalPostButton) {
-        originalPostButton.style.visibility = 'hidden';
-        originalPostButton.style.display = '';
-        originalPostButton.click();
-        setTimeout(() => {
-            originalPostButton.style.display = 'none';
-            originalPostButton.style.visibility = '';
-        }, 50);
+    if (!originalPostButton) {
+        console.error('❌ Bouton de post original introuvable');
+        return;
     }
+
+    const elements = getTopicFormElements();
+    if (elements.titleInput && !elements.titleInput.value.trim()) {
+        console.warn('⚠️ Le titre est vide, tentative de récupération...');
+        const pendingTopicJson = await store.get(storage_pendingDecensuredTopic, storage_pendingDecensuredTopic_default);
+        if (pendingTopicJson) {
+            try {
+                const pendingTopic = JSON.parse(pendingTopicJson);
+                setTextAreaValue(elements.titleInput, pendingTopic.fakeTitle);
+            } catch (error) {
+                console.error('❌ Erreur lors de la récupération du titre:', error);
+            }
+        }
+    }
+
+    originalPostButton.style.visibility = 'hidden';
+    originalPostButton.style.display = '';
+    originalPostButton.click();
+    setTimeout(() => {
+        originalPostButton.style.display = 'none';
+        originalPostButton.style.visibility = '';
+    }, 50);
 }
 
 async function handleDecensuredTopicCreation() {
@@ -1538,21 +1938,39 @@ async function handleDecensuredTopicCreation() {
     }
 
     const fakeMessageInput = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_FAKE_TEXTAREA);
+    const realTitleInput = document.querySelector('#deboucled-decensured-topic-real-title');
 
-    const initialTopicTitle = elements.titleInput.value.trim();
+    const jvcTitleValue = elements.titleInput.value.trim();
+    const realTitleValue = realTitleInput ? realTitleInput.value.trim() : '';
     const initialRealMessage = elements.messageTextarea.value.trim();
     const initialFakeMessage = fakeMessageInput ? fakeMessageInput.value.trim() : '';
 
-    if (!initialTopicTitle || !initialRealMessage) {
-        throw new Error('Le titre et le message sont obligatoires');
+    let finalRealTitle, finalFakeTitle, finalFakeMessage;
+
+    if (realTitleValue) {
+        finalRealTitle = realTitleValue;
+
+        if (jvcTitleValue || initialFakeMessage) {
+            finalFakeTitle = jvcTitleValue || getRandomPlatitudeTitle();
+            finalFakeMessage = initialFakeMessage.length > 0 ? initialFakeMessage : getRandomPlatitudeMessage();
+        } else {
+            const randomTopicData = getRandomTopicWithMessage();
+            finalFakeTitle = randomTopicData.title;
+            finalFakeMessage = randomTopicData.message;
+        }
+    } else {
+        throw new Error('Le titre réel est obligatoire en mode Topic masqué');
     }
 
-    const finalFakeMessage = initialFakeMessage.length > 0 ? initialFakeMessage : getRandomPlatitudeMessage();
+    if (!finalRealTitle || !initialRealMessage) {
+        throw new Error('Le titre réel et le message sont obligatoires');
+    }
 
     const processedContent = await processContent(initialRealMessage, finalFakeMessage);
 
     const topicData = {
-        title: initialTopicTitle,
+        realTitle: finalRealTitle,
+        fakeTitle: finalFakeTitle,
         realMessage: initialRealMessage,
         processedContent: processedContent,
         timestamp: Date.now()
@@ -1562,7 +1980,13 @@ async function handleDecensuredTopicCreation() {
 
     setTextAreaValue(elements.messageTextarea, finalFakeMessage);
 
-    return { success: true, fakeMessage: finalFakeMessage };
+    setTextAreaValue(elements.titleInput, finalFakeTitle);
+
+    if (fakeMessageInput && !initialFakeMessage) {
+        fakeMessageInput.value = finalFakeMessage;
+    }
+
+    return { success: true, fakeTitle: finalFakeTitle, fakeMessage: finalFakeMessage };
 }
 
 async function processNewTopicCreation() {
@@ -1604,11 +2028,16 @@ async function processNewTopicCreation() {
     if (success) {
         addAlertbox('success', 'Topic Décensured créé avec succès !');
 
+        formatTopicAsDecensured(
+            pendingTopic.realTitle,
+            pendingTopic.fakeTitle,
+            { indicatorType: 'default' }
+        );
+
         const decensuredMsg = {
             message_real_content: pendingTopic.realMessage
         };
         await applyDecensuredFormattingToNewTopic(firstMessage, decensuredMsg);
-        highlightCurrentTopicAsDecensured();
     } else {
         addAlertbox('warning', 'Topic créé sur JVC mais échec de l\'enregistrement Décensured');
     }
@@ -1619,30 +2048,28 @@ async function processNewTopicCreation() {
 async function createTopicAndMessage(topicId, topicUrl, pendingTopic, messageElement) {
     const topicApiResult = await createDecensuredTopic({
         topic_id: topicId,
-        title: pendingTopic.title,
+        real_title: pendingTopic.realTitle,
+        fake_title: pendingTopic.fakeTitle,
         jvc_topic_url: topicUrl
     });
 
     if (!topicApiResult) return false;
 
     const messageId = getMessageId(messageElement);
+    if (!messageId) return false;
 
-    if (messageId) {
-        const messageApiResult = await createDecensuredTopicMessage(
-            topicId, messageId, topicUrl, pendingTopic.title,
-            pendingTopic.processedContent.fake, pendingTopic.realMessage
-        );
+    const messageApiResult = await createDecensuredTopicMessage(
+        topicId, messageId, topicUrl, pendingTopic.realTitle,
+        pendingTopic.processedContent.fake, pendingTopic.realMessage
+    );
 
-        if (messageApiResult) {
-            await applyDecensuredFormattingToNewTopic(messageElement, {
-                message_real_content: pendingTopic.realMessage
-            });
-        }
-
-        return messageApiResult;
+    if (messageApiResult) {
+        await applyDecensuredFormattingToNewTopic(messageElement, {
+            message_real_content: pendingTopic.realMessage
+        });
     }
 
-    return false;
+    return messageApiResult;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -1658,32 +2085,7 @@ async function checkAndProcessNewTopic() {
 
 async function applyDecensuredFormattingToNewTopic(messageElement, decensuredMsg) {
     processDecensuredMessage(messageElement, decensuredMsg);
-
-    const topicTitleElement = document.querySelector('.topic-title, h1, #bloc-title-forum');
-    if (topicTitleElement && !topicTitleElement.querySelector('.deboucled-decensured-topic-indicator')) {
-        const indicator = document.createElement('span');
-        indicator.className = 'deboucled-decensured-topic-indicator icon-topic-lock';
-        indicator.innerHTML = '';
-        indicator.title = 'Topic Décensured';
-        topicTitleElement.appendChild(indicator);
-    }
-}
-
-function highlightCurrentTopicAsDecensured() {
-    const mainContent = document.querySelector('.main-content, .topic-content, body');
-    if (mainContent) {
-        mainContent.classList.add('deboucled-current-topic-decensured');
-
-    }
-
-    const topicTitleElement = document.querySelector('#bloc-title-forum');
-    if (topicTitleElement && !topicTitleElement.querySelector('.deboucled-decensured-topic-indicator')) {
-        const indicator = document.createElement('span');
-        indicator.className = 'deboucled-decensured-topic-indicator';
-        indicator.textContent = 'DÉCENSURED';
-        indicator.title = 'Ce topic contient des messages Décensured';
-        topicTitleElement.appendChild(indicator);
-    }
+    addTopicDecensuredIndicator();
 }
 
 async function verifyCurrentTopicDecensured() {
@@ -1699,10 +2101,26 @@ async function verifyCurrentTopicDecensured() {
 
     try {
         const topicData = await getDecensuredTopic(topicId);
-        if (topicData) {
-            highlightCurrentTopicAsDecensured();
-            await decryptMessages();
+        if (!topicData) return;
+
+        const shouldUpdateTitle = topicData.topic_name_real &&
+            topicData.topic_name_real !== topicData.topic_name_fake;
+
+        if (shouldUpdateTitle) {
+            formatTopicAsDecensured(
+                topicData.topic_name_real,
+                topicData.topic_name_fake
+            );
+        } else {
+            formatTopicAsDecensured(null, null, {
+                updateTitle: false,
+                addIndicator: true,
+                indicatorType: 'default',
+                highlightPage: true
+            });
         }
+
+        await decryptMessages();
     } catch (error) {
         console.error('❌ Erreur lors de la vérification du topic:', error);
     }
@@ -1714,14 +2132,10 @@ async function verifyCurrentTopicDecensured() {
 
 async function getDecensuredTopic(topicId) {
     try {
-        if (!topicId) {
-            return null;
-        }
-
+        if (!topicId) return null;
         const response = await fetchDecensuredApi(`${apiDecensuredTopicByIdUrl}/${topicId}`, {
             method: 'GET'
         });
-
         return response;
     } catch (error) {
         console.error('Erreur lors de la récupération du topic:', error);
@@ -1731,9 +2145,7 @@ async function getDecensuredTopic(topicId) {
 
 async function getDecensuredTopicsBatch(topicIds) {
     try {
-        if (!topicIds || topicIds.length === 0) {
-            return [];
-        }
+        if (!topicIds || topicIds.length === 0) return [];
 
         const response = await fetchDecensuredApi(apiDecensuredTopicsByIdsUrl, {
             method: 'PUT',
@@ -1743,11 +2155,7 @@ async function getDecensuredTopicsBatch(topicIds) {
             body: JSON.stringify({ topicIds })
         });
 
-        if (Array.isArray(response)) {
-
-            return response;
-        }
-
+        if (Array.isArray(response)) return response;
         return [];
     } catch (error) {
         console.error('Erreur lors de la récupération batch des topics:', error);
@@ -1815,18 +2223,23 @@ function highlightDecensuredTopics() {
         topicsData.forEach(topicData => {
             const topicId = topicData.topic_id.toString();
             const link = linksByTopicId.get(topicId);
+            if (!link) return;
 
-            if (link) {
-                const topicListItem = link.closest('li');
-                if (topicListItem) {
-                    topicListItem.classList.add('deboucled-topic-decensured');
+            const topicListItem = link.closest('li');
+            if (!topicListItem) return;
 
-                    const folderIcon = topicListItem.querySelector('.icon-topic-folder, .topic-img');
-                    if (folderIcon) {
-                        folderIcon.classList.add('deboucled-decensured-topic-icon');
-                        folderIcon.title = 'Topic Décensured';
-                    }
-                }
+            topicListItem.classList.add('deboucled-topic-decensured');
+
+            const hasRealTitle = topicData.topic_name_real && topicData.topic_name_real !== topicData.topic_name_fake;
+            if (hasRealTitle) {
+                link.textContent = topicData.topic_name_real;
+                link.title = `Titre réel : ${topicData.topic_name_real}\nTitre de couverture : ${topicData.topic_name_fake || topicData.topic_name}`;
+            }
+
+            const folderIcon = topicListItem.querySelector('.icon-topic-folder, .topic-img');
+            if (folderIcon) {
+                folderIcon.classList.add('deboucled-decensured-topic-icon');
+                folderIcon.title = 'Topic Décensured';
             }
         });
     });
@@ -1839,19 +2252,21 @@ function setupDynamicTopicHighlighting() {
         let hasNewTopics = false;
 
         mutations.forEach((mutation) => {
-            if (mutation.type === 'childList') {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const topicLinks = node.querySelectorAll ?
-                            node.querySelectorAll('a[href*="/topics/"]:not(.deboucled-decensured-checked)') : [];
+            if (mutation.type !== 'childList') return;
 
-                        if (topicLinks.length > 0 ||
-                            (node.matches && node.matches('a[href*="/topics/"]:not(.deboucled-decensured-checked)'))) {
-                            hasNewTopics = true;
-                        }
-                    }
-                });
-            }
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+                const topicLinks = node.querySelectorAll ?
+                    node.querySelectorAll('a[href*="/topics/"]:not(.deboucled-decensured-checked)') : [];
+
+                const hasTopicLinks = topicLinks.length > 0;
+                const isTopicNode = node.matches && node.matches('a[href*="/topics/"]:not(.deboucled-decensured-checked)');
+
+                if (hasTopicLinks || isTopicNode) {
+                    hasNewTopics = true;
+                }
+            });
         });
 
         if (hasNewTopics) {
@@ -1868,7 +2283,6 @@ function setupDynamicTopicHighlighting() {
         }
     });
 
-    // Observer initial des topics existants avec Intersection Observer
     const setupIntersectionObserver = () => {
         const topicObserver = new IntersectionObserver((entries) => {
             const visibleTopics = entries
@@ -1879,7 +2293,7 @@ function setupDynamicTopicHighlighting() {
                 throttledHighlightDecensuredTopics();
             }
         }, {
-            rootMargin: '200px', // Charger avant que l'élément soit visible
+            rootMargin: '200px',
             threshold: 0.1
         });
 
@@ -1909,6 +2323,7 @@ function setupTopicRedirectionListener() {
             setTimeout(() => {
                 buildDecensuredInputUI();
                 buildDecensuredTopicInputUI();
+                verifyCurrentTopicDecensured();
             }, 1000);
         }
     });
@@ -2026,6 +2441,8 @@ function handleDecensuredQuote(msgElement, decensuredMsg, selection = null) {
     const textArea = document.querySelector('#message_topic');
     if (!textArea) return;
 
+    activateDecensuredMode();
+
     const authorElement = msgElement.querySelector('.bloc-pseudo-msg');
     const dateElement = msgElement.querySelector('.bloc-date-msg');
 
@@ -2048,6 +2465,15 @@ function handleDecensuredQuote(msgElement, decensuredMsg, selection = null) {
     textArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
     textArea.focus({ preventScroll: true });
     textArea.setSelectionRange(textArea.value.length, textArea.value.length);
+}
+
+function activateDecensuredMode() {
+    const toggleButton = document.getElementById('deboucled-decensured-message-toggle');
+    if (!toggleButton) return;
+
+    if (!toggleButton.classList.contains('deboucled-decensured-toggle-active')) {
+        toggleButton.click();
+    }
 }
 
 function removeReportButton(msgElement) {
@@ -2540,11 +2966,7 @@ function setupFloatingWidgetEvents() {
         });
     }
 
-    document.addEventListener('click', (e) => {
-        if (!widgetElem.contains(e.target) && !widgetElem.classList.contains('hidden')) {
-            hideFloatingWidget();
-        }
-    });
+    createFloatingWidgetOverlay();
 
     setupThemeToggleListener();
 }
@@ -2561,6 +2983,22 @@ function setupThemeToggleListener() {
     }
 }
 
+function createFloatingWidgetOverlay() {
+    if (document.querySelector('.deboucled-floating-widget-overlay')) {
+        return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'deboucled-floating-widget-overlay';
+    overlay.id = 'deboucled-floating-widget-overlay';
+
+    overlay.addEventListener('click', () => {
+        hideFloatingWidget();
+    });
+
+    document.body.appendChild(overlay);
+}
+
 function updateFloatingWidgetTheme() {
     const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
     if (!widget) return;
@@ -2574,10 +3012,16 @@ function updateFloatingWidgetTheme() {
 
 function showFloatingWidget() {
     const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
+    const overlay = document.querySelector('.deboucled-floating-widget-overlay');
+
     if (!widget) return;
 
     widget.classList.remove('hidden');
     widget.classList.add('visible');
+
+    if (overlay) {
+        overlay.classList.add('visible');
+    }
 
     if (!widget.hasAttribute('data-loaded')) {
         loadFloatingWidgetTopics();
@@ -2591,10 +3035,16 @@ function showFloatingWidget() {
 
 function hideFloatingWidget() {
     const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
+    const overlay = document.querySelector('.deboucled-floating-widget-overlay');
+
     if (!widget) return;
 
     widget.classList.remove('visible', 'mobile-mode');
     widget.classList.add('hidden');
+
+    if (overlay) {
+        overlay.classList.remove('visible');
+    }
 }
 
 async function loadFloatingWidgetTopics() {
@@ -2656,9 +3106,14 @@ function renderFloatingWidgetTopics(topics) {
     }
 
     const html = topics.map(topic => {
-        const timeAgo = formatTimeAgo(topic.creation_date);
+        const timeAgo = formatTimeAgo(topic.latest_message_date ?? topic.creation_date);
         const messageCount = topic.nb_message || 1;
         const authorProfileUrl = `https://www.jeuxvideo.com/profil/${encodeURIComponent(topic.topic_author.toLowerCase())}?mode=infos`;
+
+        const displayTitle = topic.topic_name_real || topic.topic_name_fake || topic.topic_name;
+        const titleTooltip = topic.topic_name_real && topic.topic_name_real !== topic.topic_name_fake
+            ? `Titre réel : ${topic.topic_name_real}\nTitre de couverture : ${topic.topic_name_fake || topic.topic_name}`
+            : displayTitle;
 
         return `
             <div class="deboucled-floating-widget-topic" data-topic-id="${topic.topic_id}">
@@ -2666,8 +3121,8 @@ function renderFloatingWidgetTopics(topics) {
                     <i class="deboucled-decensured-topic-icon icon-topic-folder deboucled-floating-widget-topic-icon" title="Topic Décensured"></i>
                     <span class="deboucled-floating-widget-topic-time">${timeAgo}</span>
                 </div>
-                <a href="${topic.topic_url}" class="deboucled-floating-widget-topic-title" title="${escapeHtml(topic.topic_name)}">
-                    ${escapeHtml(topic.topic_name)}
+                <a href="${topic.topic_url}" class="deboucled-floating-widget-topic-title" title="${escapeHtml(titleTooltip)}">
+                    ${escapeHtml(displayTitle)}
                 </a>
                 <div class="deboucled-floating-widget-topic-meta">
                     <a href="${authorProfileUrl}" class="deboucled-floating-widget-topic-author" target="_blank" rel="noopener noreferrer" title="Voir le profil de ${escapeHtml(topic.topic_author)}">
@@ -2756,7 +3211,14 @@ async function handleDecensuredPost() {
     let fakeMessage = fakeMessageInput ? fakeMessageInput.value.trim() : '';
 
     if (!fakeMessage) {
-        fakeMessage = getRandomPlatitudeMessage();
+        const titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT);
+        if (titleInput && titleInput.value.trim()) {
+            const currentTitle = titleInput.value.trim();
+            fakeMessage = getRandomMessageForTitle(currentTitle);
+        } else {
+            fakeMessage = getRandomPlatitudeMessage();
+        }
+
         if (fakeMessageInput) {
             fakeMessageInput.value = fakeMessage;
             fakeMessageInput.classList.add('auto-generated');
@@ -3108,3 +3570,4 @@ function getForumPayload() {
 
     return getPayloadFromScripts(document);
 }
+
