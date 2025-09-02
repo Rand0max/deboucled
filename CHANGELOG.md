@@ -1,5 +1,11 @@
 # Changelog Déboucled
 
+## [2.64.0] (02/09/2025)
+
+- Création de topic Décensured avec titre masqué (Rand0max)
+- Amélioration de l'UX Décensured (Rand0max)
+- Platitudes topic Décensured aléatoires (Rand0max)
+
 ## [2.63.3] (27/08/2025)
 
 - Corrections visuelles et optimisation du Widget Décensured (Rand0max)

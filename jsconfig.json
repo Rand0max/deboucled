@@ -10,7 +10,8 @@
     },
     "exclude": [
         "**/*.debug.js",
-        "**/context/*",
+        "**/_context/*",
+        "**/_resources/*",
         "node_modules",
         "**/node_modules/*"
     ]
