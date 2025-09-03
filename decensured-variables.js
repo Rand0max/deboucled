@@ -177,6 +177,11 @@ const DECENSURED_CONFIG = {
             'input[placeholder*="Titre"]',
             '#forums-post-topic-editor input[type="text"]'
         ],
+        TOPIC_TITLE_DISPLAY: [
+            '#bloc-title-forum',
+            '.topic-title',
+            'h1'
+        ],
         TOPIC_REAL_TITLE_INPUT: [
             '#deboucled-decensured-topic-real-title',
             'input[name="deboucled-topic-real-title"]'
@@ -281,7 +286,12 @@ const platitudeTopics = [
             "Mario Galaxy était le pic, depuis c'est de la daube",
             "Breath of the Wild a révolutionné le gaming, Mario stagne",
             "Les mécaniques de Zelda sont plus innovantes, faut l'admettre",
-            "Nintendo mise tout sur Zelda car ça rapporte plus"
+            "Nintendo mise tout sur Zelda car ça rapporte plus",
+            "Mario c'est devenu pour les gamins de 8 ans, alors que Zelda ça demande réflexion et exploration. L'évolution naturelle quoi.",
+            "Les puzzles des sanctuaires dans BOTW écrasent n'importe quel niveau de Mario moderne. Y'a pas photo sur la complexité du game design.",
+            "Link sans voix a plus de charisme que Mario avec ses 'wahoo' de débile. Nintendo l'a compris et mise sur le bon cheval.",
+            "Tears of the Kingdom prouve que la créativité peut aller loin. Mario reste dans ses couloirs préfabriqués depuis des années.",
+            "Au final Mario Kart reste le seul truc potable de la franchise. Le reste c'est juste du fan service pour les nostalgiques."
         ]
     },
     {
@@ -291,7 +301,12 @@ const platitudeTopics = [
             "Trop de collabs, plus d'âme ce jeu",
             "Les petits de 12 ans ont tué l'ambiance",
             "Epic Games fait que du fric, plus de passion",
-            "Apex Legends 1000 fois mieux niveau gameplay"
+            "Apex Legends 1000 fois mieux niveau gameplay",
+            "Le Chapter 1 c'était magique, maintenant c'est du Marvel Simulator avec des skins overpriced. L'authenticité est morte.",
+            "La construction était l'âme du jeu, maintenant c'est juste du spray and pray comme les autres BR bas de gamme.",
+            "PUBG a mieux vieilli alors qu'il était censé être 'dépassé'. Au moins lui reste cohérent dans son délire tactique.",
+            "Epic se fout de la communauté historique, ils visent juste les gamins qui claquent l'argent de papa maman sans réfléchir.",
+            "Fall Guys qui était censé être 'temporaire' a finalement une meilleure longévité que Fortnite. L'ironie du gaming moderne."
         ]
     },
     {
@@ -301,7 +316,12 @@ const platitudeTopics = [
             "Vice City 2.0 avec la tech actuelle ça va défoncer",
             "J'espère qu'ils gardent l'esprit décalé des anciens",
             "16 ans d'attente, ça a intérêt à être parfait",
-            "Les leaks donnent envie, graphismes de OUF"
+            "Les leaks donnent envie, graphismes de OUF",
+            "GTA Online a financé ce projet pharaonique pendant des années. Maintenant on va voir si ça valait le coup d'attendre.",
+            "Le trailer a explosé tous les records YouTube en 24h. L'engouement est réel, pas juste du battage médiatique artificiel.",
+            "Première protagoniste féminine de la série, pari risqué mais Rockstar sait ce qu'ils font niveau écriture de personnages.",
+            "Next-gen seulement c'est logique, pas de compromis pour accommoder les vieilles consoles. Enfin de l'ambition technique pure.",
+            "Le budget dépasse celui de la plupart des blockbusters Hollywood. Si c'est pas un chef-d'œuvre avec ces moyens, y'a plus d'excuse."
         ]
     },
     {
@@ -336,7 +356,12 @@ const platitudeTopics = [
             "Valorant est bon mais LoL reste le KING",
             "15 ans après et toujours 100M de joueurs, respect",
             "L'e-sport LoL écrase tous les autres jeux",
-            "Chaque patch apporte du fresh, bravo Riot"
+            "Chaque patch apporte du fresh, bravo Riot",
+            "Arcane sur Netflix a ramené des millions de nouveaux joueurs. Le lore devient enfin accessible au grand public.",
+            "Les Worlds 2024 ont battu tous les records d'audience. Même les non-gamers regardent maintenant, c'est devenu mainstream.",
+            "Le modèle free-to-play parfait : compétitif accessible mais cosmétiques premium. Tous les autres jeux copient cette formule.",
+            "Les nouveaux champions restent créatifs après 160+ persos. Le game design team de Riot est au sommet de leur art.",
+            "Même avec TFT, Wild Rift et Legends of Runeterra, LoL classic reste le pilier. L'original indétrônable depuis une décennie."
         ]
     },
 
@@ -348,7 +373,12 @@ const platitudeTopics = [
             "Samsung copie Apple depuis 10 ans, pathétique",
             "Qualité photo iPhone inégalée, point final",
             "Interface Samsung surchargée VS épuré iOS",
-            "Prix élevé mais au moins ça dure 5 ans minimum"
+            "Prix élevé mais au moins ça dure 5 ans minimum",
+            "L'écosystème Apple c'est du verrouillage mais au moins tout fonctionne ensemble sans prise de tête. Android c'est l'anarchie totale.",
+            "Les mises à jour iOS arrivent le jour J sur tous les modèles. Samsung tu attends 6 mois et encore, si ton modèle est pas oublié.",
+            "Build quality Apple reste inégalée. Mon iPhone 12 de 2020 tourne encore comme neuf, mon ex S20 ramait déjà au bout d'un an.",
+            "iMessage et FaceTime gardent les utilisateurs captifs mais c'est parce que ça marche mieux que les alternatives Android fragmentées.",
+            "Samsung met 12 caméras sur leur flagship pour compenser leur algorithme photo inférieur. Apple fait mieux avec 3 capteurs optimisés."
         ]
     },
     {
@@ -358,7 +388,12 @@ const platitudeTopics = [
             "Interface changée pour rien, pure perte de temps",
             "Consommation RAM délirante sur W11",
             "Microsoft force la migration, technique de voyou",
-            "Linux gagne des parts de marché grâce à ça"
+            "Linux gagne des parts de marché grâce à ça",
+            "Le menu démarrer centré c'est une abomination. Qui a demandé ça ? Personne ! Mais Microsoft s'en fout de l'avis des utilisateurs.",
+            "TPM 2.0 obligatoire pour des machines de 2019 encore performantes. Obsolescence programmée déguisée en 'sécurité'.",
+            "Windows 10 sera plus supporté en 2025, migration forcée vers cette daube de W11. Technique de mafia informatique pure.",
+            "La consommation RAM sur tâche vide dépasse celle de certains jeux. Microsoft a perdu tout sens de l'optimisation depuis Ballmer.",
+            "Steam Deck et Linux gaming progressent grâce à ces conneries Microsoft. Ils creusent leur propre tombe à force de mépriser les users."
         ]
     },
     {
@@ -368,7 +403,12 @@ const platitudeTopics = [
             "Les juniors vont morfler en premier",
             "Faut s'adapter ou crever, règle éternelle",
             "L'IA écrit le code, nous on réfléchit l'archi",
-            "Dans 10 ans on sera des chefs d'orchestre IA"
+            "Dans 10 ans on sera des chefs d'orchestre IA",
+            "ChatGPT debug mes erreurs plus vite que Stack Overflow. L'époque du copier-coller de forums random est révolue.",
+            "L'IA généraliste fait du code fonctionnel mais pas optimisé. Les seniors qui maîtrisent la perf et l'archi gardent leur valeur.",
+            "Les bootcamps 3 mois vont souffrir grave. Pourquoi payer quelqu'un qui fait du CRUD basique quand l'IA le fait gratis ?",
+            "Par contre niveau créativité et résolution de problèmes complexes, l'humain reste irremplaçable. L'IA suit des patterns, nous on innove.",
+            "Le métier évolue vers plus de conception et moins de frappe de code. Comme l'architecte vs le maçon, hiérarchie naturelle."
         ]
     },
     {
@@ -378,7 +418,12 @@ const platitudeTopics = [
             "Les sceptiques vont encore regretter leur avis",
             "DeFi révolutionne la finance traditionnelle",
             "Ethereum 2.0 change la donne énergétique",
-            "Qui ne risque rien n'a rien, surtout en crypto"
+            "Qui ne risque rien n'a rien, surtout en crypto",
+            "Les ETF Bitcoin approuvés par la SEC ont ouvert les vannes institutionnelles. Wall Street valide enfin officiellement.",
+            "Le halving de 2024 fait son effet avec 6 mois de retard comme prévu. Les cycles sont prévisibles pour qui étudie l'historique.",
+            "DeFi élimine les intermédiaires bancaires parasites. Prêter/emprunter en peer-to-peer avec des taux transparents, révolution pure.",
+            "Ethereum post-merge consomme 99% moins d'énergie. L'argument écologique des détracteurs tombe à l'eau définitivement.",
+            "Les banques centrales préparent leurs CBDC en panique. Elles ont compris que Bitcoin devient réserve de valeur incontournable."
         ]
     },
     {
@@ -388,7 +433,12 @@ const platitudeTopics = [
             "Les antennes 5G sont moins puissantes que WiFi",
             "Complotistes confondent corrélation et causalité",
             "Corée du Sud en 5G depuis 3 ans, zéro problème",
-            "Sciences VS peur irrationnelle, combat éternel"
+            "Sciences VS peur irrationnelle, combat éternel",
+            "La latence ultra-faible change la donne pour le gaming mobile et les applis temps réel. Même les pros l'adoptent maintenant.",
+            "Les études sanitaires sur 5 ans en Corée du Sud montrent zéro impact négatif. Mais les complotistes préfèrent ignorer les faits.",
+            "Ironiquement la 5G consomme moins d'énergie que la 4G à débit équivalent. Même l'argument écologique tombe à l'eau.",
+            "Facebook et les forums pourris diffusent plus de radiations cérébrales que toutes les antennes 5G réunies. Priorité aux vrais dangers.",
+            "Les voitures autonomes et la chirurgie à distance nécessitent cette latence. On peut pas rester à l'âge de pierre par peur irrationnelle."
         ]
     },
 
@@ -400,7 +450,12 @@ const platitudeTopics = [
             "Conscience écologique développée très tôt",
             "Moins naïfs face aux manipulations médias",
             "Multitâches naturels, nous on galère",
-            "L'avenir leur appartient, on doit accepter"
+            "L'avenir leur appartient, on doit accepter",
+            "TikTok leur apprend plus sur le monde en 1h que nos profs en 1 semaine. L'info arrive directe, sans filtre institutionnel biaisé.",
+            "Niveau diversité et inclusion, ils sont naturellement ouverts là où nous on a dû déconstruire nos préjugés avec effort.",
+            "Ils monétisent leur passion via les réseaux dès 15 ans. Entrepreneuriat digital instinctif, nous on découvre à 30 balais.",
+            "Mental health awareness impressionnante chez eux. Ils normalisent la thérapie et l'introspection, on était des guerriers silencieux nous.",
+            "On critique mais on était pareils à leur âge. Nos parents disaient qu'on perdait notre temps sur Skyblog et les forums."
         ]
     },
     {
@@ -410,7 +465,12 @@ const platitudeTopics = [
             "Algorithme manipule les masses, c'est grave",
             "Contenu créatif VS cerveau disponible",
             "Instagram Reels copie TikTok, double peine",
-            "Génération entière conditionnée par l'algo chinois"
+            "Génération entière conditionnée par l'algo chinois",
+            "La dopamine addiction est programmée dans l'app. Scroll infini calibré pour maximiser le temps d'écran, manipulation pure.",
+            "Les challenges débiles mettent des vies en danger. Darwin Awards en temps réel sponsorisés par ByteDance, c'est dramatique.",
+            "L'influence sur mineurs est inquiétante et non régulée. Ces gosses deviennent addicts avant même de comprendre ce qui leur arrive.",
+            "Paradoxalement ça crée aussi de nouveaux talents créatifs. Certains arrivent à faire du contenu intelligent dans le format court.",
+            "L'Europe doit créer une alternative crédible rapidement. Laisser les cerveaux de nos jeunes entre les mains de la Chine, c'est suicidaire."
         ]
     },
     {
@@ -420,7 +480,12 @@ const platitudeTopics = [
             "Faux prétexte pour glander à la maison",
             "Collaboration équipe inexistante en remote",
             "Pause déjeuner de 2h, qui contrôle ?",
-            "Retour au bureau obligatoire pour sauver l'économie"
+            "Retour au bureau obligatoire pour sauver l'économie",
+            "Netflix pendant les calls Teams, nouveau standard de productivité française. Les managers s'en rendent même plus compte.",
+            "Dress code pyjama toute la journée, le professionnalisme français touche le fond. Comment prendre au sérieux quelqu'un en jogging ?",
+            "Les open spaces toxiques d'avant paraissent paradisiaques comparés à cette atomisation sociale généralisée du télétravail.",
+            "Balance vie pro/perso complètement détraquée. Avant on rentrait chez soi, maintenant le bureau envahit le salon H24.",
+            "L'immobilier de bureaux s'effondre, secteur entier en crise. Les centres-villes se vident, commerce local en souffrance extrême."
         ]
     },
     {
@@ -430,7 +495,12 @@ const platitudeTopics = [
             "On partage les comptes, seule solution viable",
             "Disney+ et Prime Video fragmentent le marché",
             "Nostalgie des DVD, au moins on possédait",
-            "Addiction moderne, difficile de décrocher"
+            "Addiction moderne, difficile de décrocher",
+            "Le partage de comptes devient impossible avec leurs nouvelles restrictions. Stratégie de gangsters pour pressuriser les familles.",
+            "La qualité du contenu original chute année après année. Budget marketing > budget création, logique Netflix moderne.",
+            "On se retrouve avec 5 abonnements pour avoir l'équivalent de l'ancien catalogue Netflix. Fragmentation organisée du marché.",
+            "Paradoxe moderne : on paie plus cher pour moins posséder. Nos parents avaient leurs DVD pour la vie, nous on loue l'accès.",
+            "L'algorithme de recommandations pousse du contenu médiocre. On passe plus de temps à chercher qu'à regarder, expérience dégradée."
         ]
     },
     {
@@ -440,7 +510,12 @@ const platitudeTopics = [
             "Services publics dégradés malgré la pression fiscale",
             "Irlande ou Portugal tentent de plus en plus",
             "Classe moyenne pressurée comme un citron",
-            "Expatriation fiscale devient logique économique"
+            "Expatriation fiscale devient logique économique",
+            "La France taxe le travail comme si c'était un vice. Résultat : fuite des cerveaux vers des pays moins punitifs fiscalement.",
+            "Services publics en déliquescence malgré cette pression fiscale record. L'argent part où exactement ? Mystère et boule de gomme.",
+            "Portugal avec son statut de résident non habituel attire tous nos talents. Brain drain organisé par notre propre bêtise administrative.",
+            "La classe moyenne française finance les extrêmes : RSA d'un côté, niches fiscales des riches de l'autre. Logique de dingue.",
+            "Même l'Allemagne nous regarde bizarrement niveau fiscalité. Quand nos voisins nous trouvent excessifs, c'est qu'on a touché le fond."
         ]
     },
 
@@ -452,7 +527,12 @@ const platitudeTopics = [
             "Quelqu'un a déjà eu ce problème ?",
             "Internet ne donne aucune solution viable",
             "Ça fait 3 jours que je cherche une explication",
-            "Premier reflexe : demander sur le 18-25"
+            "Premier reflexe : demander sur le 18-25",
+            "Les kheys du forum ont toujours des réponses que Google n'a pas. L'intelligence collective de la communauté reste imbattable.",
+            "J'ai épluché tous les forums tech spécialisés, rien de probant. Mais ici on trouve souvent des solutions créatives inattendues.",
+            "Le 18-25 c'est mon dernier recours avant de tout péter et recommencer from scratch. L'expertise diversifiée fait des miracles.",
+            "Entre les trolls il y a de vrais génies qui traînent ici. Suffit de trier le bon grain de l'ivraie dans les réponses.",
+            "Forum le plus réactif de France, réponse en moins d'une heure même pour les trucs les plus obscurs. Efficacité légendaire."
         ]
     },
     {
@@ -462,7 +542,12 @@ const platitudeTopics = [
             "Besoin de confirmation avant de partager",
             "Ça paraît gros mais on sait jamais",
             "Si c'est vrai ça va faire du bruit",
-            "Debunk ou pas debunk ? That is the question"
+            "Debunk ou pas debunk ? That is the question",
+            "Twitter c'est devenu un nid à fake news depuis le rachat Musk. Plus aucune modération, n'importe qui dit n'importe quoi.",
+            "Les kheys ont l'habitude de croiser les sources et de fact-checker rapidement. Communauté plus fiable que les journalistes mainstream.",
+            "Si ça passe le filtre du 18-25, c'est que l'info tient la route. Sinon ça se fait débunk en 3 messages chrono.",
+            "L'époque où on pouvait faire confiance aux médias traditionnels est révolue. Maintenant c'est vérification communautaire ou rien.",
+            "Le forum a déjà évité plusieurs fake news qui ont fait le tour des autres réseaux. Niveau fact-checking, on domine la concurrence."
         ]
     },
     {
@@ -472,7 +557,12 @@ const platitudeTopics = [
             "J'ai besoin de votre avis éclairé",
             "Ça vous paraît plausible cette situation ?",
             "Forum le plus intelligent de France, à vous",
-            "Intelligence collective du 18-25 activate"
+            "Intelligence collective du 18-25 activate",
+            "Vécu quelque chose de totalement surréaliste aujourd'hui. J'ai besoin que d'autres cerveaux analysent pour voir si je deviens fou.",
+            "Entre les trolls et les vrais conseils, le forum arrive toujours à dégager une vérité objective. L'effet de masse fonctionne.",
+            "Parfois on vit des trucs qu'on croirait sortis d'un mauvais film. Mais la réalité dépasse souvent la fiction, malheureusement.",
+            "Les kheys ont une expérience de vie collective impressionnante. Rare qu'une situation soit vraiment inédite pour la communauté.",
+            "Au final c'est thérapeutique de partager ses galères ici. On se sent moins seul face aux absurdités de l'existence moderne."
         ]
     },
     {
@@ -482,7 +572,12 @@ const platitudeTopics = [
             "J'ai lu les règles mais je stress quand même",
             "Pas habitué aux codes du forum",
             "Soyez cool avec le petit nouveau",
-            "J'apprends vite, promis les vétérans"
+            "J'apprends vite, promis les vétérans",
+            "Ça fait des mois que je lis vos délires en mode fantôme. Aujourd'hui je me lance mais j'appréhende la violence des réactions.",
+            "J'ai potassé le règlement et les topics épinglés pour pas me faire lyncher dès mon premier post. Préparation militaire.",
+            "L'ambiance du forum intimide au début mais on sent qu'il y a une vraie communauté derrière. L'intégration se mérite ici.",
+            "Les vétérans sont impressionnants niveau culture et répartie. J'espère atteindre ce niveau un jour si vous me laissez grandir.",
+            "Premier post stressant mais excitant. On devient vraiment membre du 18-25 qu'une fois qu'on a posté son premier message."
         ]
     },
     {
@@ -492,7 +587,12 @@ const platitudeTopics = [
             "Réalité dépasse la fiction parfois",
             "Mes potes me croient pas, vous non plus ?",
             "Histoire vraie à 100%, main sur le cœur",
-            "La vie réserve des surprises incroyables"
+            "La vie réserve des surprises incroyables",
+            "J'ai vécu un truc tellement wtf que même Netflix refuserait le scénario. Mais c'est ma réalité depuis ce matin.",
+            "Mes amis pensent que j'exagère ou que j'invente. Mais les kheys savent reconnaître quand quelqu'un dit la vérité vraie.",
+            "Parfois la vie te balance des situations qu'aucun scénariste n'oserait écrire. Trop gros pour être crédible, mais pourtant réel.",
+            "Je jure sur ce que j'ai de plus cher que chaque mot est authentique. La vérité vraie sans aucun enjolivement narratif.",
+            "L'existence moderne nous réserve des retournements de situation dignes des meilleures séries. On vit dans une époque folle."
         ]
     },
 
@@ -504,7 +604,12 @@ const platitudeTopics = [
             "Sucré-salé sur pizza = aberration gustative",
             "Hawaienne inventée au Canada, pas en Italie",
             "Tradition culinaire vs expérimentation douteuse",
-            "Chacun ses goûts mais là c'est objectivement faux"
+            "Chacun ses goûts mais là c'est objectivement faux",
+            "Les Italiens ont créé un patrimoine culinaire millénaire. Venir foutre de l'ananas dessus c'est du vandalisme gastronomique pur.",
+            "Le sucré-salé fonctionne dans certains plats asiatiques, mais sur une pizza margherita c'est une profanation. Context matters.",
+            "Gordon Ramsay lui-même refuse de servir ça dans ses restos. Quand un chef de cette envergure dit non, c'est que c'est vraiment problématique.",
+            "La Hawaienne fut inventée par un Grec au Canada pour satisfaire les touristes américains. Rien d'authentiquement italien là-dedans.",
+            "Liberté gustative OK, mais certaines limites existent. On met pas de ketchup sur un foie gras, logique identique pour l'ananas-pizza."
         ]
     },
     {
@@ -514,7 +619,12 @@ const platitudeTopics = [
             "Team chien : fidélité et protection assurées",
             "Chat = colocataire, Chien = meilleur ami",
             "Allergies décident souvent à notre place",
-            "Pourquoi choisir ? Les deux sont géniaux"
+            "Pourquoi choisir ? Les deux sont géniaux",
+            "Les chats respectent votre espace personnel et votre rythme de vie. Les chiens vous imposent leurs besoins H24, différence énorme.",
+            "Un chien vous aime inconditionnellement même si vous êtes un connard. Un chat doit apprendre à vous respecter, c'est plus authentique.",
+            "Niveau intelligence émotionnelle, les chats lisent vos humeurs et s'adaptent. Les chiens sont en mode 'hyperactif permanent' épuisant.",
+            "Par contre pour la sécurité et la protection famille, rien ne vaut un bon chien dressé. Les chats s'enfuient au premier danger.",
+            "Au final c'est une question de personnalité du maître. Introverti = chat, extraverti = chien. Chacun trouve son animal miroir."
         ]
     },
     {
@@ -524,7 +634,12 @@ const platitudeTopics = [
             "Liberté de customisation VS écosystème fermé",
             "Samsung Galaxy S24 concurrence iPhone 15",
             "Cliché de riche = avoir du goût pour l'overpriced",
-            "Guerre de marques débile, les deux font le taf"
+            "Guerre de marques débile, les deux font le taf",
+            "Un S24 Ultra coûte 1400€, soit plus qu'un iPhone 15 standard. L'argument financier tombe complètement à l'eau maintenant.",
+            "Android offre la liberté de personnalisation totale. iOS te traite comme un enfant incapable de gérer son téléphone.",
+            "Google Pixel fait de meilleures photos qu'iPhone grâce à l'IA computationnelle. Apple reste sur du hardware traditionnel dépassé.",
+            "Le cliché 'Android = pauvre' vient des téléphones d'entrée de gamme à 200€. Mais le haut de gamme Android domine techniquement.",
+            "Au final c'est juste du tribalisme débile. Les deux OS font correctement leur travail, le reste c'est du marketing identitaire."
         ]
     },
     {
@@ -534,7 +649,12 @@ const platitudeTopics = [
             "McDo, KFC, Subway s'adaptent aux goûts actuels",
             "Restaurant tradi = 2h et 40€, pas réaliste",
             "Qualité fast-food s'améliore, l'écart se réduit",
-            "Mode de vie moderne incompatible avec resto classique"
+            "Mode de vie moderne incompatible avec resto classique",
+            "Un McDo tu sais exactement combien tu vas payer et combien de temps ça prend. Restaurant traditionnel c'est loterie niveau timing et prix.",
+            "Les chaînes testent leurs recettes sur des millions de clients. Un resto local mise tout sur le talent d'un seul chef, plus risqué.",
+            "Génération pressée par le temps et l'argent. Passer 2h à table pour 50€ par personne devient un luxe rare, pas la norme.",
+            "La qualité s'améliore : KFC Colonel Club, McDo avec pain de mie, Subway ingrédients frais. L'écart se resserre clairement.",
+            "Restaurant traditionnel = expérience sociale. Fast-food = efficacité nutritionnelle. Deux besoins différents, deux modèles qui coexistent."
         ]
     },
     {
@@ -544,7 +664,12 @@ const platitudeTopics = [
             "Bibliothèque physique = décoration et culture",
             "Fatigue oculaire moindre sur papier",
             "Kindle pratique en voyage mais c'est tout",
-            "Librairies indépendantes méritent notre soutien"
+            "Librairies indépendantes méritent notre soutien",
+            "Tourner les pages physiquement active la mémoire spatiale. On retient mieux l'info avec un livre papier, c'est scientifiquement prouvé.",
+            "Une bibliothèque bien fournie en impose socialement. Ça montre la culture et les centres d'intérêt, le Kindle reste invisible.",
+            "Écran e-ink fatigue moins que LCD mais le papier reste optimal pour les sessions de lecture prolongées. Confort inégalé.",
+            "Pour les voyages ou déménagements, Kindle gagne clairement. 1000 livres dans 200g, argument logistique imparable.",
+            "Acheter en librairie indépendante soutient l'économie locale et maintient la diversité culturelle. Amazon standardise et appauvrit l'offre."
         ]
     },
 
@@ -556,7 +681,12 @@ const platitudeTopics = [
             "J'ai cru halluciner en entendant ça",
             "Phrase qui résume l'entreprise française",
             "Pôle emploi, me revoilà bientôt",
-            "Droit du travail inexistant dans cette boîte"
+            "Droit du travail inexistant dans cette boîte",
+            "Il m'a littéralement dit que l'ambiance de travail c'était pas son problème. Je cite : 'T'es payé pour bosser, pas pour être heureux'.",
+            "Phrase prononcée avec un sérieux déconcertant devant toute l'équipe. Le malaise dans la salle était palpable, personne osait réagir.",
+            "Ce type incarne tout ce qui dysfonctionne dans le management français. Autoritarisme désuet et mépris des employés, combo parfait.",
+            "Ma démission est déjà rédigée, je cherche juste le moment parfait pour la déposer. Cette boîte mérite de couler avec ce genre de mentalité.",
+            "Les RH sont complices ou inexistantes. Signaler ce comportement reviendrait à me tirer une balle dans le pied professionnellement."
         ]
     },
     {
@@ -566,7 +696,12 @@ const platitudeTopics = [
             "J'ai envie de déménager dans un autre pays",
             "Mes amis vont me charrier pendant 6 mois",
             "Alcool + stress social = combo destructeur",
-            "Parfois le mieux c'est de rester chez soi"
+            "Parfois le mieux c'est de rester chez soi",
+            "J'ai réussi l'exploit de renverser un verre sur la copine de mon pote devant tout le monde. Première impression ratée, record battu.",
+            "En essayant de rattraper, j'ai glissé et je me suis étalé comme une merde. Level cringe maximum atteint en moins de 5 minutes.",
+            "Le pire c'est que j'étais sobre à ce moment-là. Même pas l'excuse de l'alcool pour justifier cette coordination de manchot.",
+            "Maintenant je suis 'le mec qui s'étale' dans leur groupe d'amis. Ma réputation sociale anéantie pour les 10 prochaines années minimum.",
+            "Les réseaux sociaux modernes transforment chaque moment gênant en contenu viral potentiel. Plus moyen de mourir dans l'anonymat."
         ]
     },
     {
@@ -576,7 +711,12 @@ const platitudeTopics = [
             "Syndic incompétent, police s'en fout",
             "Déménager pour ça ? C'est eux les problèmes",
             "Guerre de voisinage, je deviens fou",
-            "Solutions légales vs envie de violence"
+            "Solutions légales vs envie de violence",
+            "Musique à fond jusqu'à 2h du mat' tous les soirs. J'ai cogné au mur, parlé calmement, rien ne fonctionne avec ces débiles.",
+            "Le syndic me renvoie vers la police, la police me dit 'débrouillez-vous entre voisins'. Cercle vicieux de l'incompétence administrative.",
+            "Je paie 1200€ de loyer pour dormir avec des boules Quies tous les soirs. C'est moi qui dois partir à cause de ces parasites ?",
+            "Mon niveau de patience atteint dangereusement le zéro absolu. Entre envie de tout casser et maintien de ma sanity, équilibre fragile.",
+            "Les solutions légales prennent des mois voir années. Mon sommeil et ma santé mentale ne peuvent pas attendre si longtemps."
         ]
     },
     {
@@ -586,7 +726,12 @@ const platitudeTopics = [
             "Conversation niveau CP, j'ai souffert",
             "1h30 les plus longues de ma vie",
             "Tinder = loterie, parfois on perd gros",
-            "Retour aux rencontres IRL obligatoire"
+            "Retour aux rencontres IRL obligatoire",
+            "Elle avait utilisé des photos d'il y a 5 ans minimum. Fausse publicité caractérisée, je me suis senti arnaqué dès les premières secondes.",
+            "Zéro point commun découvert en 90 minutes de conversation forcée. Même la météo était un sujet épuisé au bout de 30 secondes.",
+            "J'ai fait semblant d'avoir un appel urgent pour écourter. Technique lâche mais légitime défense psychologique dans ce cas précis.",
+            "Les apps de rencontre créent des attentes irréalistes. Photos filtrées, personnalités surfacées, désillusion garantie au premier contact réel.",
+            "Retour aux rencontres organiques obligatoire. Au moins en vrai on voit directement à qui on a affaire, sans marketing trompeur."
         ]
     },
     {
@@ -596,7 +741,12 @@ const platitudeTopics = [
             "Connexion intellectuelle immédiate, rare",
             "Pas trop en faire, rester naturel",
             "Deuxième date prévue, je stresse déjà",
-            "L'espoir renaît après des mois de galère"
+            "L'espoir renaît après des mois de galère",
+            "Conversation fluide pendant 3h sans voir le temps passer. Premier bon signe : elle sait développer une idée au-delà du superficiel.",
+            "Profil honnête, photos récentes, personnalité authentique. Enfin quelqu'un qui joue cartes sur table sans faux-semblant marketing.",
+            "On s'est découvert des passions communes inattendues. Rare de tomber sur quelqu'un qui partage tes centres d'intérêt vraiment.",
+            "Je stresse déjà pour le deuxième rendez-vous. Paradoxe : plus ça se passe bien, plus on a peur de tout foirer au suivant.",
+            "Après des mois de matches décevants, enfin une lueur d'espoir. Les apps peuvent fonctionner si on tombe sur la bonne personne."
         ]
     },
 
@@ -609,7 +759,11 @@ const platitudeTopics = [
             "SSD NVMe 2To, HDD c'est révolu",
             "Écran 1440p 144Hz sweet spot prix/perf",
             "Budget total 2500€ pour du high-end",
-            "Refroidissement liquide obligatoire performance soutenue"
+            "Refroidissement liquide obligatoire performance soutenue",
+            "Alimentation 850W Gold minimum pour cette config. Pas d'économies sur le PSU, c'est le cœur de tout le système.",
+            "Boîtier avec bon airflow essentiel. Fractal Design ou Corsair pour du premium, mais l'aération prime sur l'esthétique.",
+            "Carte mère B650 chipset suffisant, pas besoin de X670 hors de prix. L'argent économisé va mieux dans le GPU.",
+            "Windows 11 Pro pour les features avancées et la RAM unlimited. L'investissement se justifie sur une config pareille."
         ]
     },
     {
@@ -619,7 +773,12 @@ const platitudeTopics = [
             "Package managers efficaces vs Windows Store",
             "Ubuntu 22.04 LTS stable et performant",
             "Docker natif, pas de VM parasites",
-            "Microsoft pousse vers Linux avec WSL, aveu d'échec"
+            "Microsoft pousse vers Linux avec WSL, aveu d'échec",
+            "Bash scripting naturel vs batch files préhistoriques de Windows. Productivité développeur incomparable entre les deux systèmes.",
+            "APT, YUM, Pacman gèrent les dépendances intelligemment. Windows Store c'est un catalogue de jeux pour gamins, pas un vrai package manager.",
+            "Développement web natif sur Linux : Apache, Nginx, MySQL tournent dans leur environnement d'origine. Pas de compromis ou adaptations foireuses.",
+            "La communauté open source Linux répond en 10 minutes sur Stack Overflow. Support Microsoft facture 200€ pour te dire de redémarrer.",
+            "Pop!_OS et Manjaro rendent Linux accessible aux non-geeks. Plus d'excuse pour rester sur Windows par flemme d'apprendre."
         ]
     },
     {
@@ -629,7 +788,12 @@ const platitudeTopics = [
             "Prix SSD baissent, HDD deviennent obsolètes",
             "Jeux modernes optimisés pour SSD",
             "Silence total vs bruit mécanique HDD",
-            "2 To suffisent si on gère sa ludothèque"
+            "2 To suffisent si on gère sa ludothèque",
+            "DirectStorage de Microsoft nécessite du SSD pour fonctionner. Les jeux next-gen seront littéralement injouables sur HDD traditionnel.",
+            "Un SSD NVMe Gen4 charge Cyberpunk 2077 en 15 secondes. Mon ancien HDD prenait 3 minutes, temps de vie récupéré énorme.",
+            "Niveau prix le gap se resserre : SSD 2To à 150€ vs HDD 4To à 100€. 50€ de différence pour un gain de performance colossal.",
+            "Plus de vibrations, plus de bruit, plus de chaleur. Le SSD transforme ton PC en machine silencieuse et efficace énergétiquement.",
+            "Steam Deck et consoles utilisent que du SSD maintenant. L'industrie entire a abandonné le HDD, signal clair de l'évolution."
         ]
     },
     {
@@ -639,7 +803,12 @@ const platitudeTopics = [
             "Durabilité 50M de frappes vs 5M",
             "Cherry MX Brown équilibre parfait",
             "Productivité et plaisir de frappe++",
-            "Investissement rentabilisé sur 10 ans"
+            "Investissement rentabilisé sur 10 ans",
+            "Le feedback tactile améliore réellement la précision de frappe. Moins d'erreurs, moins de fatigue, productivité mesurable en plus.",
+            "Cherry MX Blue pour les nostalgiques du bruit, Red pour les gamers, Brown pour les polyvalents. Chacun trouve son switch idéal.",
+            "Keycaps PBT résistent à l'usure contrairement aux ABS qui deviennent brillants. Détail important pour la longévité d'usage quotidien.",
+            "Format TKL (sans pavé numérique) optimal pour gaming et bureautique. Économie d'espace bureau et position souris plus ergonomique.",
+            "Éclairage RGB optionnel mais les profils par application changent vraiment l'expérience. Raccourcis visuels et ambiance de travail."
         ]
     },
     {
@@ -649,8 +818,94 @@ const platitudeTopics = [
             "Gaming ET productivité sur même écran",
             "HDR correct change l'expérience visuelle",
             "RTX 4080 minimum pour exploiter",
-            "1500€ mais ça dure 7-8 ans minimum"
+            "1500€ mais ça dure 7-8 ans minimum",
+            "La densité de pixels 4K élimine totalement l'aliasing. Plus besoin d'anti-aliasing gourmand, performance pure récupérée.",
+            "Dual usage gaming/productivité justifie l'investissement. Travailler en 4K puis switcher vers du 144Hz gaming, polyvalence totale.",
+            "HDR 1000 nits minimum pour un vrai impact visuel. Les écrans HDR400 c'est du marketing, la différence est négligeable.",
+            "Panel IPS pour les couleurs ou VA pour le contraste. OLED trop risqué pour usage bureau intensif à cause du burn-in.",
+            "Investissement qui se rentabilise sur la durée. Un bon écran survit à 2-3 générations de config PC, priorité budgétaire logique."
         ]
     }
 ];
 
+const stickers = [
+    "https://image.noelshack.com/fichiers/2016/24/1466366209-risitas24.png",
+    "https://image.noelshack.com/fichiers/2018/13/4/1522325846-jesusopti.png",
+    "https://image.noelshack.com/fichiers/2018/26/7/1530476579-reupjesus.png",
+    "https://image.noelshack.com/fichiers/2018/29/6/1532128784-risitas33.png",
+    "https://image.noelshack.com/fichiers/2018/27/4/1530827992-jesusreup.png",
+    "https://image.noelshack.com/fichiers/2016/24/1466366197-risitas10.png",
+    "https://image.noelshack.com/fichiers/2016/26/1467335935-jesus1.png",
+    "https://image.noelshack.com/fichiers/2017/13/1490886827-risibo.png",
+    "https://image.noelshack.com/fichiers/2018/25/2/1529422413-risitaszoom.png",
+    "https://image.noelshack.com/fichiers/2018/10/1/1520256134-risitasue2.png",
+    "https://image.noelshack.com/fichiers/2017/18/1494048058-pppppppppppppppppppp.png",
+    "https://image.noelshack.com/fichiers/2022/37/1/1663014384-ahi-pince-mais.png",
+    "https://image.noelshack.com/fichiers/2016/38/1474488555-jesus24.png",
+    "https://image.noelshack.com/fichiers/2017/39/3/1506524542-ruth-perplexev2.png",
+    "https://image.noelshack.com/fichiers/2016/30/1469541952-risitas182.png",
+    "https://image.noelshack.com/fichiers/2021/43/4/1635454847-elton-john-tison-golem.png",
+    "https://image.noelshack.com/fichiers/2018/10/1/1520260980-risitas94.png",
+    "https://image.noelshack.com/fichiers/2017/39/3/1506463228-risibg.png",
+    "https://image.noelshack.com/fichiers/2017/39/3/1506463227-risitaspeur.png",
+    "https://image.noelshack.com/fichiers/2016/36/1473263957-risitas33.png",
+    "https://image.noelshack.com/fichiers/2017/30/4/1501186981-risimixbestreup.png",
+    "https://image.noelshack.com/fichiers/2017/02/1484173541-cc-risitas596.png",
+    "https://image.noelshack.com/fichiers/2017/22/1496583962-risisingecigarette.png",
+    "https://image.noelshack.com/fichiers/2016/38/1474490235-risitas434.png",
+    "https://image.noelshack.com/fichiers/2017/31/5/1501862610-jesus56bestreup.png",
+    "https://image.noelshack.com/fichiers/2017/07/1487382298-risitasdepressif.png",
+    "https://image.noelshack.com/fichiers/2021/04/4/1611841177-ahiahiahi.png",
+    "https://image.noelshack.com/fichiers/2016/50/1482000512-onsecalmerisitas.png",
+    "https://image.noelshack.com/fichiers/2016/47/1480081450-ris42.png",
+    "https://image.noelshack.com/fichiers/2016/39/1474977832-sadchanclaloop.gif",
+    "https://image.noelshack.com/fichiers/2018/51/3/1545248326-larryreup.png",
+    "https://image.noelshack.com/fichiers/2017/22/1496587449-1494613194-risisinge.png",
+    "https://image.noelshack.com/fichiers/2017/04/1485259037-bloggif-588741091e719.png",
+    "https://image.noelshack.com/fichiers/2017/30/4/1501186458-risitalarmebestreup.gif",
+    "https://image.noelshack.com/fichiers/2017/30/4/1501187858-risitassebestreup.png",
+    "https://image.noelshack.com/fichiers/2017/19/1494343590-risitas2vz-z-3x.png",
+    "https://image.noelshack.com/fichiers/2018/10/1/1520255849-risitasse.png",
+    "https://image.noelshack.com/fichiers/2020/51/2/1607997474-ayaoo.png",
+    "https://image.noelshack.com/fichiers/2016/30/1469402389-smiley16.png",
+    "https://image.noelshack.com/fichiers/2017/18/1493933263-fou-rire-jesus.png",
+    "https://image.noelshack.com/fichiers/2020/52/6/1608985783-ahi-triangle.png",
+    "https://image.noelshack.com/fichiers/2022/38/4/1663852709-golemabasourdi.png",
+    "https://image.noelshack.com/fichiers/2017/30/4/1501185683-jesusjournalbestreup.png",
+    "https://image.noelshack.com/fichiers/2016/50/1481878288-asile2.jpg",
+    "https://image.noelshack.com/fichiers/2022/24/6/1655577587-ahi-triangle-clopent.png",
+    "https://image.noelshack.com/fichiers/2021/18/7/1620572127-jesus-barbe-serein.png",
+    "https://image.noelshack.com/fichiers/2017/15/1492340491-jesus32.png",
+    "https://image.noelshack.com/fichiers/2017/30/4/1501188028-risitasbestreup.png",
+    "https://image.noelshack.com/fichiers/2018/13/6/1522530708-jesusgif.gif",
+    "https://image.noelshack.com/fichiers/2017/02/1484089609-coeur.png",
+    "https://image.noelshack.com/fichiers/2017/20/1494968374-pas-de-chance.png",
+    "https://image.noelshack.com/fichiers/2016/49/1481221589-jesuszoom2.jpg",
+    "https://image.noelshack.com/fichiers/2017/30/4/1501186885-risitasueurbestreup.png",
+    "https://image.noelshack.com/fichiers/2016/47/1480092147-1477945635-1465556572-elrisitassticker3-copy.png",
+    "https://image.noelshack.com/fichiers/2017/50/1/1513020307-jesusjointtransparent.png",
+    "https://image.noelshack.com/fichiers/2022/38/5/1663951771-indespite.png",
+    "https://image.noelshack.com/fichiers/2017/18/1493758368-mpytb.png",
+    "https://image.noelshack.com/fichiers/2017/22/1496349456-thjghj.png",
+    "https://image.noelshack.com/fichiers/2017/10/1489162412-1465686632-jesuus-risitas.gif",
+    "https://image.noelshack.com/fichiers/2017/19/1494260086-zoom3.png",
+    "https://image.noelshack.com/fichiers/2016/47/1480064732-1467335935-jesus4.png",
+    "https://image.noelshack.com/fichiers/2016/49/1481201791-yaahshs.png",
+    "https://image.noelshack.com/fichiers/2017/12/1490497882-zemmourrire.png",
+    "https://image.noelshack.com/fichiers/2017/09/1488387951-zemmour-lol.png",
+    "https://image.noelshack.com/fichiers/2021/08/1/1613997318-zidane.png",
+    "https://image.noelshack.com/fichiers/2017/14/1491572376-img-0024.png",
+    "https://image.noelshack.com/fichiers/2016/51/1482448857-celestinrisitas.png",
+    "https://image.noelshack.com/fichiers/2016/47/1480081469-ris6.png",
+    "https://image.noelshack.com/fichiers/2017/15/1491851452-villani-zepo.png",
+    "https://image.noelshack.com/fichiers/2017/06/1486457204-issou3.png",
+    "https://image.noelshack.com/fichiers/2024/40/4/1727979813-photo-outpute983ec5bc8086b8d.jpg",
+    "https://image.noelshack.com/fichiers/2017/05/1485800183-2588741.png",
+    "https://image.noelshack.com/fichiers/2017/08/1487984196-789797987987464646468798798.png",
+    "https://image.noelshack.com/fichiers/2017/06/1486561574-jesusarthur.png",
+    "https://image.noelshack.com/fichiers/2017/31/5/1501863678-risitas596bestreup.png",
+    "https://image.noelshack.com/fichiers/2017/19/1494619651-larryhome-2.png",
+    "https://image.noelshack.com/fichiers/2017/22/1496491923-jesusperplex2.png",
+    "https://image.noelshack.com/fichiers/2016/31/1470170706-1469971038-risitas258.png",
+    "https://image.noelshack.com/fichiers/2016/38/1474488637-jesus26.png"
+];

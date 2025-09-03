@@ -24,9 +24,8 @@ async function handleDecensuredPost() {
     let fakeMessage = fakeMessageInput ? fakeMessageInput.value.trim() : '';
 
     if (!fakeMessage) {
-        const titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT);
-        if (titleInput && titleInput.value.trim()) {
-            const currentTitle = titleInput.value.trim();
+        const currentTitle = getTitleFromTopicPage('fake');
+        if (currentTitle) {
             fakeMessage = getRandomMessageForTitle(currentTitle);
         } else {
             fakeMessage = getRandomPlatitudeMessage();
@@ -298,7 +297,7 @@ async function saveToDecensuredApi(messageId, realMessage, fakeContent) {
     const username = getUserPseudo();
     const messageUrl = `${window.location.origin}/forums/message/${messageId}`;
     const topicUrl = window.location.origin + window.location.pathname;
-    const topicTitle = getTitleFromTopicPage();
+    const topicTitle = getTitleFromTopicPage('fake');
 
     return await createDecensuredMessage(
         messageId,

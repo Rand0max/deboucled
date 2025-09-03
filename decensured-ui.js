@@ -882,7 +882,6 @@ function setupFormElementsObserver() {
 
         mutations.forEach((mutation) => {
             if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                // Vérifier si des nœuds ajoutés contiennent nos éléments cibles
                 mutation.addedNodes.forEach((node) => {
                     if (node.nodeType === Node.ELEMENT_NODE) {
                         const hasTargetElement = targetSelectors.some(selector => {
@@ -1101,22 +1100,26 @@ function moveMainTextareaToContainer(type, textarea) {
     const textareaWrapper = document.getElementById(`deboucled-textarea-wrapper-${type}`);
     if (!textareaWrapper || !textarea) return;
 
+    const jvcContainer = textarea.parentElement;
+    if (!jvcContainer) return;
+
     const originalTabIndex = textarea.tabIndex;
-
-    const editButtons = textarea.parentElement.querySelector('.messageEditor__buttonEdit') ||
-        textarea.parentElement.querySelector('[class*="messageEditor"]') ||
-        textarea.nextElementSibling;
-
+    const editButtons = jvcContainer.querySelector('.messageEditor__buttonEdit');
     const previewContainer = document.querySelector('.messageEditor__containerPreview');
 
-    textareaWrapper.appendChild(textarea);
+    const decensuredContainer = textareaWrapper.closest('.deboucled-decensured-input');
+    if (decensuredContainer && decensuredContainer.parentElement) {
+        jvcContainer.insertBefore(decensuredContainer, textarea);
 
-    if (editButtons) {
-        textareaWrapper.appendChild(editButtons);
-    }
+        textareaWrapper.appendChild(textarea);
 
-    if (previewContainer) {
-        textareaWrapper.appendChild(previewContainer);
+        if (editButtons) {
+            textareaWrapper.appendChild(editButtons);
+        }
+
+        if (previewContainer) {
+            textareaWrapper.appendChild(previewContainer);
+        }
     }
 
     if (originalTabIndex > 0) {
@@ -1128,15 +1131,22 @@ function moveMainTextareaToContainer(type, textarea) {
 
 function restoreMainTextareaFromContainer(type, textarea) {
     if (!textarea) return;
-    const textAreaParent = document.querySelector(DECENSURED_CONFIG.SELECTORS.MESSAGE_EDITOR_CONTAINER);
-    if (!textAreaParent) return;
+
     const textareaWrapper = document.getElementById(`deboucled-textarea-wrapper-${type}`);
-    if (textareaWrapper) {
-        const elements = Array.from(textareaWrapper.children);
-        elements.forEach(element => {
-            textAreaParent.appendChild(element);
-        });
+    if (!textareaWrapper) return;
+
+    const jvcContainer = document.querySelector(DECENSURED_CONFIG.SELECTORS.MESSAGE_EDITOR_CONTAINER);
+    if (!jvcContainer) return;
+
+    const elements = Array.from(textareaWrapper.children);
+    elements.forEach(element => { jvcContainer.appendChild(element); });
+
+    const decensuredContainer = textareaWrapper.closest('.deboucled-decensured-input');
+    if (decensuredContainer) {
+        const jvcParent = jvcContainer.parentElement;
+        if (jvcParent) jvcParent.insertBefore(decensuredContainer, jvcContainer);
     }
+
     textarea.placeholder = '';
 }
 

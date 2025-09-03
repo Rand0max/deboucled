@@ -52,10 +52,25 @@ setInterval(() => {
 
 // Sequence Helpers
 
+function getRandomSticker() {
+    if (stickers.length === 0) return '';
+    const randomIndex = Math.floor(Math.random() * stickers.length);
+    return stickers[randomIndex];
+}
+
+function addStickerToMessage(message) {
+    if (Math.random() <= 1 / 3) {
+        const sticker = getRandomSticker();
+        if (sticker) return `${message} ${sticker}`;
+    }
+    return message;
+}
+
 function getRandomPlatitudeMessage() {
     initAllPlatitudeSequences();
     const messageIndex = getNextIndexFromSequence(platitudeMessageSequenceData, platitudeMessages.length);
-    return platitudeMessages[messageIndex];
+    const message = platitudeMessages[messageIndex];
+    return addStickerToMessage(message);
 }
 
 function getRandomPlatitudeTitle() {
@@ -98,7 +113,7 @@ function initAllSequences() {
 
     topicWithMessagesIndexSequences.clear();
     platitudeTopics.forEach(topic => {
-        topicWithMessagesIndexSequences.set(topic.title, {
+        topicWithMessagesIndexSequences.set(topic.title.toLowerCase(), {
             sequence: createShuffledSequence(topic.messages.length),
             currentIndex: 0
         });
@@ -118,24 +133,27 @@ function getRandomTopicWithMessage() {
     const topicIndex = getNextIndexFromSequence(platitudeTopicSequenceData, platitudeTopics.length);
     const selectedTopic = platitudeTopics[topicIndex];
 
-    const messageSequenceData = topicWithMessagesIndexSequences.get(selectedTopic.title);
+    const messageSequenceData = topicWithMessagesIndexSequences.get(selectedTopic.title.toLowerCase());
     const messageIndex = getNextIndexFromSequence(messageSequenceData, selectedTopic.messages.length);
+
+    const message = selectedTopic.messages[messageIndex];
+    const messageWithSticker = addStickerToMessage(message);
 
     return {
         title: selectedTopic.title,
-        message: selectedTopic.messages[messageIndex]
+        message: messageWithSticker
     };
 }
 
 function getRandomMessageForTitle(title) {
-    const messageSequenceData = topicWithMessagesIndexSequences.get(title);
+    initAllPlatitudeSequences();
+    const titleLower = title.toLowerCase();
+    const messageSequenceData = topicWithMessagesIndexSequences.get(titleLower);
     if (messageSequenceData) {
-        initAllPlatitudeSequences();
-
-        const matchingTopic = platitudeTopics.find(topic => topic.title === title);
+        const matchingTopic = platitudeTopics.find(topic => topic.title.toLowerCase() === titleLower);
         const messageIndex = getNextIndexFromSequence(messageSequenceData, matchingTopic.messages.length);
-
-        return matchingTopic.messages[messageIndex];
+        const message = matchingTopic.messages[messageIndex];
+        return addStickerToMessage(message);
     }
     return getRandomPlatitudeMessage();
 }
@@ -196,9 +214,7 @@ function logDecensuredError(error, context = '') {
     handleApiError(error, context);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
 // Notifications utilisateur
-///////////////////////////////////////////////////////////////////////////////////////
 
 function addAlertbox(type, message, duration = DECENSURED_CONFIG.NOTIFICATION_DURATION) {
     const notification = document.createElement('div');
@@ -237,9 +253,7 @@ function addAlertbox(type, message, duration = DECENSURED_CONFIG.NOTIFICATION_DU
 
 window.addEventListener('beforeunload', cleanupTimers);
 
-///////////////////////////////////////////////////////////////////////////////////////
-// API Helpers
-///////////////////////////////////////////////////////////////////////////////////////
+// API Helper
 
 async function fetchDecensuredApi(endpoint, options = {}) {
     try {

@@ -1,5 +1,11 @@
 # Changelog Déboucled
 
+## [2.65.0] (03/09/2025)
+
+- Nouvelles platitudes Décensured et amélioration de la logique (Rand0max)
+- Stickers aléatoires dans les messages Décensured (Rand0max)
+- Correction du bug de la barre d'outils de saisie des messages Décensured (Rand0max)
+
 ## [2.64.1] (03/09/2025)
 
 - Optimisations (Rand0max)

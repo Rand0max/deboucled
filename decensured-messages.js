@@ -31,9 +31,8 @@ async function processContent(message, fakeMessage = '') {
         let finalFake = fakeMessage;
 
         if (!finalFake) {
-            const titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT);
-            if (titleInput && titleInput.value.trim()) {
-                const currentTitle = titleInput.value.trim();
+            const currentTitle = getTitleFromTopicPage('fake');
+            if (currentTitle) {
                 finalFake = getRandomMessageForTitle(currentTitle);
             } else {
                 finalFake = getRandomPlatitudeMessage();

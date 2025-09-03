@@ -15,26 +15,17 @@ function isValidTopicId(topicId) {
     return topicId && parseInt(topicId) >= DECENSURED_CONFIG.TOPICS.MIN_VALID_TOPIC_ID;
 }
 
-function getTopicTitleElement() {
-    const selectors = ['#bloc-title-forum', '.topic-title', 'h1'];
-
-    for (const selector of selectors) {
-        const element = document.querySelector(selector);
-        if (element) {
-            return element;
-        }
-    }
-    return null;
-}
-
 function updateTopicTitle(realTitle, fakeTitle = null) {
-    const topicTitleElement = getTopicTitleElement();
+    const topicTitleElement = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_DISPLAY);
     if (!topicTitleElement || !realTitle) {
         return false;
     }
 
     const originalTitle = topicTitleElement.textContent;
     topicTitleElement.textContent = realTitle;
+
+    topicTitleElement.setAttribute('topic-fake-title', fakeTitle);
+    topicTitleElement.setAttribute('topic-real-title', realTitle);
 
     document.title = `DÉCENSURED - ${realTitle}`;
 
@@ -48,7 +39,7 @@ function updateTopicTitle(realTitle, fakeTitle = null) {
 }
 
 function addTopicDecensuredIndicator(indicatorType = 'default') {
-    const topicTitleElement = getTopicTitleElement();
+    const topicTitleElement = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_DISPLAY);
     if (!topicTitleElement || topicTitleElement.querySelector('.deboucled-decensured-topic-indicator')) {
         return false;
     }
@@ -205,10 +196,23 @@ function restoreOriginalTopicPostButton() {
     postButton.removeAttribute('data-decensured-topic-original');
 }
 
-function getTitleFromTopicPage() {
-    const titleElement = getTopicTitleElement();
+function extractTitleFromElement(titleElement, titleType) {
+    if (!titleElement) return null;
+
+    const attributeName = titleType === 'real' ? 'topic-real-title' : 'topic-fake-title';
+    const savedTitle = titleElement.getAttribute(attributeName);
+    if (savedTitle && savedTitle.trim()) {
+        return savedTitle.trim();
+    }
+
+    return titleElement.firstChild ? titleElement.firstChild.textContent.trim() : titleElement.textContent.trim();
+}
+
+function getTitleFromTopicPage(titleType = 'fake') {
+    const titleElement = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_DISPLAY);
     if (titleElement) {
-        return titleElement.textContent.trim();
+        const title = extractTitleFromElement(titleElement, titleType);
+        if (title) return title;
     }
 
     const additionalSelectors = [
@@ -218,12 +222,11 @@ function getTitleFromTopicPage() {
 
     for (const selector of additionalSelectors) {
         const titleElement = document.querySelector(selector);
-        if (titleElement) {
-            return titleElement.textContent.trim();
-        }
+        const title = extractTitleFromElement(titleElement, titleType);
+        if (title) return title;
     }
 
-    return document.title.replace(' - Jeuxvideo.com', '').trim();
+    return document.title.replace(' - Jeuxvideo.com', '').replace('DÉCENSURED - ', '').trim();
 }
 
 function cleanTopicUrl(url) {
