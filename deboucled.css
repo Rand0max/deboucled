@@ -636,6 +636,11 @@ input.deboucled-decensured-fake-message-input {
   margin-bottom: 0;
 }
 
+.titre-head-bloc {
+  display: inline-block;
+  overflow: visible;
+}
+
 /* Dice Button */
 .deboucled-dice-button {
   padding: 8px 12px;

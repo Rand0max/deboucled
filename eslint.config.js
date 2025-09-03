@@ -171,8 +171,17 @@ export default [
       "privatemessages.js",
       "profile.js",
       "extras.js",
-      "decensured.js",
       "decensured-variables.js",
+      "decensured-helpers.js",
+      "decensured-api.js",
+      "decensured-formatting.js",
+      "decensured-topics.js",
+      "decensured-messages.js",
+      "decensured-ui.js",
+      "decensured-widget.js",
+      "decensured-users.js",
+      "decensured-posting.js",
+      "decensured-main.js",
       "main.js"
     ]
   }
