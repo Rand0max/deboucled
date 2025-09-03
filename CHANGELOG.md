@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.64.1] (03/09/2025)
+
+- Optimisations (Rand0max)
+
 ## [2.64.0] (02/09/2025)
 
 - Création de topic Décensured avec titre masqué (Rand0max)

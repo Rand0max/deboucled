@@ -10,6 +10,7 @@ let tabOrderSetupInProgress = false;
 let isProcessingTopicCreation = false;
 let messageElementsCache = null;
 let messageElementsCacheTime = 0;
+let decensuredFormObserver = null;
 
 let platitudeTopicSequenceData = { sequence: [], currentIndex: 0 };
 let platitudeMessageSequenceData = { sequence: [], currentIndex: 0 };
@@ -38,13 +39,46 @@ const topicDecensuredState = {
 const DECENSURED_CONFIG = {
     // === TIMING CONFIGURATION ===
     INIT_DELAY: 1000,
-    RETRY_TIMEOUT: 10 * 60 * 1000,
+    RETRY_TIMEOUT: 10 * 60 * 1000, // 10 minutes
     POST_TIMEOUT: 40000,
-    USERS_REFRESH_INTERVAL: 4 * 60 * 1000,
+    USERS_REFRESH_INTERVAL: 4 * 60 * 1000, // 4 minutes
+
+    // === ANIMATION DELAYS ===
+    ANIMATION_DELAY: 300,
+    ANIMATION_FADE_DELAY: 300,
+    CONTAINER_HIDE_DELAY: 200,
+    DICE_ROTATION_DELAY: 500,
+    TAB_ORDER_DELAY: 50,
+    TAB_ORDER_DELAY_LONG: 100,
+    DOM_STABILIZATION_DELAY: 100,
+    OBSERVER_CLEANUP_TIMEOUT: 15000, // 15 seconds
+    PENDING_TOPIC_TIMEOUT: 30000, // 30 seconds
+    TRIGGER_NATIVE_CREATION_DELAY: 50,
 
     // === PERFORMANCE CONFIGURATION ===
     CACHE_TTL: 5000, // 5 secondes
     MESSAGE_CACHE_TTL: 3000, // 3 secondes
+
+    // === API CONFIGURATION ===
+    API_TIMEOUT: 2000, // 2 seconds
+    API_MAX_RETRIES: 10,
+    API_MAX_MESSAGES: 999999,
+
+    // === UI SPACING AND LAYOUT ===
+    NOTIFICATION_TOP_OFFSET: 20,
+    NOTIFICATION_SPACING: 80,
+    IMAGE_THUMBNAIL_WIDTH: 68,
+    IMAGE_THUMBNAIL_HEIGHT: 51,
+    URL_CONTEXT_LENGTH: 50,
+    SPOILER_ID_LENGTH: 32,
+
+    // === TAB INDEX CONFIGURATION ===
+    TAB_INDEX_MESSAGE_START: 100,
+    TAB_INDEX_TOPIC_START: 200,
+
+    // === HTTP STATUS CODES ===
+    HTTP_OK_MIN: 200,
+    HTTP_OK_MAX: 300,
 
     // === FORMATTING REGEX ===
     FORMATTING_REGEX: {
