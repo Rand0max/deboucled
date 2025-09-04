@@ -160,18 +160,16 @@ function toggleDecensuredUsersCountDisplay() {
     }
 }
 
-function startDecensuredUsersMonitoring() {
+async function startDecensuredUsersMonitoring() {
     if (!store.get(storage_optionDisplayDecensuredUsersCount, storage_optionDisplayDecensuredUsersCount_default)) {
         return;
     }
     if (decensuredUsersTimer) return;
-
-    loadDecensuredUsersData();
-
-    decensuredUsersTimer = setInterval(loadDecensuredUsersData, DECENSURED_CONFIG.USERS_REFRESH_INTERVAL);
+    loadDecensuredStatsData();
+    decensuredUsersTimer = setInterval(loadDecensuredStatsData, DECENSURED_CONFIG.USERS_REFRESH_INTERVAL);
 }
 
-function updateDecensuredUsersCount(count) {
+function updateDecensuredStatsOnlineCount(count) {
     const button = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_USERS_COUNTER);
     if (!button) return;
 

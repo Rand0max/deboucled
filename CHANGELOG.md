@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.65.1] (04/09/2025)
+
+- Amélioration de la gestion des citations imbriquées dans Décensured (Rand0max)
+- Corrections mineures Décensured (Rand0max)
+
 ## [2.65.0] (03/09/2025)
 
 - Nouvelles platitudes Décensured et amélioration de la logique (Rand0max)

@@ -310,19 +310,22 @@ function getTopicFormElements() {
 }
 
 function buildDecensuredTopicsUI() {
+    if (decensuredIsBuilding) return;
     if (!isTopicsDecensuredEnabled()) return;
-
     const currentPage = getCurrentPageType(window.location.pathname);
-
     if (currentPage !== 'topiclist') return;
+
+    decensuredIsBuilding = true;
 
     const elements = getTopicFormElements();
     if (!elements.form || !elements.titleInput || !elements.messageTextarea) {
-        setupFormElementsObserver();
+        if (!decensuredFormObserver) setupFormElementsObserver();
+        decensuredIsBuilding = false;
         return;
     }
 
     injectDecensuredTopicUI(elements);
+    decensuredIsBuilding = false;
 }
 
 function injectDecensuredTopicUI(elements) {
@@ -827,9 +830,7 @@ function createToggleButton(originalContent, realContentDiv) {
 }
 
 function setupFormElementsObserver() {
-    if (decensuredFormObserver) {
-        return;
-    }
+    if (decensuredFormObserver) return;
 
     const currentPage = getCurrentPageType(window.location.pathname);
     let targetSelectors = [];

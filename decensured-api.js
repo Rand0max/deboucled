@@ -11,12 +11,11 @@ async function pingDecensuredApi() {
     const lastPing = await store.get(storage_decensuredLastPing, 0);
     const now = Date.now();
 
-    if (now - lastPing < decensuredPingInterval) {
+    if (now - lastPing < DECENSURED_CONFIG.PING_INTERVAL) {
         return;
     }
 
-    const failureKey = 'deboucled_decensuredPingFailures';
-    const lastFailure = await store.get(failureKey, 0);
+    const lastFailure = await store.get(storage_deboucled_decensuredPingFailures, 0);
     const timeSinceFailure = now - lastFailure;
 
     if (timeSinceFailure < DECENSURED_CONFIG.RETRY_TIMEOUT) {
@@ -33,16 +32,16 @@ async function pingDecensuredApi() {
         });
 
         if (response) {
-            await store.set(failureKey, 0);
+            await store.set(storage_deboucled_decensuredPingFailures, 0);
             await store.set(storage_decensuredLastPing, now);
         } else {
-            await store.set(failureKey, now);
+            await store.set(storage_deboucled_decensuredPingFailures, now);
         }
     } catch (error) {
-        await store.set(failureKey, now);
+        await store.set(storage_deboucled_decensuredPingFailures, now);
         console.error('Ping API échoué :', error);
         logDecensuredError(error, 'pingDecensuredApi');
-        await store.set(storage_decensuredLastPing, now - decensuredPingInterval + DECENSURED_CONFIG.RETRY_TIMEOUT);
+        await store.set(storage_decensuredLastPing, now - DECENSURED_CONFIG.PING_INTERVAL + DECENSURED_CONFIG.RETRY_TIMEOUT);
     }
 }
 
@@ -245,21 +244,39 @@ async function showDecensuredUsersModal() {
     }
 }
 
-async function loadDecensuredUsersData() {
+async function loadDecensuredStatsData(forceRefresh = false) {
     if (decensuredUsersLoading) return;
+
+    const now = Date.now();
+    const lastLoad = await store.get(storage_decensuredLastStatsLoad, 0);
+
+    if (!forceRefresh && now - lastLoad < DECENSURED_CONFIG.STATS_CACHE_DURATION) {
+        const cachedCount = await store.get(storage_decensuredOnlineCount, 0);
+        updateDecensuredStatsOnlineCount(cachedCount);
+        return;
+    }
+
     decensuredUsersLoading = true;
 
     try {
         const response = await fetchDecensuredApi(apiDecensuredStatsUrl);
         if (response && response.nb) {
             const onlineCount = parseInt(response.nb) || 0;
-            updateDecensuredUsersCount(onlineCount);
+            updateDecensuredStatsOnlineCount(onlineCount);
+
+            await store.set(storage_decensuredOnlineCount, onlineCount);
+            await store.set(storage_decensuredLastStatsLoad, now);
         } else {
-            updateDecensuredUsersCount(0);
+            updateDecensuredStatsOnlineCount(0);
+
+            await store.set(storage_decensuredOnlineCount, 0);
+            await store.set(storage_decensuredLastStatsLoad, now);
         }
     } catch (error) {
-        handleApiError(error, 'Chargement utilisateurs Décensured');
-        updateDecensuredUsersCount(0);
+        handleApiError(error, 'Chargement statistiques Décensured');
+
+        const cachedCount = await store.get(storage_decensuredOnlineCount, 0);
+        updateDecensuredStatsOnlineCount(cachedCount);
     } finally {
         decensuredUsersLoading = false;
     }

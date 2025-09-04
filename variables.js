@@ -132,5 +132,3 @@ const apiDecensuredTopicsLatestUrl = `${decensuredApiUrl}/topic/latest`;
 const apiDecensuredStatsUrl = `${decensuredApiUrl}/stats/online`;
 const apiDecensuredUsersOnlineUrl = `${decensuredApiUrl}/users/online`;
 
-const decensuredPingInterval = 1000 * 60 * 2; // every 2 minutes
-

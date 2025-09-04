@@ -23,7 +23,7 @@ async function initDecensured() {
 
         decensuredPingTimer = setInterval(() => {
             pingDecensuredApi().catch(err => console.error('Erreur ping timer :', err));
-        }, decensuredPingInterval);
+        }, DECENSURED_CONFIG.PING_INTERVAL);
     }
 
     buildDecensuredMessagesUI();

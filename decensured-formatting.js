@@ -69,9 +69,69 @@ function formatJvcLists(text) {
 }
 
 function formatJvcBlockquotes(text) {
-    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.blockquote, (match, quote) => {
-        const quotedText = quote.split('\n').map(line => line.trim().substring(1).trim()).join('<br>');
-        return `<blockquote class="blockquote-jv"><p>${quotedText}</p></blockquote>`;
+    return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.blockquote, (match) => {
+        const lines = match.split('\n');
+        let html = '';
+        let currentLevel = 0;
+        let isParagraphOpen = false;
+
+        for (const line of lines) {
+            // 1. Déterminer le niveau d'imbrication de la ligne actuelle
+            const levelMatch = line.match(/^(>\s*)+/);
+            const level = levelMatch ? (levelMatch[0].match(/>/g) || []).length : 0;
+
+            // 2. Nettoyer la ligne de son contenu
+            const content = line.replace(/^(>\s*)+/, '').trim();
+
+            // Si le niveau est 0, c'est une erreur de capture, on ignore.
+            if (level === 0) continue;
+
+            // 3. Fermer les blockquotes si on "remonte" d'un ou plusieurs niveaux
+            while (level < currentLevel) {
+                if (isParagraphOpen) {
+                    html += '</p>';
+                    isParagraphOpen = false;
+                }
+                html += '</blockquote>';
+                currentLevel--;
+            }
+
+            // 4. Ouvrir les blockquotes si on "descend" d'un ou plusieurs niveaux
+            while (level > currentLevel) {
+                // On ferme le paragraphe précédent s'il existe avant d'ouvrir un nouveau blockquote
+                if (isParagraphOpen) {
+                    html += '</p>';
+                    isParagraphOpen = false;
+                }
+                html += '<blockquote class="blockquote-jv">';
+                currentLevel++;
+            }
+
+            // 5. Ajouter le contenu de la ligne
+            // Si la ligne n'est pas vide (cas des ">" seuls pour l'aération)
+            if (content) {
+                if (!isParagraphOpen) {
+                    html += '<p>';
+                    isParagraphOpen = true;
+                } else {
+                    // Si un paragraphe est déjà ouvert, on ajoute un simple saut de ligne
+                    html += '<br>';
+                }
+                html += content; // Ajoute le texte nettoyé
+            }
+        }
+
+        // 6. Fermer toutes les balises restantes à la fin du bloc
+        while (currentLevel > 0) {
+            if (isParagraphOpen) {
+                html += '</p>';
+                isParagraphOpen = false;
+            }
+            html += '</blockquote>';
+            currentLevel--;
+        }
+
+        return html;
     });
 }
 

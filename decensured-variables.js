@@ -11,12 +11,11 @@ let isProcessingTopicCreation = false;
 let messageElementsCache = null;
 let messageElementsCacheTime = 0;
 let decensuredFormObserver = null;
-
 let platitudeTopicSequenceData = { sequence: [], currentIndex: 0 };
 let platitudeMessageSequenceData = { sequence: [], currentIndex: 0 };
 let topicWithMessagesIndexSequences = new Map();
 let sequencesInitialized = false;
-
+let decensuredIsBuilding = false;
 const domCache = new Map();
 
 // Versions debounced et throttled des fonctions critiques
@@ -42,6 +41,8 @@ const DECENSURED_CONFIG = {
     RETRY_TIMEOUT: 10 * 60 * 1000, // 10 minutes
     POST_TIMEOUT: 40000,
     USERS_REFRESH_INTERVAL: 4 * 60 * 1000, // 4 minutes
+    STATS_CACHE_DURATION: 4 * 60 * 1000, // 4 minutes
+    PING_INTERVAL: 1000 * 60 * 5, // 5 minutes
 
     // === ANIMATION DELAYS ===
     ANIMATION_DELAY: 300,
