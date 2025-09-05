@@ -22,18 +22,20 @@ function updateTopicTitle(realTitle, fakeTitle = null) {
     }
 
     const originalTitle = topicTitleElement.textContent;
-    topicTitleElement.textContent = realTitle;
 
-    topicTitleElement.setAttribute('topic-fake-title', fakeTitle);
-    topicTitleElement.setAttribute('topic-real-title', realTitle);
+    // Utiliser l'animation pour changer le titre
+    animateTopicTitleTransition(topicTitleElement, realTitle, () => {
+        topicTitleElement.setAttribute('topic-fake-title', fakeTitle);
+        topicTitleElement.setAttribute('topic-real-title', realTitle);
 
-    document.title = `DÉCENSURED - ${realTitle}`;
+        document.title = `DÉCENSURED - ${realTitle}`;
 
-    const fakeTitleForTooltip = fakeTitle || originalTitle;
-    if (fakeTitleForTooltip !== realTitle) {
-        topicTitleElement.setAttribute('deboucled-data-tooltip', `Titre réel : ${realTitle}\nTitre de couverture : ${fakeTitleForTooltip}`);
-        topicTitleElement.setAttribute('data-tooltip-location', 'bottom');
-    }
+        const fakeTitleForTooltip = fakeTitle || originalTitle;
+        if (fakeTitleForTooltip !== realTitle) {
+            topicTitleElement.setAttribute('deboucled-data-tooltip', `Titre réel : ${realTitle}\nTitre de couverture : ${fakeTitleForTooltip}`);
+            topicTitleElement.setAttribute('data-tooltip-location', 'bottom');
+        }
+    });
 
     return true;
 }
@@ -45,7 +47,7 @@ function addTopicDecensuredIndicator(indicatorType = 'default') {
     }
 
     const indicator = document.createElement('span');
-    indicator.className = 'deboucled-decensured-topic-indicator';
+    indicator.className = 'deboucled-decensured-topic-indicator deboucled-topic-indicator-entering';
 
     if (indicatorType === 'lock') {
         indicator.className += ' icon-topic-lock';
@@ -57,6 +59,7 @@ function addTopicDecensuredIndicator(indicatorType = 'default') {
     }
 
     topicTitleElement.appendChild(indicator);
+
     return true;
 }
 
@@ -133,7 +136,7 @@ async function verifyCurrentTopicDecensured() {
 
         await decryptMessages();
     } catch (error) {
-        console.error('❌ Erreur lors de la vérification du topic:', error);
+        logDecensuredError(error, 'checkAndHighlightCurrentTopicIfDecensured - Erreur lors de la vérification du topic');
     }
 }
 
@@ -168,7 +171,7 @@ function replaceTopicPostButtonWithDecensured() {
             isProcessingTopicCreation = true;
             await handleTopicDecensuredCreationFlow();
         } catch (error) {
-            console.error('❌ Erreur lors de la création du topic Décensured:', error);
+            logDecensuredError(error, 'replaceTopicPostButtonWithDecensured - Erreur lors de la création du topic Décensured');
             addAlertbox('danger', 'Erreur lors de la création du topic masqué: ' + error.message);
         } finally {
             setTimeout(() => {

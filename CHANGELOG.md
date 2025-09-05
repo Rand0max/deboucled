@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.65.2] (05/09/2025)
+
+- Améliorations graphiques Décensured (Rand0max)
+- Défilement infini des topics Décensured (Rand0max)
+
 ## [2.65.1] (04/09/2025)
 
 - Amélioration de la gestion des citations imbriquées dans Décensured (Rand0max)

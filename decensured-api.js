@@ -39,8 +39,7 @@ async function pingDecensuredApi() {
         }
     } catch (error) {
         await store.set(storage_deboucled_decensuredPingFailures, now);
-        console.error('Ping API échoué :', error);
-        logDecensuredError(error, 'pingDecensuredApi');
+        logDecensuredError(error, 'pingDecensuredApi - Ping API échoué');
         await store.set(storage_decensuredLastPing, now - DECENSURED_CONFIG.PING_INTERVAL + DECENSURED_CONFIG.RETRY_TIMEOUT);
     }
 }
@@ -66,12 +65,12 @@ async function createDecensuredMessage(messageId, username, messageUrl, fakeCont
 
         for (const [key, value] of Object.entries(data)) {
             if (!value || !value.toString().length) {
-                console.error(`Champ manquant ou vide: ${key} = ${value}`);
+                logDecensuredError(new Error(`Champ manquant ou vide: ${key} = ${value}`), 'createDecensuredMessage');
             }
         }
 
         if (!isValidTopicId(topicId)) {
-            console.error(`TopicId invalide: ${topicId} < ${DECENSURED_CONFIG.TOPICS.MIN_VALID_TOPIC_ID}`);
+            logDecensuredError(new Error(`TopicId invalide: ${topicId} < ${DECENSURED_CONFIG.TOPICS.MIN_VALID_TOPIC_ID}`), 'createDecensuredMessage');
         }
 
         const response = await fetchDecensuredApi(apiDecensuredCreateMessageUrl, {
@@ -124,8 +123,7 @@ async function createDecensuredTopic(topicData) {
         const success = topicResponse !== null;
         return success;
     } catch (error) {
-        console.error('💥 Erreur dans createDecensuredTopic:', error);
-        logDecensuredError(error, 'createDecensuredTopic');
+        logDecensuredError(error, 'createDecensuredTopic - Erreur dans createDecensuredTopic');
         return false;
     }
 }
@@ -159,8 +157,7 @@ async function createDecensuredTopicMessage(topicId, messageId, topicUrl, topicT
         const success = messageResponse !== null;
         return success;
     } catch (error) {
-        console.error('💥 Erreur dans createDecensuredTopicMessage:', error);
-        logDecensuredError(error, 'createDecensuredTopicMessage');
+        logDecensuredError(error, 'createDecensuredTopicMessage - Erreur dans createDecensuredTopicMessage');
         return false;
     }
 }
@@ -173,7 +170,7 @@ async function getDecensuredTopic(topicId) {
         });
         return response;
     } catch (error) {
-        console.error('Erreur lors de la récupération du topic:', error);
+        logDecensuredError(error, 'getDecensuredTopic - Erreur lors de la récupération du topic');
         return null;
     }
 }
@@ -193,7 +190,7 @@ async function getDecensuredTopicsBatch(topicIds) {
         if (Array.isArray(response)) return response;
         return [];
     } catch (error) {
-        console.error('Erreur lors de la récupération batch des topics:', error);
+        logDecensuredError(error, 'getDecensuredTopicsBatch - Erreur lors de la récupération batch des topics');
         return [];
     }
 }
@@ -220,7 +217,7 @@ async function decryptSingleMessage() {
         }
 
     } catch (error) {
-        handleApiError(error, `Erreur lors du déchiffrement du message unique ${messageId}`);
+        logDecensuredError(error, `decryptSingleMessage - Erreur lors du déchiffrement du message unique ${messageId}`);
     }
 }
 
@@ -239,7 +236,7 @@ async function showDecensuredUsersModal() {
             addAlertbox('warning', 'Aucun utilisateur Décensured trouvé');
         }
     } catch (error) {
-        console.error('Erreur lors du chargement des utilisateurs:', error);
+        logDecensuredError(error, 'showDecensuredUsersModal - Erreur lors du chargement des utilisateurs');
         addAlertbox('error', 'Impossible de charger la liste des utilisateurs');
     }
 }
@@ -273,11 +270,26 @@ async function loadDecensuredStatsData(forceRefresh = false) {
             await store.set(storage_decensuredLastStatsLoad, now);
         }
     } catch (error) {
-        handleApiError(error, 'Chargement statistiques Décensured');
+        logDecensuredError(error, 'loadDecensuredStatsData - Chargement statistiques Décensured');
 
         const cachedCount = await store.get(storage_decensuredOnlineCount, 0);
         updateDecensuredStatsOnlineCount(cachedCount);
     } finally {
         decensuredUsersLoading = false;
+    }
+}
+
+async function getDecensuredTopicsPaginated(limit, offset) {
+    try {
+        const response = await fetchDecensuredApi(`${apiDecensuredTopicsPaginatedUrl}/${limit}/${offset}`);
+
+        if (!response || !Array.isArray(response)) {
+            return [];
+        }
+
+        return response;
+    } catch (error) {
+        logDecensuredError(error, 'getDecensuredTopicsPaginated - Erreur lors de la récupération des topics paginés');
+        return [];
     }
 }

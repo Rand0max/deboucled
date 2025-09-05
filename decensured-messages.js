@@ -78,6 +78,16 @@ function processDecensuredMessage(msgElement, decensuredMsg) {
     contentElement.insertBefore(decensuredIndicator, contentElement.firstChild);
     contentElement.appendChild(realContentDiv);
 
+    realContentDiv.classList.add('deboucled-content-entering');
+
+    realContentDiv.addEventListener('animationend', function handleAnimation(e) {
+        if (e.animationName === 'deboucled-content-enter') {
+            realContentDiv.classList.remove('deboucled-content-entering');
+            realContentDiv.classList.add('deboucled-content-entered');
+            realContentDiv.removeEventListener('animationend', handleAnimation);
+        }
+    }, { once: true });
+
     initializeSpoilerHandlers(realContentDiv);
 
     addDecensuredBadge(msgElement);
@@ -132,7 +142,7 @@ async function decryptTopicMessages() {
             processDecensuredMessage(msgElement, decensuredMsg);
         });
     } catch (error) {
-        handleApiError(error, 'Erreur lors du déchiffrement des messages du topic');
+        logDecensuredError(error, 'decryptMessages - Erreur lors du déchiffrement des messages du topic');
     }
 }
 

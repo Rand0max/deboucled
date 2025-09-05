@@ -34,7 +34,12 @@ function createDecensuredFloatingWidget() {
             <div class="deboucled-floating-widget-loading">
                 <div class="deboucled-spinner active"></div>
             </div>
-            <div class="deboucled-floating-widget-topics" id="deboucled-floating-widget-topics"></div>
+            <div class="deboucled-floating-widget-topics" id="deboucled-floating-widget-topics">
+                <div class="deboucled-floating-widget-topics-container"></div>
+                <div class="deboucled-floating-widget-topics-loader" style="display: none;">
+                    <div class="deboucled-loading-text">Chargement...</div>
+                </div>
+            </div>
         </div>
     `;
 
@@ -166,93 +171,159 @@ function hideFloatingWidget() {
 
 async function loadFloatingWidgetTopics() {
     const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
-    const topicsContainer = document.getElementById('deboucled-floating-widget-topics');
-    const loadingContainer = document.querySelector('.deboucled-floating-widget-loading');
-    const refreshButton = document.getElementById('deboucled-floating-widget-refresh');
-
-    if (!topicsContainer) return;
-
     if (!widget || !widget.classList.contains('visible')) {
         return;
     }
-
-    if (loadingContainer) {
-        loadingContainer.classList.add('active');
-    }
-    if (refreshButton) refreshButton.disabled = true;
-
-    try {
-        const response = await fetchDecensuredApi(`${apiDecensuredTopicsLatestUrl}/${DECENSURED_CONFIG.FLOATING_WIDGET.MAX_TOPICS}`);
-
-        if (!response || !Array.isArray(response)) {
-            throw new Error('Réponse API invalide');
-        }
-
-        renderFloatingWidgetTopics(response);
-    } catch (error) {
-        console.error('Erreur lors du chargement des topics:', error);
-        const errorClass = preferDarkTheme() ? 'deboucled-floating-error dark-theme' : 'deboucled-floating-error';
-        topicsContainer.innerHTML = `
-            <div class="${errorClass}">
-                <i class="icon-warning"></i>
-                <span>Erreur de chargement</span>
-                <button onclick="loadFloatingWidgetTopics()">Réessayer</button>
-            </div>
-        `;
-    } finally {
-        if (loadingContainer) {
-            loadingContainer.classList.remove('active');
-        }
-        if (refreshButton) refreshButton.disabled = false;
-    }
+    initializeFloatingWidgetInfiniteScroll();
 }
 
-function renderFloatingWidgetTopics(topics) {
+function initializeFloatingWidgetInfiniteScroll() {
     const topicsContainer = document.getElementById('deboucled-floating-widget-topics');
-    if (!topicsContainer) return;
+    const topicsListContainer = topicsContainer?.querySelector('.deboucled-floating-widget-topics-container');
+    const loadingContainer = document.querySelector('.deboucled-floating-widget-loading');
+    const loader = topicsContainer?.querySelector('.deboucled-floating-widget-topics-loader');
+    const refreshButton = document.getElementById('deboucled-floating-widget-refresh');
 
-    if (!topics || topics.length === 0) {
-        const emptyClass = preferDarkTheme() ? 'deboucled-floating-widget-empty dark-theme' : 'deboucled-floating-widget-empty';
-        topicsContainer.innerHTML = `
-            <div class="${emptyClass}">
-                <i class="icon-info"></i>
-                <span>Aucun topic Décensured récent</span>
-            </div>
-        `;
-        return;
+    if (!topicsContainer || !topicsListContainer) return;
+
+    // Reset state
+    topicsListContainer.innerHTML = '';
+    let currentPage = 0;
+    let isLoading = false;
+    let hasMoreTopics = true;
+
+    if (refreshButton) refreshButton.disabled = true;
+
+    async function loadMoreTopics() {
+        if (isLoading || !hasMoreTopics) return;
+
+        isLoading = true;
+        const isFirstLoad = currentPage === 0;
+
+        if (isFirstLoad && loadingContainer) {
+            loadingContainer.classList.add('active');
+        } else if (loader) {
+            loader.style.display = 'block';
+        }
+
+        try {
+            const offset = currentPage * DECENSURED_CONFIG.FLOATING_WIDGET.TOPICS_PER_PAGE;
+            const response = await getDecensuredTopicsPaginated(
+                DECENSURED_CONFIG.FLOATING_WIDGET.TOPICS_PER_PAGE,
+                offset
+            );
+
+            if (response.length === 0) {
+                hasMoreTopics = false;
+                if (currentPage === 0) {
+                    showEmptyState(topicsListContainer);
+                }
+                return;
+            }
+
+            if (response.length < DECENSURED_CONFIG.FLOATING_WIDGET.TOPICS_PER_PAGE) {
+                hasMoreTopics = false;
+            }
+
+            appendTopicsToContainer(topicsListContainer, response);
+            currentPage++;
+
+        } catch (error) {
+            logDecensuredError(error, 'loadMoreTopics - Erreur lors du chargement des topics');
+            if (currentPage === 0) {
+                showErrorState(topicsListContainer);
+            }
+            hasMoreTopics = false;
+        } finally {
+            isLoading = false;
+            if (isFirstLoad && loadingContainer) {
+                loadingContainer.classList.remove('active');
+            }
+            if (loader) {
+                loader.style.display = hasMoreTopics ? 'none' : 'none';
+            }
+            if (refreshButton) refreshButton.disabled = false;
+        }
     }
 
-    const html = topics.map(topic => {
-        const timeAgo = formatTimeAgo(topic.latest_message_date ?? topic.creation_date);
-        const messageCount = topic.nb_message || 1;
-        const authorProfileUrl = `https://www.jeuxvideo.com/profil/${encodeURIComponent(topic.topic_author.toLowerCase())}?mode=infos`;
+    // Setup scroll listener for infinite scroll
+    if (topicsContainer) {
+        topicsContainer.addEventListener('scroll', () => {
+            if (isLoading || !hasMoreTopics) return;
 
-        const displayTitle = topic.topic_name_real || topic.topic_name_fake || topic.topic_name;
-        const titleTooltip = topic.topic_name_real && topic.topic_name_real !== topic.topic_name_fake
-            ? `Titre réel : ${topic.topic_name_real}\nTitre de couverture : ${topic.topic_name_fake || topic.topic_name}`
-            : displayTitle;
+            const { scrollTop, scrollHeight, clientHeight } = topicsContainer;
+            const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+            const isNearBottom = scrollPercentage >= 0.8;
 
-        return `
-            <div class="deboucled-floating-widget-topic" data-topic-id="${topic.topic_id}">
-                <div class="deboucled-floating-widget-topic-header">
-                    <i class="deboucled-decensured-topic-icon icon-topic-folder deboucled-floating-widget-topic-icon" title="Topic Décensured"></i>
-                    <span class="deboucled-floating-widget-topic-time">${timeAgo}</span>
-                </div>
-                <a href="${topic.topic_url}" class="deboucled-floating-widget-topic-title" title="${escapeHtml(titleTooltip)}">
-                    ${escapeHtml(displayTitle)}
-                </a>
-                <div class="deboucled-floating-widget-topic-meta">
-                    <a href="${authorProfileUrl}" class="deboucled-floating-widget-topic-author" target="_blank" rel="noopener noreferrer" title="Voir le profil de ${escapeHtml(topic.topic_author)}">
-                        par ${escapeHtml(topic.topic_author)}
-                    </a>
-                    <span class="deboucled-floating-widget-topic-messages">${messageCount} msg</span>
-                </div>
-            </div>
-        `;
-    }).join('');
+            if (isNearBottom) {
+                loadMoreTopics();
+            }
+        });
+    }
 
-    topicsContainer.innerHTML = html;
+    // Initial load
+    loadMoreTopics();
+}
 
+function appendTopicsToContainer(container, topics) {
+    topics.forEach(topic => {
+        const topicElement = createTopicElement(topic);
+        container.appendChild(topicElement);
+    });
+}
+
+function createTopicElement(topic) {
+    const topicDiv = document.createElement('div');
+    topicDiv.className = 'deboucled-floating-widget-topic';
+    topicDiv.setAttribute('data-topic-id', topic.topic_id);
+
+    const timeAgo = formatTimeAgo(topic.latest_message_date ?? topic.creation_date);
+    const messageCount = topic.nb_message || 1;
+    const authorProfileUrl = `https://www.jeuxvideo.com/profil/${encodeURIComponent(topic.topic_author.toLowerCase())}?mode=infos`;
+
+    const displayTitle = topic.topic_name_real || topic.topic_name_fake || topic.topic_name;
+    const titleTooltip = topic.topic_name_real && topic.topic_name_real !== topic.topic_name_fake
+        ? `Titre réel : ${topic.topic_name_real}\nTitre de couverture : ${topic.topic_name_fake || topic.topic_name}`
+        : displayTitle;
+
+    topicDiv.innerHTML = `
+        <div class="deboucled-floating-widget-topic-header">
+            <i class="deboucled-decensured-topic-icon icon-topic-folder deboucled-floating-widget-topic-icon" title="Topic Décensured"></i>
+            <span class="deboucled-floating-widget-topic-time">${timeAgo}</span>
+        </div>
+        <a href="${topic.topic_url}" class="deboucled-floating-widget-topic-title" title="${escapeHtml(titleTooltip)}">
+            ${escapeHtml(displayTitle)}
+        </a>
+        <div class="deboucled-floating-widget-topic-meta">
+            <a href="${authorProfileUrl}" class="deboucled-floating-widget-topic-author" target="_blank" rel="noopener noreferrer" title="Voir le profil de ${escapeHtml(topic.topic_author)}">
+                par ${escapeHtml(topic.topic_author)}
+            </a>
+            <span class="deboucled-floating-widget-topic-messages">${messageCount} msg</span>
+        </div>
+    `;
+
+    return topicDiv;
+}
+
+function showEmptyState(container) {
+    const emptyClass = preferDarkTheme() ? 'deboucled-floating-widget-empty dark-theme' : 'deboucled-floating-widget-empty';
+    container.innerHTML = `
+        <div class="${emptyClass}">
+            <i class="icon-info"></i>
+            <span>Aucun topic Décensured récent</span>
+        </div>
+    `;
+}
+
+function showErrorState(container) {
+    const errorClass = preferDarkTheme() ? 'deboucled-floating-error dark-theme' : 'deboucled-floating-error';
+    container.innerHTML = `
+        <div class="${errorClass}">
+            <i class="icon-warning"></i>
+            <span>Erreur de chargement</span>
+            <button onclick="loadFloatingWidgetTopics()">Réessayer</button>
+        </div>
+    `;
 }
 
 function startFloatingWidgetMonitoring() {

@@ -198,7 +198,7 @@ function cleanupTimers() {
     cleanupFormObserver();
 }
 
-function handleApiError(error, context, showNotification = false) {
+function logDecensuredError(error, context = '', showNotification = false) {
     console.error(`[Décensured] ${context}:`, error);
 
     if (typeof sendDiagnostic === 'function') {
@@ -208,10 +208,6 @@ function handleApiError(error, context, showNotification = false) {
     if (showNotification) {
         addAlertbox('error', `Erreur ${context}: ${error.message}`);
     }
-}
-
-function logDecensuredError(error, context = '') {
-    handleApiError(error, context);
 }
 
 // Notifications utilisateur

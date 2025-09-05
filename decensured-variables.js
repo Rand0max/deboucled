@@ -128,7 +128,7 @@ const DECENSURED_CONFIG = {
 
     // === FLOATING WIDGET CONFIGURATION ===
     FLOATING_WIDGET: {
-        MAX_TOPICS: 15,
+        TOPICS_PER_PAGE: 10,
         REFRESH_INTERVAL: 5 * 60 * 1000, // 5 minutes
         ANIMATION_DURATION: 300
     },

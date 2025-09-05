@@ -341,7 +341,7 @@ function injectDecensuredTopicUI(elements) {
     if (messageTextarea && messageTextarea.parentElement) {
         messageTextarea.parentElement.insertBefore(container, messageTextarea);
     } else {
-        console.error('[Décensured] Impossible d\'insérer le container - textarea ou parent manquant');
+        logDecensuredError(new Error('Impossible d\'insérer le container - textarea ou parent manquant'), 'addDecensuredTopicContainer');
         return;
     }
 
@@ -781,18 +781,70 @@ function animateContentTransition(fromElement, toElement, onComplete) {
         return;
     }
 
-    fromElement.classList.add('fade-out');
+    const toggleButton = fromElement.closest('.bloc-message-forum, .conteneur-message')?.querySelector('.deboucled-decensured-indicator');
+    if (toggleButton) {
+        toggleButton.classList.add('transitioning');
+    }
 
-    setTimeout(() => {
-        fromElement.style.display = 'none';
-        fromElement.classList.remove('fade-out');
+    fromElement.classList.add('deboucled-content-hiding');
 
-        toElement.style.display = '';
-        toElement.classList.add('fade-in');
-        setTimeout(() => toElement.classList.remove('fade-in'), DECENSURED_CONFIG.ANIMATION_DELAY);
+    fromElement.addEventListener('animationend', function handleHideAnimation(e) {
+        if (e.animationName === 'deboucled-content-hide') {
+            fromElement.removeEventListener('animationend', handleHideAnimation);
+            fromElement.style.display = 'none';
+            fromElement.classList.remove('deboucled-content-hiding');
 
+            toElement.style.display = '';
+            toElement.classList.add('deboucled-content-revealing');
+
+            toElement.addEventListener('animationend', function handleRevealAnimation(e) {
+                if (e.animationName === 'deboucled-content-reveal') {
+                    toElement.removeEventListener('animationend', handleRevealAnimation);
+                    toElement.classList.remove('deboucled-content-revealing');
+
+                    if (toggleButton) {
+                        toggleButton.classList.remove('transitioning');
+                    }
+
+                    if (onComplete) onComplete();
+                }
+            }, { once: true });
+        }
+    }, { once: true });
+}
+
+function animateTopicTitleTransition(titleElement, newText, onComplete) {
+    if (!titleElement) {
         if (onComplete) onComplete();
-    }, DECENSURED_CONFIG.ANIMATION_DELAY);
+        return;
+    }
+
+    titleElement.classList.add('deboucled-title-exiting');
+
+    titleElement.addEventListener('animationend', function handleExitAnimation(e) {
+        if (e.animationName === 'deboucled-title-exit') {
+            titleElement.removeEventListener('animationend', handleExitAnimation);
+
+            const children = Array.from(titleElement.children);
+            titleElement.textContent = newText;
+
+            children.forEach(child => {
+                titleElement.appendChild(child);
+            });
+
+            titleElement.classList.remove('deboucled-title-exiting');
+            titleElement.classList.add('deboucled-title-entering');
+
+            titleElement.addEventListener('animationend', function handleEnterAnimation(e) {
+                if (e.animationName === 'deboucled-title-enter') {
+                    titleElement.classList.remove('deboucled-title-entering');
+                    titleElement.removeEventListener('animationend', handleEnterAnimation);
+
+                    if (onComplete) onComplete();
+                }
+            }, { once: true });
+        }
+    }, { once: true });
 }
 
 function createToggleButton(originalContent, realContentDiv) {

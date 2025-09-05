@@ -40,7 +40,7 @@ async function handleDecensuredPost() {
     try {
         const processedContent = await processContent(realMessage, fakeMessage);
         if (!processedContent) {
-            handleApiError(new Error('Échec du traitement du contenu'), 'handleDecensuredPost', true);
+            logDecensuredError(new Error('Échec du traitement du contenu'), 'handleDecensuredPost', true);
             return;
         }
 
@@ -63,12 +63,12 @@ async function handleDecensuredPost() {
             }
         } else {
             setTextAreaValue(textarea, realMessage);
-            handleApiError(new Error('Échec du posting sur JVC'), 'handleDecensuredPost', true);
+            logDecensuredError(new Error('Échec du posting sur JVC'), 'handleDecensuredPost', true);
         }
 
     } catch (error) {
         setTextAreaValue(textarea, realMessage);
-        handleApiError(error, 'handleDecensuredPost', true);
+        logDecensuredError(error, 'handleDecensuredPost', true);
     }
 }
 
@@ -114,7 +114,7 @@ function buildFormData(form, messageContent) {
         if (ajaxHashInput) {
             formData.set("ajax_hash", ajaxHashInput.value);
         } else {
-            console.error('Aucun ajax_hash trouvé !');
+            logDecensuredError(new Error('Aucun ajax_hash trouvé'), 'prepareFormData');
         }
     }
 
@@ -229,7 +229,7 @@ function getPayloadFromScripts(doc) {
             const decodedPayload = JSON.parse(atob(rawPayloadString));
             return decodedPayload;
         } catch (e) {
-            console.error('Erreur parsing payload JVC :', e);
+            logDecensuredError(e, 'getGcToken - Erreur parsing payload JVC');
             return null;
         }
     }
@@ -241,7 +241,7 @@ function getForumPayload() {
         try {
             return JSON.parse(atob(window.jvc.forumsAppPayload));
         } catch (e) {
-            console.error('Erreur parsing window.jvc.forumsAppPayload :', e);
+            logDecensuredError(e, 'getForumPayload - Erreur parsing window.jvc.forumsAppPayload');
         }
     }
 
@@ -346,7 +346,7 @@ async function processNewTopicCreation() {
     try {
         pendingTopic = JSON.parse(pendingTopicJson);
     } catch (error) {
-        console.error('Erreur parsing pendingTopic:', error);
+        logDecensuredError(error, 'processNewTopicCreation - Erreur parsing pendingTopic');
         await store.delete(storage_pendingDecensuredTopic);
         return;
     }
@@ -402,7 +402,7 @@ async function handleTopicDecensuredCreationFlow() {
             await triggerNativeTopicCreation();
         }, DECENSURED_CONFIG.ANIMATION_DELAY);
     } catch (error) {
-        console.error('❌ Erreur dans handleTopicDecensuredCreationFlow:', error);
+        logDecensuredError(error, 'handleTopicDecensuredCreationFlow - Erreur dans handleTopicDecensuredCreationFlow');
         throw error;
     }
 }
@@ -410,7 +410,7 @@ async function handleTopicDecensuredCreationFlow() {
 async function triggerNativeTopicCreation() {
     const originalPostButton = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_ORIGINAL_TOPIC_POST_BUTTON);
     if (!originalPostButton) {
-        console.error('❌ Bouton de post original introuvable');
+        logDecensuredError(new Error('Bouton de post original introuvable'), 'triggerNativeTopicCreation');
         return;
     }
 
@@ -423,7 +423,7 @@ async function triggerNativeTopicCreation() {
                 const pendingTopic = JSON.parse(pendingTopicJson);
                 setTextAreaValue(elements.titleInput, pendingTopic.fakeTitle);
             } catch (error) {
-                console.error('❌ Erreur lors de la récupération du titre:', error);
+                logDecensuredError(error, 'triggerNativeTopicCreation - Erreur lors de la récupération du titre');
             }
         }
     }
