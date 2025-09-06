@@ -1160,26 +1160,27 @@ function moveMainTextareaToContainer(type, textarea) {
     const editButtons = jvcContainer.querySelector('.messageEditor__buttonEdit');
     const previewContainer = document.querySelector('.messageEditor__containerPreview');
 
-    const decensuredContainer = textareaWrapper.closest('.deboucled-decensured-input');
+    const decensuredContainer = textareaWrapper.closest(DECENSURED_CONFIG.SELECTORS.DECENSURED_CONTAINER);
     if (decensuredContainer && decensuredContainer.parentElement) {
+        decensuredContainer.setAttribute('data-original-parent-selector', getElementSelector(decensuredContainer.parentElement));
         jvcContainer.insertBefore(decensuredContainer, textarea);
-
         textareaWrapper.appendChild(textarea);
-
-        if (editButtons) {
-            textareaWrapper.appendChild(editButtons);
-        }
-
-        if (previewContainer) {
-            textareaWrapper.appendChild(previewContainer);
-        }
+        if (editButtons) textareaWrapper.appendChild(editButtons);
+        if (previewContainer) textareaWrapper.appendChild(previewContainer);
     }
 
-    if (originalTabIndex > 0) {
-        textarea.tabIndex = originalTabIndex;
-    }
-
+    if (originalTabIndex > 0) textarea.tabIndex = originalTabIndex;
     textarea.placeholder = 'Message Décensured';
+}
+
+function getElementSelector(element) {
+    if (!element) return '';
+    if (element.id) return `#${element.id}`;
+    if (element.className) {
+        const classes = element.className.split(' ').filter(c => c.trim());
+        if (classes.length > 0) return `.${classes[0]}`;
+    }
+    return element.tagName.toLowerCase();
 }
 
 function restoreMainTextareaFromContainer(type, textarea) {
@@ -1194,10 +1195,21 @@ function restoreMainTextareaFromContainer(type, textarea) {
     const elements = Array.from(textareaWrapper.children);
     elements.forEach(element => { jvcContainer.appendChild(element); });
 
-    const decensuredContainer = textareaWrapper.closest('.deboucled-decensured-input');
+    const decensuredContainer = textareaWrapper.closest(DECENSURED_CONFIG.SELECTORS.DECENSURED_CONTAINER);
     if (decensuredContainer) {
-        const jvcParent = jvcContainer.parentElement;
-        if (jvcParent) jvcParent.insertBefore(decensuredContainer, jvcContainer);
+        const originalParentSelector = decensuredContainer.getAttribute('data-original-parent-selector');
+        let targetParent = null;
+        if (originalParentSelector) targetParent = document.querySelector(originalParentSelector);
+        if (!targetParent) targetParent = jvcContainer.parentElement;
+        if (targetParent) {
+            const jvcContainerOrParent = targetParent === jvcContainer.parentElement ? jvcContainer : targetParent.querySelector('#forums-post-message-editor');
+            if (jvcContainerOrParent) {
+                targetParent.insertBefore(decensuredContainer, jvcContainerOrParent);
+            } else {
+                targetParent.appendChild(decensuredContainer);
+            }
+        }
+        decensuredContainer.removeAttribute('data-original-parent-selector');
     }
 
     textarea.placeholder = '';

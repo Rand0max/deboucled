@@ -16,14 +16,16 @@ let platitudeMessageSequenceData = { sequence: [], currentIndex: 0 };
 let topicWithMessagesIndexSequences = new Map();
 let sequencesInitialized = false;
 let decensuredIsBuilding = false;
+let decensuredTopicMessagesUseCache = false;
+let decensuredTopicMessagesCache = null;
 const domCache = new Map();
 
 // Versions debounced et throttled des fonctions critiques
 const debouncedHighlightDecensuredTopics = debounce(highlightDecensuredTopics, 500);
-const debouncedDecryptMessages = debounce(decryptMessages, 300);
 const debouncedLoadFloatingWidgetTopics = debounce(loadFloatingWidgetTopics, 1000);
 
 // Versions throttled pour les events frequents
+const throttledDecryptTopicMessages = throttle(decryptTopicMessages, 500);
 const throttledSetupTabOrder = throttle(setupTabOrder, 250);
 const throttledClearDomCache = throttle(clearDomCache, 2000);
 const throttledHighlightDecensuredTopics = throttle(highlightDecensuredTopics, 1000);

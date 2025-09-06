@@ -104,37 +104,33 @@ async function applyDecensuredFormattingToNewTopic(messageElement, decensuredMsg
 
 async function verifyCurrentTopicDecensured() {
     const currentPage = getCurrentPageType(window.location.pathname);
-    if (currentPage !== 'topicmessages') {
-        return;
-    }
+    if (currentPage !== 'topicmessages') return;
 
     const topicId = extractTopicIdFromUrl(window.location.pathname);
-    if (!topicId) {
-        return;
-    }
+    if (!topicId) return;
 
     try {
         const topicData = await getDecensuredTopic(topicId);
-        if (!topicData) return;
+        if (topicData) {
 
-        const shouldUpdateTitle = topicData.topic_name_real &&
-            topicData.topic_name_real !== topicData.topic_name_fake;
+            const shouldUpdateTitle = topicData.topic_name_real && topicData.topic_name_real !== topicData.topic_name_fake;
 
-        if (shouldUpdateTitle) {
-            formatTopicAsDecensured(
-                topicData.topic_name_real,
-                topicData.topic_name_fake
-            );
-        } else {
-            formatTopicAsDecensured(null, null, {
-                updateTitle: false,
-                addIndicator: true,
-                indicatorType: 'default',
-                highlightPage: true
-            });
+            if (shouldUpdateTitle) {
+                formatTopicAsDecensured(
+                    topicData.topic_name_real,
+                    topicData.topic_name_fake
+                );
+            } else {
+                formatTopicAsDecensured(null, null, {
+                    updateTitle: false,
+                    addIndicator: true,
+                    indicatorType: 'default',
+                    highlightPage: true
+                });
+            }
         }
 
-        await decryptMessages();
+        if (store.get(storage_optionAutoDecryptMessages, storage_optionAutoDecryptMessages_default)) await decryptMessages();
     } catch (error) {
         logDecensuredError(error, 'checkAndHighlightCurrentTopicIfDecensured - Erreur lors de la vérification du topic');
     }

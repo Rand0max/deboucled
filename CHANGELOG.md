@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.66.0] (06/09/2025)
+
+- Intégration de JvChat et TopicLive avec Décensured (Rand0max)
+
 ## [2.65.2] (05/09/2025)
 
 - Améliorations graphiques Décensured (Rand0max)

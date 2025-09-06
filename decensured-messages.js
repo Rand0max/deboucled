@@ -114,7 +114,7 @@ async function decryptMessages() {
 
     const currentPage = getCurrentPageType(window.location.pathname);
     if (currentPage === 'topicmessages') {
-        await decryptTopicMessages();
+        await throttledDecryptTopicMessages();
     } else if (currentPage === 'singlemessage') {
         await decryptSingleMessage();
     }
@@ -200,6 +200,107 @@ function removeReportButton(msgElement) {
 function invalidateMessageElementsCache() {
     messageElementsCache = null;
     messageElementsCacheTime = 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+// JVCHAT INTEGRATION
+///////////////////////////////////////////////////////////////////////////////////////
+
+function processJvChatDecensuredMessage(jvchatElement, decensuredMsg) {
+    const realContent = decensuredMsg.message_real_content;
+    if (!realContent) return;
+
+    if (jvchatElement.classList.contains('deboucled-decensured-processed')) {
+        return;
+    }
+
+    const contentElement = jvchatElement.querySelector('.jvchat-content');
+    if (!contentElement) return;
+
+    const originalContent = contentElement.querySelector('div, p');
+
+    const realContentDiv = document.createElement('div');
+    realContentDiv.className = 'deboucled-decensured-content';
+    realContentDiv.id = `deboucled-content-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    realContentDiv.innerHTML = formatMessageContent(realContent);
+
+    const decensuredIndicator = createToggleButton(originalContent, realContentDiv);
+
+    if (originalContent) {
+        originalContent.style.display = 'none';
+    }
+
+    contentElement.insertBefore(decensuredIndicator, contentElement.firstChild);
+    contentElement.appendChild(realContentDiv);
+
+    realContentDiv.classList.add('deboucled-content-entering');
+
+    realContentDiv.addEventListener('animationend', function handleAnimation(e) {
+        if (e.animationName === 'deboucled-content-enter') {
+            realContentDiv.classList.remove('deboucled-content-entering');
+            realContentDiv.classList.add('deboucled-content-entered');
+            realContentDiv.removeEventListener('animationend', handleAnimation);
+        }
+    }, { once: true });
+
+    initializeSpoilerHandlers(realContentDiv);
+
+    addJvChatDecensuredBadge(jvchatElement);
+
+    jvchatElement.classList.add('deboucled-decensured-processed');
+
+    const quoteButton = jvchatElement.querySelector('.jvchat-quote');
+    if (quoteButton) {
+        const newQuoteButton = quoteButton.cloneNode(true);
+        quoteButton.parentNode.replaceChild(newQuoteButton, quoteButton);
+
+        newQuoteButton.addEventListener('click', () => {
+            handleJvChatDecensuredQuote(jvchatElement, decensuredMsg);
+        });
+    }
+}
+
+function addJvChatDecensuredBadge(jvchatElement) {
+    const toolbarElement = jvchatElement.querySelector('.jvchat-toolbar');
+    if (!toolbarElement) return;
+
+    const existingBadge = toolbarElement.querySelector('.deboucled-decensured-badge');
+    if (existingBadge) return;
+
+    const badge = document.createElement('span');
+    badge.className = 'deboucled-decensured-badge deboucled-decensured-premium-logo';
+    badge.setAttribute('deboucled-data-tooltip', 'Membre d\'élite Décensured');
+
+    const authorElement = toolbarElement.querySelector('.jvchat-author');
+    if (authorElement) {
+        authorElement.parentNode.insertBefore(badge, authorElement.nextSibling);
+    } else {
+        toolbarElement.appendChild(badge);
+    }
+}
+
+function handleJvChatDecensuredQuote(jvchatElement, decensuredMsg) {
+    const textArea = document.querySelector('#message_topic');
+    if (!textArea) return;
+
+    activateDecensuredMode();
+
+    const authorElement = jvchatElement.querySelector('.jvchat-author');
+    const dateElement = jvchatElement.querySelector('.jvchat-date');
+
+    const author = authorElement ? authorElement.textContent.trim() : 'Utilisateur';
+    const date = dateElement ? dateElement.getAttribute('title') || dateElement.textContent.trim() : '';
+
+    const newQuoteHeader = `> Le ${date} '''${author}''' a écrit : `;
+
+    const messageContent = decensuredMsg.message_real_content || '';
+    const currentContent = textArea.value.length === 0 ? '' : `${textArea.value.trim()}\n\n`;
+    const quotedText = messageContent.replaceAll('\n', '\n> ');
+    setTextAreaValue(textArea, `${currentContent}${newQuoteHeader}\n> ${quotedText}\n\n`);
+
+    textArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    textArea.focus({ preventScroll: true });
+    textArea.setSelectionRange(textArea.value.length, textArea.value.length);
 }
 
 function getCurrentMessageContent(msgElement, decensuredMsg) {

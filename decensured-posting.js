@@ -54,13 +54,16 @@ async function handleDecensuredPost() {
                 ? jvcResponse.redirectUrl
                 : window.location.origin + jvcResponse.redirectUrl;
 
-            if (success) {
-                addAlertbox("success", "Message Décensured posté avec succès ! Redirection en cours...");
-                setTimeout(() => performRedirection(redirectUrl), 1500);
-            } else {
-                addAlertbox("warning", "Message posté sur JVC mais pas sauvegardé avec Décensured. Redirection en cours...");
-                setTimeout(() => performRedirection(redirectUrl), 2000);
+            if (jvChatActive) {
+                if (success) addAlertbox("success", "Message Décensured posté avec succès.");
+                else addAlertbox("warning", "Message posté sur JVC mais pas sauvegardé avec Décensured.");
             }
+            else {
+                if (success) addAlertbox("success", "Message Décensured posté avec succès ! Redirection en cours...");
+                else addAlertbox("warning", "Message posté sur JVC mais pas sauvegardé avec Décensured. Redirection en cours...");
+                setTimeout(() => performRedirection(redirectUrl), 1000);
+            }
+
         } else {
             setTextAreaValue(textarea, realMessage);
             logDecensuredError(new Error('Échec du posting sur JVC'), 'handleDecensuredPost', true);

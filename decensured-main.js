@@ -35,7 +35,6 @@ async function initDecensured() {
 
     toggleDecensuredFloatingWidget();
 
-    debouncedDecryptMessages();
     debouncedHighlightDecensuredTopics();
     setupDynamicTopicHighlighting();
 

@@ -64,6 +64,8 @@ let hotTopicsData = undefined;
 let messageQuotesPendingArray = [];
 let messageQuotesData = undefined;
 
+let jvChatActive = false;
+
 let pocTopicMap = new Map();
 let topicAuthorMap = new Map();
 let authorAvatarMap = new Map();

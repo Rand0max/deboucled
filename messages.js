@@ -206,6 +206,8 @@ function handleJvChatAndTopicLive(messageOptions) {
             if (topicLiveEvent) enhanceBlockquotes(messageContent);
         }
 
+        if (messageOptions.optionEnableDecensured && messageOptions.optionAutoDecryptMessages) handleLiveDecensuredMessage(messageElement, topicLiveEvent);
+
         if (!messageOptions.optionBlSubjectIgnoreMessages || isSelf) return;
         handleBlSubjectIgnoreMessages(messageElement);
     }
@@ -237,10 +239,59 @@ function handleJvChatAndTopicLive(messageOptions) {
         });
     }
 
-    enableJvChatAndTopicLiveEvents(handleLiveMessage, handlePostLiveMessage);
+    async function handleActivation() {
+        hiddenMessages = 0;
+        hiddenAuthorArray.clear();
+        updateMessagesHeader();
+
+        if (messageOptions.optionEnableDecensured && messageOptions.optionAutoDecryptMessages) {
+            const decensuredMessages = await getDecensuredMessages(currentTopicId);
+            if (!decensuredMessages.length) return;
+            decensuredTopicMessagesUseCache = true;
+        }
+    }
+
+    async function handleActivated() {
+        if (messageOptions.optionEnableDecensured && messageOptions.optionAutoDecryptMessages) {
+            setTimeout(() => {
+                decensuredTopicMessagesUseCache = false;
+                decensuredTopicMessagesCache = null;
+            }, DECENSURED_CONFIG.INIT_DELAY);
+        }
+    }
+
+    enableJvChatAndTopicLiveEvents(handleLiveMessage, handlePostLiveMessage, handleActivation, handleActivated);
 }
 
-function enableJvChatAndTopicLiveEvents(newMessageCallback, postMessageCallback) {
+async function handleLiveDecensuredMessage(messageElement, topicLiveEvent) {
+    const topicId = getCurrentTopicId();
+    if (!topicId) return;
+
+    try {
+        const messageId = topicLiveEvent ? getMessageId(messageElement) : messageElement.getAttribute('jvchat-id');
+        if (!messageId) return;
+
+        let decensuredMessage;
+        if (decensuredTopicMessagesUseCache) {
+            decensuredMessage = decensuredTopicMessagesCache.find(msg => msg.message_id === parseInt(messageId));
+        }
+        else {
+            decensuredMessage = await getDecensuredSingleMessage(messageId);
+        }
+        if (!decensuredMessage) return;
+
+        if (topicLiveEvent) {
+            processDecensuredMessage(messageElement, decensuredMessage);
+        } else {
+            processJvChatDecensuredMessage(messageElement, decensuredMessage);
+        }
+
+    } catch (error) {
+        logDecensuredError(error, 'handleLiveDecensuredMessage - Erreur lors du traitement d\'un message live');
+    }
+}
+
+function enableJvChatAndTopicLiveEvents(newMessageCallback, postMessageCallback, activationCallback, activatedCallback) {
     // JvChat
     window.addEventListener('jvchat:newmessage', function (event) {
         const messageElement = document.querySelector(`.jvchat-message[jvchat-id="${event.detail.id}"]`);
@@ -249,9 +300,12 @@ function enableJvChatAndTopicLiveEvents(newMessageCallback, postMessageCallback)
         newMessageCallback(messageElement, authorElement);
     });
     window.addEventListener('jvchat:activation', function () {
-        hiddenMessages = 0;
-        hiddenAuthorArray.clear();
-        updateMessagesHeader();
+        jvChatActive = true;
+        activationCallback();
+    });
+    window.addEventListener('jvchat:activated', function () {
+        jvChatActive = true;
+        activatedCallback();
     });
     window.addEventListener('jvchat:postmessage', function (event) {
         if (!event.detail) return;

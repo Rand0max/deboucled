@@ -669,6 +669,8 @@ function prepareMessageOptions(isWhitelistedTopic) {
         optionEmbedTwitter: store.get(storage_optionEmbedTwitter, storage_optionEmbedTwitter_default),
         optionAntiLoopAiMode: store.get(storage_optionAntiLoopAiMode, storage_optionAntiLoopAiMode_default),
         optionDisplayBadges: store.get(storage_optionDisplayBadges, storage_optionDisplayBadges_default),
+        optionEnableDecensured: store.get(storage_optionEnableDecensured, storage_optionEnableDecensured_default),
+        optionAutoDecryptMessages: store.get(storage_optionAutoDecryptMessages, storage_optionAutoDecryptMessages_default),
         isWhitelistedTopic: isWhitelistedTopic
     };
 }

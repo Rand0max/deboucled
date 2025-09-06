@@ -87,15 +87,17 @@ async function createDecensuredMessage(messageId, username, messageUrl, fakeCont
 
 async function getDecensuredMessages(topicId) {
     try {
+        if (decensuredTopicMessagesUseCache && decensuredTopicMessagesCache?.length) {
+            return decensuredTopicMessagesCache;
+        }
         const data = await fetchDecensuredApi(`${apiDecensuredMessagesUrl}/${topicId}/${DECENSURED_CONFIG.API_MAX_MESSAGES}/0`);
         if (data && Array.isArray(data)) {
+            decensuredTopicMessagesCache = data;
             return data;
         }
     } catch (error) {
         logDecensuredError(error, 'getDecensuredMessages');
     }
-
-    return [];
 }
 
 async function createDecensuredTopic(topicData) {
@@ -195,15 +197,22 @@ async function getDecensuredTopicsBatch(topicIds) {
     }
 }
 
+async function getDecensuredSingleMessage(messageId) {
+    try {
+        const apiResponse = await fetchDecensuredApi(`${apiDecensuredSingleMessageUrl}/${messageId}`);
+        const decensuredMsg = Array.isArray(apiResponse) && apiResponse.length > 0 ? apiResponse[0] : null;
+        return decensuredMsg;
+    } catch (error) {
+        logDecensuredError(error, 'getDecensuredMessages');
+    }
+}
+
 async function decryptSingleMessage() {
     const messageId = getCurrentMessageIdFromUrl();
     if (!messageId) return;
 
     try {
-        const apiResponse = await fetchDecensuredApi(`${apiDecensuredSingleMessageUrl}/${messageId}`);
-
-        const decensuredMsg = Array.isArray(apiResponse) && apiResponse.length > 0 ? apiResponse[0] : null;
-
+        const decensuredMsg = await getDecensuredSingleMessage(messageId);
         if (!decensuredMsg || !decensuredMsg.message_real_content) return;
 
         const messageElements = getMessageElements();
