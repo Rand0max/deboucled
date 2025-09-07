@@ -61,21 +61,29 @@ function processDecensuredMessage(msgElement, decensuredMsg) {
 
     const contentElement = msgElement.querySelector('.message-content, .text-enrichi-forum');
     if (!contentElement) return;
+    
+    const originalContentsContainer = document.createElement("div");
+    originalContentsContainer.className = 'deboucled-decensured-original-content-container';
+    originalContentsContainer.id = `deboucled-container-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    const originalContent = contentElement.querySelector('p, div');
+    const originalContents = contentElement.querySelectorAll(':scope > :not([class*="deboucled"])');
+    originalContents.forEach(content => {
+        originalContentsContainer.appendChild(content);
+    });
 
     const realContentDiv = document.createElement('div');
     realContentDiv.className = 'deboucled-decensured-content';
     realContentDiv.id = `deboucled-content-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     realContentDiv.innerHTML = formatMessageContent(realContent);
 
-    const decensuredIndicator = createToggleButton(originalContent, realContentDiv);
+    const decensuredIndicator = createToggleButton(originalContentsContainer, realContentDiv);
 
-    if (originalContent) {
-        originalContent.style.display = 'none';
+    if (originalContentsContainer) {
+        originalContentsContainer.style.display = 'none';
     }
 
     contentElement.insertBefore(decensuredIndicator, contentElement.firstChild);
+    contentElement.insertBefore(originalContentsContainer, decensuredIndicator.nextSibling);
     contentElement.appendChild(realContentDiv);
 
     realContentDiv.classList.add('deboucled-content-entering');
