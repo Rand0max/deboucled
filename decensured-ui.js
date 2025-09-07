@@ -861,12 +861,15 @@ function createToggleButton(originalContent, realContentDiv) {
     let showingDecensured = true;
 
     decensuredIndicator.addEventListener('click', () => {
+        decensuredIndicator.disabled = true;
+
         if (showingDecensured) {
             animateContentTransition(realContentDiv, originalContent, () => {
                 decensuredIndicator.innerHTML = SWITCH_TO_DECENSURED_TITLE;
                 decensuredIndicator.title = 'Cliquer pour voir le message Décensured';
                 decensuredIndicator.classList.remove('showing-fake');
                 showingDecensured = false;
+                decensuredIndicator.disabled = false;
             });
         } else {
             animateContentTransition(originalContent, realContentDiv, () => {
@@ -874,6 +877,7 @@ function createToggleButton(originalContent, realContentDiv) {
                 decensuredIndicator.title = 'Cliquer pour voir le message original';
                 decensuredIndicator.classList.add('showing-fake');
                 showingDecensured = true;
+                decensuredIndicator.disabled = false;
             });
         }
     });
