@@ -251,6 +251,10 @@ window.addEventListener('beforeunload', cleanupTimers);
 
 // API Helper
 
+function getCurrentUserPseudo() {
+    return userPseudo ?? store.get(storage_lastUsedPseudo, storage_lastUsedPseudo_default);
+}
+
 async function fetchDecensuredApi(endpoint, options = {}) {
     try {
         const method = options.method || 'GET';
@@ -260,6 +264,11 @@ async function fetchDecensuredApi(endpoint, options = {}) {
                 'Referer': window.location.href,
                 ...options.headers
             };
+
+            const currentUserPseudo = getCurrentUserPseudo();
+            if (currentUserPseudo && currentUserPseudo.trim() !== '') {
+                headers['X-Deboucled-User'] = currentUserPseudo;
+            }
 
             if (method !== 'GET') {
                 headers['Content-Type'] = 'application/json';

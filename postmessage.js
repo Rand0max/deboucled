@@ -50,11 +50,8 @@ function fixNoelshackDirectUrl() {
 
 async function handlePostMessage() {
     const decensuredToggle = document.querySelector('#decensured-toggle');
-    if (decensuredToggle && decensuredToggle.checked) {
-        return;
-    }
-
-    bypassTextCensorship();
+    const isDecensuredActive = decensuredToggle && decensuredToggle.checked;
+    if (!isDecensuredActive) bypassTextCensorship();
     await validatePendingMessageQuotes();
 }
 

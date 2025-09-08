@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.66.2] (06/09/2025)
+
+- Amélioration de la sécurité (Rand0max)
+
 ## [2.66.1] (06/09/2025)
 
 - Corrections Décensured mineures (Rand0max)
