@@ -986,7 +986,7 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
   font-size: 0.7rem;
   font-weight: bold;
   position: absolute;
-  left: -30px;
+  left: -28px;
   top: 50%;
   transform: translateY(-50%);
   width: 35px;
@@ -1016,8 +1016,8 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
 }
 
 .deboucled-floating-widget.dark-theme::before {
-  background: rgba(15, 60, 80, 0.9);
-  border-color: rgba(70, 120, 140, 0.9);
+  background: rgba(15, 60, 80, 0.8);
+  border-color: rgba(70, 120, 140, 0.8);
 }
 
 @keyframes deboucled-widget-intro {

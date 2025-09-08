@@ -23,14 +23,25 @@ async function suggestUpdate() {
 
     const updateRes = await checkUpdate();
     if (updateRes?.length && mustRefresh(storage_lastUpdateDeferredCheck, checkUpdateDeferredExpire)) {
-        if (confirm('Nouvelle version de Déboucled disponible. Voulez-vous l\'installer ?')) {
-            toggleDeferUpdate(false);
-            window.location.href = updateRes;
-            //window.open(updateRes, '_blank').focus();
-        }
-        else {
-            toggleDeferUpdate(true);
-        }
+        Swal.fire({
+            title: '<strong>Nouvelle version disponible !<strong>',
+            html: `<p>Une <b>nouvelle version</b> de Déboucled est disponible.</p><p>Voulez-vous l'<b>installer maintenant</b> pour profiter des dernières améliorations et corrections ?</p><p><i>Vous pouvez reporter cette mise à jour de 5 jours en cliquant sur "Plus tard".</i></p>`,
+            icon: 'info',
+            showDenyButton: true,
+            showCancelButton: false,
+            confirmButtonText: 'Installer maintenant',
+            denyButtonText: 'Plus tard',
+            customClass: {
+                confirmButton: 'deboucled-bold'
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                toggleDeferUpdate(false);
+                window.location.href = updateRes;
+            } else if (result.isDenied) {
+                toggleDeferUpdate(true);
+            }
+        });
     }
 }
 

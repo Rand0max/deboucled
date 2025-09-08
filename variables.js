@@ -14,6 +14,8 @@ const entityTopicId = 'topicid';
 const jvarchiveUrl = 'https://jvarchive.st';
 const avatarUseJvArchiveApi = false;
 
+const deboucledRepositoryUrl = 'https://github.com/Rand0max/deboucled';
+
 const deboucledBackendUrl = 'https://deboucled.randomax.com';
 const deboucledApiUrl = `${deboucledBackendUrl}/api`;
 const apiChangelogUrl = `${deboucledApiUrl}/changelog`;
@@ -118,7 +120,7 @@ let brokenSmileyGifArray = [];
 let smileyGifRegex = new RegExp();
 
 const deboucledPseudos = ['rand0max', 'rand0max2', 'rand0max3', 'rand0max4', 'rand0max5', 'rand0max6', 'rand0max7', 'rand0maxreborn', 'deboucled', 'decensured', 'roninwf', 'roninwf2'];
-const deboucledTopics = ['67697509', '68410257', '68982055', '70029449', '71596925'];
+const deboucledTopics = ['67697509', '68410257', '68982055', '70029449', '71596925', '76209003'];
 
 // Decensured
 const decensuredBackendUrl = 'https://deboucled.randomax.com';

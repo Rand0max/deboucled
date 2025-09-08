@@ -54,6 +54,15 @@ async function checkUpdate() {
 
     store.set(storage_lastUpdateCheck, Date.now());
 
+    if (!checkRes || typeof checkRes !== 'string') return checkRes;
+
+    const trimmedUrl = checkRes.trim();
+    if (!trimmedUrl.toLowerCase().startsWith(deboucledRepositoryUrl.toLowerCase()) ||
+        !trimmedUrl.toLowerCase().endsWith('deboucled.user.js')) {
+        console.warn('checkUpdate : URL de retour invalide', checkRes);
+        return null;
+    }
+
     return checkRes;
 }
 

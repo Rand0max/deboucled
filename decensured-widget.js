@@ -171,9 +171,7 @@ function hideFloatingWidget() {
 
 async function loadFloatingWidgetTopics() {
     const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
-    if (!widget || !widget.classList.contains('visible')) {
-        return;
-    }
+    if (!widget || !widget.classList.contains('visible')) return;
     initializeFloatingWidgetInfiniteScroll();
 }
 
@@ -186,7 +184,6 @@ function initializeFloatingWidgetInfiniteScroll() {
 
     if (!topicsContainer || !topicsListContainer) return;
 
-    // Reset state
     topicsListContainer.innerHTML = '';
     let currentPage = 0;
     let isLoading = false;
@@ -236,32 +233,22 @@ function initializeFloatingWidgetInfiniteScroll() {
             hasMoreTopics = false;
         } finally {
             isLoading = false;
-            if (isFirstLoad && loadingContainer) {
-                loadingContainer.classList.remove('active');
-            }
-            if (loader) {
-                loader.style.display = hasMoreTopics ? 'none' : 'none';
-            }
+            if (isFirstLoad && loadingContainer) loadingContainer.classList.remove('active');
+            if (loader) loader.style.display = 'none';
             if (refreshButton) refreshButton.disabled = false;
         }
     }
 
-    // Setup scroll listener for infinite scroll
-    if (topicsContainer) {
-        topicsContainer.addEventListener('scroll', () => {
-            if (isLoading || !hasMoreTopics) return;
+    topicsContainer.addEventListener('scroll', () => {
+        if (isLoading || !hasMoreTopics) return;
 
-            const { scrollTop, scrollHeight, clientHeight } = topicsContainer;
-            const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
-            const isNearBottom = scrollPercentage >= 0.8;
+        const { scrollTop, scrollHeight, clientHeight } = topicsContainer;
+        const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+        const isNearBottom = scrollPercentage >= 0.8;
 
-            if (isNearBottom) {
-                loadMoreTopics();
-            }
-        });
-    }
+        if (isNearBottom) loadMoreTopics();
+    });
 
-    // Initial load
     loadMoreTopics();
 }
 

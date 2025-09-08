@@ -220,7 +220,7 @@ function getPayloadFromScripts(doc) {
             }
 
             const jvcVarMatch = scriptContent.match(/jvc\.forumsAppPayload\s*=\s*['"]([^'"]+)['"]/);
-            if (!rawPayloadString && jvcVarMatch && jvcVarMatch[1]) {
+            if (jvcVarMatch && jvcVarMatch[1]) {
                 rawPayloadString = jvcVarMatch[1];
                 break;
             }
@@ -245,6 +245,13 @@ function getForumPayload() {
             return JSON.parse(atob(window.jvc.forumsAppPayload));
         } catch (e) {
             logDecensuredError(e, 'getForumPayload - Erreur parsing window.jvc.forumsAppPayload');
+        }
+    }
+    if (unsafeWindow.jvc && unsafeWindow.jvc.forumsAppPayload) {
+        try {
+            return JSON.parse(atob(unsafeWindow.jvc.forumsAppPayload));
+        } catch (e) {
+            logDecensuredError(e, 'getForumPayload - Erreur parsing unsafeWindow.jvc.forumsAppPayload');
         }
     }
 
@@ -471,8 +478,8 @@ async function handleDecensuredTopicCreation() {
         throw new Error('Le titre réel est obligatoire en mode Topic masqué');
     }
 
-    if (!finalRealTitle || !initialRealMessage) {
-        throw new Error('Le titre réel et le message sont obligatoires');
+    if (!initialRealMessage) {
+        throw new Error('Le message est obligatoire');
     }
 
     const processedContent = await processContent(initialRealMessage, finalFakeMessage);

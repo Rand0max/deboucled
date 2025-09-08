@@ -268,10 +268,8 @@ function cleanupTopicDecensuredState() {
 }
 
 function getTopicFormElements() {
-
     if (topicDecensuredState.formElements) {
-        const isValid = topicDecensuredState.formElements.titleInput &&
-            document.contains(topicDecensuredState.formElements.titleInput);
+        const isValid = topicDecensuredState.formElements.titleInput && document.contains(topicDecensuredState.formElements.titleInput);
         if (isValid) return topicDecensuredState.formElements;
     }
 
@@ -909,20 +907,12 @@ function setupFormElementsObserver() {
     }
 
     let retryCount = 0;
-    const maxRetries = DECENSURED_CONFIG.API_MAX_RETRIES;
 
     const checkAndInject = () => {
         const foundElements = targetSelectors.filter(selector => document.querySelector(selector));
-
         if (foundElements.length > 0) {
-            if (callbackFunction) {
-                callbackFunction();
-            }
-
-            if (decensuredFormObserver) {
-                decensuredFormObserver.disconnect();
-                decensuredFormObserver = null;
-            }
+            if (callbackFunction) callbackFunction();
+            cleanupFormObserver();
             return true;
         }
         return false;
@@ -940,7 +930,6 @@ function setupFormElementsObserver() {
                         const hasTargetElement = targetSelectors.some(selector => {
                             return node.querySelector?.(selector) || node.id === selector.replace('#', '');
                         });
-
                         if (hasTargetElement) {
                             shouldCheck = true;
                         }
@@ -951,16 +940,11 @@ function setupFormElementsObserver() {
 
         if (shouldCheck) {
             retryCount++;
-
-            if (retryCount > maxRetries) {
-                console.warn(`[Décensured] Abandon après ${maxRetries} tentatives d'injection de l'UI`);
-                if (decensuredFormObserver) {
-                    decensuredFormObserver.disconnect();
-                    decensuredFormObserver = null;
-                }
+            if (retryCount > DECENSURED_CONFIG.API_MAX_RETRIES) {
+                console.warn(`[Décensured] Abandon après ${DECENSURED_CONFIG.API_MAX_RETRIES} tentatives d'injection de l'UI`);
+                cleanupFormObserver();
                 return;
             }
-
             setTimeout(checkAndInject, DECENSURED_CONFIG.DOM_STABILIZATION_DELAY);
         }
     });
@@ -970,12 +954,7 @@ function setupFormElementsObserver() {
         subtree: true
     });
 
-    setTimeout(() => {
-        if (decensuredFormObserver) {
-            decensuredFormObserver.disconnect();
-            decensuredFormObserver = null;
-        }
-    }, DECENSURED_CONFIG.OBSERVER_CLEANUP_TIMEOUT);
+    setTimeout(() => { cleanupFormObserver(); }, DECENSURED_CONFIG.OBSERVER_CLEANUP_TIMEOUT);
 }
 
 function cleanupFormObserver() {

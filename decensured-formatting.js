@@ -10,8 +10,7 @@ function formatSpoilers(text) {
 
 function formatCodeBlocks(text) {
     return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.codeBlocks, (match, content) => {
-        const cleanContent = content.trim().replace(/\n/g, '\n');
-        return `<pre class="pre-jv"><code class="code-jv">${cleanContent}</code></pre>`;
+        return `<pre class="pre-jv"><code class="code-jv">${content.trim()}</code></pre>`;
     });
 }
 

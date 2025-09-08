@@ -118,7 +118,7 @@ function buildSettingsPage() {
         */
 
         const githubLogo = '<span class="deboucled-svg-github"><svg width="20px" viewBox="0 0 16 16" id="deboucled-github-logo"><use href="#githublogo"/></svg></span>';
-        html += `<a class="deboucled-about-link-github" href="https://github.com/Rand0max/deboucled" target="_blank" title="Github officiel Déboucled">${githubLogo}</a>`;
+        html += `<a class="deboucled-about-link-github" href="${deboucledRepositoryUrl}" target="_blank" title="Github officiel Déboucled">${githubLogo}</a>`;
 
         /*
         const jvarchiveLogo = '<span class="deboucled-jvarchive-logo"></span>';
