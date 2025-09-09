@@ -25,14 +25,19 @@ async function suggestUpdate() {
     if (updateRes?.length && mustRefresh(storage_lastUpdateDeferredCheck, checkUpdateDeferredExpire)) {
         Swal.fire({
             title: '<strong>Nouvelle version disponible !<strong>',
-            html: `<p>Une <b>nouvelle version</b> de Déboucled est disponible.</p><p>Voulez-vous l'<b>installer maintenant</b> pour profiter des dernières améliorations et corrections ?</p><p><i>Vous pouvez reporter cette mise à jour de 5 jours en cliquant sur "Plus tard".</i></p>`,
-            icon: 'info',
+            html: `<p>Voulez-vous l'installer maintenant pour profiter des dernières améliorations et corrections de Déboucled ?</p>`,
+            imageUrl: 'https://image.noelshack.com/fichiers/2025/37/2/1757408733-deboucled-logo-new.png',
+            imageWidth: 200,
+            imageHeight: 200,
+            imageAlt: "Déboucled",
+            background: '#031b2c',
             showDenyButton: true,
             showCancelButton: false,
             confirmButtonText: 'Installer maintenant',
             denyButtonText: 'Plus tard',
             customClass: {
-                confirmButton: 'deboucled-bold'
+                confirmButton: 'deboucled-bold',
+                title: 'deboucled-swal-title'
             },
         }).then((result) => {
             if (result.isConfirmed) {

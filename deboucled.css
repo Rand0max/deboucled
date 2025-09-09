@@ -106,6 +106,9 @@ body.deboucled-dark-theme {
   align-items: center;
   row-gap: 0.7rem;
 }
+.deboucled-swal-title {
+  padding-top: 0;
+}
 
 /* Overlay */
 #deboucled-topic-list-wrapper {

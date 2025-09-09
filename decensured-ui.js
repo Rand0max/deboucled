@@ -826,7 +826,19 @@ function animateTopicTitleTransition(titleElement, newText, onComplete) {
             const children = Array.from(titleElement.children);
             titleElement.textContent = newText;
 
-            children.forEach(child => {
+            const allowedChildren = children.filter(child => {
+                if (child.classList && child.classList.contains('deboucled-decensured-topic-indicator')) {
+                    return true;
+                }
+
+                if (child.classList && child.classList.contains('deboucled-blacklisted')) {
+                    return false;
+                }
+
+                return true;
+            });
+
+            allowedChildren.forEach(child => {
                 titleElement.appendChild(child);
             });
 

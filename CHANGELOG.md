@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.66.3] (06/09/2025)
+
+- Correction bug des titres Décensured avec des mots blacklist (Rand0max)
+
 ## [2.66.2] (06/09/2025)
 
 - Amélioration de la sécurité (Rand0max)

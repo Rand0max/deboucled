@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.66.2
+// @version     2.66.3
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
 // @description Masque les topics, les sujets et les auteurs indésirables et vous sort de la boucle.
-// @icon        https://image.noelshack.com/fichiers/2021/38/6/1632606701-deboucled.png
+// @icon        https://jvscript.fr/storage/images/deboucled.png
 // @match       http://www.jeuxvideo.com/forums/*
 // @match       https://www.jeuxvideo.com/forums/*
 // @match       http://www.jeuxvideo.com/recherche/forums/*
