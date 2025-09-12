@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.66.4] (12/09/2025)
+
+- Correction de deux bugs relatifs à l'affichage des messages Decensured (Contrapunctus-XIV)
+
 ## [2.66.3] (06/09/2025)
 
 - Correction bug des titres Décensured avec des mots blacklist (Rand0max)
