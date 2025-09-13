@@ -757,61 +757,6 @@ function removeUselessTags(topics) {
 async function handleTopicAvatars(topics) {
     GM_addStyle('.topic-list .topic-author { width: 7.4rem; }');
 
-    const imageRootUrl = 'https://image.jeuxvideo.com';
-    const avatarSmallSizeRoute = 'avatar-sm';
-    const defaultAvatar = `${imageRootUrl}/${avatarSmallSizeRoute}/default.jpg`;
-
-    async function getAuthorAvatarUrl(topicAuthorElem) {
-        if (!topicAuthorElem) return;
-
-        const author = topicAuthorElem.textContent.trim().toLowerCase();
-        if (!author?.length) return;
-
-        if (authorAvatarMap.has(author)) {
-            let url = authorAvatarMap.get(author);
-            if (url === 'def') return defaultAvatar;
-            return `${imageRootUrl}${url}`;
-        }
-
-        function storeAvatarUrl(avatarUrl) {
-            avatarUrl = avatarUrl.replace('avatar-md', avatarSmallSizeRoute);
-            if (avatarUrl === defaultAvatar) authorAvatarMap.set(author, 'def');
-            else authorAvatarMap.set(author, avatarUrl.replace(imageRootUrl, ''));
-            return avatarUrl;
-        }
-
-        async function getAvatarUsingJvcProfile() {
-            const authorProfileUrl = topicAuthorElem.href;
-            if (!authorProfileUrl?.length) return;
-            const resHtml = await fetchHtml(authorProfileUrl);
-            if (!resHtml) return;
-
-            const profileAvatarUrl = resHtml.querySelector('.content-img-avatar')?.firstElementChild?.src;
-            if (!profileAvatarUrl?.length) return;
-            return storeAvatarUrl(profileAvatarUrl);
-        }
-
-        async function getAvatarUsingJvArchive() {
-            const authorJvaResult = await getJvArchiveAuthor(author);
-            if (!authorJvaResult) return;
-
-            const authorJva = parseJvArchiveAuthorResult(authorJvaResult);
-            let jvaAvatarUrl = authorJva?.avatar;
-            if (!jvaAvatarUrl?.length) jvaAvatarUrl = defaultAvatar;
-
-            return storeAvatarUrl(jvaAvatarUrl);
-        }
-
-        // Use JvArchive to get avatar in only one request instead of two (with JVC profile)
-        // Useful to avoid JVC query limitation/slowness
-        if (avatarUseJvArchiveApi) {
-            const jvArchiveAvatarUrl = await getAvatarUsingJvArchive();
-            if (jvArchiveAvatarUrl?.length) return jvArchiveAvatarUrl;
-        }
-        // If not successful (too many request/jvarchive down) or not enabled, fallback with JVC
-        return await getAvatarUsingJvcProfile();
-    }
-
     await Promise.all(topics.slice(1).map(async function (topic) {
         const topicAuthorElem = topic.querySelector('.topic-author');
         if (!topicAuthorElem) return;
@@ -825,10 +770,13 @@ async function handleTopicAvatars(topics) {
 
         const authorAvatar = document.createElement('img');
         authorAvatar.className = 'deboucled-topic-avatar';
-        authorAvatar.src = defaultAvatar;
+        authorAvatar.src = defaultAvatarUrl;
         topicAuthorElem.prepend(authorAvatar);
 
-        const avatarUrl = await getAuthorAvatarUrl(topicAuthorElem);
+        const author = topicAuthorElem.textContent.trim().toLowerCase();
+        const authorProfileUrl = topicAuthorElem.getAttribute('href');
+
+        const avatarUrl = await getAuthorAvatarUrl(author, authorProfileUrl);
         if (avatarUrl?.length) {
             authorAvatar.alt = authorAvatar.src;
             authorAvatar.src = avatarUrl;

@@ -240,7 +240,7 @@ async function showDecensuredUsersModal() {
         const usersData = await fetchDecensuredApi(apiDecensuredUsersOnlineUrl, { method: 'GET' });
 
         if (usersData && usersData.users) {
-            createAndShowUsersModal(usersData.users, usersData.count);
+            await createAndShowUsersModal(usersData.users, usersData.count);
         } else {
             addAlertbox('warning', 'Aucun utilisateur Décensured trouvé');
         }

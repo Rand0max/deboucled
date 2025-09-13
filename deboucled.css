@@ -3887,6 +3887,17 @@ body.dark .headerAccount--decensured .headerAccount__notif:hover {
   font-weight: bold;
   font-size: 1rem;
   transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deboucled-user-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 .deboucled-user-status {

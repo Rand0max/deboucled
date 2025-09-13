@@ -33,7 +33,7 @@ function createDecensuredUsersHeader() {
     return decensuredButton;
 }
 
-function createAndShowUsersModal(users, totalCount) {
+async function createAndShowUsersModal(users, totalCount) {
     const existingModal = document.querySelector('.deboucled-users-modal');
     if (existingModal) {
         existingModal.remove();
@@ -48,7 +48,7 @@ function createAndShowUsersModal(users, totalCount) {
     let currentPage = 0;
     let isLoading = false;
 
-    function loadMoreUsers() {
+    async function loadMoreUsers() {
         const startIndex = currentPage * USERS_PER_PAGE;
         const endIndex = Math.min(startIndex + USERS_PER_PAGE, sortedUsers.length);
         const usersToShow = sortedUsers.slice(startIndex, endIndex);
@@ -60,20 +60,49 @@ function createAndShowUsersModal(users, totalCount) {
 
         if (!userContainer) return;
 
-        usersToShow.forEach(user => {
+        const optionDisplayTopicAvatar = store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default);
+
+        await Promise.all(usersToShow.map(async user => {
             const userItem = document.createElement('div');
             userItem.className = 'deboucled-user-item';
-            userItem.innerHTML = `
-                <a href="https://www.jeuxvideo.com/profil/${encodeURIComponent(user.username)}?mode=infos" 
-                   target="_blank" 
-                   rel="noopener noreferrer" 
-                   class="deboucled-user-pseudo">${escapeHtml(user.username)}</a>
-                <span class="deboucled-user-status">Actif ${formatTimeAgo(user.lastActiveDate)}</span>
-            `;
+
+            const userLink = document.createElement('a');
+            userLink.href = `https://www.jeuxvideo.com/profil/${encodeURIComponent(user.username.toLowerCase())}?mode=infos`;
+            userLink.target = '_blank';
+            userLink.rel = 'noopener noreferrer';
+            userLink.className = 'deboucled-user-pseudo';
+
+            if (optionDisplayTopicAvatar) {
+                const userAvatar = document.createElement('img');
+                userAvatar.className = 'deboucled-user-avatar';
+                userAvatar.src = defaultAvatarUrl;
+                userAvatar.alt = user.username;
+                userAvatar.setAttribute('onerror', `this.onerror=null; this.src='${defaultAvatarUrl}';`);
+
+                const avatarUrl = await getAuthorAvatarUrl(user.username.toLowerCase(), userLink.href);
+                if (avatarUrl?.length) {
+                    userAvatar.src = avatarUrl;
+                }
+
+                userLink.appendChild(userAvatar);
+            }
+
+            const usernameSpan = document.createElement('span');
+            usernameSpan.textContent = user.username;
+            userLink.appendChild(usernameSpan);
+
+            const statusSpan = document.createElement('span');
+            statusSpan.className = 'deboucled-user-status';
+            statusSpan.textContent = `Actif ${formatTimeAgo(user.lastActiveDate)}`;
+
+            userItem.appendChild(userLink);
+            userItem.appendChild(statusSpan);
             userContainer.appendChild(userItem);
-        });
+        }));
 
         currentPage++;
+
+        await saveLocalStorage();
 
         if (endIndex >= sortedUsers.length) {
             const loader = modalBody.querySelector('.deboucled-users-loader');
@@ -109,7 +138,7 @@ function createAndShowUsersModal(users, totalCount) {
     }
 
     if (sortedUsers.length > 0) {
-        loadMoreUsers();
+        await loadMoreUsers();
     }
 
     if (modalBody && sortedUsers.length > USERS_PER_PAGE) {
@@ -125,8 +154,8 @@ function createAndShowUsersModal(users, totalCount) {
 
                 if (loader) loader.style.display = 'block';
 
-                setTimeout(() => {
-                    loadMoreUsers();
+                setTimeout(async () => {
+                    await loadMoreUsers();
                     isLoading = false;
                 }, DECENSURED_CONFIG.ANIMATION_DELAY);
             }

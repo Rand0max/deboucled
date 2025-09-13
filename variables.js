@@ -40,6 +40,10 @@ const hotTopicsRefreshExpire = TimeSpan.FromMinutes(15);
 const messageQuotesRefreshExpire = TimeSpan.FromMinutes(2);
 const pendingMessageQuoteExpire = TimeSpan.FromDays(3);
 
+const imageRootUrl = 'https://image.jeuxvideo.com';
+const avatarSmallSizeRoute = 'avatar-sm';
+const defaultAvatarUrl = `${imageRootUrl}/${avatarSmallSizeRoute}/default.jpg`;
+
 let subjectBlacklistArray = [];
 let authorBlacklistArray = [];
 let topicIdBlacklistMap = new Map();

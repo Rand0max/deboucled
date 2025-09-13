@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.66.5] (14/09/2025)
+
+- Affichage des avatars dans la liste des utilisateurs Décensured (si option active) (Rand0max)
+
 ## [2.66.4] (12/09/2025)
 
 - Correction de deux bugs relatifs à l'affichage des messages Decensured (Contrapunctus-XIV)

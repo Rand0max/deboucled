@@ -295,3 +295,51 @@ async function showDeletedMessages() {
 
 
 }
+
+async function getAuthorAvatarUrl(author, authorProfileUrl) {
+    if (!author?.length || !authorProfileUrl) return;
+
+    if (authorAvatarMap.has(author)) {
+        let url = authorAvatarMap.get(author);
+        if (url === 'def') return defaultAvatarUrl;
+        return `${imageRootUrl}${url}`;
+    }
+
+    function storeAvatarUrl(avatarUrl) {
+        avatarUrl = avatarUrl.replace('avatar-md', avatarSmallSizeRoute);
+        if (avatarUrl === defaultAvatarUrl) authorAvatarMap.set(author, 'def');
+        else authorAvatarMap.set(author, avatarUrl.replace(imageRootUrl, ''));
+        return avatarUrl;
+    }
+
+    async function getAvatarUsingJvcProfile() {
+        if (!authorProfileUrl?.length) return;
+        const resHtml = await fetchHtml(authorProfileUrl);
+        if (!resHtml) return;
+
+        const profileAvatarUrl = resHtml.querySelector('.content-img-avatar')?.firstElementChild?.src;
+        if (!profileAvatarUrl?.length) return;
+        return storeAvatarUrl(profileAvatarUrl);
+    }
+
+    async function getAvatarUsingJvArchive() {
+        const authorJvaResult = await getJvArchiveAuthor(author);
+        if (!authorJvaResult) return;
+
+        const authorJva = parseJvArchiveAuthorResult(authorJvaResult);
+        let jvaAvatarUrl = authorJva?.avatar;
+        if (!jvaAvatarUrl?.length) jvaAvatarUrl = defaultAvatarUrl;
+
+        return storeAvatarUrl(jvaAvatarUrl);
+    }
+
+    // First try to get avatar from JVC profile
+    const jvcAvatarResult = await getAvatarUsingJvcProfile();
+    if (jvcAvatarResult?.length) return jvcAvatarResult;
+
+    if (!avatarUseJvArchiveApi) return defaultAvatarUrl;
+
+    // If not successful, fallback with JvArchive
+    const jvArchiveAvatarUrl = await getAvatarUsingJvArchive();
+    if (jvArchiveAvatarUrl?.length) return jvArchiveAvatarUrl;
+}
