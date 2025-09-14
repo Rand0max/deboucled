@@ -62,7 +62,7 @@ async function createAndShowUsersModal(users, totalCount) {
 
         const optionDisplayTopicAvatar = store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default);
 
-        await Promise.all(usersToShow.map(async user => {
+        for (const user of usersToShow) {
             const userItem = document.createElement('div');
             userItem.className = 'deboucled-user-item';
 
@@ -79,10 +79,13 @@ async function createAndShowUsersModal(users, totalCount) {
                 userAvatar.alt = user.username;
                 userAvatar.setAttribute('onerror', `this.onerror=null; this.src='${defaultAvatarUrl}';`);
 
-                const avatarUrl = await getAuthorAvatarUrl(user.username.toLowerCase(), userLink.href);
-                if (avatarUrl?.length) {
-                    userAvatar.src = avatarUrl;
-                }
+                getAuthorAvatarUrl(user.username.toLowerCase(), userLink.href).then(avatarUrl => {
+                    if (avatarUrl?.length) {
+                        userAvatar.src = avatarUrl;
+                    }
+                }).catch(() => {
+                    // En cas d'erreur, garde l'avatar par défaut
+                });
 
                 userLink.appendChild(userAvatar);
             }
@@ -98,7 +101,7 @@ async function createAndShowUsersModal(users, totalCount) {
             userItem.appendChild(userLink);
             userItem.appendChild(statusSpan);
             userContainer.appendChild(userItem);
-        }));
+        }
 
         currentPage++;
 

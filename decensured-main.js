@@ -2,6 +2,21 @@
 // DECENSURED MAIN
 ///////////////////////////////////////////////////////////////////////////////////////
 
+async function initDecensuredPing() {
+    if (!getCurrentUserPseudo()) return;
+
+    await pingDecensuredApi();
+
+    if (decensuredPingTimer) {
+        clearInterval(decensuredPingTimer);
+        decensuredPingTimer = null;
+    }
+
+    decensuredPingTimer = setInterval(() => {
+        pingDecensuredApi().catch(err => logDecensuredError(err, 'initializeDecensured - Erreur ping timer'));
+    }, DECENSURED_CONFIG.PING_INTERVAL);
+}
+
 async function initDecensured() {
     if (decensuredInitialized) {
         return;
@@ -13,18 +28,7 @@ async function initDecensured() {
 
     decensuredInitialized = true;
 
-    if (getUserPseudo()) {
-        await pingDecensuredApi();
-
-        if (decensuredPingTimer) {
-            clearInterval(decensuredPingTimer);
-            decensuredPingTimer = null;
-        }
-
-        decensuredPingTimer = setInterval(() => {
-            pingDecensuredApi().catch(err => logDecensuredError(err, 'initializeDecensured - Erreur ping timer'));
-        }, DECENSURED_CONFIG.PING_INTERVAL);
-    }
+    initDecensuredPing();
 
     buildDecensuredMessagesUI();
     buildDecensuredTopicsUI();

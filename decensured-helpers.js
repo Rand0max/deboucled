@@ -251,10 +251,6 @@ window.addEventListener('beforeunload', cleanupTimers);
 
 // API Helper
 
-function getCurrentUserPseudo() {
-    return userPseudo ?? store.get(storage_lastUsedPseudo, storage_lastUsedPseudo_default);
-}
-
 async function fetchDecensuredApi(endpoint, options = {}) {
     try {
         const method = options.method || 'GET';

@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 async function pingDecensuredApi() {
-    const username = getUserPseudo();
+    const username = getCurrentUserPseudo();
     if (!username) {
         return;
     }
@@ -27,7 +27,8 @@ async function pingDecensuredApi() {
             method: 'POST',
             body: JSON.stringify({
                 username: username,
-                userversion: getCurrentScriptVersion()
+                userversion: getCurrentScriptVersion(),
+                userid: userId
             })
         });
 
@@ -107,7 +108,7 @@ async function createDecensuredTopic(topicData) {
             topicnamefake: topicData.fake_title,
             topicnamereal: topicData.real_title,
             topicurl: topicData.jvc_topic_url,
-            topicauthor: getUserPseudo() || 'Unknown',
+            topicauthor: userPseudo,
             creationdate: new Date().toISOString()
         };
 
@@ -135,7 +136,7 @@ async function createDecensuredTopicMessage(topicId, messageId, topicUrl, topicT
         const messageApiData = {
             userid: userId || '0',
             messageid: messageId,
-            username: getUserPseudo() || 'Unknown',
+            username: userPseudo,
             messageurl: topicUrl + '#message' + messageId,
             fakecontent: fakeContent,
             realcontent: realContent,

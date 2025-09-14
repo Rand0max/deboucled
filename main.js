@@ -935,6 +935,10 @@ async function updateCurrentUser() {
     }
 }
 
+function getCurrentUserPseudo() {
+    return userPseudo ?? store.get(storage_lastUsedPseudo, storage_lastUsedPseudo_default);
+}
+
 async function init(currentPageType) {
     loadStyles();
 

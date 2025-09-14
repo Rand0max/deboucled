@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.67.0] (14/09/2025)
+
+- Amélioration de gestion des utilisateurs Décensured (Rand0max)
+- Nouvelles platitudes Décensured (Rand0max)
+
 ## [2.66.5] (14/09/2025)
 
 - Affichage des avatars dans la liste des utilisateurs Décensured (si option active) (Rand0max)

@@ -193,7 +193,7 @@ function handleFormResponse(response, textarea, resolve, reject) {
             detail: {
                 id: messageId,
                 content: textarea.value,
-                username: getUserPseudo()
+                username: userPseudo
             }
         });
         dispatchEvent(event);
@@ -304,7 +304,7 @@ function performRedirection(redirectUrl) {
 
 async function saveToDecensuredApi(messageId, realMessage, fakeContent) {
     const topicId = getCurrentTopicId();
-    const username = getUserPseudo();
+    const username = userPseudo;
     const messageUrl = `${window.location.origin}/forums/message/${messageId}`;
     const topicUrl = window.location.origin + window.location.pathname;
     const topicTitle = getTitleFromTopicPage('fake');
@@ -369,7 +369,7 @@ async function processNewTopicCreation() {
 
     const topicId = extractTopicIdFromUrl(window.location.pathname);
     const topicUrl = cleanTopicUrl(window.location.href);
-    const username = getUserPseudo();
+    const username = userPseudo;
 
     if (!topicId || !username) return;
 

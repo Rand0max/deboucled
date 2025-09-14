@@ -254,7 +254,7 @@ const platitudeMessages = [
     "Drôle d'idée !", "Selon toi il faudrait faire quoi ?", "Peut-être pas aujourd'hui mais à réfléchir", "ta reacprout ?", "ça marche", "d'accord", "la je vois pas",
     "L'amour te tombera dessus au moment où tu t'y attendras le moins crois moi", "Garde l'oeil ouvert, et le bon !", "Protégez-vous les kheys", "La pluie c'est déprimant",
     "Prenez soin de vos proches les kheys", "Les bouchons près de Paris on en parle ?", "Le principal c'est de protéger les autres avant soi-même", "Oula c'est quoi ce topic",
-    "le week-end est passé tellement vite", "C'est lequel votre sticker préféré ? Moi c'est ", "Franchement je préfère pas y penser", "ça veut dire quoi pnj ?",
+    "le week-end est passé tellement vite", "C'est lequel votre sticker préféré ? Moi c'est https://image.noelshack.com/fichiers/2016/24/1466366209-risitas24.png", "Franchement je préfère pas y penser", "ça veut dire quoi pnj ?",
     "Son point de vue est à considérer, mais restons prudents", "up", "je up", "hophophop on up le topic", "perso ça m'est égal", "peut-être pas qui sait",
     "Le travail paie", "Mangez 5 fruits et légumes par jour les kheys", "La musique de nos jours tu sais", "Ca parait peu probable en dépit de", "Faut voir",
     "A voir", "Ca permet de respirer j'avoue", "Le mieux étant de rester nuancé", "J'hésite à le dire mais bon", "Sérieux ?", "Sérieusement ?", "Non mais allo quoi",
@@ -827,6 +827,247 @@ const platitudeTopics = [
             "HDR 1000 nits minimum pour un vrai impact visuel. Les écrans HDR400 c'est du marketing, la différence est négligeable.",
             "Panel IPS pour les couleurs ou VA pour le contraste. OLED trop risqué pour usage bureau intensif à cause du burn-in.",
             "Investissement qui se rentabilise sur la durée. Un bon écran survit à 2-3 générations de config PC, priorité budgétaire logique."
+        ]
+    },
+    // NEW
+    {
+        title: "NETFLIX annule encore les BONNES SÉRIES",
+        messages: [
+            "Dès qu'une série devient intéressante, pouf annulée",
+            "Ils gardent que les daubes pour adolescents",
+            "Sense8, The OA, Dark Crystal... RIP",
+            "Budget gaspillé sur des films Adam Sandler",
+            "Prime Video commence à faire pareil, catastrophe",
+            "Ils préfèrent 50 séries moyennes qu'une excellente qui coûte cher. Logique financière pure mais artistiquement désastreuse.",
+            "Les algorithmes favorisent le contenu qui accroche vite. Pas le temps de développer une intrigue complexe, tout doit exploser dès l'épisode 1.",
+            "Stranger Things saison 15 en préparation mais Mindhunter abandonné. Les priorités Netflix en 2025, ça fait mal au crâne.",
+            "Les créateurs évitent maintenant Netflix, ils savent que leurs projets ambitions finiront au cimetière après 2 saisons max.",
+            "Disney+ tue la créativité avec du Marvel sauce, Netflix la tue avec de l'annulation préventive. L'âge d'or des séries est fini."
+        ]
+    },
+    {
+        title: "[VÉCU] SPEED DATING cauchemar absolu",
+        messages: [
+            "7 minutes avec chaque personne, torture organisée",
+            "Conversation niveau surface sur la météo",
+            "Une fille m'a demandé mon salaire direct",
+            "Mec d'à côté parlait que de crypto pendant 7 min",
+            "Plus jamais ça, retour aux apps",
+            "L'organisatrice avait dit 'public jeune et dynamique'. Réalité : retraités divorcés et étudiants désespérés. Marketing mensonger total.",
+            "Question récurrente : 'Alors tu fais quoi dans la vie ?' répétée 15 fois. J'avais envie de hurler au bout de la 5ème rotation.",
+            "Une meuf a sorti son téléphone pour checker Instagram pendant qu'on parlait. Respect niveau -1000, éducation en option apparemment.",
+            "Le concept marche peut-être pour les extravertis, mais en tant qu'introverti c'était un marathon social épuisant et superficiel.",
+            "50€ pour ça alors qu'une soirée normal entre potes coûte moins cher et apporte 100 fois plus de plaisir. Arnaque totale."
+        ]
+    },
+    {
+        title: "LIVRAISON UberEats HORS DE PRIX",
+        messages: [
+            "McDo à 25€ avec les frais, on marche sur la tête",
+            "Livreurs sous-payés, clients surtaxés, Uber se gave",
+            "Temps de livraison x2 depuis le COVID",
+            "La flemme de cuisiner coûte un rein maintenant",
+            "Retour aux courses et fourneaux obligatoire",
+            "Frais de service + frais de livraison + pourboire = le burger coûte plus cher qu'au restaurant. Logique économique inversée totale.",
+            "Livreur qui galère 30 minutes pour trouver l'adresse et le repas arrive froid. Service dégradé mais prix premium, arnaque organisée.",
+            "Deliveroo, Uber Eats, Just Eat... tous identiques niveau tarifs abusifs. Oligopole déguisé qui pressure les clients captifs.",
+            "Paradoxe moderne : on paie plus cher pour manger moins bien. Nos parents commandaient une pizza, nous on commande de la dette.",
+            "L'inflation UberEats dépasse celle de l'immobilier parisien. Bientôt plus rentable d'acheter un appart qu'un sandwich livré."
+        ]
+    },
+    {
+        title: "CAFÉ 5€ à PARIS normal",
+        messages: [
+            "Loyer parisien répercuté sur le prix du café",
+            "En province c'est 1,50€, ici c'est du luxe",
+            "Barista hipster justifie pas 300% de majoration",
+            "Nespresso à la maison, même goût pour 10 centimes",
+            "Gentrification a tué les vrais bistrots",
+            "Les tourists payent sans broncher, ça encourage les cafetiers à maintenir ces tarifs délirants. Cercle vicieux économique pur.",
+            "Coffee shops 'artisanaux' avec grains bio équitables... Marketing pour justifier le prix d'un repas complet pour un expresso.",
+            "Même Starbucks paraît abordable comparé aux indépendants parisiens. Quand la chaîne américaine devient le choix économique, tout est dit.",
+            "Un café correctement préparé mérite un prix juste, mais là c'est de l'exploitation de la dépendance caféinée. Drug dealer légal.",
+            "Banlieue proche, prix divisé par 3 pour la même qualité. 20 minutes de RER pour économiser 100€ par mois de café, calcul rentable."
+        ]
+    },
+    {
+        title: "TESLA Model 3 overrated",
+        messages: [
+            "Design spartiate pour faire riche écolo",
+            "Qualité de finition allemande inexistante",
+            "Autonomie réelle 50% de l'annoncé",
+            "Réseau superchargeur saturé les week-ends",
+            "Musk overhype tout, marketing > réalité",
+            "L'écran tactile unique c'est de la branlette design. Vouloir régler la clim pendant qu'on conduit devient un parcours du combattant.",
+            "Paint job de mauvaise qualité qui s'écaille au bout d'un an. Pour 50k€ on s'attend à mieux qu'une Dacia niveau finition.",
+            "Pompes Tesla bondées l'été, 45 minutes d'attente pour recharger. L'autonomie c'est bien, l'infrastructure c'est la catastrophe.",
+            "Les mises à jour OTA cassent parfois plus qu'elles réparent. Avoir sa voiture en mode debug permanent c'est fatiguant à la longue.",
+            "BMW i4, Mercedes EQS font mieux niveau confort et finition. Tesla vivait sur son avance tech, maintenant la concurrence rattrape."
+        ]
+    },
+    {
+        title: "[HELP] Mes PARENTS comprennent rien à Internet",
+        messages: [
+            "Maman pense que Facebook = tout Internet",
+            "Papa imprime ses mails pour les lire",
+            "Ils cliquent sur toutes les pubs, PC infecté",
+            "Password123 pour tous leurs comptes",
+            "Je suis leur support tech à vie maintenant",
+            "Ma mère m'appelle en panique parce qu'elle a 'cassé Google'. En réalité elle a juste fermé l'onglet. Drama quotidien niveau expert.",
+            "Mon père sauvegarde ses photos... en les imprimant puis en les scannant. L'efficacité technologique made in France années 60.",
+            "Ils utilisent Internet Explorer en 2025. Même Microsoft a abandonné mais eux persistent. Loyauté aveugle ou masochisme assumé ?",
+            "Tentative d'explication des cookies = regard de poisson rouge. Ils acceptent tout sans lire, paradis des data brokers.",
+            "WhatsApp famille = chaînes de fake news h24. Debunker devient un travail à temps plein, fatigue mentale garantie."
+        ]
+    },
+    {
+        title: "VACANCES ALL INCLUSIVE piège à touristes",
+        messages: [
+            "Nourriture industrielle réchauffée h24",
+            "Animation forcée, ambiance Club Med discount",
+            "Hôtel 4 étoiles = 2 étoiles en vrai",
+            "Plage privée = bout de sable surpeuplé",
+            "Voyager autrement coûte moins cher finalement",
+            "Buffet identique tous les jours avec la même paella douteuse. Variety culinaire = ketchup ou mayo avec tout.",
+            "Animateurs surgonflés qui hurlent 'ENERGY ENERGY' dès 8h du mat'. Réveil forcé inclus dans le forfait apparemment.",
+            "Piscine bondée style métro parisien aux heures de pointe. Détente garantie entre 50 gamins qui crient et 20 matelas pneumatiques.",
+            "Excursions proposées = arnaques organisées. 80€ pour visiter un village touristique construit spécialement pour ça. Authenticité zéro.",
+            "Soi-disant 'tout compris' mais wifi payant, coffre payant, serviette de plage payante. Technique de low cost camouflée en premium."
+        ]
+    },
+    {
+        title: "EURO 2024 France DÉCEVANTE",
+        messages: [
+            "Equipe de stars mais zéro collectif",
+            "Deschamps tactiquement dépassé en 2025",
+            "Mbappé invisible quand ça compte",
+            "Portugal avec Ronaldo 40 ans joue mieux",
+            "Génération dorée gâchée par le coaching",
+            "On a les meilleurs joueurs individuellement mais on joue comme Stade de Reims contre Barcelone. Paradoxe footballistique français.",
+            "Deschamps reste sur ses acquis 2018 alors que le foot a évolué. Même l'Allemagne s'est remise en question après leurs échecs.",
+            "Mbappé psychologiquement fragile dès que la pression monte. Messi et Ronaldo à son âge portaient déjà leurs équipes, lui il disparaît.",
+            "Le banc français est meilleur que l'équipe titulaire de la moitié des nations. Mais l'alchimie groupe inexistante, individualisme roi.",
+            "2026 sera notre dernière chance avec cette génération. Après ce sera reconstruction totale avec des joueurs moins talentueux."
+        ]
+    },
+    {
+        title: "MÉDECINS 3 SEMAINES de délai SCANDALEUX",
+        messages: [
+            "Généraliste surbookés, spécialistes introuvables",
+            "Doctolib crashe dès qu'un créneau se libère",
+            "Urgences saturées pour un rhume maintenant",
+            "Désert médical même en banlieue parisienne",
+            "Système de santé français au bord du gouffre",
+            "RDV dermato dans 4 mois pour un grain de beauté suspect. Si c'est un cancer j'ai le temps de mourir 3 fois avant le diagnostic.",
+            "Médecin de famille parti à la retraite, impossible d'en trouver un autre. Orphelins médicaux à 25 ans, performance française.",
+            "Téléconsultation = 50€ pour 5 minutes de discussion Skype avec connexion pourrie. Innovation médicale du futur mes fesses.",
+            "SOS Médecins facture 80€ le déplacement + consultation. Plus cher qu'un plombier et moins efficace pour réparer les fuites.",
+            "Numerus clausus supprimé mais formation rallongée. On aura peut-être plus de médecins vers 2035 si tout va bien. Planification visionnaire."
+        ]
+    },
+    {
+        title: "[CRINGE] PROF qui utilise des MEMES de 2010",
+        messages: [
+            "Trollface et Rage Comics en cours d'anglais",
+            "Il croit être connecté avec les jeunes",
+            "Malaise niveau maximum dans l'amphi",
+            "Meme explicatif sur les équations différentielles",
+            "Personne ose lui dire que c'est mort depuis 15 ans",
+            "Il a sorti un 'U MAD BRO ?' en corrigeant une copie. Le niveau de second-hand embarrassment a atteint des sommets inégalés.",
+            "PowerPoint avec des GIFs qui bougent dans tous les sens. Esthétique web 1.0 assumée, on dirait un site perso de 2005.",
+            "Il essaie d'expliquer la relativité avec des memes Keanu Reeves. Einstein se retourne dans sa tombe à 3000 tours/minute.",
+            "Les étudiants regardent leurs téléphones par gêne. Même la génération TikTok trouve ça too much niveau cringe factor.",
+            "Best of : il a fini son cours sur 'YOLO donc révisez vos examens'. Shakespeare de l'humour moderne, un génie incompris."
+        ]
+    },
+    {
+        title: "INSTAGRAM REELS copie TikTok sans ÂMES",
+        messages: [
+            "Meta copie tout ce que fait ByteDance",
+            "Algorithme de recommandation bidon",
+            "Créateurs originaux partent sur d'autres plateformes",
+            "Interface instagram polluée par ce format",
+            "Facebook devient vraiment le réseau des vieux",
+            "Zuckerberg a vu le succès TikTok et a copié-collé sans comprendre l'essence. Résultat : format TikTok avec l'âme d'Instagram, bancal.",
+            "Les créateurs TikTok font du contenu natif pour leur plateforme. Sur Reels c'est du réchauffé avec watermark TikTok visible.",
+            "Instagram était cool pour les photos, maintenant c'est un hybride foireux entre TikTok et YouTube. Identité perdue totalement.",
+            "Meta essaie de garder ses utilisateurs captifs au lieu d'innover. Stratégie défensive qui montre leur manque de créativité actuel.",
+            "TikTok garde son avance malgré les tentatives de copie. L'original reste supérieur à tous ses clones occidentaux ratés."
+        ]
+    },
+    {
+        title: "INFLATION étudiants mangent des PÂTES",
+        messages: [
+            "Courses à 80€ pour la semaine impossible",
+            "Resto U rationné, queues de 2h",
+            "Parents peuvent plus aider financièrement",
+            "Jobs étudiants payés en tickets restaurants",
+            "Génération sacrifiée par l'économie française",
+            "Un paquet de pâtes bas de gamme coûte maintenant plus cher qu'un menu McDo il y a 5 ans. Inversion des valeurs nutritionnelles.",
+            "Colocation à 4 dans 40m² pour diviser le loyer. Mais même comme ça ça représente 70% des revenus étudiants moyens.",
+            "Bourse étudiante indexée sur les revenus des parents de 2022. Inflation de 2024-25 pas prise en compte, décalage temporel mortel.",
+            "Stage non rémunéré obligatoire pour valider le diplôme. Travailler gratis quand on a déjà pas de thunes, logique inversée totale.",
+            "Livreur Deliveroo le soir pour payer les études de journalisme. Le système fabrique ses propres contradictions en temps réel."
+        ]
+    },
+    {
+        title: "SMARTPHONES trop FRAGILES maintenant",
+        messages: [
+            "Ecran pété au premier contact avec le sol",
+            "Batterie morte après 18 mois d'utilisation",
+            "Réparation coûte plus cher qu'un neuf",
+            "Obsolescence programmée assumée par les marques",
+            "Nokia 3310 indestructible, nostalgie du solide",
+            "Gorilla Glass mon cul, ça résiste pas à une chute de 50cm. Marketing de merde pour vendre du verre normal overpriced.",
+            "Batterie soudée impossible à remplacer. Technique pour forcer le renouvellement tous les 2 ans, écologie en berne.",
+            "Smartphone de 2015 qui fonctionne encore mieux que les flagships actuels. Plus c'est récent, plus c'est buggé bizarrement.",
+            "Réparateur indépendant = garantie annulée. Monopole des services après-vente qui facturent 300€ pour changer un écran.",
+            "Fairphone existe mais personne en parle. Alternative durable étouffée par le marketing des grands groupes. Complot assumé."
+        ]
+    },
+    {
+        title: "[LOVE] Elle m'a dit OUI pour le MARIAGE",
+        messages: [
+            "Stress maximum pendant la demande",
+            "Bague économies de 6 mois, ça valait le coup",
+            "Ses parents pas encore convaincus par moi",
+            "Organisation mariage = parcours du combattant",
+            "Bonheur niveau maximum, merci la vie",
+            "J'avais préparé un speech de 10 minutes, j'ai bégayé 'tu veux m'épouser ?' en 3 secondes. Éloquence romantique niveau débutant.",
+            "Elle a pleuré, moi j'ai pleuré, même le serveur du resto avait les yeux humides. Émotion collective assumed, moment magique.",
+            "Bague choisie avec sa meilleure amie en secret mission impossible. Opération commando réussie, goûts validés par l'experte.",
+            "Ses parents m'appellent encore par mon prénom de famille après 3 ans. Intégration familiale progressive, diplomatie required.",
+            "Budget mariage = prix d'une voiture neuve. Mais pour une fois dans la vie on va pas économiser, YOLO romantique assumé."
+        ]
+    },
+    {
+        title: "ÉLECTRICITÉ facture x3 cet HIVER",
+        messages: [
+            "Chauffage électrique = ruine assurée",
+            "Isolation thermique inexistante années 70",
+            "EDF profite de la situation énergétique",
+            "Pull en laine obligatoire à l'intérieur",
+            "Déménagement vers logement BBC urgent",
+            "Facture février 450€ pour un T2. À ce tarif autant chauffer la rue, même effet sur le porte-monnaie.",
+            "Radiateur électrique grille-pain qui consomme comme un data center. Technologie française des années 60, efficacité zéro.",
+            "Isolation par l'extérieur = 15k€ de travaux. Plus rentable de déménager que de rénover, calcul économique absurde.",
+            "Voisins ont installé poêle à bois, leur salon sent la cheminée H24. Pollution locale contre économies, arbitrage compliqué.",
+            "Pompe à chaleur + panneaux solaires = investissement 25k€. Rentabilité sur 15 ans si les prix n'augmentent plus. Paris risqué."
+        ]
+    },
+    {
+        title: "YOUTUBE Premium OBLIGATOIRE maintenant",
+        messages: [
+            "Publicité toutes les 30 secondes sinon",
+            "Vidéo de 5 minutes = 3 minutes de pub",
+            "AdBlock détecté, lecture bloquée",
+            "12€/mois pour du contenu gratuit avant",
+            "Monopole Google montre ses vraies couleurs",
+            "Double pub non-skippable avant chaque vidéo. Regarder un tuto de 2 minutes devient un calvaire publicitaire infernal.",
+            "YouTube Music inclus mais qui utilise ça ? Spotify largement supérieur, bundling forcé pour justifier le prix premium.",
+            "Créateurs touchent des clopinettes des vues Premium. Google garde 70% et prétend rémunérer équitablement, foutage de gueule.",
+            "Alternative crédible inexistante, tous les créateurs sont sur YouTube. Monopole absolu qui peut se permettre tous les abus.",
+            "Époque où YouTube était vraiment gratuit révolue. Monétisation agressive transforme la plateforme en télé payante classique."
         ]
     }
 ];
