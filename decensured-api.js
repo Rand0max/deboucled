@@ -2,6 +2,126 @@
 // DECENSURED API
 ///////////////////////////////////////////////////////////////////////////////////////
 
+async function getCachedDecensuredTopics() {
+    if (typeof localforage === 'undefined' || !localforage.getItem) {
+        return new Map();
+    }
+
+    try {
+        const cached = await localforage.getItem(localstorage_decensuredTopics);
+        return cached ? new Map(cached) : new Map();
+    } catch (error) {
+        logDecensuredError(error, 'getCachedDecensuredTopics');
+        return new Map();
+    }
+}
+
+async function setCachedDecensuredTopic(topicId, topicData) {
+    if (typeof localforage === 'undefined' || !localforage.setItemWithTTL) {
+        return;
+    }
+
+    try {
+        const cached = await getCachedDecensuredTopics();
+        cached.set(parseInt(topicId), topicData);
+
+        await localforage.setItemWithTTL(
+            localstorage_decensuredTopics,
+            [...cached],
+            TTL_CONFIG.decensuredTopics
+        );
+    } catch (error) {
+        logDecensuredError(error, 'setCachedDecensuredTopic');
+    }
+}
+
+async function getCachedDecensuredMessages(topicId) {
+    if (typeof localforage === 'undefined' || !localforage.getItem) {
+        return null;
+    }
+
+    try {
+        const cached = await localforage.getItem(`${localstorage_decensuredMessages}_${topicId}`);
+        return cached || null;
+    } catch (error) {
+        logDecensuredError(error, 'getCachedDecensuredMessages');
+        return null;
+    }
+}
+
+async function setCachedDecensuredMessages(topicId, messages) {
+    if (typeof localforage === 'undefined' || !localforage.setItemWithTTL) {
+        return;
+    }
+
+    try {
+        await localforage.setItemWithTTL(
+            `${localstorage_decensuredMessages}_${topicId}`,
+            messages,
+            TTL_CONFIG.decensuredMessages
+        );
+    } catch (error) {
+        logDecensuredError(error, 'setCachedDecensuredMessages');
+    }
+}
+
+async function getCachedDecensuredSingleMessage(messageId) {
+    if (typeof localforage === 'undefined' || !localforage.getItem) {
+        return null;
+    }
+
+    try {
+        const cached = await localforage.getItem(`${localstorage_decensuredSingleMessages}_${messageId}`);
+        return cached || null;
+    } catch (error) {
+        logDecensuredError(error, 'getCachedDecensuredSingleMessage');
+        return null;
+    }
+}
+
+async function setCachedDecensuredSingleMessage(messageId, messageData) {
+    if (typeof localforage === 'undefined' || !localforage.setItemWithTTL) {
+        return;
+    }
+
+    try {
+        await localforage.setItemWithTTL(
+            `${localstorage_decensuredSingleMessages}_${messageId}`,
+            messageData,
+            TTL_CONFIG.decensuredSingleMessage
+        );
+    } catch (error) {
+        logDecensuredError(error, 'setCachedDecensuredSingleMessage');
+    }
+}
+
+async function invalidateDecensuredTopicCache(topicId) {
+    if (typeof localforage === 'undefined' || !localforage.removeItem) {
+        return;
+    }
+
+    try {
+        await localforage.removeItem(`${localstorage_decensuredMessages}_${topicId}`);
+
+        const cachedTopics = await getCachedDecensuredTopics();
+        if (cachedTopics.has(parseInt(topicId))) {
+            cachedTopics.delete(parseInt(topicId));
+            await localforage.setItemWithTTL(
+                localstorage_decensuredTopics,
+                [...cachedTopics],
+                TTL_CONFIG.decensuredTopics
+            );
+        }
+
+        if (decensuredTopicMessagesCache) {
+            decensuredTopicMessagesCache = null;
+            decensuredTopicMessagesUseCache = false;
+        }
+    } catch (error) {
+        logDecensuredError(error, 'invalidateDecensuredTopicCache');
+    }
+}
+
 async function pingDecensuredApi() {
     const username = getCurrentUserPseudo();
     if (!username) {
@@ -79,6 +199,10 @@ async function createDecensuredMessage(messageId, username, messageUrl, fakeCont
             body: JSON.stringify(data)
         });
 
+        if (response !== null) {
+            await invalidateDecensuredTopicCache(topicId);
+        }
+
         return response !== null;
     } catch (error) {
         logDecensuredError(error, 'createDecensuredMessage');
@@ -91,13 +215,24 @@ async function getDecensuredMessages(topicId) {
         if (decensuredTopicMessagesUseCache && decensuredTopicMessagesCache?.length) {
             return decensuredTopicMessagesCache;
         }
+
+        const cachedMessages = await getCachedDecensuredMessages(topicId);
+        if (cachedMessages) {
+            decensuredTopicMessagesCache = cachedMessages;
+            return cachedMessages;
+        }
+
         const data = await fetchDecensuredApi(`${apiDecensuredMessagesUrl}/${topicId}/${DECENSURED_CONFIG.API_MAX_MESSAGES}/0`);
         if (data && Array.isArray(data)) {
             decensuredTopicMessagesCache = data;
+            await setCachedDecensuredMessages(topicId, data);
             return data;
         }
+
+        return [];
     } catch (error) {
         logDecensuredError(error, 'getDecensuredMessages');
+        return [];
     }
 }
 
@@ -124,6 +259,11 @@ async function createDecensuredTopic(topicData) {
         });
 
         const success = topicResponse !== null;
+
+        if (success) {
+            await invalidateDecensuredTopicCache(topicData.topic_id);
+        }
+
         return success;
     } catch (error) {
         logDecensuredError(error, 'createDecensuredTopic - Erreur dans createDecensuredTopic');
@@ -158,6 +298,11 @@ async function createDecensuredTopicMessage(topicId, messageId, topicUrl, topicT
         });
 
         const success = messageResponse !== null;
+
+        if (success) {
+            await invalidateDecensuredTopicCache(topicId);
+        }
+
         return success;
     } catch (error) {
         logDecensuredError(error, 'createDecensuredTopicMessage - Erreur dans createDecensuredTopicMessage');
@@ -168,9 +313,23 @@ async function createDecensuredTopicMessage(topicId, messageId, topicUrl, topicT
 async function getDecensuredTopic(topicId) {
     try {
         if (!topicId) return null;
+
+        const cachedTopics = await getCachedDecensuredTopics();
+        const cachedTopic = cachedTopics.get(parseInt(topicId));
+        if (cachedTopic) {
+            return cachedTopic;
+        }
+
         const response = await fetchDecensuredApi(`${apiDecensuredTopicByIdUrl}/${topicId}`, {
             method: 'GET'
         });
+
+        if (response) {
+            await setCachedDecensuredTopic(topicId, response);
+        } else {
+            await setCachedDecensuredTopic(topicId, null);
+        }
+
         return response;
     } catch (error) {
         logDecensuredError(error, 'getDecensuredTopic - Erreur lors de la récupération du topic');
@@ -182,16 +341,51 @@ async function getDecensuredTopicsBatch(topicIds) {
     try {
         if (!topicIds || topicIds.length === 0) return [];
 
+        const cachedTopics = await getCachedDecensuredTopics();
+        const results = [];
+        const uncachedIds = [];
+
+        for (const topicId of topicIds) {
+            const parsedId = parseInt(topicId);
+            if (cachedTopics.has(parsedId)) {
+                const cachedData = cachedTopics.get(parsedId);
+                if (cachedData) {
+                    results.push(cachedData);
+                }
+            } else {
+                uncachedIds.push(topicId);
+            }
+        }
+
+        if (uncachedIds.length === 0) {
+            return results;
+        }
+
         const response = await fetchDecensuredApi(apiDecensuredTopicsByIdsUrl, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ topicIds })
+            body: JSON.stringify({ topicIds: uncachedIds })
         });
 
-        if (Array.isArray(response)) return response;
-        return [];
+        if (Array.isArray(response)) {
+            for (const topic of response) {
+                if (topic && topic.topic_id) {
+                    await setCachedDecensuredTopic(topic.topic_id, topic);
+                    results.push(topic);
+                }
+            }
+
+            for (const uncachedId of uncachedIds) {
+                const found = response.find(t => t && t.topic_id && t.topic_id.toString() === uncachedId.toString());
+                if (!found) {
+                    await setCachedDecensuredTopic(uncachedId, null);
+                }
+            }
+        }
+
+        return results;
     } catch (error) {
         logDecensuredError(error, 'getDecensuredTopicsBatch - Erreur lors de la récupération batch des topics');
         return [];
@@ -200,11 +394,20 @@ async function getDecensuredTopicsBatch(topicIds) {
 
 async function getDecensuredSingleMessage(messageId) {
     try {
+        const cachedMessage = await getCachedDecensuredSingleMessage(messageId);
+        if (cachedMessage !== null) {
+            return cachedMessage;
+        }
+
         const apiResponse = await fetchDecensuredApi(`${apiDecensuredSingleMessageUrl}/${messageId}`);
         const decensuredMsg = Array.isArray(apiResponse) && apiResponse.length > 0 ? apiResponse[0] : null;
+
+        await setCachedDecensuredSingleMessage(messageId, decensuredMsg);
+
         return decensuredMsg;
     } catch (error) {
-        logDecensuredError(error, 'getDecensuredMessages');
+        logDecensuredError(error, 'getDecensuredSingleMessage');
+        return null;
     }
 }
 

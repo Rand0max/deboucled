@@ -148,32 +148,60 @@ function formatStrikethrough(text) {
     return text.replace(DECENSURED_CONFIG.FORMATTING_REGEX.strikethrough, '<del>$1</del>');
 }
 
-function formatImages(text) {
+function formatNoelshackImages(text) {
     return text.replace(/https:\/\/(?:www\.|image\.)?noelshack\.com\/[^\s<>"']+\.(png|jpg|jpeg|gif|webp)/gi, (match) => {
         const imageUrl = match;
-        let miniUrl;
+        let srcUrl;
 
-        if (match.includes('/minis/')) {
-            miniUrl = imageUrl;
-        } else if (match.includes('/fichiers/')) {
-            miniUrl = match.replace('/fichiers/', '/minis/').replace(/\.(jpg|jpeg|gif|webp)$/i, '.png');
-        } else if (match.includes('www.noelshack.com/') && match.match(/\/\d{4}-\d{2}-\d-\d+-/)) {
-            const urlParts = match.match(/https:\/\/www\.noelshack\.com\/(\d{4})-(\d{2})-(\d)-(\d+-)(.+)\.(png|jpg|jpeg|gif|webp)/i);
-            if (urlParts) {
-                const [, year, week, day, timestamp, fileName, extension] = urlParts;
-                const fichiersUrl = `https://image.noelshack.com/fichiers/${year}/${week}/${day}/${timestamp}${fileName}.${extension}`;
-                miniUrl = fichiersUrl.replace('/fichiers/', '/minis/').replace(/\.(jpg|jpeg|gif|webp)$/i, '.png');
-            } else {
-                miniUrl = imageUrl;
-            }
-        } else if (match.includes('www.noelshack.com/')) {
-            miniUrl = match.replace('www.noelshack.com/', 'image.noelshack.com/minis/').replace(/\.(jpg|jpeg|gif|webp)$/i, '.png');
+        if (match.toLowerCase().includes('.gif')) {
+            srcUrl = imageUrl;
         } else {
-            miniUrl = match.replace('noelshack.com/', 'noelshack.com/minis/').replace(/\.(jpg|jpeg|gif|webp)$/i, '.png');
+            if (match.includes('/minis/')) {
+                srcUrl = imageUrl;
+            } else if (match.includes('/fichiers/')) {
+                srcUrl = match.replace('/fichiers/', '/minis/').replace(/\.(jpg|jpeg|webp)$/i, '.png');
+            } else if (match.includes('www.noelshack.com/') && match.match(/\/\d{4}-\d{2}-\d-\d+-/)) {
+                const urlParts = match.match(/https:\/\/www\.noelshack\.com\/(\d{4})-(\d{2})-(\d)-(\d+-)(.+)\.(png|jpg|jpeg|gif|webp)/i);
+                if (urlParts) {
+                    const [, year, week, day, timestamp, fileName, extension] = urlParts;
+                    const fichiersUrl = `https://image.noelshack.com/fichiers/${year}/${week}/${day}/${timestamp}${fileName}.${extension}`;
+                    srcUrl = fichiersUrl.replace('/fichiers/', '/minis/').replace(/\.(jpg|jpeg|webp)$/i, '.png');
+                } else {
+                    srcUrl = imageUrl;
+                }
+            } else if (match.includes('www.noelshack.com/')) {
+                srcUrl = match.replace('www.noelshack.com/', 'image.noelshack.com/minis/').replace(/\.(jpg|jpeg|webp)$/i, '.png');
+            } else {
+                srcUrl = match.replace('noelshack.com/', 'noelshack.com/minis/').replace(/\.(jpg|jpeg|webp)$/i, '.png');
+            }
         }
 
-        return `<a href="${imageUrl}" target="_blank" class="xXx "><img class="img-shack" width="${DECENSURED_CONFIG.IMAGE_THUMBNAIL_WIDTH}" height="${DECENSURED_CONFIG.IMAGE_THUMBNAIL_HEIGHT}" src="${miniUrl}" alt="${imageUrl}"></a>`;
+        return `<a href="${imageUrl}" target="_blank" class="xXx "><img class="img-shack" width="${DECENSURED_CONFIG.IMAGE_THUMBNAIL_WIDTH}" height="${DECENSURED_CONFIG.IMAGE_THUMBNAIL_HEIGHT}" src="${srcUrl}" alt="${imageUrl}"></a>`;
     });
+}
+
+function formatRisibankImages(text) {
+    return text.replace(/https:\/\/risibank\.fr\/cache\/medias\/[^\s<>"']+\.(png|jpg|jpeg|gif|webp)/gi, (match) => {
+        const imageUrl = match;
+        return `<a href="${imageUrl}" target="_blank" class="xXx "><img class="img-shack" width="${DECENSURED_CONFIG.IMAGE_THUMBNAIL_WIDTH}" height="${DECENSURED_CONFIG.IMAGE_THUMBNAIL_HEIGHT}" src="${imageUrl}" alt="${imageUrl}"></a>`;
+    });
+}
+
+function formatZupimagesImages(text) {
+    return text.replace(/https:\/\/zupimages\.net\/(?:viewer\.php\?id=|up\/)[^\s<>"']+\.(png|jpg|jpeg|gif|webp)/gi, (match) => {
+        let imageUrl = match;
+        if (match.includes('viewer.php?id=')) {
+            imageUrl = match.replace('viewer.php?id=', 'up/');
+        }
+        return `<a href="${imageUrl}" target="_blank" class="xXx "><img class="img-shack" width="${DECENSURED_CONFIG.IMAGE_THUMBNAIL_WIDTH}" height="${DECENSURED_CONFIG.IMAGE_THUMBNAIL_HEIGHT}" src="${imageUrl}" alt="${imageUrl}"></a>`;
+    });
+}
+
+function formatImages(text) {
+    text = formatNoelshackImages(text);
+    text = formatRisibankImages(text);
+    text = formatZupimagesImages(text);
+    return text;
 }
 
 function formatLinks(text) {
@@ -186,7 +214,7 @@ function formatLinks(text) {
             return url;
         }
 
-        if (url.includes('image.noelshack.com')) {
+        if (url.includes('image.noelshack.com') || url.includes('risibank.fr') || url.includes('zupimages.net')) {
             return url;
         }
 

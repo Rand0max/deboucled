@@ -240,3 +240,76 @@ function cleanTopicUrl(url) {
     console.warn('URL de topic ne se termine pas par .htm :', url);
     return url;
 }
+
+async function preloadDecensuredTopicsStatus(topicElements = null) {
+    if (!isTopicsDecensuredEnabled()) return;
+
+    try {
+        if (!topicElements) {
+            topicElements = document.querySelectorAll('.topic-list .topic-item, .forum-topic-list .topic-subject');
+        }
+
+        if (!topicElements.length) return;
+
+        const topicIds = [];
+        const topicElementsMap = new Map();
+
+        for (const element of topicElements) {
+            const topicLink = element.querySelector('a[href*="/forums/"]') || element;
+            if (!topicLink.href) continue;
+
+            const topicId = extractTopicIdFromUrl(topicLink.href);
+            if (isValidTopicId(topicId)) {
+                topicIds.push(topicId);
+                topicElementsMap.set(topicId, element);
+            }
+        }
+
+        if (topicIds.length === 0) return;
+
+        const decensuredTopics = await getDecensuredTopicsBatch(topicIds);
+
+        for (const topic of decensuredTopics) {
+            const topicElement = topicElementsMap.get(topic.topic_id);
+            if (topicElement && topic) {
+                markTopicAsDecensured(topicElement, topic);
+            }
+        }
+
+    } catch (error) {
+        logDecensuredError(error, 'preloadDecensuredTopicsStatus - Erreur lors du préchargement des statuts');
+    }
+}
+
+function markTopicAsDecensured(topicElement, topicData) {
+    if (!topicElement || !topicData) return;
+
+    if (topicElement.querySelector('.deboucled-decensured-topic-list-indicator')) {
+        return;
+    }
+
+    const indicator = document.createElement('span');
+    indicator.className = 'deboucled-decensured-topic-list-indicator';
+    indicator.textContent = 'DÉCENSURED';
+    indicator.title = `Topic Décensured - Titre réel: ${topicData.topic_name_real || 'Non spécifié'}`;
+
+    const titleElement = topicElement.querySelector('.topic-title, .topic-subject, a[href*="/forums/"]');
+    if (titleElement) {
+        titleElement.classList.add('deboucled-topic-title-decensured');
+
+        if (titleElement.parentElement) {
+            titleElement.parentElement.insertBefore(indicator, titleElement.nextSibling);
+        } else {
+            topicElement.appendChild(indicator);
+        }
+
+        if (topicData.topic_name_real && topicData.topic_name_real !== topicData.topic_name_fake) {
+            titleElement.setAttribute('deboucled-data-tooltip',
+                `Titre réel : ${topicData.topic_name_real}\nTitre de couverture : ${topicData.topic_name_fake || titleElement.textContent.trim()}`
+            );
+            titleElement.setAttribute('data-tooltip-location', 'bottom');
+        }
+    }
+
+    topicElement.classList.add('deboucled-topic-item-decensured');
+}

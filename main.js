@@ -235,6 +235,12 @@ async function handleTopicList(canFillTopics, topicOptions) {
     saveTotalHidden();
     if (canFillTopics) updateTopicHiddenAtDate();
 
+    if (store.get(storage_optionEnableDecensuredTopics, storage_optionEnableDecensuredTopics_default)) {
+        preloadDecensuredTopicsStatus().catch(error => {
+            logDecensuredError(error, 'handleTopicList - Erreur lors du préchargement Décensured');
+        });
+    }
+
     return finalTopics;
 }
 
@@ -701,6 +707,12 @@ async function handleTopicMessages() {
     const messageOptions = prepareMessageOptions(isWhitelistedTopic);
 
     handleTopicHeader(messageOptions);
+
+    if (store.get(storage_optionEnableDecensuredTopics, storage_optionEnableDecensuredTopics_default)) {
+        verifyCurrentTopicDecensured().catch(error => {
+            logDecensuredError(error, 'handleTopicMessages - Erreur lors de la vérification Décensured');
+        });
+    }
 
     handleJvChatAndTopicLive(messageOptions);
 

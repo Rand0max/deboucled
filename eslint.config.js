@@ -144,7 +144,8 @@ export default [
         distance: 'readonly',
         Swal: 'readonly',
         InfiniteScroll: 'readonly',
-        ShowMore: 'readonly'
+        ShowMore: 'readonly',
+        localforage: 'readonly'
       }
     },
     rules: {

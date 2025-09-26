@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.67.0
+// @version     2.68.0
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -37,7 +37,6 @@
 // @resource    CHARTS_CSS https://unpkg.com/charts.css@1.1.0/dist/charts.min.css
 // @resource    SWEETALERTDARK_CSS https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark/dark.css
 // @resource    LITEYOUTUBE_CSS https://cdn.jsdelivr.net/npm/lite-youtube-embed@0.3.2/src/lite-yt-embed.min.css
-// @require     https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js
 // @require     https://unpkg.com/infinite-scroll@4.0.1/dist/infinite-scroll.pkgd.min.js
 // @require     https://unpkg.com/timespan@2.3.0/browser/TimeSpan-1.2.min.js
 // @require     https://unpkg.com/gm-storage@2.0.3/dist/index.umd.min.js

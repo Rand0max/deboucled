@@ -469,7 +469,7 @@ function embedZupimages(messageContent) {
 function embedStreamable(messageContent) {
     if (!messageContent) return;
 
-    function createAndInsertVideo(a, videoUrl, type) {
+    function createAndInsertVideo(anchor, videoUrl, type) {
         const video = document.createElement('video');
         video.controls = true;
         video.style = "width:100%; height:auto; max-width:730px; max-height:700px; display:block; margin:0 auto;";
@@ -479,15 +479,24 @@ function embedStreamable(messageContent) {
         source.type = type;
 
         video.appendChild(source);
-        a.insertAdjacentElement('afterend', video);
+        anchor.insertAdjacentElement('afterend', video);
+    }
+
+    function createAndInsertIframe(anchor, videoUrl) {
+        const iframe = document.createElement('iframe');
+        iframe.src = videoUrl;
+        iframe.frameBorder = '0';
+        iframe.allowFullscreen = true;
+        iframe.style = 'width: 100%; height: auto; max-width: 730px; max-height: 700px; min-height: 500px; display: block; margin: 0px auto;';
+        anchor.insertAdjacentElement('afterend', iframe);
     }
 
     messageContent.querySelectorAll('div > p > a[href*="streamable.com"]').forEach(a => {
         const url = a.href;
         const match = url.match(/^https:\/\/streamable\.com\/(?<id>.*)$/, 'i');
         if (!match) return;
-        const videoUrl = `https://api-f.streamable.com/api/v1/videos/${match.groups.id}/mp4`;
-        createAndInsertVideo(a, videoUrl, 'video/mp4');
+        const videoUrl = `https://streamable.com/e/${match.groups.id}`;
+        createAndInsertIframe(a, videoUrl);
     });
 
     messageContent.querySelectorAll('div > p > a[href*="webmshare.com"]').forEach(a => {

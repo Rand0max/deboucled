@@ -26,13 +26,6 @@ function buildDecensuredMessagesUI() {
     const currentPage = getCurrentPageType(window.location.pathname);
     if (currentPage !== 'topicmessages') return;
 
-    if (isTopicsDecensuredEnabled()) {
-        const pendingTopicJson = store.get(storage_pendingDecensuredTopic, storage_pendingDecensuredTopic_default);
-        if (!pendingTopicJson) {
-            setTimeout(verifyCurrentTopicDecensured, DECENSURED_CONFIG.TOPICS.CHECK_DELAY);
-        }
-    }
-
     const modernEditor = document.querySelector('#forums-post-message-editor');
     const traditionalTextarea = document.querySelector('#message_topic');
 
@@ -489,57 +482,13 @@ function highlightDecensuredTopics() {
         return;
     }
 
-    const topicIds = [];
-    const linksByTopicId = new Map();
 
     topicsToCheck.forEach(topic => {
         topic.classList.add('deboucled-decensured-checked');
-
-        const titleLink = topic.querySelector('.topic-title, .lien-jv.topic-title');
-        const topicUrl = titleLink.href;
-        const dataId = topic.getAttribute('data-id');
-
-        let topicId = dataId;
-
-        if (!topicId) {
-            const topicIdMatch = topicUrl.match(/\/forums\/\d+-\d+-(\d+)-/);
-            topicId = topicIdMatch ? topicIdMatch[1] : null;
-        }
-
-        if (topicId) {
-            topicIds.push(topicId);
-            linksByTopicId.set(topicId, titleLink);
-        }
     });
 
-    if (topicIds.length === 0) {
-
-        return;
-    }
-
-    getDecensuredTopicsBatch(topicIds).then(topicsData => {
-        topicsData.forEach(topicData => {
-            const topicId = topicData.topic_id.toString();
-            const link = linksByTopicId.get(topicId);
-            if (!link) return;
-
-            const topicListItem = link.closest('li');
-            if (!topicListItem) return;
-
-            topicListItem.classList.add('deboucled-topic-decensured');
-
-            const hasRealTitle = topicData.topic_name_real && topicData.topic_name_real !== topicData.topic_name_fake;
-            if (hasRealTitle) {
-                link.textContent = topicData.topic_name_real;
-                link.title = `Titre réel : ${topicData.topic_name_real}\nTitre de couverture : ${topicData.topic_name_fake || topicData.topic_name}`;
-            }
-
-            const folderIcon = topicListItem.querySelector('.icon-topic-folder, .topic-img');
-            if (folderIcon) {
-                folderIcon.classList.add('deboucled-decensured-topic-icon');
-                folderIcon.title = 'Topic Décensured';
-            }
-        });
+    preloadDecensuredTopicsStatus(topicsToCheck).catch(error => {
+        logDecensuredError(error, 'highlightDecensuredTopics - Erreur lors du préchargement');
     });
 }
 
@@ -824,23 +773,15 @@ function animateTopicTitleTransition(titleElement, newText, onComplete) {
             titleElement.removeEventListener('animationend', handleExitAnimation);
 
             const children = Array.from(titleElement.children);
+            const allowedChildren = children.filter(child => {
+                return child.classList &&
+                    child.classList.contains('deboucled-decensured-topic-indicator') &&
+                    !child.classList.contains('deboucled-blacklisted');
+            });
+
             titleElement.textContent = newText;
 
-            const allowedChildren = children.filter(child => {
-                if (child.classList && child.classList.contains('deboucled-decensured-topic-indicator')) {
-                    return true;
-                }
-
-                if (child.classList && child.classList.contains('deboucled-blacklisted')) {
-                    return false;
-                }
-
-                return true;
-            });
-
-            allowedChildren.forEach(child => {
-                titleElement.appendChild(child);
-            });
+            allowedChildren.forEach(child => titleElement.appendChild(child));
 
             titleElement.classList.remove('deboucled-title-exiting');
             titleElement.classList.add('deboucled-title-entering');
@@ -849,7 +790,6 @@ function animateTopicTitleTransition(titleElement, newText, onComplete) {
                 if (e.animationName === 'deboucled-title-enter') {
                     titleElement.classList.remove('deboucled-title-entering');
                     titleElement.removeEventListener('animationend', handleEnterAnimation);
-
                     if (onComplete) onComplete();
                 }
             }, { once: true });

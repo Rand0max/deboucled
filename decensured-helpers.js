@@ -49,7 +49,6 @@ setInterval(() => {
     }
 }, DECENSURED_CONFIG.CACHE_TTL);
 
-
 // Sequence Helpers
 
 function getRandomSticker() {

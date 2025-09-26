@@ -1,5 +1,11 @@
 # Changelog Déboucled
 
+## [2.68.0] (26/09/2025)
+
+- Amélioration du cache Déboucled et optimisation de Décensured (Rand0max)
+- Amélioration de la gestion des images dans Décensured (Rand0max)
+- Amélioration de l'intégration de Streamable (Rand0max)
+
 ## [2.67.0] (14/09/2025)
 
 - Amélioration de gestion des utilisateurs Décensured (Rand0max)

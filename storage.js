@@ -5,11 +5,37 @@
 
 const store = new GMStorage();
 
+const TTL_CONFIG = {
+    authorAvatars: 48 * 60 * 60 * 1000,
+    pocTopics: 72 * 60 * 60 * 1000,
+    topicAuthors: 72 * 60 * 60 * 1000,
+    topicFilteredAuthors: 12 * 60 * 60 * 1000,
+    pendingMessageQuotes: 2 * 60 * 60 * 1000,
+    // Configuration cache Décensured
+    decensuredTopics: 48 * 60 * 60 * 1000, // 48 heures - statut des topics
+    decensuredMessages: 1 * 60 * 1000,    // 1 minute - messages d'un topic
+    decensuredSingleMessage: 6 * 60 * 60 * 1000 // 6 heures - message unique
+};
+
+function initLocalForageTTL() {
+    if (typeof window !== 'undefined' && window.localforage && window.localforage.setItemWithTTL) {
+        window.localforage.config({
+            name: 'deboucled',
+            cleanupInterval: 10 * 60 * 1000
+        });
+        return true;
+    }
+    return false;
+}
+
 const localstorage_pocTopics = 'deboucled_pocTopics';
 const localstorage_topicAuthors = 'deboucled_topicAuthors';
 const localstorage_authorAvatars = 'deboucled_topicAuthorAvatars';
 const localstorage_topicFilteredAuthors = 'deboucled_topicFilteredAuthors';
 const localstorage_pendingMessageQuotes = 'deboucled_pendingMessageQuotes';
+const localstorage_decensuredTopics = 'deboucled_decensuredTopics';
+const localstorage_decensuredMessages = 'deboucled_decensuredMessages';
+const localstorage_decensuredSingleMessages = 'deboucled_decensuredSingleMessages';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
 const storage_secret_displayed = 'deboucled_secret3_displayed', storage_secret_displayed_default = false;
@@ -135,6 +161,14 @@ async function initStorage() {
     //initShadowent();
     initSmileyGifMap();
 
+    initLocalForageTTL();
+
+    try {
+        await cleanupExpiredData();
+    } catch (error) {
+        console.warn('Erreur lors du nettoyage des données expirées :', error);
+    }
+
     firstLaunch = !store.get(storage_init, storage_init_default);
     if (firstLaunch) {
         await refreshApiData();
@@ -186,17 +220,21 @@ async function saveStorage() {
 }
 
 async function loadLocalStorage() {
-    //let optionDetectPocMode = store.get(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
-    //if (optionDetectPocMode === 0) return;
-
     let storagePocTopics;
     let storageTopicAuthors;
     let storageAuthorAvatars;
     let storageTopicFilteredAuthors;
     let storagePendingMessageQuotes;
 
-    /* eslint-disable no-undef */
     if (typeof localforage !== 'undefined') {
+        if (localforage.setItemWithTTL) {
+            try {
+                await localforage.cleanup();
+            } catch (e) {
+                console.warn('Erreur lors du nettoyage TTL:', e);
+            }
+        }
+
         storagePocTopics = await localforage.getItem(localstorage_pocTopics);
         storageTopicAuthors = await localforage.getItem(localstorage_topicAuthors);
         storageAuthorAvatars = await localforage.getItem(localstorage_authorAvatars);
@@ -210,7 +248,6 @@ async function loadLocalStorage() {
         storageTopicFilteredAuthors = store.get(localstorage_topicFilteredAuthors, '[]');
         storagePendingMessageQuotes = store.get(localstorage_pendingMessageQuotes, '[]');
     }
-    /* eslint-enable no-undef */
 
     if (storagePocTopics) pocTopicMap = new Map([...JSON.parse(storagePocTopics)]);
     if (storageTopicAuthors) topicAuthorMap = new Map([...JSON.parse(storageTopicAuthors)]);
@@ -220,16 +257,20 @@ async function loadLocalStorage() {
 }
 
 async function saveLocalStorage() {
-    //let optionDetectPocMode = store.get(storage_optionDetectPocMode, storage_optionDetectPocMode_default);
-    //if (optionDetectPocMode === 0) return;
-
-    /* eslint-disable no-undef */
     if (typeof localforage !== 'undefined') {
-        await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
-        await localforage.setItem(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
-        await localforage.setItem(localstorage_authorAvatars, JSON.stringify([...authorAvatarMap]));
-        await localforage.setItem(localstorage_topicFilteredAuthors, JSON.stringify([...topicFilteredAuthorMap]));
-        await localforage.setItem(localstorage_pendingMessageQuotes, JSON.stringify([...messageQuotesPendingArray]));
+        if (localforage.setItemWithTTL) {
+            await localforage.setItemWithTTL(localstorage_pocTopics, JSON.stringify([...pocTopicMap]), TTL_CONFIG.pocTopics);
+            await localforage.setItemWithTTL(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]), TTL_CONFIG.topicAuthors);
+            await localforage.setItemWithTTL(localstorage_authorAvatars, JSON.stringify([...authorAvatarMap]), TTL_CONFIG.authorAvatars);
+            await localforage.setItemWithTTL(localstorage_topicFilteredAuthors, JSON.stringify([...topicFilteredAuthorMap]), TTL_CONFIG.topicFilteredAuthors);
+            await localforage.setItemWithTTL(localstorage_pendingMessageQuotes, JSON.stringify([...messageQuotesPendingArray]), TTL_CONFIG.pendingMessageQuotes);
+        } else {
+            await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
+            await localforage.setItem(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
+            await localforage.setItem(localstorage_authorAvatars, JSON.stringify([...authorAvatarMap]));
+            await localforage.setItem(localstorage_topicFilteredAuthors, JSON.stringify([...topicFilteredAuthorMap]));
+            await localforage.setItem(localstorage_pendingMessageQuotes, JSON.stringify([...messageQuotesPendingArray]));
+        }
     }
     else {
         store.set(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
@@ -238,7 +279,58 @@ async function saveLocalStorage() {
         store.set(localstorage_topicFilteredAuthors, JSON.stringify([...topicFilteredAuthorMap]));
         store.set(localstorage_pendingMessageQuotes, JSON.stringify([...messageQuotesPendingArray]));
     }
-    /* eslint-enable no-undef */
+}
+
+async function getTTLInfo() {
+    if (typeof localforage === 'undefined' || !localforage.getTTL) {
+        return null;
+    }
+
+    const keys = [
+        localstorage_pocTopics,
+        localstorage_topicAuthors,
+        localstorage_authorAvatars,
+        localstorage_topicFilteredAuthors,
+        localstorage_pendingMessageQuotes,
+        localstorage_decensuredTopics,
+        localstorage_decensuredMessages,
+        localstorage_decensuredSingleMessages
+    ];
+
+    const ttlInfo = {};
+    for (const key of keys) {
+        try {
+            const remaining = await localforage.getTTL(key);
+            ttlInfo[key] = {
+                remaining: remaining,
+                remainingFormatted: remaining ? Math.round(remaining / 1000 / 60) + ' min' : 'Pas d\'expiration'
+            };
+        } catch (e) {
+            ttlInfo[key] = { error: e.message };
+        }
+    }
+
+    return ttlInfo;
+}
+
+async function cleanupExpiredData() {
+    if (typeof localforage === 'undefined' || !localforage.cleanup) {
+        return 0;
+    }
+
+    try {
+        const count = await localforage.cleanup();
+        return count;
+    } catch (e) {
+        console.error('Erreur lors du nettoyage:', e);
+        return 0;
+    }
+}
+
+if (typeof window !== 'undefined') {
+    window.getTTLInfo = getTTLInfo;
+    window.cleanupExpiredData = cleanupExpiredData;
+    window.TTL_CONFIG = TTL_CONFIG;
 }
 
 async function refreshApiData(forceUpdate = false) {

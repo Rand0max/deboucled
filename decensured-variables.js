@@ -1143,7 +1143,6 @@ const stickers = [
     "https://image.noelshack.com/fichiers/2016/47/1480081469-ris6.png",
     "https://image.noelshack.com/fichiers/2017/15/1491851452-villani-zepo.png",
     "https://image.noelshack.com/fichiers/2017/06/1486457204-issou3.png",
-    "https://image.noelshack.com/fichiers/2024/40/4/1727979813-photo-outpute983ec5bc8086b8d.jpg",
     "https://image.noelshack.com/fichiers/2017/05/1485800183-2588741.png",
     "https://image.noelshack.com/fichiers/2017/08/1487984196-789797987987464646468798798.png",
     "https://image.noelshack.com/fichiers/2017/06/1486561574-jesusarthur.png",

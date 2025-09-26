@@ -514,6 +514,13 @@ blockquote .deboucled-highlighted {
   animation: deboucled-title-enter 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
+.titre-head-bloc:not(.deboucled-title-exiting):not(.deboucled-title-entering),
+.bloc-title-forum:not(.deboucled-title-exiting):not(.deboucled-title-entering),
+.titre-bloc-forum:not(.deboucled-title-exiting):not(.deboucled-title-entering) {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 .deboucled-content-hiding {
   animation: deboucled-content-hide 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }

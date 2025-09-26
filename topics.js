@@ -1014,7 +1014,8 @@ function initSmileyGifMap() {
         [':siffle:', 'siffle'],
         [':globe:', '6'],
         [':mac:', '16'],
-        [':fete:', '66']
+        [':fete:', '66'],
+        [':-d', '40']
     ]);
     //brokenSmileyGifArray = [':fete:', ':rire:',':ouch:'];
 
