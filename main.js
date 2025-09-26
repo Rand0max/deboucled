@@ -526,6 +526,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
 
     handleMessageAssignTopicAuthor(author, authorElement);
     buildAuthorBadges(authorElement, author, messageOptions, title);
+    fixMessageJvCare(messageElement);
     fixMessageUrls(messageContent);
     embedZupimages(messageContent);
     embedVocaroo(messageContent);
