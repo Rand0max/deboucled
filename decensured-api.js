@@ -122,24 +122,26 @@ async function invalidateDecensuredTopicCache(topicId) {
     }
 }
 
-async function pingDecensuredApi() {
+async function pingDecensuredApi(forceUpdate = false) {
     const username = getCurrentUserPseudo();
     if (!username) {
         return;
     }
 
-    const lastPing = await store.get(storage_decensuredLastPing, 0);
-    const now = Date.now();
+    if (!forceUpdate) {
+        const lastPing = await store.get(storage_decensuredLastPing, 0);
+        const now = Date.now();
 
-    if (now - lastPing < DECENSURED_CONFIG.PING_INTERVAL) {
-        return;
-    }
+        if (now - lastPing < DECENSURED_CONFIG.PING_INTERVAL) {
+            return;
+        }
 
-    const lastFailure = await store.get(storage_deboucled_decensuredPingFailures, 0);
-    const timeSinceFailure = now - lastFailure;
+        const lastFailure = await store.get(storage_deboucled_decensuredPingFailures, 0);
+        const timeSinceFailure = now - lastFailure;
 
-    if (timeSinceFailure < DECENSURED_CONFIG.RETRY_TIMEOUT) {
-        return;
+        if (timeSinceFailure < DECENSURED_CONFIG.RETRY_TIMEOUT) {
+            return;
+        }
     }
 
     try {

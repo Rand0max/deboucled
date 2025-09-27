@@ -23,7 +23,7 @@ function getRawTypedMessage(text) {
 
 function prepareMessageQuoteInfo(messageElement) {
     const currentUserPseudo = userPseudo ?? store.get(storage_lastUsedPseudo, userId);
-    return {
+    const res = {
         userId: userId,
         quotedMessageId: messageElement.getAttribute('data-id') ?? messageElement.getAttribute('jvchat-id'),
         quotedUsername: getAuthorFromMessageElem(messageElement).toLowerCase(),
@@ -38,6 +38,7 @@ function prepareMessageQuoteInfo(messageElement) {
         status: 'pending',
         lastUpdateDate: new Date()
     }
+    return res;
 }
 
 function fixNoelshackDirectUrl() {
@@ -70,7 +71,7 @@ function bypassTextCensorship() {
 }
 
 async function validatePendingMessageQuotes() {
-    fixNoelshackDirectUrl()
+    fixNoelshackDirectUrl();
     const rawMessage = getRawTypedMessage();
     const newStatus = rawMessage?.length ? 'validated' : 'canceled'; // Citation vide
     messageQuotesPendingArray

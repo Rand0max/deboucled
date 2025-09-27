@@ -746,8 +746,12 @@ async function handleTopicMessages() {
 
     if (messageOptions.optionHideLongMessages) handleLongMessages(allMessages);
 
-    const postMessageElement = document.querySelector('.btn-poster-msg');
-    prependEvent(postMessageElement, 'click', async () => await handlePostMessage());
+    const postMessageElement = document.querySelector('.postMessage');
+    prependEvent(
+        postMessageElement,
+        'click',
+        handlePostMessage,
+        { stopPropagation: true, executeOriginal: true });
 
     setHdAvatars();
 }
@@ -945,6 +949,7 @@ async function updateCurrentUser() {
     if (userPseudo?.length && lastUsedUserPseudo.toLowerCase() !== userPseudo.toLowerCase()) {
         store.set(storage_lastUsedPseudo, userPseudo);
         await updateUser(true);
+        await pingDecensuredApi(true);
     }
 }
 

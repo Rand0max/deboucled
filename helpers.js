@@ -507,9 +507,44 @@ function buildRandomStr(maxLength) {
     return (Math.random() + 1).toString(36).substring(maxLength);
 }
 
-function prependEvent(element, event, fn) {
-    if (!element) return;
-    element.addEventListener(event, fn, { capture: true });
+function prependEvent(element, event, fn, options = {}) {
+    if (!element) {
+        console.warn('prependEvent : element is null');
+        return;
+    }
+
+    const { stopPropagation = false, executeOriginal = false } = options;
+
+    const wrappedFn = async (e) => {
+        if (stopPropagation) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+        }
+
+        try {
+            await fn(e);
+
+            if (executeOriginal) {
+                setTimeout(() => {
+                    // eslint-disable-next-line no-undef
+                    const newEvent = new MouseEvent('click', {
+                        bubbles: true,
+                        cancelable: true,
+                        clientX: e.clientX,
+                        clientY: e.clientY
+                    });
+
+                    element.removeEventListener(event, wrappedFn, { capture: true });
+                    element.dispatchEvent(newEvent);
+                }, 300);
+            }
+        } catch (error) {
+            console.error('prependEvent : erreur dans la fonction utilisateur', error);
+        }
+    };
+
+    element.addEventListener(event, wrappedFn, { capture: true });
 }
 
 function setTextAreaValue(textarea, value) {

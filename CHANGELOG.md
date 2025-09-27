@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.68.2] (28/09/2025)
+
+- Correction des notifications de citation (Rand0max)
+- Correction bug Décensured qui empêche de poster quand on change de pseudo (Rand0max)
+
 ## [2.68.0] (26/09/2025)
 
 - Amélioration du cache Déboucled et optimisation de Décensured (Rand0max)
