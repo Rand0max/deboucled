@@ -266,31 +266,19 @@ function getTopicFormElements() {
         if (isValid) return topicDecensuredState.formElements;
     }
 
-    const form = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_FORM);
+    const form = document.querySelector('#forums-post-topic-editor form') ||
+        document.querySelector('#forums-post-topic-editor') ||
+        findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_FORM);
 
-    let titleInput, messageTextarea;
-
-    if (form) {
-        titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT, form);
-        messageTextarea = findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA, form);
-
-        if (!titleInput) {
-            titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT);
-        }
-        if (!messageTextarea) {
-            messageTextarea = findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA);
-        }
-    } else {
-        titleInput = findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT);
-        messageTextarea = findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA);
-    }
+    let titleInput = document.querySelector('#input-topic-title') || findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT);
+    let messageTextarea = document.querySelector('#message_topic') || findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA);
 
     const elements = {
-        titleInput: titleInput,
+        titleInput,
         realTitleInput: document.querySelector('#deboucled-decensured-topic-real-title'),
-        messageTextarea: messageTextarea,
+        messageTextarea,
         fakeMessageInput: document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_FAKE_TEXTAREA),
-        form: form
+        form
     };
 
     if (elements.titleInput && elements.messageTextarea && elements.form) {
@@ -301,29 +289,39 @@ function getTopicFormElements() {
 }
 
 function buildDecensuredTopicsUI() {
-    if (decensuredIsBuilding) return;
     if (!isTopicsDecensuredEnabled()) return;
+
     const currentPage = getCurrentPageType(window.location.pathname);
     if (currentPage !== 'topiclist') return;
 
-    decensuredIsBuilding = true;
-
-    const elements = getTopicFormElements();
-    if (!elements.form || !elements.titleInput || !elements.messageTextarea) {
-        if (!decensuredFormObserver) setupFormElementsObserver();
-        decensuredIsBuilding = false;
+    if (document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_CONTAINER)) {
         return;
     }
 
-    injectDecensuredTopicUI(elements);
-    decensuredIsBuilding = false;
+    if (decensuredIsBuilding) return;
+
+    decensuredIsBuilding = true;
+
+    try {
+        const elements = getTopicFormElements();
+
+        if (!elements.form || !elements.titleInput || !elements.messageTextarea) {
+            if (!decensuredFormObserver) setupFormElementsObserver();
+            return;
+        }
+
+        injectDecensuredTopicUI(elements);
+    } catch (error) {
+        console.error('[Décensured DEBUG] Erreur construction UI Topics:', error);
+    } finally {
+        decensuredIsBuilding = false;
+    }
 }
 
 function injectDecensuredTopicUI(elements) {
     const { messageTextarea } = elements;
 
-    const existingContainer = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_CONTAINER);
-    if (existingContainer) {
+    if (document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_DECENSURED_TOPIC_CONTAINER)) {
         return;
     }
 
@@ -839,14 +837,11 @@ function setupFormElementsObserver() {
     if (decensuredFormObserver) return;
 
     const currentPage = getCurrentPageType(window.location.pathname);
-    let targetSelectors = [];
     let callbackFunction = null;
 
     if (currentPage === 'topicmessages') {
-        targetSelectors = ['#forums-post-message-editor', '#message_topic'];
         callbackFunction = buildDecensuredMessagesUI;
     } else if (currentPage === 'topiclist') {
-        targetSelectors = ['#forums-post-topic-editor', '#input-topic-title', '#message_topic'];
         callbackFunction = buildDecensuredTopicsUI;
     } else {
         return;
@@ -862,12 +857,9 @@ function setupFormElementsObserver() {
         return;
     }
 
-    let retryCount = 0;
-
     const checkAndInject = () => {
-        const foundElements = targetSelectors.filter(selector => document.querySelector(selector));
-        if (foundElements.length > 0) {
-            if (callbackFunction) callbackFunction();
+        if (callbackFunction) {
+            callbackFunction();
             cleanupFormObserver();
             return true;
         }
@@ -876,33 +868,13 @@ function setupFormElementsObserver() {
 
     if (checkAndInject()) return;
 
-    decensuredFormObserver = new MutationObserver((mutations) => {
-        let shouldCheck = false;
-
-        mutations.forEach((mutation) => {
-            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const hasTargetElement = targetSelectors.some(selector => {
-                            return node.querySelector?.(selector) || node.id === selector.replace('#', '');
-                        });
-                        if (hasTargetElement) {
-                            shouldCheck = true;
-                        }
-                    }
-                });
-            }
-        });
-
-        if (shouldCheck) {
-            retryCount++;
-            if (retryCount > DECENSURED_CONFIG.API_MAX_RETRIES) {
-                console.warn(`[Décensured] Abandon après ${DECENSURED_CONFIG.API_MAX_RETRIES} tentatives d'injection de l'UI`);
-                cleanupFormObserver();
-                return;
-            }
-            setTimeout(checkAndInject, DECENSURED_CONFIG.DOM_STABILIZATION_DELAY);
+    let attemptCount = 0;
+    decensuredFormObserver = new MutationObserver(() => {
+        if (++attemptCount > 3) {
+            cleanupFormObserver();
+            return;
         }
+        setTimeout(checkAndInject, 500);
     });
 
     decensuredFormObserver.observe(targetNode, {
@@ -910,7 +882,7 @@ function setupFormElementsObserver() {
         subtree: true
     });
 
-    setTimeout(() => { cleanupFormObserver(); }, DECENSURED_CONFIG.OBSERVER_CLEANUP_TIMEOUT);
+    setTimeout(cleanupFormObserver, 10000);
 }
 
 function cleanupFormObserver() {

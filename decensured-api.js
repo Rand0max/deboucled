@@ -128,9 +128,10 @@ async function pingDecensuredApi(forceUpdate = false) {
         return;
     }
 
+    const now = Date.now();
+
     if (!forceUpdate) {
         const lastPing = await store.get(storage_decensuredLastPing, 0);
-        const now = Date.now();
 
         if (now - lastPing < DECENSURED_CONFIG.PING_INTERVAL) {
             return;

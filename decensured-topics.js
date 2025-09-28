@@ -271,9 +271,7 @@ async function preloadDecensuredTopicsStatus(topicElements = null) {
 
         for (const topic of decensuredTopics) {
             const topicElement = topicElementsMap.get(topic.topic_id);
-            if (topicElement && topic) {
-                markTopicAsDecensured(topicElement, topic);
-            }
+            if (topicElement) markTopicAsDecensured(topicElement, topic);
         }
 
     } catch (error) {

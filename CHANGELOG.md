@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.68.3] (28/09/2025)
+
+- Correction bug Décensured bouton "Topic masqué" non visible (Rand0max)
+
 ## [2.68.2] (28/09/2025)
 
 - Correction des notifications de citation (Rand0max)

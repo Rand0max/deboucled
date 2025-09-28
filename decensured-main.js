@@ -33,6 +33,10 @@ async function initDecensured() {
     buildDecensuredMessagesUI();
     buildDecensuredTopicsUI();
 
+    setTimeout(() => {
+        buildDecensuredTopicsUI();
+    }, 1500);
+
     createDecensuredUsersHeader();
     toggleDecensuredUsersCountDisplay();
     startDecensuredUsersMonitoring();
