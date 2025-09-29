@@ -281,33 +281,25 @@ async function preloadDecensuredTopicsStatus(topicElements = null) {
 
 function markTopicAsDecensured(topicElement, topicData) {
     if (!topicElement || !topicData) return;
+    if (topicElement.querySelector('.deboucled-decensured-topic-list-indicator')) return;
 
-    if (topicElement.querySelector('.deboucled-decensured-topic-list-indicator')) {
-        return;
+    const link = topicElement.querySelector('.topic-title, .lien-jv.topic-title');
+    if (!link) return;
+
+    const topicListItem = link.closest('li');
+    if (!topicListItem) return;
+
+    topicListItem.classList.add('deboucled-topic-decensured');
+
+    const hasRealTitle = topicData.topic_name_real && topicData.topic_name_real !== topicData.topic_name_fake;
+    if (hasRealTitle) {
+        link.textContent = topicData.topic_name_real;
+        link.title = `Titre réel : ${topicData.topic_name_real}\nTitre de couverture : ${topicData.topic_name_fake || topicData.topic_name}`;
     }
 
-    const indicator = document.createElement('span');
-    indicator.className = 'deboucled-decensured-topic-list-indicator';
-    indicator.textContent = 'DÉCENSURED';
-    indicator.title = `Topic Décensured - Titre réel: ${topicData.topic_name_real || 'Non spécifié'}`;
-
-    const titleElement = topicElement.querySelector('.topic-title, .topic-subject, a[href*="/forums/"]');
-    if (titleElement) {
-        titleElement.classList.add('deboucled-topic-title-decensured');
-
-        if (titleElement.parentElement) {
-            titleElement.parentElement.insertBefore(indicator, titleElement.nextSibling);
-        } else {
-            topicElement.appendChild(indicator);
-        }
-
-        if (topicData.topic_name_real && topicData.topic_name_real !== topicData.topic_name_fake) {
-            titleElement.setAttribute('deboucled-data-tooltip',
-                `Titre réel : ${topicData.topic_name_real}\nTitre de couverture : ${topicData.topic_name_fake || titleElement.textContent.trim()}`
-            );
-            titleElement.setAttribute('data-tooltip-location', 'bottom');
-        }
+    const folderIcon = topicListItem.querySelector('.icon-topic-folder, .topic-img');
+    if (folderIcon) {
+        folderIcon.classList.add('deboucled-decensured-topic-icon');
+        folderIcon.title = 'Topic Décensured';
     }
-
-    topicElement.classList.add('deboucled-topic-item-decensured');
 }

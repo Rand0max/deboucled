@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.68.4] (29/09/2025)
+
+- Correction de l'affichage des topics Décensured dans la liste (Rand0max)
+
 ## [2.68.3] (28/09/2025)
 
 - Correction bug Décensured bouton "Topic masqué" non visible (Rand0max)
