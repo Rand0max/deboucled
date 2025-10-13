@@ -6,6 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 const defaultTopicCount = 25;
+const maxMessageByPage = 20;
 
 const entitySubject = 'subject';
 const entityAuthor = 'author';

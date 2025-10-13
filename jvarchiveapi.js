@@ -45,7 +45,7 @@ function parseJvArchiveHotTopicResults(results) {
             lastMessageDate: new Date(r.date_dernier_message),
             url: `/forums/42-51-${r.id}-1-0-1-0-${randomStr}.htm`,
             authorProfile: `/profil/${r.auteur.pseudo.toLowerCase()}?mode=infos`,
-            lastPageUrl: `/forums/42-51-${r.id}-${Math.ceil(r.nb_messages / 20)}-0-1-0-${randomStr}.htm`
+            lastPageUrl: `/forums/42-51-${r.id}-${Math.ceil(r.nb_messages / maxMessageByPage)}-0-1-0-${randomStr}.htm`
         };
     });
 }
@@ -113,7 +113,7 @@ function parseJvArchiveTopicsResults(results) {
             jvArchiveUrl: `${jvarchiveUrl}/forums/42-51-${r.id}-1-0-1-0-${randomStr}.htm`,
             authorProfile: `/profil/${r.auteur.pseudo.toLowerCase()}?mode=infos`,
             authorJvArchiveProfile: `${jvarchiveUrl}/profil/${r.auteur.pseudo.toLowerCase()}`,
-            lastPageUrl: `/forums/42-51-${r.id}-${Math.ceil(r.nb_messages / 20)}-0-1-0-${randomStr}.htm`
+            lastPageUrl: `/forums/42-51-${r.id}-${Math.ceil(r.nb_messages / maxMessageByPage)}-0-1-0-${randomStr}.htm`
         };
     });
 }

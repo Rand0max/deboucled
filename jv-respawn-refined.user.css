@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.4.3
+@version        1.4.4
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -198,5 +198,15 @@
       --grid-template-columns: 1fr 53rem 24.5rem 1fr;
       --ad-placeholder-w: 0;
     }
+  }
+  html.modal-generic-mode {
+    overflow: auto !important;
+    padding-right: 0 !important;
+  }
+  .modal-generic-mode,
+  .modal-generic-overflow,
+  .modal-generic,
+  #newsletter-app {
+    display: none !important;
   }
 }

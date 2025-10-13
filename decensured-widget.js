@@ -268,6 +268,9 @@ function createTopicElement(topic) {
     const messageCount = topic.nb_message || 1;
     const authorProfileUrl = `https://www.jeuxvideo.com/profil/${encodeURIComponent(topic.topic_author.toLowerCase())}?mode=infos`;
 
+    const lastPage = Math.ceil(messageCount / maxMessageByPage);
+    const lastPageUrl = topic.topic_url.replace(/-(\d+)-0-1-0-/, `-${lastPage}-0-1-0-`);
+
     const displayTitle = topic.topic_name_real || topic.topic_name_fake || topic.topic_name;
     const titleTooltip = topic.topic_name_real && topic.topic_name_real !== topic.topic_name_fake
         ? `Titre réel : ${topic.topic_name_real}\nTitre de couverture : ${topic.topic_name_fake || topic.topic_name}`
@@ -278,14 +281,10 @@ function createTopicElement(topic) {
             <i class="deboucled-decensured-topic-icon icon-topic-folder deboucled-floating-widget-topic-icon" title="Topic Décensured"></i>
             <span class="deboucled-floating-widget-topic-time">${timeAgo}</span>
         </div>
-        <a href="${topic.topic_url}" class="deboucled-floating-widget-topic-title" title="${escapeHtml(titleTooltip)}">
-            ${escapeHtml(displayTitle)}
-        </a>
+        <a href="${topic.topic_url}" class="deboucled-floating-widget-topic-title" title="${escapeHtml(titleTooltip)}">${escapeHtml(displayTitle)}</a>
         <div class="deboucled-floating-widget-topic-meta">
-            <a href="${authorProfileUrl}" class="deboucled-floating-widget-topic-author" target="_blank" rel="noopener noreferrer" title="Voir le profil de ${escapeHtml(topic.topic_author)}">
-                par ${escapeHtml(topic.topic_author)}
-            </a>
-            <span class="deboucled-floating-widget-topic-messages">${messageCount} msg</span>
+            <a href="${authorProfileUrl}" class="deboucled-floating-widget-topic-author" target="_blank" rel="noopener noreferrer" title="Voir le profil de ${escapeHtml(topic.topic_author)}">${escapeHtml(topic.topic_author)}</a>
+            <a href="${lastPageUrl}" class="deboucled-floating-widget-topic-messages" target="_blank" rel="noopener noreferrer" title="Aller à la dernière page (page ${lastPage})">${messageCount} msg</a>
         </div>
     `;
 

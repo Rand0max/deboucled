@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.69.0] (13/10/2025)
+
+- Corrections visuelles mineures (Rand0max)
+- Nombre de messages Décensured devient un lien cliquable vers la dernière page (Rand0max)
+
 ## [2.68.4] (29/09/2025)
 
 - Correction de l'affichage des topics Décensured dans la liste (Rand0max)
