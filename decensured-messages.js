@@ -61,7 +61,7 @@ function processDecensuredMessage(msgElement, decensuredMsg) {
 
     const contentElement = msgElement.querySelector('.message-content, .text-enrichi-forum');
     if (!contentElement) return;
-    
+
     const originalContentsContainer = document.createElement("div");
     originalContentsContainer.className = 'deboucled-decensured-original-content-container';
     originalContentsContainer.id = `deboucled-container-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;

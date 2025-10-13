@@ -218,7 +218,18 @@ function formatLinks(text) {
             return url;
         }
 
-        return `<a href="${url}" target="_blank" rel="noreferrer">${url}</a>`;
+        // Nettoyer l'URL de la ponctuation finale potentielle
+        let cleanUrl = url;
+        let trailingPunctuation = '';
+
+        // Si l'URL se termine par une ponctuation courante, la retirer
+        const punctuationMatch = url.match(/([.,;!?)\]]+)$/);
+        if (punctuationMatch) {
+            trailingPunctuation = punctuationMatch[1];
+            cleanUrl = url.slice(0, -trailingPunctuation.length);
+        }
+
+        return `<a href="${cleanUrl}" target="_blank" rel="noreferrer">${cleanUrl}</a>${trailingPunctuation}`;
     });
 }
 
@@ -269,7 +280,17 @@ function processParagraphContent(paragraph) {
         }
 
         // Mentions @pseudo (simple détection)
-        line = line.replace(/@([a-zA-Z0-9_-]+)/g, '<span class="jv-mention">@$1</span>');
+        // Ne pas formater les @ qui sont dans des URLs ou des liens déjà formatés
+        if (!line.includes('href="') && !line.includes('<a ')) {
+            line = line.replace(/@([a-zA-Z0-9_-]+)/g, (match, pseudo, offset) => {
+                // Double vérification : ne pas formater si dans une URL
+                const beforeMatch = line.substring(Math.max(0, offset - 50), offset);
+                if (beforeMatch.match(/https?:\/\/[^\s<>"']*$/)) {
+                    return match; // C'est dans une URL, ne pas formater
+                }
+                return `<span class="jv-mention">@${pseudo}</span>`;
+            });
+        }
 
         // Ligne normale
         processedLines.push(line);
