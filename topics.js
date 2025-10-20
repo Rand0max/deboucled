@@ -778,8 +778,9 @@ async function handleTopicAvatars(topics) {
 
         const avatarUrl = await getAuthorAvatarUrl(author, authorProfileUrl);
         if (avatarUrl?.length) {
-            authorAvatar.alt = authorAvatar.src;
+            authorAvatar.alt = author;
             authorAvatar.src = avatarUrl;
+            authorAvatar.onerror = `this.onerror=null; this.src='${defaultAvatarUrl}';`;
         }
     }));
 

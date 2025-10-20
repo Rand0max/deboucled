@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.69.2] (20/10/2025)
+
+- Corrections des citations de message (Rand0max)
+- Correction de l'avatar qui ne s'affiche pas parfois (Rand0max)
+
 ## [2.69.0] (13/10/2025)
 
 - Corrections visuelles mineures (Rand0max)

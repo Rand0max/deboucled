@@ -537,7 +537,7 @@ function prependEvent(element, event, fn, options = {}) {
 
                     element.removeEventListener(event, wrappedFn, { capture: true });
                     element.dispatchEvent(newEvent);
-                }, 300);
+                }, 1000);
             }
         } catch (error) {
             console.error('prependEvent : erreur dans la fonction utilisateur', error);

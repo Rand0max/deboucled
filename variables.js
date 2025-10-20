@@ -38,7 +38,7 @@ const aiBoucledAuthorsRefreshExpire = TimeSpan.FromMinutes(30);
 const updateUserExpire = TimeSpan.FromHours(3);
 const diagnosticExpire = TimeSpan.FromHours(12);
 const hotTopicsRefreshExpire = TimeSpan.FromMinutes(15);
-const messageQuotesRefreshExpire = TimeSpan.FromMinutes(2);
+const messageQuotesRefreshExpire = TimeSpan.FromMinutes(1);
 const pendingMessageQuoteExpire = TimeSpan.FromDays(3);
 
 const imageRootUrl = 'https://image.jeuxvideo.com';

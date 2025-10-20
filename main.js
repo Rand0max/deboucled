@@ -746,14 +746,16 @@ async function handleTopicMessages() {
 
     if (messageOptions.optionHideLongMessages) handleLongMessages(allMessages);
 
-    const postMessageElement = document.querySelector('.postMessage');
-    prependEvent(
-        postMessageElement,
-        'click',
-        handlePostMessage,
-        { stopPropagation: true, executeOriginal: true });
-
     setHdAvatars();
+
+    setTimeout(() => {
+        const postMessageElement = document.querySelector('.postMessage');
+        prependEvent(
+            postMessageElement,
+            'click',
+            handlePostMessage,
+            { stopPropagation: true, executeOriginal: true });
+    }, 1000);
 }
 
 async function handleSearch() {
