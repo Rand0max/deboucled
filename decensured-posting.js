@@ -38,6 +38,8 @@ async function handleDecensuredPost() {
     }
 
     try {
+        await validatePendingMessageQuotes();
+
         const processedContent = await processContent(realMessage, fakeMessage);
         if (!processedContent) {
             logDecensuredError(new Error('Échec du traitement du contenu'), 'handleDecensuredPost', true);

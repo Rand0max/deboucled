@@ -154,7 +154,7 @@ async function decryptTopicMessages() {
     }
 }
 
-function handleDecensuredQuote(msgElement, decensuredMsg, selection = null) {
+async function handleDecensuredQuote(msgElement, decensuredMsg, selection = null) {
     const textArea = document.querySelector('#message_topic');
     if (!textArea) return;
 
@@ -182,6 +182,11 @@ function handleDecensuredQuote(msgElement, decensuredMsg, selection = null) {
     textArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
     textArea.focus({ preventScroll: true });
     textArea.setSelectionRange(textArea.value.length, textArea.value.length);
+
+    if (author.toLowerCase() !== userPseudo?.toLowerCase()) {
+        messageQuotesPendingArray.push(prepareMessageQuoteInfo(msgElement));
+        await saveLocalStorage();
+    }
 }
 
 function extractMessageIdFromUrl(pathname) {
@@ -287,7 +292,7 @@ function addJvChatDecensuredBadge(jvchatElement) {
     }
 }
 
-function handleJvChatDecensuredQuote(jvchatElement, decensuredMsg) {
+async function handleJvChatDecensuredQuote(jvchatElement, decensuredMsg) {
     const textArea = document.querySelector('#message_topic');
     if (!textArea) return;
 
@@ -309,6 +314,11 @@ function handleJvChatDecensuredQuote(jvchatElement, decensuredMsg) {
     textArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
     textArea.focus({ preventScroll: true });
     textArea.setSelectionRange(textArea.value.length, textArea.value.length);
+
+    if (author.toLowerCase() !== userPseudo?.toLowerCase()) {
+        messageQuotesPendingArray.push(prepareMessageQuoteInfo(jvchatElement));
+        await saveLocalStorage();
+    }
 }
 
 function getCurrentMessageContent(msgElement, decensuredMsg) {
