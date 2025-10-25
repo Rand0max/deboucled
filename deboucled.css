@@ -1567,10 +1567,17 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
   margin: 0 0 1px 5px;
 }
 .bloc-message-forum .bloc-options-msg {
-  align-self: end;
+  align-self: flex-start;
   line-height: 1.1rem !important;
   grid-area: options;
   justify-self: end;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-left: 0.3rem;
+}
+.bloc-message-forum .bloc-options-msg span {
+  margin-left: 0;
 }
 .bloc-message-forum .bloc-date-msg {
   grid-area: date;
@@ -3520,14 +3527,14 @@ select.deboucled-dropdown::-ms-expand {
     margin: 5px;
   }
   .conteneur-message .deboucled-jvarchive-logo {
-    margin: 0 0 3px 10px;
+    margin: 0 0 3px 0.3rem;
   }
   .bloc-header .deboucled-author-boucled-button {
-    margin: 0 0 1px 10px;
+    margin: 0 0 1px 0.3rem;
   }
   .conteneur-message .deboucled-filter-logo,
   .conteneur-message .deboucled-clearfilter-logo {
-    margin: 0 0 2px 8px;
+    margin: 0 0 1px 0.25rem;
   }
   .bloc-message-forum .bloc-header {
     grid-template-areas:
@@ -3558,7 +3565,7 @@ select.deboucled-dropdown::-ms-expand {
     width: 108%;
   }
   [deboucled-data-tooltip]::before {
-    max-width: 60vw;
+    max-width: 38vw;
   }
 }
 @media (max-width: 500px) {

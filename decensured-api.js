@@ -429,7 +429,7 @@ async function decryptSingleMessage() {
         });
 
         if (messageElement) {
-            processDecensuredMessage(messageElement, decensuredMsg);
+            await processDecensuredMessage(messageElement, decensuredMsg);
         }
 
     } catch (error) {
@@ -507,5 +507,34 @@ async function getDecensuredTopicsPaginated(limit, offset) {
     } catch (error) {
         logDecensuredError(error, 'getDecensuredTopicsPaginated - Erreur lors de la récupération des topics paginés');
         return [];
+    }
+}
+
+async function checkDecensuredUsers(usernames) {
+    if (!usernames || usernames.length === 0) return new Set();
+
+    try {
+        const cachedUsers = decensuredUsersSet || new Set();
+
+        const uncachedUsernames = usernames.filter(username => !cachedUsers.has(username.toLowerCase()));
+
+        if (uncachedUsernames.length === 0) {
+            return new Set(usernames.filter(username => cachedUsers.has(username.toLowerCase())));
+        }
+
+        const response = await fetchDecensuredApi(apiDecensuredUsersUrl, {
+            method: 'PUT',
+            body: JSON.stringify({ usernames: uncachedUsernames })
+        });
+
+        if (response && Array.isArray(response)) {
+            response.forEach(username => { decensuredUsersSet.add(username.toLowerCase()); });
+            await saveLocalStorage();
+        }
+
+        return new Set(usernames.filter(username => decensuredUsersSet.has(username.toLowerCase())));
+    } catch (error) {
+        logDecensuredError(error, 'checkDecensuredUsers');
+        return new Set();
     }
 }

@@ -51,12 +51,21 @@ async function processContent(message, fakeMessage = '') {
     }
 }
 
-function processDecensuredMessage(msgElement, decensuredMsg) {
+async function processDecensuredMessage(msgElement, decensuredMsg) {
     const realContent = decensuredMsg.message_real_content;
     if (!realContent) return;
 
     if (msgElement.classList.contains('deboucled-decensured-processed')) {
         return;
+    }
+
+    const authorElement = msgElement.querySelector('.bloc-pseudo-msg');
+    if (authorElement) {
+        const username = authorElement.textContent.trim();
+        if (username) {
+            decensuredUsersSet.add(username.toLowerCase());
+            await saveLocalStorage();
+        }
     }
 
     const contentElement = msgElement.querySelector('.message-content, .text-enrichi-forum');
@@ -98,8 +107,6 @@ function processDecensuredMessage(msgElement, decensuredMsg) {
 
     initializeSpoilerHandlers(realContentDiv);
 
-    addDecensuredBadge(msgElement);
-
     removeReportButton(msgElement);
 
     msgElement.classList.add('deboucled-decensured-processed');
@@ -128,6 +135,57 @@ async function decryptMessages() {
     }
 }
 
+async function addDecensuredBadgesToAllMessages() {
+    if (!await store.get(storage_optionEnableDecensuredBadges, storage_optionEnableDecensuredBadges_default)) {
+        return;
+    }
+
+    const currentPage = getCurrentPageType(window.location.pathname);
+    if (currentPage !== 'topicmessages') return;
+
+    try {
+        const messageElements = getMessageElements();
+        if (messageElements.length === 0) return;
+
+        const usernames = [];
+        const usernameToElements = new Map();
+        const uncachedUsernames = [];
+
+        messageElements.forEach(msgElement => {
+            const pseudoLink = msgElement.querySelector('.bloc-pseudo-msg');
+            if (!pseudoLink) return;
+
+            const username = pseudoLink.textContent.trim();
+            if (!username) return;
+
+            usernames.push(username);
+
+            if (!usernameToElements.has(username)) {
+                usernameToElements.set(username, []);
+            }
+            usernameToElements.get(username).push(msgElement);
+
+            if (!decensuredUsersSet.has(username.toLowerCase())) {
+                uncachedUsernames.push(username);
+            }
+        });
+
+        if (uncachedUsernames.length > 0) await checkDecensuredUsers([...new Set(uncachedUsernames)]);
+
+        const uniqueUsernames = [...new Set(usernames)];
+        uniqueUsernames.forEach(username => {
+            if (!decensuredUsersSet.has(username.toLowerCase())) return;
+            const elements = usernameToElements.get(username);
+            if (elements) {
+                elements.forEach(msgElement => addDecensuredBadge(msgElement));
+            }
+        });
+    } catch (error) {
+        logDecensuredError(error, 'addDecensuredBadgesToAllMessages');
+    }
+}
+
+
 async function decryptTopicMessages() {
     const topicId = getCurrentTopicId();
     if (!topicId) return;
@@ -140,14 +198,14 @@ async function decryptTopicMessages() {
 
         const messageElements = getMessageElements();
 
-        messageElements.forEach(msgElement => {
+        messageElements.forEach(async msgElement => {
             const messageId = getMessageId(msgElement);
             if (!messageId) return;
 
             const decensuredMsg = messageIndex.get(messageId);
             if (!decensuredMsg) return;
 
-            processDecensuredMessage(msgElement, decensuredMsg);
+            await processDecensuredMessage(msgElement, decensuredMsg);
         });
     } catch (error) {
         logDecensuredError(error, 'decryptMessages - Erreur lors du déchiffrement des messages du topic');
@@ -219,12 +277,21 @@ function invalidateMessageElementsCache() {
 // JVCHAT INTEGRATION
 ///////////////////////////////////////////////////////////////////////////////////////
 
-function processJvChatDecensuredMessage(jvchatElement, decensuredMsg) {
+async function processJvChatDecensuredMessage(jvchatElement, decensuredMsg) {
     const realContent = decensuredMsg.message_real_content;
     if (!realContent) return;
 
     if (jvchatElement.classList.contains('deboucled-decensured-processed')) {
         return;
+    }
+
+    const authorElement = jvchatElement.querySelector('.jvchat-author');
+    if (authorElement) {
+        const username = authorElement.textContent.trim();
+        if (username) {
+            decensuredUsersSet.add(username.toLowerCase());
+            await saveLocalStorage();
+        }
     }
 
     const contentElement = jvchatElement.querySelector('.jvchat-content');

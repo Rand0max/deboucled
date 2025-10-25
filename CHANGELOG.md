@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.70.0] (26/10/2025)
+
+- Amélioration de la détection des utilisateurs Décensured (Rand0max)
+- Corrections visuelles mineures (Rand0max)
+
 ## [2.69.2] (20/10/2025)
 
 - Corrections des citations de message (Rand0max)

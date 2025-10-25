@@ -119,11 +119,11 @@ function addAuthorButtons(nearbyElement, author, optionBoucledUseJvarchive) {
     let boucledButton = buildBoucledAuthorButton(author, optionBoucledUseJvarchive);
     insertAfter(boucledButton, nearbyElement);
 
-    let jvArchiveProfilButton = buildJvArchiveProfilButton(author);
-    insertAfter(jvArchiveProfilButton, boucledButton);
+    // let jvArchiveProfilButton = buildJvArchiveProfilButton(author);
+    // insertAfter(jvArchiveProfilButton, boucledButton);
 
     let filterAuthorButton = buildFilterAuthorMessageButton(author);
-    insertAfter(filterAuthorButton, jvArchiveProfilButton);
+    insertAfter(filterAuthorButton, boucledButton); // jvArchiveProfilButton);
 }
 
 function buildAuthorBadges(authorElement, author, messageOptions, title) {
@@ -281,9 +281,9 @@ async function handleLiveDecensuredMessage(messageElement, topicLiveEvent) {
         if (!decensuredMessage) return;
 
         if (topicLiveEvent) {
-            processDecensuredMessage(messageElement, decensuredMessage);
+            await processDecensuredMessage(messageElement, decensuredMessage);
         } else {
-            processJvChatDecensuredMessage(messageElement, decensuredMessage);
+            await processJvChatDecensuredMessage(messageElement, decensuredMessage);
         }
 
     } catch (error) {

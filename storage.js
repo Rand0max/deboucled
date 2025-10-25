@@ -14,7 +14,8 @@ const TTL_CONFIG = {
     // Configuration cache Décensured
     decensuredTopics: 48 * 60 * 60 * 1000, // 48 heures - statut des topics
     decensuredMessages: 1 * 60 * 1000,    // 1 minute - messages d'un topic
-    decensuredSingleMessage: 6 * 60 * 60 * 1000 // 6 heures - message unique
+    decensuredSingleMessage: 6 * 60 * 60 * 1000, // 6 heures - message unique
+    decensuredUsers: 96 * 60 * 60 * 1000 // 96 heures - liste des utilisateurs Decensured
 };
 
 function initLocalForageTTL() {
@@ -36,6 +37,7 @@ const localstorage_pendingMessageQuotes = 'deboucled_pendingMessageQuotes';
 const localstorage_decensuredTopics = 'deboucled_decensuredTopics';
 const localstorage_decensuredMessages = 'deboucled_decensuredMessages';
 const localstorage_decensuredSingleMessages = 'deboucled_decensuredSingleMessages';
+const localstorage_decensuredUsers = 'deboucled_decensuredUsers';
 
 const storage_init = 'deboucled_init', storage_init_default = false;
 const storage_secret_displayed = 'deboucled_secret3_displayed', storage_secret_displayed_default = false;
@@ -225,6 +227,7 @@ async function loadLocalStorage() {
     let storageAuthorAvatars;
     let storageTopicFilteredAuthors;
     let storagePendingMessageQuotes;
+    let storageDecensuredUsers;
 
     if (typeof localforage !== 'undefined') {
         if (localforage.setItemWithTTL) {
@@ -240,6 +243,7 @@ async function loadLocalStorage() {
         storageAuthorAvatars = await localforage.getItem(localstorage_authorAvatars);
         storageTopicFilteredAuthors = await localforage.getItem(localstorage_topicFilteredAuthors);
         storagePendingMessageQuotes = await localforage.getItem(localstorage_pendingMessageQuotes);
+        storageDecensuredUsers = await localforage.getItem(localstorage_decensuredUsers);
     }
     else {
         storagePocTopics = store.get(localstorage_pocTopics, '[]');
@@ -247,6 +251,7 @@ async function loadLocalStorage() {
         storageAuthorAvatars = store.get(localstorage_authorAvatars, '[]');
         storageTopicFilteredAuthors = store.get(localstorage_topicFilteredAuthors, '[]');
         storagePendingMessageQuotes = store.get(localstorage_pendingMessageQuotes, '[]');
+        storageDecensuredUsers = store.get(localstorage_decensuredUsers, '[]');
     }
 
     if (storagePocTopics) pocTopicMap = new Map([...JSON.parse(storagePocTopics)]);
@@ -254,6 +259,7 @@ async function loadLocalStorage() {
     if (storageAuthorAvatars) authorAvatarMap = new Map([...JSON.parse(storageAuthorAvatars)]);
     if (storageTopicFilteredAuthors) topicFilteredAuthorMap = new Map([...JSON.parse(storageTopicFilteredAuthors)]);
     if (storagePendingMessageQuotes) messageQuotesPendingArray = JSON.parse(storagePendingMessageQuotes);
+    if (storageDecensuredUsers) decensuredUsersSet = new Set(JSON.parse(storageDecensuredUsers));
 }
 
 async function saveLocalStorage() {
@@ -264,12 +270,14 @@ async function saveLocalStorage() {
             await localforage.setItemWithTTL(localstorage_authorAvatars, JSON.stringify([...authorAvatarMap]), TTL_CONFIG.authorAvatars);
             await localforage.setItemWithTTL(localstorage_topicFilteredAuthors, JSON.stringify([...topicFilteredAuthorMap]), TTL_CONFIG.topicFilteredAuthors);
             await localforage.setItemWithTTL(localstorage_pendingMessageQuotes, JSON.stringify([...messageQuotesPendingArray]), TTL_CONFIG.pendingMessageQuotes);
+            await localforage.setItemWithTTL(localstorage_decensuredUsers, JSON.stringify([...decensuredUsersSet]), TTL_CONFIG.decensuredUsers);
         } else {
             await localforage.setItem(localstorage_pocTopics, JSON.stringify([...pocTopicMap]));
             await localforage.setItem(localstorage_topicAuthors, JSON.stringify([...topicAuthorMap]));
             await localforage.setItem(localstorage_authorAvatars, JSON.stringify([...authorAvatarMap]));
             await localforage.setItem(localstorage_topicFilteredAuthors, JSON.stringify([...topicFilteredAuthorMap]));
             await localforage.setItem(localstorage_pendingMessageQuotes, JSON.stringify([...messageQuotesPendingArray]));
+            await localforage.setItem(localstorage_decensuredUsers, JSON.stringify([...decensuredUsersSet]));
         }
     }
     else {
@@ -278,6 +286,7 @@ async function saveLocalStorage() {
         store.set(localstorage_authorAvatars, JSON.stringify([...authorAvatarMap]));
         store.set(localstorage_topicFilteredAuthors, JSON.stringify([...topicFilteredAuthorMap]));
         store.set(localstorage_pendingMessageQuotes, JSON.stringify([...messageQuotesPendingArray]));
+        store.set(localstorage_decensuredUsers, JSON.stringify([...decensuredUsersSet]));
     }
 }
 
@@ -294,7 +303,8 @@ async function getTTLInfo() {
         localstorage_pendingMessageQuotes,
         localstorage_decensuredTopics,
         localstorage_decensuredMessages,
-        localstorage_decensuredSingleMessages
+        localstorage_decensuredSingleMessages,
+        localstorage_decensuredUsers
     ];
 
     const ttlInfo = {};

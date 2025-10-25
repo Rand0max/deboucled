@@ -98,7 +98,7 @@ async function checkAndProcessNewTopic() {
 }
 
 async function applyDecensuredFormattingToNewTopic(messageElement, decensuredMsg) {
-    processDecensuredMessage(messageElement, decensuredMsg);
+    await processDecensuredMessage(messageElement, decensuredMsg);
     addTopicDecensuredIndicator();
 }
 
@@ -130,7 +130,11 @@ async function verifyCurrentTopicDecensured() {
             }
         }
 
-        if (store.get(storage_optionAutoDecryptMessages, storage_optionAutoDecryptMessages_default)) await decryptMessages();
+        if (store.get(storage_optionAutoDecryptMessages, storage_optionAutoDecryptMessages_default)) {
+            await decryptMessages();
+        }
+
+        await addDecensuredBadgesToAllMessages();
     } catch (error) {
         logDecensuredError(error, 'checkAndHighlightCurrentTopicIfDecensured - Erreur lors de la vérification du topic');
     }
