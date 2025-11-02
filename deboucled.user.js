@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Déboucled
 // @namespace   deboucledjvcom
-// @version     2.71.0
+// @version     2.71.1
 // @downloadURL https://github.com/Rand0max/deboucled/raw/master/deboucled.user.js
 // @updateURL   https://github.com/Rand0max/deboucled/raw/master/deboucled.meta.js
 // @author      Rand0max
@@ -63,8 +63,9 @@
 // @require     decensured-topics.js
 // @require     decensured-messages.js
 // @require     decensured-ui.js
-// @require     decensured-widget.js
 // @require     decensured-users.js
+// @require     decensured-chat.js
+// @require     decensured-widget.js
 // @require     decensured-posting.js
 // @require     decensured-main.js
 // @require     settings.js
