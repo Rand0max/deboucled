@@ -5,6 +5,9 @@
 function createDecensuredFloatingWidget() {
     if (document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET)) return;
 
+    const chatEnabled = store.get(storage_optionEnableDecensuredChat, storage_optionEnableDecensuredChat_default);
+    const defaultTab = chatEnabled ? 'chat' : 'topics';
+
     const widget = document.createElement('div');
     widget.id = 'deboucled-floating-widget';
     widget.className = 'deboucled-floating-widget';
@@ -31,11 +34,11 @@ function createDecensuredFloatingWidget() {
             </div>
         </div>
         <div class="deboucled-widget-tabs">
-            <button class="deboucled-widget-tab active" data-tab="chat">
+            <button class="deboucled-widget-tab ${defaultTab === 'chat' ? 'active' : ''}" data-tab="chat">
                 💬 Chat
                 <span class="notification-badge" style="display: none;">0</span>
             </button>
-            <button class="deboucled-widget-tab" data-tab="topics">
+            <button class="deboucled-widget-tab ${defaultTab === 'topics' ? 'active' : ''}" data-tab="topics">
                 📋 Topics
             </button>
         </div>
@@ -43,7 +46,7 @@ function createDecensuredFloatingWidget() {
             <div class="deboucled-floating-widget-loading">
                 <div class="deboucled-spinner active"></div>
             </div>
-            <div class="deboucled-widget-tab-content active" data-content="chat">
+            <div class="deboucled-widget-tab-content ${defaultTab === 'chat' ? 'active' : ''}" data-content="chat">
                 <div class="deboucled-chat-container">
                     <div class="deboucled-chat-status connecting">
                         <span class="deboucled-chat-status-indicator"></span>
@@ -68,7 +71,7 @@ function createDecensuredFloatingWidget() {
                     </div>
                 </div>
             </div>
-            <div class="deboucled-widget-tab-content" data-content="topics">
+            <div class="deboucled-widget-tab-content ${defaultTab === 'topics' ? 'active' : ''}" data-content="topics">
                 <div class="deboucled-floating-widget-topics" id="deboucled-floating-widget-topics">
                     <div class="deboucled-floating-widget-topics-container"></div>
                     <div class="deboucled-floating-widget-topics-loader" style="display: none;">
@@ -87,8 +90,7 @@ function createDecensuredFloatingWidget() {
 
     setupFloatingWidgetEvents();
 
-    // Initialize chat by default since it's the first tab
-    const chatEnabled = store.get(storage_optionEnableDecensuredChat, storage_optionEnableDecensuredChat_default);
+    // Initialize based on chat enabled setting
     if (chatEnabled) {
         setTimeout(() => {
             initializeDecensuredChat();

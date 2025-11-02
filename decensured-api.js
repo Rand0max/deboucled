@@ -541,16 +541,23 @@ async function checkDecensuredUsers(usernames) {
 
 // Chat API
 
-async function sendChatMessage(username, userid, content, messageType = 'text') {
+async function sendChatMessage(username, userid, content, messageType = 'text', replyToMessageId = null) {
     try {
+        const payload = {
+            username: username,
+            userid: userid,
+            message_content: content,
+            message_type: messageType
+        };
+
+        // Ajouter reply_to_message_id si présent
+        if (replyToMessageId) {
+            payload.reply_to_message_id = replyToMessageId;
+        }
+
         const response = await fetchDecensuredApi(apiDecensuredChatMessageUrl, {
             method: 'POST',
-            body: JSON.stringify({
-                username: username,
-                userid: userid,
-                message_content: content,
-                message_type: messageType
-            })
+            body: JSON.stringify(payload)
         });
 
         return response !== null;
