@@ -86,18 +86,27 @@
 - **🔢 Vous pouvez choisir d'afficher plus que 25 topics** dans les options
 - **🎨 Thème sombre et thème officiel pour le script et JVC**
 
-## 📡 **Compatibilité Chat & Temps Réel**
-- **💬 Compatible JvChat & TopicLive** : *Décensured fonctionne avec JvChat & TopicLive pour les discussions en temps réel*
-- **📡 Compatible avec TopicLive et JvChat** : *100% compatible, Déboucled filtera en direct les messages des pseudos blacklist*
+## � **Chat Décensured en Temps Réel**
+- **💬 Chat en temps réel Décensured** : *Nouveau système de messagerie instantanée intégré pour communiquer avec les autres utilisateurs Décensured*
+- **📡 Notifications en temps réel** : *Recevez instantanément les nouveaux messages via Server-Sent Events (SSE)*
+- **🔔 Badge de notifications** : *Compteur de messages non lus sur l'onglet Chat*
+- **🎨 Interface moderne** : *Widget flottant avec onglets Topics/Chat, support thème sombre/clair*
+- **⚡ Reconnexion automatique** : *Le chat se reconnecte automatiquement en cas de perte de connexion*
+
+## 🔌 **Compatibilité avec Autres Scripts**
+- **💬 Compatible JvChat & TopicLive** : *Déboucled fonctionne parfaitement avec les scripts JvChat et TopicLive*
+- **📡 Filtrage en direct** : *Déboucled filtre automatiquement les messages des pseudos blacklist dans JvChat et TopicLive*
+- **🎭 Décensured avec JvChat/TopicLive** : *Les messages Décensured s'affichent correctement dans ces scripts tiers*
 
 ## 🎯 **Interface & Expérience Utilisateur**
 - **👁️ Prévisualisation des topics** : *affiche un aperçu du topic à la volée sur la liste des sujets*
 - **🖼️ Affichage des avatars** : *rajoute les avatars à côté des pseudos dans la liste des topics*
 - **😀 Intégration des smileys dans les topics** : *intégration des smileys JVC dans les titres des topics*
-- **🏷️ Uniformise les titres des sujets, masque les balises abusives [ALERTE] ou les AYA à répétition** *pour gagne en lisibilité*
+- **🏷️ Uniformise les titres des sujets, masque les balises abusives [ALERTE] ou les AYA à répétition** *pour gagner en lisibilité*
 - **⚫ Pictogramme pour les topics *noirs*** *pour mettre en avant les topics avec plus de 100 messages*
 - **🔥 Topics tendances** : *mise en avant des topics les plus actifs*
 - **📊 Graphique sur les tendances de filtrage** *à droite de la liste des topics*
+- **💬 Widget flottant Décensured** : *accès rapide aux topics récents et au chat en temps réel via un widget élégant*
 
 ## 🌐 **Navigation & Performance**
 - **⬇️ Défilement automatique des messages** : *vous pouvez charger automatiquement les pages d'un topic simplement en défilant vers le bas*

@@ -367,6 +367,34 @@ function formatMessageContent(rawText) {
     return formatParagraphs(text);
 }
 
+function formatChatMessageContent(rawText) {
+    if (!rawText) return '';
+
+    let text = rawText;
+
+    // Formatage JVC simple (sans spoilers, blockquotes, listes)
+    text = formatJvcBold(text);
+    text = formatJvcItalic(text);
+    text = formatJvcUnderline(text);
+    text = formatJvcStrikethrough(text);
+    text = formatJvcCode(text);
+
+    // Formatage Markdown simple (sans spoilers, codeblocks)
+    text = formatInlineCode(text);
+    text = formatBoldAndItalicText(text);
+    text = formatStrikethrough(text);
+
+    // Images et liens
+    text = formatImages(text);
+    text = formatLinks(text);
+    text = formatSmileys(text);
+
+    // Remplacer les retours à la ligne simples par des <br>
+    text = text.replace(/\n/g, '<br>');
+
+    return text;
+}
+
 function initializeSpoilerHandlers(container) {
     if (!container) return;
 

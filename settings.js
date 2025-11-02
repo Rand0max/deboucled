@@ -286,11 +286,14 @@ function buildSettingsPage() {
         const topicLogo = '📋';
         html += addToggleOption(`Activer les ${topicLogo} topics masqués`, storage_optionEnableDecensuredTopics, storage_optionEnableDecensuredTopics_default, 'Active la possibilité de créer des topics avec des messages masqués et de les mettre en évidence.', optionEnableDecensured, true);
 
+        const widgetLogo = '📑';
+        html += addToggleOption(`Afficher le widget ${widgetLogo} flottant`, storage_optionDisplayDecensuredWidget, storage_optionDisplayDecensuredWidget_default, 'Affiche un widget flottant avec le chat en temps réel et les derniers topics Décensured créés.', optionEnableDecensured, true);
+
+        const chatLogo = '💬';
+        html += addToggleOption(`Activer le ${chatLogo} chat en temps réel`, storage_optionEnableDecensuredChat, storage_optionEnableDecensuredChat_default, 'Active le chat en temps réel Décensured pour communiquer avec les autres utilisateurs en direct.', optionEnableDecensured, true);
+
         const peopleLogo = '👥';
         html += addToggleOption(`Afficher le ${peopleLogo} nombre de connectés`, storage_optionDisplayDecensuredUsersCount, storage_optionDisplayDecensuredUsersCount_default, 'Affiche dans le header le nombre d\'utilisateurs Décensured actuellement connectés.', optionEnableDecensured, true);
-
-        const widgetLogo = '📑';
-        html += addToggleOption(`Afficher le widget ${widgetLogo} topics récents`, storage_optionDisplayDecensuredTopics, storage_optionDisplayDecensuredTopics_default, 'Affiche un widget flottant avec les derniers topics Décensured créés.', optionEnableDecensured, true);
 
         const badgeLogo = '<span class="deboucled-decensured-premium-logo settings"></span>';
         html += addToggleOption(`Afficher les ${badgeLogo} utilisateurs Décensured`, storage_optionEnableDecensuredBadges, storage_optionEnableDecensuredBadges_default, 'Affiche un petit badge à côté du pseudo des utilisateurs qui utilisent aussi Déboucled pour les messages masqués.', optionEnableDecensured, true);
@@ -575,8 +578,9 @@ function addSettingEvents() {
             `${storage_optionEnableDecensuredBadges}-container`,
             `${storage_optionAutoDecryptMessages}-container`,
             `${storage_optionDisplayDecensuredUsersCount}-container`,
-            `${storage_optionDisplayDecensuredTopics}-container`,
-            `${storage_optionEnableDecensuredTopics}-container`
+            `${storage_optionDisplayDecensuredWidget}-container`,
+            `${storage_optionEnableDecensuredTopics}-container`,
+            `${storage_optionEnableDecensuredChat}-container`
         ];
 
         decensuredSubOptions.forEach(optionId => {
@@ -593,10 +597,19 @@ function addSettingEvents() {
     addToggleEvent(storage_optionDisplayDecensuredUsersCount, undefined, function () {
         toggleDecensuredUsersCountDisplay();
     });
-    addToggleEvent(storage_optionDisplayDecensuredTopics, undefined, function () {
+    addToggleEvent(storage_optionDisplayDecensuredWidget, undefined, function () {
         toggleDecensuredFloatingWidget();
     });
     addToggleEvent(storage_optionEnableDecensuredTopics);
+    addToggleEvent(storage_optionEnableDecensuredChat, undefined, function () {
+        const isEnabled = store.get(storage_optionEnableDecensuredChat, storage_optionEnableDecensuredChat_default);
+        if (!isEnabled) {
+            destroyDecensuredChat();
+            updateChatStatusWhenDisabled();
+        } else {
+            initializeDecensuredChat();
+        }
+    });
 
     addPrebouclesEvents();
 }

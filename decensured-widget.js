@@ -15,7 +15,7 @@ function createDecensuredFloatingWidget() {
                 <span class="deboucled-decensured-premium-logo widget"></span> 
                 <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2;">
                     <span style="font-size: 18px; font-weight: 700;">Décensured</span>
-                    <span style="font-size: 13px; font-weight: 400; opacity: 0.9;">Topics récents</span>
+                    <span style="font-size: 13px; font-weight: 400; opacity: 0.9;">Live Chat & Topics</span>
                 </div>
             </h4>
             <div style="display: flex; align-items: center; gap: 12px;">
@@ -30,14 +30,50 @@ function createDecensuredFloatingWidget() {
                 <button class="deboucled-floating-widget-close" id="deboucled-floating-widget-close">×</button>
             </div>
         </div>
+        <div class="deboucled-widget-tabs">
+            <button class="deboucled-widget-tab active" data-tab="chat">
+                💬 Chat
+                <span class="notification-badge" style="display: none;">0</span>
+            </button>
+            <button class="deboucled-widget-tab" data-tab="topics">
+                📋 Topics
+            </button>
+        </div>
         <div class="deboucled-floating-widget-content">
             <div class="deboucled-floating-widget-loading">
                 <div class="deboucled-spinner active"></div>
             </div>
-            <div class="deboucled-floating-widget-topics" id="deboucled-floating-widget-topics">
-                <div class="deboucled-floating-widget-topics-container"></div>
-                <div class="deboucled-floating-widget-topics-loader" style="display: none;">
-                    <div class="deboucled-loading-text">Chargement...</div>
+            <div class="deboucled-widget-tab-content active" data-content="chat">
+                <div class="deboucled-chat-container">
+                    <div class="deboucled-chat-status connecting">
+                        <span class="deboucled-chat-status-indicator"></span>
+                        <span>Connexion...</span>
+                    </div>
+                    <div class="deboucled-chat-messages"></div>
+                    <button class="deboucled-chat-scroll-bottom" title="Aller en bas">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                            <path d="M12 5v14M19 12l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div class="deboucled-chat-input-container">
+                        <div class="deboucled-chat-input-wrapper">
+                            <textarea class="deboucled-chat-input" placeholder="Écrivez votre message..." rows="1"></textarea>
+                            <button class="deboucled-chat-send-btn">
+                                <svg class="deboucled-chat-send-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                                </svg>
+                                Envoyer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="deboucled-widget-tab-content" data-content="topics">
+                <div class="deboucled-floating-widget-topics" id="deboucled-floating-widget-topics">
+                    <div class="deboucled-floating-widget-topics-container"></div>
+                    <div class="deboucled-floating-widget-topics-loader" style="display: none;">
+                        <div class="deboucled-loading-text">Chargement...</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -51,7 +87,15 @@ function createDecensuredFloatingWidget() {
 
     setupFloatingWidgetEvents();
 
-    loadFloatingWidgetTopics();
+    // Initialize chat by default since it's the first tab
+    const chatEnabled = store.get(storage_optionEnableDecensuredChat, storage_optionEnableDecensuredChat_default);
+    if (chatEnabled) {
+        setTimeout(() => {
+            initializeDecensuredChat();
+        }, 500);
+    } else {
+        updateChatStatusWhenDisabled();
+    }
 
     return widget;
 }
@@ -94,15 +138,76 @@ function setupFloatingWidgetEvents() {
         refreshWidgetButton.addEventListener('click', (e) => {
             e.stopPropagation();
             refreshWidgetButton.classList.add('spinning');
-            loadFloatingWidgetTopics().finally(() => {
-                setTimeout(() => refreshWidgetButton.classList.remove('spinning'), 500);
-            });
+            const currentTab = document.querySelector('.deboucled-widget-tab.active')?.dataset.tab;
+
+            if (currentTab === 'topics') {
+                loadFloatingWidgetTopics().finally(() => {
+                    setTimeout(() => refreshWidgetButton.classList.remove('spinning'), 500);
+                });
+            } else if (currentTab === 'chat') {
+                const chatInstance = getDecensuredChatInstance();
+                if (chatInstance) {
+                    chatInstance.loadRecentMessages().finally(() => {
+                        setTimeout(() => refreshWidgetButton.classList.remove('spinning'), 500);
+                    });
+                } else {
+                    setTimeout(() => refreshWidgetButton.classList.remove('spinning'), 500);
+                }
+            }
         });
     }
+
+    // Setup tab switching
+    setupWidgetTabs();
 
     createFloatingWidgetOverlay();
 
     setupThemeToggleListener();
+}
+
+function setupWidgetTabs() {
+    const tabs = document.querySelectorAll('.deboucled-widget-tab');
+    const tabContents = document.querySelectorAll('.deboucled-widget-tab-content');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const tabName = tab.dataset.tab;
+
+            // Remove active class from all tabs
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(tc => tc.classList.remove('active'));
+
+            // Add active class to clicked tab
+            tab.classList.add('active');
+            const targetContent = document.querySelector(`.deboucled-widget-tab-content[data-content="${tabName}"]`);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+
+            // Handle tab-specific actions
+            if (tabName === 'chat') {
+                const chatEnabled = store.get(storage_optionEnableDecensuredChat, storage_optionEnableDecensuredChat_default);
+                if (!chatEnabled) {
+                    updateChatStatusWhenDisabled();
+                    return;
+                }
+
+                const chatInstance = getDecensuredChatInstance();
+                if (chatInstance) {
+                    chatInstance.setTabActive(true);
+                    chatInstance.scrollToBottom(false);
+                } else {
+                    initializeDecensuredChat();
+                }
+            } else if (tabName === 'topics') {
+                const chatInstance = getDecensuredChatInstance();
+                if (chatInstance) {
+                    chatInstance.setTabActive(false);
+                }
+            }
+        });
+    });
 }
 
 function createFloatingWidgetOverlay() {
@@ -140,6 +245,19 @@ function showFloatingWidget() {
 
     widget.classList.remove('hidden');
     widget.classList.add('visible');
+
+    // Supprimer le badge de la languette quand le widget s'ouvre
+    widget.classList.remove('has-unread');
+    widget.removeAttribute('data-unread-count');
+
+    // Si l'onglet Chat est actif, marquer les messages comme lus
+    const chatTab = document.querySelector('.deboucled-widget-tab[data-tab="chat"]');
+    if (chatTab && chatTab.classList.contains('active')) {
+        const chatInstance = getDecensuredChatInstance();
+        if (chatInstance) {
+            chatInstance.markMessagesAsRead();
+        }
+    }
 
     if (overlay) {
         overlay.classList.add('visible');
@@ -313,7 +431,7 @@ function showErrorState(container) {
 }
 
 function startFloatingWidgetMonitoring() {
-    if (!store.get(storage_optionDisplayDecensuredTopics, storage_optionDisplayDecensuredTopics_default)) {
+    if (!store.get(storage_optionDisplayDecensuredWidget, storage_optionDisplayDecensuredWidget_default)) {
         return;
     }
 
@@ -326,7 +444,7 @@ function startFloatingWidgetMonitoring() {
 }
 
 function toggleDecensuredFloatingWidget() {
-    const isEnabled = store.get(storage_optionDisplayDecensuredTopics, storage_optionDisplayDecensuredTopics_default);
+    const isEnabled = store.get(storage_optionDisplayDecensuredWidget, storage_optionDisplayDecensuredWidget_default);
 
     if (isEnabled) {
         if (!document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET)) {
@@ -338,5 +456,16 @@ function toggleDecensuredFloatingWidget() {
         if (widget) {
             widget.remove();
         }
+    }
+}
+
+function updateChatStatusWhenDisabled() {
+    const statusElement = document.querySelector('.deboucled-chat-status');
+    if (!statusElement) return;
+
+    statusElement.className = 'deboucled-chat-status disconnected';
+    const statusSpans = statusElement.querySelectorAll('span');
+    if (statusSpans.length > 1) {
+        statusSpans[1].textContent = 'Déconnecté';
     }
 }

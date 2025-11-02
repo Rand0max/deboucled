@@ -135,6 +135,17 @@ const DECENSURED_CONFIG = {
         ANIMATION_DURATION: 300
     },
 
+    // === CHAT CONFIGURATION ===
+    CHAT: {
+        MESSAGE_MAX_LENGTH: 1000,
+        MESSAGES_PER_LOAD: 50,
+        RECONNECT_MAX_ATTEMPTS: 10,
+        RECONNECT_BASE_DELAY: 3000, // 3 seconds
+        RECONNECT_MAX_DELAY: 30000, // 30 seconds
+        SCROLL_THRESHOLD: 50, // pixels from bottom to consider "at bottom"
+        TYPING_INDICATOR_DURATION: 3000 // 3 seconds
+    },
+
     // === TOPICS SPECIFIC CONFIGURATION ===
     TOPICS: {
         MIN_VALID_TOPIC_ID: 70000000,
