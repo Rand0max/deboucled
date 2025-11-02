@@ -141,4 +141,7 @@ const apiDecensuredTopicsByIdsUrl = `${decensuredApiUrl}/topic/ids`;
 const apiDecensuredTopicsPaginatedUrl = `${decensuredApiUrl}/topic`;
 const apiDecensuredStatsUrl = `${decensuredApiUrl}/stats/online`;
 const apiDecensuredUsersOnlineUrl = `${decensuredApiUrl}/users/online`;
+const apiDecensuredChatStreamUrl = `${decensuredApiUrl}/chat/stream`;
+const apiDecensuredChatMessageUrl = `${decensuredApiUrl}/chat/message`;
+const apiDecensuredChatMessagesUrl = `${decensuredApiUrl}/chat/messages`;
 

@@ -135,6 +135,7 @@ export default [
         Headers: 'readonly',
         Request: 'readonly',
         Response: 'readonly',
+        EventSource: 'readonly',
 
         // APIs Web modernes
         ResizeObserver: 'readonly',
@@ -179,6 +180,7 @@ export default [
       "decensured-topics.js",
       "decensured-messages.js",
       "decensured-ui.js",
+      "decensured-chat.js",
       "decensured-widget.js",
       "decensured-users.js",
       "decensured-posting.js",

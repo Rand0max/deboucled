@@ -538,3 +538,59 @@ async function checkDecensuredUsers(usernames) {
         return new Set();
     }
 }
+
+// Chat API
+
+async function sendChatMessage(username, userid, content, messageType = 'text', replyToMessageId = null) {
+    try {
+        const payload = {
+            username: username,
+            userid: userid,
+            message_content: content,
+            message_type: messageType
+        };
+
+        // Ajouter reply_to_message_id si présent
+        if (replyToMessageId) {
+            payload.reply_to_message_id = replyToMessageId;
+        }
+
+        const response = await fetchDecensuredApi(apiDecensuredChatMessageUrl, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        return response !== null;
+    } catch (error) {
+        logDecensuredError(error, 'sendChatMessage');
+        return false;
+    }
+}
+
+async function getChatMessages(limit = 50) {
+    try {
+        const response = await fetchDecensuredApi(`${apiDecensuredChatMessagesUrl}?limit=${limit}`, {
+            method: 'GET'
+        });
+
+        return Array.isArray(response) ? response : [];
+    } catch (error) {
+        logDecensuredError(error, 'getChatMessages');
+        return [];
+    }
+}
+
+function createChatEventSource(username) {
+    if (!username) {
+        console.error('[Chat] Username required for SSE connection');
+        return null;
+    }
+
+    try {
+        const url = `${apiDecensuredChatStreamUrl}?username=${encodeURIComponent(username)}`;
+        return new EventSource(url);
+    } catch (error) {
+        logDecensuredError(error, 'createChatEventSource');
+        return null;
+    }
+}

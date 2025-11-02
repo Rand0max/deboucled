@@ -89,23 +89,35 @@ function displayAnnouncement() {
     supportButton.classList.add('blinking');
 
     Swal.fire({
-        title: '<strong>Décensured est de retour !<strong>',
-        html: `<p>Après plus de trois ans d'absence, l'extension <b>anti-censure</b> fait son grand retour pour <b>pazifier une fois de plus Webedia</b> et sa clique de dictateurs de la pensée.</p><p><b><a href="https://jvflux.fr/D%C3%A9censured" target="_blank">Décensured</a></b> a été nativement intégré à Déboucled pour atteindre un plus grand nombre d'utilisateurs, et ainsi en finir avec la censure sur ce forum.</p><p>D'autres fonctionnalités arriveront au fur et à mesure, soyez patients les clés (<i>pas 3 ans, promis</i>).<p/><p>Pour toute question n'hésitez pas à envoyer un email ou créer une <i>Issue</i> sur <a href="${deboucledRepositoryUrl}" target="_blank">GitHub</a>.</p><img src="https://image.noelshack.com/fichiers/2022/22/7/1654433573-cavillax.png" alt="paz" width="133" height="100"></img>`,
-        icon: 'info',
+        title: '<strong>Nouveau : Live Chat Décensured ! 💬<strong>',
+        html: `<p>Une nouvelle fonctionnalité majeure arrive dans <b>Déboucled</b> : le <b>chat en temps réel</b> !</p>
+        <p>🚀 <b>Communiquez instantanément</b> avec les autres utilisateurs Décensured directement depuis le forum, sans avoir besoin de créer un topic.</p>
+        <p>✨ <b>Fonctionnalités :</b></p>
+        <ul style="text-align: left; margin: 0 auto; display: inline-block;">
+            <li>💬 Messages en temps réel</li>
+            <li>🎨 Formatage riche (liens, stickers, smileys...)</li>
+            <li>🔔 Notifications de nouveaux messages</li>
+            <li>📋 Widget regroupant Chat & Topics récents</li>
+            <li>👥 Voir qui est connecté en temps réel</li>
+        </ul><br/><br/>
+        <p>Le chat est accessible via le widget flottant en bas à droite de la page. Vous pouvez l'activer/désactiver dans les paramètres Décensured.</p>
+        <p><i>N.B : Cette fonctionnalité est en version bêta, n'hésitez pas à reporter les bugs sur <a href="${deboucledRepositoryUrl}/issues" target="_blank">GitHub</a>.</i></p>
+        <img src="https://image.noelshack.com/fichiers/2022/22/7/1654433573-cavillax.png" alt="paz" width="133" height="100"></img>`,
+        icon: 'success',
         showDenyButton: true,
-        confirmButtonText: 'Paz sur Webedia',
-        denyButtonText: 'Ent',
+        confirmButtonText: '🎉 Découvrir le chat',
+        denyButtonText: 'Plus tard',
         footer: '<a href="mailto:rand0max@protonmail.com">Nous contacter</a>',
         customClass: {
             confirmButton: 'deboucled-bold'
         },
     }).then((result) => {
         if (result.isConfirmed) {
-            window.open(`https://www.buymeacoffee.com/jvcdeboucled`, '_blank').focus();
+            const widget = document.querySelector('.deboucled-floating-widget');
+            if (widget && !widget.classList.contains('visible')) {
+                showFloatingWidget();
+            }
         }
-        // else if (result.isDenied) {
-        //     window.open('https://youtu.be/KkxZfUlNlDo', '_blank').focus();
-        // }
     });
 }
 

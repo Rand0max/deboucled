@@ -367,6 +367,57 @@ function formatMessageContent(rawText) {
     return formatParagraphs(text);
 }
 
+function highlightChatMentions(text, currentUser) {
+    if (!text) return text;
+
+    // Regex pour les mentions : @username (3-15 caractères)    
+    // eslint-disable-next-line no-useless-escape
+    return text.replace(/@([a-zA-Z0-9\-_\[\]]{3,15})/g, (match, username, offset) => {
+        // Ne pas formater si dans une URL ou un lien déjà formaté
+        const beforeMatch = text.substring(Math.max(0, offset - 50), offset);
+        if (beforeMatch.match(/https?:\/\/[^\s<>"']*$/) || beforeMatch.includes('href="')) {
+            return match;
+        }
+
+        // Vérifier si c'est l'utilisateur courant (case-insensitive)
+        const isCurrentUser = currentUser && username.toLowerCase() === currentUser.toLowerCase();
+        const className = isCurrentUser ? 'deboucled-chat-mention mention-me' : 'deboucled-chat-mention';
+
+        return `<span class="${className}" data-username="${escapeHtml(username)}">${match}</span>`;
+    });
+}
+
+function formatChatMessageContent(rawText, currentUser = null) {
+    if (!rawText) return '';
+
+    let text = rawText;
+
+    // Formatage JVC simple (sans spoilers, blockquotes, listes)
+    text = formatJvcBold(text);
+    text = formatJvcItalic(text);
+    text = formatJvcUnderline(text);
+    text = formatJvcStrikethrough(text);
+    text = formatJvcCode(text);
+
+    // Formatage Markdown simple (sans spoilers, codeblocks)
+    text = formatInlineCode(text);
+    text = formatBoldAndItalicText(text);
+    text = formatStrikethrough(text);
+
+    // Images et liens
+    text = formatImages(text);
+    text = formatLinks(text);
+    text = formatSmileys(text);
+
+    // Surligner les mentions
+    text = highlightChatMentions(text, currentUser);
+
+    // Remplacer les retours à la ligne simples par des <br>
+    text = text.replace(/\n/g, '<br>');
+
+    return text;
+}
+
 function initializeSpoilerHandlers(container) {
     if (!container) return;
 
