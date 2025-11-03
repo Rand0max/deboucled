@@ -966,9 +966,10 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
 .deboucled-floating-widget {
   position: fixed;
   z-index: 10000;
-  width: 350px;
+  width: 500px;
+  max-width: 100vw;
   height: 70%;
-  right: -350px;
+  right: -500px;
   top: 50%;
   transform: translateY(-50%);
   background: #ffffff;
@@ -1413,6 +1414,27 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
 .deboucled-floating-widget-overlay.visible {
   opacity: 1;
   visibility: visible;
+}
+
+/* Widget responsive sur mobile */
+@media (max-width: 768px) {
+  .deboucled-floating-widget {
+    width: 100vw;
+    right: -100vw;
+    height: 70vh;
+    max-height: 70vh;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 0;
+  }
+
+  .deboucled-floating-widget::before {
+    left: -30px;
+  }
+
+  .deboucled-floating-widget::after {
+    left: -36px;
+  }
 }
 
 @media (max-width: 999px) {
@@ -4351,6 +4373,32 @@ body.dark .deboucled-loading-text::after {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
+.deboucled-chat-message.deboucled-team-message {
+  background: linear-gradient(135deg, #fff5e6 0%, #ffe4cc 100%);
+  border-left-color: #ff8c00;
+  border-left-width: 4px;
+  box-shadow: 0 2px 6px rgba(255, 140, 0, 0.15);
+}
+
+.deboucled-floating-widget.dark-theme
+  .deboucled-chat-message.deboucled-team-message {
+  background: linear-gradient(135deg, #2a2416 0%, #3a3020 100%);
+  border-left-color: #ffa500;
+  box-shadow: 0 2px 6px rgba(255, 165, 0, 0.25);
+}
+
+.deboucled-chat-message.deboucled-team-message
+  .deboucled-chat-message-username {
+  color: #ff8c00;
+  font-weight: 700;
+}
+
+.deboucled-floating-widget.dark-theme
+  .deboucled-chat-message.deboucled-team-message
+  .deboucled-chat-message-username {
+  color: #ffa500;
+}
+
 @keyframes slide-in-message {
   from {
     opacity: 0;
@@ -4647,6 +4695,7 @@ body.dark .deboucled-loading-text::after {
 .deboucled-chat-input-wrapper {
   display: flex;
   gap: 8px;
+  align-items: center;
 }
 
 .deboucled-chat-input {
@@ -4715,6 +4764,56 @@ body.dark .deboucled-loading-text::after {
   background: #ccc;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+/* RisiBank button */
+.deboucled-chat-risibank-btn {
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  transition: filter 0.2s;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.deboucled-chat-risibank-btn:hover {
+  filter: brightness(1.2);
+}
+
+.deboucled-chat-risibank-btn:active {
+  transform: scale(0.98);
+}
+
+.deboucled-chat-risibank-btn img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* RisiBank container */
+.deboucled-chat-risibank-container {
+  border-top: 1px solid #e0e0e0;
+  background: #fafafa;
+  max-height: 300px;
+  overflow: hidden;
+}
+
+.deboucled-floating-widget.dark-theme .deboucled-chat-risibank-container {
+  border-top-color: #404040;
+  background: #1a1a1a;
+}
+
+#deboucled-risibank-embed {
+  width: 100%;
+  height: 185px;
 }
 
 .deboucled-floating-widget.dark-theme .deboucled-chat-send-btn {

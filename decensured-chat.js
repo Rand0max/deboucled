@@ -30,6 +30,9 @@ class DecensuredChat {
         this.originalTitle = document.title; // Titre original de la page
         this.lastReadMessageId = null; // ID du dernier message lu
         this.storageKey = 'decensured_chat_unread'; // Clé localStorage
+        this.isManualScrolling = false; // Flag pour empêcher l'auto-scroll pendant un scroll manuel
+        this.risiBankInstance = null; // Instance RisiBank
+        this.risiBankEnabled = false; // RisiBank userscript détecté
     }
 
     async initialize() {
@@ -41,6 +44,7 @@ class DecensuredChat {
         this.setupDOM();
         await this.loadRecentMessages();
         this.loadUnreadState(); // Charger l'état des messages non lus
+        this.setupRisiBank(); // Configurer RisiBank si disponible
         this.connect();
         this.setupEventListeners();
 
@@ -53,7 +57,6 @@ class DecensuredChat {
         this.sendButton = document.querySelector('.deboucled-chat-send-btn');
         this.statusElement = document.querySelector('.deboucled-chat-status');
 
-        // Créer l'indicateur "En réponse à..." au-dessus de l'input
         this.createReplyIndicator();
     }
 
@@ -75,6 +78,101 @@ class DecensuredChat {
         cancelBtn.addEventListener('click', () => this.cancelReply());
 
         inputContainer.insertBefore(replyIndicator, inputContainer.firstChild);
+    }
+
+    setupRisiBank() {
+        if (!document.querySelector('button.risibank-toggle') || typeof window.RisiBank === 'undefined') {
+            console.log('[Chat] RisiBank non disponible');
+            return;
+        }
+
+        console.log('[Chat] RisiBank détecté, intégration du bouton');
+        this.risiBankEnabled = true;
+        this.createRisiBankButton();
+    }
+
+    createRisiBankButton() {
+        const inputWrapper = document.querySelector('.deboucled-chat-input-wrapper');
+        if (!inputWrapper || inputWrapper.querySelector('.deboucled-chat-risibank-btn')) return;
+
+        const risiBankBtn = document.createElement('button');
+        risiBankBtn.className = 'deboucled-chat-risibank-btn';
+        risiBankBtn.type = 'button';
+        risiBankBtn.title = 'RisiBank';
+        risiBankBtn.innerHTML = `
+            <img src="https://risibank.fr/logo.png" width="18" height="18" style="vertical-align: baseline;">
+        `;
+
+        risiBankBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.toggleRisiBank();
+        });
+
+        const sendBtn = inputWrapper.querySelector('.deboucled-chat-send-btn');
+        if (sendBtn) {
+            inputWrapper.insertBefore(risiBankBtn, sendBtn);
+        }
+    }
+
+    toggleRisiBank() {
+        const container = document.querySelector('.deboucled-chat-risibank-container');
+
+        if (!container) {
+            this.initializeRisiBank();
+            return;
+        }
+
+        const isVisible = container.style.display !== 'none';
+        container.style.display = isVisible ? 'none' : 'block';
+
+        if (isVisible && this.risiBankInstance) {
+            this.risiBankInstance = null;
+            container.querySelector('#deboucled-risibank-embed').innerHTML = '';
+        } else if (!isVisible && !this.risiBankInstance) {
+            this.initializeRisiBank();
+        }
+    }
+
+    initializeRisiBank() {
+        let embedContainer = document.getElementById('deboucled-risibank-embed');
+
+        if (!embedContainer) {
+            const chatContainer = document.querySelector('.deboucled-chat-container');
+            if (!chatContainer) return;
+
+            const risiBankContainer = document.createElement('div');
+            risiBankContainer.className = 'deboucled-chat-risibank-container';
+            risiBankContainer.innerHTML = '<div id="deboucled-risibank-embed"></div>';
+
+            const inputContainer = document.querySelector('.deboucled-chat-input-container');
+            if (inputContainer) {
+                chatContainer.insertBefore(risiBankContainer, inputContainer);
+            }
+
+            embedContainer = document.getElementById('deboucled-risibank-embed');
+        }
+
+        if (!embedContainer || !window.RisiBank) return;
+
+        try {
+            this.risiBankInstance = window.RisiBank.activate({
+                type: 'iframe',
+                container: embedContainer,
+                theme: preferDarkTheme() ? 'dark' : 'light',
+                defaultTab: 'top',
+                mediaSize: 'sm',
+                navbarSize: 'sm',
+                allowUsernameSelection: false,
+                showNSFW: true,
+                showCopyButton: false,
+                onSelectMedia: (media) => {
+                    window.RisiBank.Actions.addSourceImageLink('.deboucled-chat-input')(media);
+                    this.toggleRisiBank();
+                }
+            });
+        } catch (error) {
+            console.error('[Chat] Erreur lors de l\'initialisation de RisiBank:', error);
+        }
     }
 
     setReplyTo(message) {
@@ -203,7 +301,6 @@ class DecensuredChat {
             }
 
             this.eventSource.onopen = () => {
-                console.log('[Chat] SSE connected');
                 this.isConnecting = false;
                 this.isConnected = true;
                 this.reconnectAttempts = 0;
@@ -300,18 +397,16 @@ class DecensuredChat {
     }
 
     showMentionNotification(message) {
-        // Notification visuelle pour les mentions
         if (!this.debugMode && (this.isTabActive && !document.hidden)) return; // Pas de notification si déjà actif (sauf en mode debug)
 
-        console.log(`[Chat] 🔔 ${this.debugMode ? '[DEBUG MODE] ' : ''}Vous avez été mentionné par ${message.sender_full_username || message.sender_username}`);
+        if (this.debugMode)
+            console.log(`[Chat] 🔔 ${this.debugMode ? '[DEBUG MODE] ' : ''}Vous avez été mentionné par ${message.sender_full_username || message.sender_username}`);
 
-        // Marquer qu'on a une notification de mention et incrémenter le compteur
         this.hasMentionNotification = true;
         this.mentionCount++;
         this.updateUnreadBadge();
         this.saveUnreadState();
 
-        // On pourrait ajouter une notification système ici si désiré
         this.updateBrowserNotification();
     }
 
@@ -326,7 +421,6 @@ class DecensuredChat {
             return;
         }
 
-        // Vérifier le throttle - empêcher l'envoi trop rapide de messages
         const now = Date.now();
         const timeSinceLastMessage = now - this.lastSentMessageTime;
 
@@ -335,36 +429,27 @@ class DecensuredChat {
             return;
         }
 
-        // Disable send button temporarily
         if (this.sendButton) {
             this.sendButton.disabled = true;
         }
 
         try {
-            // Ajouter le reply_to_message_id si on répond à un message
             const replyToId = this.replyToMessageId || null;
-
             const success = await sendChatMessage(username, userId, content, 'text', replyToId);
 
             if (success) {
-                // Mettre à jour le timestamp du dernier message envoyé
                 this.lastSentMessageTime = now;
 
-                // Clear input
                 if (this.inputElement) {
                     this.inputElement.value = '';
                     this.inputElement.style.height = 'auto';
                 }
 
-                // Annuler la réponse après l'envoi
                 this.cancelReply();
 
-                // Scroll to bottom immediately after sending
                 setTimeout(() => {
                     this.scrollToBottom(true);
                 }, 100);
-
-                // Message will be received via SSE
             } else {
                 console.error('[Chat] Failed to send message');
                 addAlertbox('error', 'Erreur lors de l\'envoi du message');
@@ -449,6 +534,10 @@ class DecensuredChat {
         messageEl.className = 'deboucled-chat-message';
         messageEl.setAttribute('data-message-id', message.id);
 
+        if (message.sender_username && deboucledPseudos.includes(message.sender_username.toLowerCase())) {
+            messageEl.classList.add('deboucled-team-message');
+        }
+
         if (message.message_type === 'system') {
             messageEl.classList.add('system');
             messageEl.innerHTML = `<div class="deboucled-chat-message-content">${escapeHtml(message.message_content)}</div>`;
@@ -523,6 +612,9 @@ class DecensuredChat {
     scrollToMessage(messageId) {
         const targetMessage = this.messageContainer.querySelector(`[data-message-id="${messageId}"]`);
         if (targetMessage) {
+            // Bloquer l'auto-scroll pendant le scroll manuel
+            this.isManualScrolling = true;
+
             targetMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
             // Animation de highlight temporaire
@@ -530,6 +622,11 @@ class DecensuredChat {
             setTimeout(() => {
                 targetMessage.style.backgroundColor = '';
             }, 2000);
+
+            // Débloquer après l'animation du scroll (1 seconde pour smooth scroll)
+            setTimeout(() => {
+                this.isManualScrolling = false;
+            }, 1000);
         } else {
             console.log('[Chat] Message cité non trouvé dans la liste');
         }
@@ -644,6 +741,11 @@ class DecensuredChat {
     scrollToBottom(smooth = true) {
         if (!this.messageContainer) return;
 
+        // Ne pas scroller si un scroll manuel est en cours
+        if (this.isManualScrolling) {
+            return;
+        }
+
         this.messageContainer.scrollTo({
             top: this.messageContainer.scrollHeight,
             behavior: smooth ? 'smooth' : 'auto'
@@ -679,13 +781,13 @@ class DecensuredChat {
         this.unreadCount = 0;
         this.hasMentionNotification = false;
         this.mentionCount = 0;
-        
+
         // Sauvegarder le dernier message lu
         if (this.messages.length > 0) {
             this.lastReadMessageId = this.messages[this.messages.length - 1].id;
             this.saveUnreadState();
         }
-        
+
         this.updateUnreadBadge();
         this.restorePageTitle();
     }
@@ -731,11 +833,6 @@ class DecensuredChat {
         }
     }
 
-    playNotificationSound() {
-        // Optional: play a subtle notification sound
-        // Can be implemented later if desired
-    }
-
     updateBrowserNotification() {
         // Ne modifier le titre que pour les mentions/citations et si l'onglet n'est pas visible
         if (document.hidden || !this.isTabActive) {
@@ -765,48 +862,48 @@ class DecensuredChat {
 
             const storageKey = `${this.storageKey}_${username}`;
             const saved = localStorage.getItem(storageKey);
-            
+
             if (saved) {
                 const data = JSON.parse(saved);
                 this.lastReadMessageId = data.lastReadMessageId;
-                
+
                 // Calculer le nombre de messages non lus
                 if (this.lastReadMessageId && this.messages.length > 0) {
                     const lastReadIndex = this.messages.findIndex(m => m.id === this.lastReadMessageId);
-                    
+
                     if (lastReadIndex !== -1) {
                         // Compter les messages après le dernier lu
                         const unreadMessages = this.messages.slice(lastReadIndex + 1);
                         this.unreadCount = unreadMessages.filter(m => {
                             return m.sender_username.toLowerCase() !== username.toLowerCase();
                         }).length;
-                        
+
                         // Vérifier s'il y a des mentions dans les messages non lus
                         const currentUserLower = username.toLowerCase();
                         const hasMention = unreadMessages.some(m => {
                             const mentionRegex = new RegExp(`@${currentUserLower}\\b`, 'i');
-                            return mentionRegex.test(m.message_content) || 
-                                   (m.reply_to_message_id && this.messages.find(orig => 
-                                       orig.id === m.reply_to_message_id && 
-                                       orig.sender_username.toLowerCase() === currentUserLower
-                                   ));
+                            return mentionRegex.test(m.message_content) ||
+                                (m.reply_to_message_id && this.messages.find(orig =>
+                                    orig.id === m.reply_to_message_id &&
+                                    orig.sender_username.toLowerCase() === currentUserLower
+                                ));
                         });
-                        
+
                         if (hasMention) {
                             this.hasMentionNotification = true;
                             // Compter le nombre de mentions/citations
                             this.mentionCount = unreadMessages.filter(m => {
                                 const mentionRegex = new RegExp(`@${currentUserLower}\\b`, 'i');
-                                return mentionRegex.test(m.message_content) || 
-                                       (m.reply_to_message_id && this.messages.find(orig => 
-                                           orig.id === m.reply_to_message_id && 
-                                           orig.sender_username.toLowerCase() === currentUserLower
-                                       ));
+                                return mentionRegex.test(m.message_content) ||
+                                    (m.reply_to_message_id && this.messages.find(orig =>
+                                        orig.id === m.reply_to_message_id &&
+                                        orig.sender_username.toLowerCase() === currentUserLower
+                                    ));
                             }).length;
                         }
-                        
+
                         this.updateUnreadBadge();
-                        
+
                         if (this.mentionCount > 0) {
                             this.updateBrowserNotification();
                         }
@@ -828,7 +925,7 @@ class DecensuredChat {
                 lastReadMessageId: this.lastReadMessageId,
                 timestamp: Date.now()
             };
-            
+
             localStorage.setItem(storageKey, JSON.stringify(data));
         } catch (error) {
             console.error('[Chat] Failed to save unread state:', error);
@@ -838,10 +935,8 @@ class DecensuredChat {
     destroy() {
         this.disconnect();
 
-        // Restaurer le titre de la page
         this.restorePageTitle();
 
-        // Clean up event listeners
         if (this.inputElement) {
             this.inputElement.replaceWith(this.inputElement.cloneNode(true));
         }

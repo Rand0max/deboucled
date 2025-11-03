@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.71.3] (03/10/2025)
+
+- Intégration de Risibank dans le Chat Décensured (Rand0max)
+- Corrections mineures Chat Décensured (Rand0max)
+
 ## [2.71.2] (03/10/2025)
 
 - Corrections mineures Décensured (Rand0max)

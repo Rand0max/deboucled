@@ -129,7 +129,7 @@ function setupFloatingWidgetEvents() {
         widgetElem.addEventListener('mouseleave', () => {
             hoverTimeout = setTimeout(() => {
                 hideFloatingWidget();
-            }, DECENSURED_CONFIG.ANIMATION_DELAY);
+            }, DECENSURED_CONFIG.ANIMATION_FADE_DELAY);
         });
     }
 
@@ -504,12 +504,12 @@ function updateChatStatusWhenNotAuthenticated() {
     // Désactiver l'input et le bouton d'envoi
     const inputElement = document.querySelector('.deboucled-chat-input');
     const sendButton = document.querySelector('.deboucled-chat-send-btn');
-    
+
     if (inputElement) {
         inputElement.disabled = true;
         inputElement.placeholder = 'Connexion requise...';
     }
-    
+
     if (sendButton) {
         sendButton.disabled = true;
     }
