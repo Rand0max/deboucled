@@ -4419,6 +4419,35 @@ body.dark .deboucled-loading-text::after {
   gap: 8px;
 }
 
+.deboucled-chat-message-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid #21a0d3;
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-font-smoothing: subpixel-antialiased;
+  image-rendering: auto;
+}
+
+.deboucled-floating-widget.dark-theme .deboucled-chat-message-avatar {
+  border-color: #4fb3d4;
+}
+
+.deboucled-chat-message.deboucled-team-message .deboucled-chat-message-avatar {
+  border-color: #ff8c00;
+}
+
+.deboucled-floating-widget.dark-theme
+  .deboucled-chat-message.deboucled-team-message
+  .deboucled-chat-message-avatar {
+  border-color: #ffa500;
+}
+
 .deboucled-chat-message-username {
   font-weight: 600;
   color: #21a0d3;

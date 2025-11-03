@@ -76,7 +76,6 @@ async function createAndShowUsersModal(users, totalCount) {
                 const userAvatar = document.createElement('img');
                 userAvatar.className = 'deboucled-user-avatar';
                 userAvatar.src = defaultAvatarUrl;
-                userAvatar.alt = user.username;
                 userAvatar.setAttribute('onerror', `this.onerror=null; this.src='${defaultAvatarUrl}';`);
 
                 getAuthorAvatarUrl(user.username.toLowerCase(), userLink.href).then(avatarUrl => {

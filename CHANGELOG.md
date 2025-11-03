@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.71.4] (03/10/2025)
+
+- Affichage des avatars dans le Chat Décensured (Rand0max)
+- Correction d'un bug sur le scroll dans le Chat Décensured (Rand0max)
+
 ## [2.71.3] (03/10/2025)
 
 - Intégration de Risibank dans le Chat Décensured (Rand0max)

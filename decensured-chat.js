@@ -639,6 +639,14 @@ class DecensuredChat {
         const content = formatChatMessageContent(message.message_content, currentUser);
         const profileUrl = `https://www.jeuxvideo.com/profil/${encodeURIComponent(message.sender_username.toLowerCase())}?mode=infos`;
 
+        const optionDisplayTopicAvatar = store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default);
+        let avatarHtml = '';
+
+        if (optionDisplayTopicAvatar) {
+            const avatarUrl = await getAuthorAvatarUrl(message.sender_username.toLowerCase(), profileUrl) || defaultAvatarUrl;
+            avatarHtml = `<img class="deboucled-chat-message-avatar" src="${avatarUrl}" onerror="this.onerror=null; this.src='${defaultAvatarUrl}';">`;
+        }
+
         let html = '';
 
         // Afficher la citation si le message répond à un autre message
@@ -649,6 +657,7 @@ class DecensuredChat {
 
         html += `
             <div class="deboucled-chat-message-header">
+                ${avatarHtml}
                 <a href="${profileUrl}" class="deboucled-chat-message-username" data-username="${escapeHtml(message.sender_username)}" target="_blank" rel="noopener noreferrer" title="Voir le profil de ${escapeHtml(message.sender_username)}">${username}</a>
                 <span class="deboucled-chat-message-time">${time}</span>
             </div>

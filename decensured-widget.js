@@ -115,9 +115,22 @@ function setupFloatingWidgetEvents() {
 
     let hoverTimeout;
 
-    widgetElem.addEventListener('click', () => {
-        clearTimeout(hoverTimeout);
-        showFloatingWidget();
+    // Gérer le clic uniquement sur la languette (::before), pas sur le contenu
+    widgetElem.addEventListener('click', (e) => {
+        // Si le widget est déjà visible, ne rien faire (éviter de scroller à chaque clic)
+        if (widgetElem.classList.contains('visible')) {
+            return;
+        }
+
+        // Vérifier si le clic est sur la languette (partie gauche du widget quand il est fermé)
+        const rect = widgetElem.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+
+        // La languette fait environ 40px de large
+        if (clickX < 40) {
+            clearTimeout(hoverTimeout);
+            showFloatingWidget();
+        }
     });
 
     if (window.innerWidth > 950) { // not smartphone
