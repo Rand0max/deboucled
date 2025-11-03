@@ -90,10 +90,14 @@ function createDecensuredFloatingWidget() {
 
     setupFloatingWidgetEvents();
 
-    // Initialize based on chat enabled setting
+    // Initialize based on chat enabled setting and authentication
     if (chatEnabled) {
-        setTimeout(() => {
-            initializeDecensuredChat();
+        setTimeout(async () => {
+            const chatInstance = await initializeDecensuredChat();
+            // Si l'initialisation échoue (pas authentifié), afficher le message approprié
+            if (!chatInstance) {
+                updateChatStatusWhenNotAuthenticated();
+            }
         }, 500);
     } else {
         updateChatStatusWhenDisabled();
@@ -252,12 +256,16 @@ function showFloatingWidget() {
     widget.classList.remove('has-unread');
     widget.removeAttribute('data-unread-count');
 
-    // Si l'onglet Chat est actif, marquer les messages comme lus
+    // Si l'onglet Chat est actif, marquer les messages comme lus et scroller en bas
     const chatTab = document.querySelector('.deboucled-widget-tab[data-tab="chat"]');
     if (chatTab && chatTab.classList.contains('active')) {
         const chatInstance = getDecensuredChatInstance();
         if (chatInstance) {
             chatInstance.markMessagesAsRead();
+            // Scroller en bas du chat après un court délai pour que le DOM soit bien rendu
+            setTimeout(() => {
+                chatInstance.scrollToBottom(false);
+            }, 100);
         }
     }
 
@@ -469,5 +477,40 @@ function updateChatStatusWhenDisabled() {
     const statusSpans = statusElement.querySelectorAll('span');
     if (statusSpans.length > 1) {
         statusSpans[1].textContent = 'Déconnecté';
+    }
+}
+
+function updateChatStatusWhenNotAuthenticated() {
+    const statusElement = document.querySelector('.deboucled-chat-status');
+    const messageContainer = document.querySelector('.deboucled-chat-messages');
+
+    if (statusElement) {
+        statusElement.className = 'deboucled-chat-status disconnected';
+        const statusSpans = statusElement.querySelectorAll('span');
+        if (statusSpans.length > 1) {
+            statusSpans[1].textContent = 'Déconnecté';
+        }
+    }
+
+    if (messageContainer) {
+        messageContainer.innerHTML = `
+            <div class="deboucled-chat-empty">
+                <div class="deboucled-chat-empty-icon">🔒</div>
+                <div>Vous devez être connecté à votre compte JVC pour utiliser le chat.</div>
+            </div>
+        `;
+    }
+
+    // Désactiver l'input et le bouton d'envoi
+    const inputElement = document.querySelector('.deboucled-chat-input');
+    const sendButton = document.querySelector('.deboucled-chat-send-btn');
+    
+    if (inputElement) {
+        inputElement.disabled = true;
+        inputElement.placeholder = 'Connexion requise...';
+    }
+    
+    if (sendButton) {
+        sendButton.disabled = true;
     }
 }

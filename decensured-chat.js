@@ -28,6 +28,8 @@ class DecensuredChat {
         this.lastSentMessageTime = 0; // Timestamp du dernier message envoyé
         this.messageCooldown = 2000; // Cooldown entre les messages (2 secondes)
         this.originalTitle = document.title; // Titre original de la page
+        this.lastReadMessageId = null; // ID du dernier message lu
+        this.storageKey = 'decensured_chat_unread'; // Clé localStorage
     }
 
     async initialize() {
@@ -38,6 +40,7 @@ class DecensuredChat {
 
         this.setupDOM();
         await this.loadRecentMessages();
+        this.loadUnreadState(); // Charger l'état des messages non lus
         this.connect();
         this.setupEventListeners();
 
@@ -306,6 +309,7 @@ class DecensuredChat {
         this.hasMentionNotification = true;
         this.mentionCount++;
         this.updateUnreadBadge();
+        this.saveUnreadState();
 
         // On pourrait ajouter une notification système ici si désiré
         this.updateBrowserNotification();
@@ -668,12 +672,20 @@ class DecensuredChat {
 
         this.unreadCount++;
         this.updateUnreadBadge();
+        this.saveUnreadState();
     }
 
     markMessagesAsRead() {
         this.unreadCount = 0;
         this.hasMentionNotification = false;
         this.mentionCount = 0;
+        
+        // Sauvegarder le dernier message lu
+        if (this.messages.length > 0) {
+            this.lastReadMessageId = this.messages[this.messages.length - 1].id;
+            this.saveUnreadState();
+        }
+        
         this.updateUnreadBadge();
         this.restorePageTitle();
     }
@@ -746,6 +758,83 @@ class DecensuredChat {
         }
     }
 
+    loadUnreadState() {
+        try {
+            const username = getCurrentUserPseudo();
+            if (!username) return;
+
+            const storageKey = `${this.storageKey}_${username}`;
+            const saved = localStorage.getItem(storageKey);
+            
+            if (saved) {
+                const data = JSON.parse(saved);
+                this.lastReadMessageId = data.lastReadMessageId;
+                
+                // Calculer le nombre de messages non lus
+                if (this.lastReadMessageId && this.messages.length > 0) {
+                    const lastReadIndex = this.messages.findIndex(m => m.id === this.lastReadMessageId);
+                    
+                    if (lastReadIndex !== -1) {
+                        // Compter les messages après le dernier lu
+                        const unreadMessages = this.messages.slice(lastReadIndex + 1);
+                        this.unreadCount = unreadMessages.filter(m => {
+                            return m.sender_username.toLowerCase() !== username.toLowerCase();
+                        }).length;
+                        
+                        // Vérifier s'il y a des mentions dans les messages non lus
+                        const currentUserLower = username.toLowerCase();
+                        const hasMention = unreadMessages.some(m => {
+                            const mentionRegex = new RegExp(`@${currentUserLower}\\b`, 'i');
+                            return mentionRegex.test(m.message_content) || 
+                                   (m.reply_to_message_id && this.messages.find(orig => 
+                                       orig.id === m.reply_to_message_id && 
+                                       orig.sender_username.toLowerCase() === currentUserLower
+                                   ));
+                        });
+                        
+                        if (hasMention) {
+                            this.hasMentionNotification = true;
+                            // Compter le nombre de mentions/citations
+                            this.mentionCount = unreadMessages.filter(m => {
+                                const mentionRegex = new RegExp(`@${currentUserLower}\\b`, 'i');
+                                return mentionRegex.test(m.message_content) || 
+                                       (m.reply_to_message_id && this.messages.find(orig => 
+                                           orig.id === m.reply_to_message_id && 
+                                           orig.sender_username.toLowerCase() === currentUserLower
+                                       ));
+                            }).length;
+                        }
+                        
+                        this.updateUnreadBadge();
+                        
+                        if (this.mentionCount > 0) {
+                            this.updateBrowserNotification();
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('[Chat] Failed to load unread state:', error);
+        }
+    }
+
+    saveUnreadState() {
+        try {
+            const username = getCurrentUserPseudo();
+            if (!username) return;
+
+            const storageKey = `${this.storageKey}_${username}`;
+            const data = {
+                lastReadMessageId: this.lastReadMessageId,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem(storageKey, JSON.stringify(data));
+        } catch (error) {
+            console.error('[Chat] Failed to save unread state:', error);
+        }
+    }
+
     destroy() {
         this.disconnect();
 
@@ -777,7 +866,7 @@ async function initializeDecensuredChat() {
     }
 
     decensuredChatInstance = new DecensuredChat();
-    decensuredChatInstance.debugMode = true;
+    //decensuredChatInstance.debugMode = true;
     const success = await decensuredChatInstance.initialize();
 
     if (!success) {

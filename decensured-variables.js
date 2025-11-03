@@ -40,7 +40,7 @@ const topicDecensuredState = {
 const DECENSURED_CONFIG = {
     // === TIMING CONFIGURATION ===
     INIT_DELAY: 1000,
-    RETRY_TIMEOUT: 10 * 60 * 1000, // 10 minutes
+    RETRY_TIMEOUT: 7 * 60 * 1000, // 7 minutes
     POST_TIMEOUT: 40000,
     USERS_REFRESH_INTERVAL: 4 * 60 * 1000, // 4 minutes
     STATS_CACHE_DURATION: 4 * 60 * 1000, // 4 minutes

@@ -1,6 +1,14 @@
 # Changelog Déboucled
 
-## [2.71.0] (31/10/2025)
+## [2.71.2] (03/10/2025)
+
+- Corrections mineures Décensured (Rand0max)
+
+## [2.71.1] (02/10/2025)
+
+- Correction fichier manquant Décensured (Rand0max)
+
+## [2.71.0] (01/10/2025)
 
 - Système de messagerie instantanée pour les utilisateurs Décensured (Rand0max)
 - Widget flottant avec onglets Topics/Chat (Rand0max)

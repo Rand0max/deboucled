@@ -4751,7 +4751,7 @@ body.dark .deboucled-loading-text::after {
 }
 
 .deboucled-chat-empty-icon {
-  font-size: 48px;
+  font-size: 25px;
   opacity: 0.3;
 }
 

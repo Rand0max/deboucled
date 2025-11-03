@@ -138,10 +138,11 @@ async function pingDecensuredApi(forceUpdate = false) {
         }
 
         const lastFailure = await store.get(storage_deboucled_decensuredPingFailures, 0);
-        const timeSinceFailure = now - lastFailure;
-
-        if (timeSinceFailure < DECENSURED_CONFIG.RETRY_TIMEOUT) {
-            return;
+        if (lastFailure > 0) {
+            const timeSinceFailure = now - lastFailure;
+            if (timeSinceFailure < DECENSURED_CONFIG.RETRY_TIMEOUT) {
+                return;
+            }
         }
     }
 
