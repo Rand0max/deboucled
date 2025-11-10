@@ -548,6 +548,7 @@ class DecensuredChat {
                 messageEl.innerHTML = html;
                 this.attachReplyButton(messageEl, message);
                 this.attachQuoteClickHandler(messageEl);
+                embedVideos(messageEl, '', 400, 300);
             });
             this.messageContainer.appendChild(messageEl);
         } else {
@@ -555,6 +556,7 @@ class DecensuredChat {
                 messageEl.innerHTML = html;
                 this.attachReplyButton(messageEl, message);
                 this.attachQuoteClickHandler(messageEl);
+                embedVideos(messageEl, '', 400, 300);
             });
             this.messageContainer.appendChild(messageEl);
         }

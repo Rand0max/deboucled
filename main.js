@@ -532,7 +532,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     embedVocaroo(messageContent);
 
     if (messageOptions.optionEmbedVideos) {
-        embedStreamable(messageContent);
+        embedVideos(messageContent);
         embedYoutube(messageContent);
     }
 

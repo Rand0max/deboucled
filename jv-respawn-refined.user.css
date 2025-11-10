@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.4.4
+@version        1.4.5
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -205,7 +205,6 @@
   }
   .modal-generic-mode,
   .modal-generic-overflow,
-  .modal-generic,
   #newsletter-app {
     display: none !important;
   }

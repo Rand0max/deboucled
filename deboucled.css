@@ -1134,6 +1134,7 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
   color: #333333;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .deboucled-floating-widget.dark-theme .deboucled-floating-widget-content {

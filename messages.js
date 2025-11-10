@@ -466,13 +466,13 @@ function embedZupimages(messageContent) {
     });
 }
 
-function embedStreamable(messageContent) {
+function embedVideos(messageContent, selectorPrefix = 'div > p > ', maxWidth = 730, maxHeight = 700) {
     if (!messageContent) return;
 
     function createAndInsertVideo(anchor, videoUrl, type) {
         const video = document.createElement('video');
         video.controls = true;
-        video.style = "width:100%; height:auto; max-width:730px; max-height:700px; display:block; margin:0 auto;";
+        video.style = `width:100%; height:auto; max-width:${maxWidth}px; max-height:${maxHeight}px; display:block; margin:0 auto;`;
 
         const source = document.createElement('source');
         source.src = videoUrl;
@@ -487,11 +487,11 @@ function embedStreamable(messageContent) {
         iframe.src = videoUrl;
         iframe.frameBorder = '0';
         iframe.allowFullscreen = true;
-        iframe.style = 'width: 100%; height: auto; max-width: 730px; max-height: 700px; min-height: 500px; display: block; margin: 0px auto;';
+        iframe.style = `width: 100%; height: auto; max-width: ${maxWidth}px; max-height: ${maxHeight}px; min-height: ${Math.min(maxHeight * 0.7, 500)}px; display: block; margin: 0px auto;`;
         anchor.insertAdjacentElement('afterend', iframe);
     }
 
-    messageContent.querySelectorAll('div > p > a[href*="streamable.com"]').forEach(a => {
+    messageContent.querySelectorAll(`${selectorPrefix}a[href*="streamable.com"]`).forEach(a => {
         const url = a.href;
         const match = url.match(/^https:\/\/streamable\.com\/(?<id>.*)$/, 'i');
         if (!match) return;
@@ -499,7 +499,7 @@ function embedStreamable(messageContent) {
         createAndInsertIframe(a, videoUrl);
     });
 
-    messageContent.querySelectorAll('div > p > a[href*="webmshare.com"]').forEach(a => {
+    messageContent.querySelectorAll(`${selectorPrefix}a[href*="webmshare.com"]`).forEach(a => {
         const url = a.href;
         const match = url.match(/https:\/\/webmshare\.com\/(?:play\/)?(?<id>[\w]+)/i);
         if (!match) return;
@@ -507,11 +507,11 @@ function embedStreamable(messageContent) {
         createAndInsertVideo(a, videoUrl, 'video/webm');
     });
 
-    messageContent.querySelectorAll('div > p > a[href*=".mp4"]').forEach(a => {
+    messageContent.querySelectorAll(`${selectorPrefix}a[href*=".mp4"]`).forEach(a => {
         createAndInsertVideo(a, a.href, 'video/mp4');
     });
 
-    messageContent.querySelectorAll('div > p > a[href*=".webm"]').forEach(a => {
+    messageContent.querySelectorAll(`${selectorPrefix}a[href*=".webm"]`).forEach(a => {
         createAndInsertVideo(a, a.href, 'video/webm');
     });
 }

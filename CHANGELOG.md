@@ -1,6 +1,11 @@
 # Changelog Déboucled
 
-## [2.71.4] (03/10/2025)
+## [2.72.0] (10/11/2025)
+
+- Intégration des vidéos dans le Chat Décensured (Rand0max)
+- Correction bug css qui empêchait de DDB avec le thème actif (Rand0max)
+
+## [2.71.4] (04/10/2025)
 
 - Affichage des avatars dans le Chat Décensured (Rand0max)
 - Correction d'un bug sur le scroll dans le Chat Décensured (Rand0max)
