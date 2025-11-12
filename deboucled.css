@@ -5009,3 +5009,8 @@ body.dark .deboucled-loading-text::after {
     transform: translateY(-6px);
   }
 }
+
+.text-enrichi-forum .img-shack {
+  margin-right: -4px;
+  margin-bottom: -7px;
+}
