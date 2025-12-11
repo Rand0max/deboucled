@@ -144,4 +144,6 @@ const apiDecensuredUsersOnlineUrl = `${decensuredApiUrl}/users/online`;
 const apiDecensuredChatStreamUrl = `${decensuredApiUrl}/chat/stream`;
 const apiDecensuredChatMessageUrl = `${decensuredApiUrl}/chat/message`;
 const apiDecensuredChatMessagesUrl = `${decensuredApiUrl}/chat/messages`;
+const apiDecensuredChatTypingStartUrl = `${decensuredApiUrl}/chat/typing/start`;
+const apiDecensuredChatTypingStopUrl = `${decensuredApiUrl}/chat/typing/stop`;
 

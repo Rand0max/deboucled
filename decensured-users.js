@@ -60,8 +60,6 @@ async function createAndShowUsersModal(users, totalCount) {
 
         if (!userContainer) return;
 
-        const optionDisplayTopicAvatar = store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default);
-
         for (const user of usersToShow) {
             const userItem = document.createElement('div');
             userItem.className = 'deboucled-user-item';
@@ -72,22 +70,20 @@ async function createAndShowUsersModal(users, totalCount) {
             userLink.rel = 'noopener noreferrer';
             userLink.className = 'deboucled-user-pseudo';
 
-            if (optionDisplayTopicAvatar) {
-                const userAvatar = document.createElement('img');
-                userAvatar.className = 'deboucled-user-avatar';
-                userAvatar.src = defaultAvatarUrl;
-                userAvatar.setAttribute('onerror', `this.onerror=null; this.src='${defaultAvatarUrl}';`);
+            const userAvatar = document.createElement('img');
+            userAvatar.className = 'deboucled-user-avatar';
+            userAvatar.src = defaultAvatarUrl;
+            userAvatar.setAttribute('onerror', `this.onerror=null; this.src='${defaultAvatarUrl}';`);
 
-                getAuthorAvatarUrl(user.username.toLowerCase(), userLink.href).then(avatarUrl => {
-                    if (avatarUrl?.length) {
-                        userAvatar.src = avatarUrl;
-                    }
-                }).catch(() => {
-                    // En cas d'erreur, garde l'avatar par défaut
-                });
+            getAuthorAvatarUrl(user.username.toLowerCase(), userLink.href).then(avatarUrl => {
+                if (avatarUrl?.length) {
+                    userAvatar.src = avatarUrl;
+                }
+            }).catch(() => {
+                // En cas d'erreur, garde l'avatar par défaut
+            });
 
-                userLink.appendChild(userAvatar);
-            }
+            userLink.appendChild(userAvatar);
 
             const usernameSpan = document.createElement('span');
             usernameSpan.textContent = user.username;

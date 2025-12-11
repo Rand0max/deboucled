@@ -33,6 +33,10 @@ class DecensuredChat {
         this.isManualScrolling = false; // Flag pour empêcher l'auto-scroll pendant un scroll manuel
         this.risiBankInstance = null; // Instance RisiBank
         this.risiBankEnabled = false; // RisiBank userscript détecté
+        this.isTyping = false; // Flag pour savoir si on est en train de taper
+        this.typingDebounceTimer = null; // Timer pour debounce typing
+        this.typingStopTimer = null; // Timer pour auto-stop typing
+        this.typingUsers = new Map(); // Map des utilisateurs en train de taper
     }
 
     async initialize() {
@@ -58,6 +62,7 @@ class DecensuredChat {
         this.statusElement = document.querySelector('.deboucled-chat-status');
 
         this.createReplyIndicator();
+        this.createTypingIndicator();
     }
 
     createReplyIndicator() {
@@ -78,6 +83,79 @@ class DecensuredChat {
         cancelBtn.addEventListener('click', () => this.cancelReply());
 
         inputContainer.insertBefore(replyIndicator, inputContainer.firstChild);
+    }
+
+    createTypingIndicator() {
+        const messagesContainer = document.querySelector('.deboucled-chat-messages');
+        if (!messagesContainer || document.querySelector('.deboucled-chat-typing-indicator')) return;
+
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'deboucled-chat-typing-indicator';
+        typingIndicator.style.display = 'none';
+        typingIndicator.innerHTML = `
+            <div class="deboucled-chat-typing-dots">
+                <span></span><span></span><span></span>
+            </div>
+            <span class="deboucled-chat-typing-text"></span>
+        `;
+
+        messagesContainer.parentElement.insertBefore(typingIndicator, messagesContainer.nextSibling);
+    }
+
+    updateTypingIndicator() {
+        const indicator = document.querySelector('.deboucled-chat-typing-indicator');
+        if (!indicator) return;
+
+        const currentUser = getCurrentUserPseudo()?.toLowerCase();
+        const typingUsernames = [...this.typingUsers.values()]
+            .filter(u => u.username !== currentUser)
+            .map(u => u.fullUsername);
+
+        if (typingUsernames.length === 0) {
+            indicator.style.display = 'none';
+            return;
+        }
+
+        const textEl = indicator.querySelector('.deboucled-chat-typing-text');
+        if (textEl) {
+            if (typingUsernames.length === 1) {
+                textEl.textContent = `${typingUsernames[0]} est en train d'écrire...`;
+            } else if (typingUsernames.length === 2) {
+                textEl.textContent = `${typingUsernames[0]} et ${typingUsernames[1]} sont en train d'écrire...`;
+            } else {
+                textEl.textContent = `${typingUsernames.length} personnes sont en train d'écrire...`;
+            }
+        }
+
+        indicator.style.display = 'flex';
+    }
+
+    handleTypingStart() {
+        if (this.isTyping) {
+            // Reset le timer de stop si on tape encore
+            clearTimeout(this.typingStopTimer);
+            this.typingStopTimer = setTimeout(() => this.handleTypingStop(), 3000);
+            return;
+        }
+
+        this.isTyping = true;
+        const username = getCurrentUserPseudo();
+        const fullUsername = userPseudo || username;
+
+        sendTypingStart(username, userId, fullUsername);
+
+        // Auto-stop après 3 secondes d'inactivité
+        this.typingStopTimer = setTimeout(() => this.handleTypingStop(), 3000);
+    }
+
+    handleTypingStop() {
+        if (!this.isTyping) return;
+
+        this.isTyping = false;
+        clearTimeout(this.typingStopTimer);
+
+        const username = getCurrentUserPseudo();
+        sendTypingStop(username, userId);
     }
 
     setupRisiBank() {
@@ -241,6 +319,14 @@ class DecensuredChat {
         this.inputElement.addEventListener('input', () => {
             this.inputElement.style.height = 'auto';
             this.inputElement.style.height = Math.min(this.inputElement.scrollHeight, 80) + 'px';
+
+            // Typing indicator
+            if (this.inputElement.value.trim().length > 0) {
+                clearTimeout(this.typingDebounceTimer);
+                this.typingDebounceTimer = setTimeout(() => this.handleTypingStart(), 100);
+            } else {
+                this.handleTypingStop();
+            }
         });
 
         // Scroll to bottom button
@@ -391,6 +477,23 @@ class DecensuredChat {
                 this.showMentionNotification(data.message);
                 break;
 
+            case 'typing_start':
+                if (data.message?.username) {
+                    this.typingUsers.set(data.message.username, {
+                        username: data.message.username,
+                        fullUsername: data.message.fullUsername || data.message.username
+                    });
+                    this.updateTypingIndicator();
+                }
+                break;
+
+            case 'typing_stop':
+                if (data.message?.username) {
+                    this.typingUsers.delete(data.message.username);
+                    this.updateTypingIndicator();
+                }
+                break;
+
             default:
                 console.log('[Chat] Unknown message type:', data.type);
         }
@@ -413,6 +516,8 @@ class DecensuredChat {
     async sendMessage() {
         const content = this.inputElement?.value.trim();
         if (!content || !this.isConnected) return;
+
+        this.handleTypingStop();
 
         const username = getCurrentUserPseudo();
 
@@ -641,16 +746,10 @@ class DecensuredChat {
         const content = formatChatMessageContent(message.message_content, currentUser);
         const profileUrl = `https://www.jeuxvideo.com/profil/${encodeURIComponent(message.sender_username.toLowerCase())}?mode=infos`;
 
-        const optionDisplayTopicAvatar = store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default);
-        let avatarHtml = '';
-
-        if (optionDisplayTopicAvatar) {
-            const avatarUrl = await getAuthorAvatarUrl(message.sender_username.toLowerCase(), profileUrl) || defaultAvatarUrl;
-            avatarHtml = `<img class="deboucled-chat-message-avatar" src="${avatarUrl}" onerror="this.onerror=null; this.src='${defaultAvatarUrl}';">`;
-        }
+        const avatarUrl = await getAuthorAvatarUrl(message.sender_username.toLowerCase(), profileUrl) || defaultAvatarUrl;
+        let avatarHtml = `<img class="deboucled-chat-message-avatar" src="${avatarUrl}" onerror="this.onerror=null; this.src='${defaultAvatarUrl}';">`;
 
         let html = '';
-
         // Afficher la citation si le message répond à un autre message
         if (message.reply_to_message_id) {
             const quotedHtml = await this.buildQuotedMessageHTML(message.reply_to_message_id);

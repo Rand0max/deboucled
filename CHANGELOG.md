@@ -1,5 +1,10 @@
 # Changelog Déboucled
 
+## [2.73.0] (11/12/2025)
+
+- Indicateur de frappe Chat Décensured (Rand0max)
+- Corrections mineures Chat Décensured (Rand0max)
+
 ## [2.72.0] (10/11/2025)
 
 - Intégration des vidéos dans le Chat Décensured (Rand0max)

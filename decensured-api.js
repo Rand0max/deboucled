@@ -595,3 +595,32 @@ function createChatEventSource(username) {
         return null;
     }
 }
+
+async function sendTypingStart(username, userid, fullUsername) {
+    try {
+        await fetchDecensuredApi(apiDecensuredChatTypingStartUrl, {
+            method: 'POST',
+            body: JSON.stringify({
+                username: username,
+                userid: userid,
+                full_username: fullUsername
+            })
+        });
+    } catch {
+        // Silently fail - typing indicator is not critical
+    }
+}
+
+async function sendTypingStop(username, userid) {
+    try {
+        await fetchDecensuredApi(apiDecensuredChatTypingStopUrl, {
+            method: 'POST',
+            body: JSON.stringify({
+                username: username,
+                userid: userid
+            })
+        });
+    } catch {
+        // Silently fail - typing indicator is not critical
+    }
+}
