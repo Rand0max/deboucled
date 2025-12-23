@@ -12,7 +12,7 @@ const entitySubject = 'subject';
 const entityAuthor = 'author';
 const entityTopicId = 'topicid';
 
-const jvarchiveUrl = 'https://jvarchive.st';
+const jvarchiveUrl = 'https://jvarchive.net';
 const avatarUseJvArchiveApi = true;
 
 const deboucledRepositoryUrl = 'https://github.com/Rand0max/deboucled';

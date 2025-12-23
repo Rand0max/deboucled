@@ -134,7 +134,7 @@ class DecensuredChat {
         if (this.isTyping) {
             // Reset le timer de stop si on tape encore
             clearTimeout(this.typingStopTimer);
-            this.typingStopTimer = setTimeout(() => this.handleTypingStop(), 3000);
+            this.typingStopTimer = setTimeout(() => this.handleTypingStop(), 10000);
             return;
         }
 
@@ -145,7 +145,7 @@ class DecensuredChat {
         sendTypingStart(username, userId, fullUsername);
 
         // Auto-stop après 3 secondes d'inactivité
-        this.typingStopTimer = setTimeout(() => this.handleTypingStop(), 3000);
+        this.typingStopTimer = setTimeout(() => this.handleTypingStop(), 10000);
     }
 
     handleTypingStop() {

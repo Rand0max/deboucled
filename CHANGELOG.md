@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.73.1] (23/12/2025)
+
+- Bascule sur le nouveau domaine jvarchive.net (Rand0max)
+- 
 ## [2.73.0] (11/12/2025)
 
 - Indicateur de frappe Chat Décensured (Rand0max)
