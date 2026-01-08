@@ -3879,7 +3879,7 @@ del {
 }
 
 .headerAccount--decensured .icon-people::before {
-  content: "\EA3F";
+  content: "\EA08";
   color: var(--jv-text-color);
 }
 

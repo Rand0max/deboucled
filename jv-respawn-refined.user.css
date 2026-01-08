@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           JV Respawn Refined
 @namespace      deboucledjvcom
-@version        1.4.5
+@version        1.4.6
 @description    JV Respawn Refined
 @author         Rand0max
 ==/UserStyle== */
@@ -76,7 +76,7 @@
     display: none;
   }
   .icon-topic-folder::before {
-    content: "";
+    content: "\EA76";
   }
   .layout__videoFooter {
     display: none;
