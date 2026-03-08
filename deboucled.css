@@ -396,7 +396,8 @@ blockquote .deboucled-highlighted {
   border: none;
   cursor: pointer;
   outline: none;
-  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -426,7 +427,8 @@ blockquote .deboucled-highlighted {
   margin: 5px 0;
   font-family: inherit;
   line-height: 1.4;
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
     max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -448,7 +450,8 @@ blockquote .deboucled-highlighted {
 .deboucled-decensured-content.deboucled-content-entered {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -492,7 +495,8 @@ blockquote .deboucled-highlighted {
 
 .deboucled-topic-decensured .topic-subject {
   margin-left: -4px !important;
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -545,7 +549,8 @@ blockquote .deboucled-highlighted {
   border-radius: 12px;
   margin-left: 8px;
   vertical-align: baseline;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 6px rgba(33, 160, 211, 0.3);
 }
@@ -565,7 +570,8 @@ blockquote .deboucled-highlighted {
 .deboucled-decensured-topic-indicator.deboucled-topic-indicator-entered {
   opacity: 1;
   transform: scale(1) translateX(0);
-  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -669,7 +675,9 @@ blockquote .deboucled-highlighted {
   font-size: 0.9em;
   line-height: 1.4;
   resize: vertical;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .deboucled-decensured-fake-message-input#deboucled-decensured-topic-real-title {
@@ -762,7 +770,9 @@ input.deboucled-decensured-fake-message-input {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
   white-space: nowrap;
 }
 
@@ -770,14 +780,18 @@ input.deboucled-decensured-fake-message-input {
   background: #e9ecef;
   border-color: #adb5bd;
   transform: scale(1.05);
-  transition: transform 0.2s ease, background-color 0.2s ease,
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
     border-color 0.2s ease;
 }
 
 .deboucled-dice-button:active {
   background: #dee2e6;
   transform: scale(0.95);
-  transition: transform 0.1s ease, background-color 0.2s ease,
+  transition:
+    transform 0.1s ease,
+    background-color 0.2s ease,
     border-color 0.2s ease;
 }
 
@@ -1037,7 +1051,9 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   opacity: 0;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
   z-index: 10002;
   pointer-events: none;
 }
@@ -1295,6 +1311,157 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
   color: #8dc9ff;
 }
 
+/* Messages tab */
+.deboucled-floating-widget-messages {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+}
+
+.deboucled-floating-widget-messages-container {
+  min-height: 100%;
+}
+
+.deboucled-floating-widget-messages-loader {
+  padding: 15px 20px;
+  text-align: center;
+  border-top: 1px solid #e5e5e5;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.deboucled-floating-widget.dark-theme
+  .deboucled-floating-widget-messages-loader {
+  border-top-color: #404040;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.deboucled-floating-widget-message {
+  padding: 10px 20px;
+  border-bottom: 1px solid #e5e5e5;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.deboucled-floating-widget.dark-theme .deboucled-floating-widget-message {
+  border-bottom: 1px solid #404040;
+}
+
+.deboucled-floating-widget-message:last-child {
+  border-bottom: none;
+}
+
+.deboucled-floating-widget-message:hover {
+  background: rgba(33, 160, 211, 0.08);
+}
+
+.deboucled-floating-widget-message-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.deboucled-floating-widget-message-icon {
+  flex-shrink: 0;
+}
+
+.deboucled-floating-widget-message-time {
+  margin-left: auto;
+}
+
+.deboucled-floating-widget-message-author {
+  font-weight: 600;
+  color: #21a0d3;
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.2s ease;
+}
+
+.deboucled-floating-widget.dark-theme
+  .deboucled-floating-widget-message-author {
+  color: #4fb3d4;
+}
+
+.deboucled-floating-widget-message-author:hover {
+  color: #1a8bb8;
+  text-decoration: underline;
+}
+
+.deboucled-floating-widget.dark-theme
+  .deboucled-floating-widget-message-author:hover {
+  color: #6bc5e8;
+  text-decoration: underline;
+}
+
+.deboucled-floating-widget-message-time {
+  font-size: 11px;
+  color: #21a0d3;
+  font-weight: 600;
+  background: rgba(33, 160, 211, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.deboucled-floating-widget-message-content {
+  margin-bottom: 6px;
+}
+
+.deboucled-floating-widget-message-text {
+  font-size: 13px;
+  color: #333333;
+  line-height: 1.5;
+  text-decoration: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.deboucled-floating-widget.dark-theme .deboucled-floating-widget-message-text {
+  color: #d0d0d0;
+  font-weight: 600;
+}
+
+.deboucled-floating-widget-message-text:hover {
+  color: #1a8bb8;
+}
+
+.deboucled-floating-widget.dark-theme
+  .deboucled-floating-widget-message-text:hover {
+  color: #4fb3d4;
+}
+
+.deboucled-floating-widget-message-footer {
+  margin-top: 4px;
+}
+
+.deboucled-floating-widget-message-topic {
+  font-size: 12px;
+  color: #888;
+  text-decoration: none;
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.deboucled-floating-widget.dark-theme .deboucled-floating-widget-message-topic {
+  color: #777;
+}
+
+.deboucled-floating-widget-message-topic:hover {
+  color: #21a0d3;
+}
+
+.deboucled-floating-widget.dark-theme
+  .deboucled-floating-widget-message-topic:hover {
+  color: #4fb3d4;
+}
+
 .deboucled-floating-widget-empty {
   text-align: center;
   color: #888;
@@ -1409,7 +1576,9 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
   z-index: 9999;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
 }
 
 .deboucled-floating-widget-overlay.visible {
@@ -1463,7 +1632,8 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
 .text-enrichi-forum p,
 .message-content div,
 .text-enrichi-forum div {
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
     max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
@@ -1538,7 +1708,9 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
   margin: 15px 10px 0px 0;
 }
 .deboucled-setting-impexp-message {
-  font: bold 11px/100% arial, sans-serif;
+  font:
+    bold 11px/100% arial,
+    sans-serif;
   color: rgba(180, 0, 0, 0.9);
   pointer-events: none;
   user-select: none;
@@ -2582,7 +2754,9 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
 .deboucled-author-button-delete-key,
 .deboucled-topicid-button-delete-key {
   color: var(--deboucled-entity-delete-text-color);
-  font: 14px/100% arial, sans-serif;
+  font:
+    14px/100% arial,
+    sans-serif;
   text-decoration: none;
   text-shadow: var(--deboucled-entity-delete-text-shadow);
   background: 0 0;
@@ -2800,8 +2974,11 @@ input[type="search"] {
   text-align: center;
   white-space: nowrap;
   border-radius: 0.375rem;
-  transition: color 0.15s ease-in-out 0s, background-color 0.15s ease-in-out 0s,
-    border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+  transition:
+    color 0.15s ease-in-out 0s,
+    background-color 0.15s ease-in-out 0s,
+    border-color 0.15s ease-in-out 0s,
+    box-shadow 0.15s ease-in-out 0s;
   margin: 0 5px;
   user-select: none;
   cursor: pointer;
@@ -3103,7 +3280,8 @@ input[type="search"] {
   cursor: pointer;
 }
 .deboucled-svg-refresh #deboucled-refresh-logo {
-  transition: transform 800ms cubic-bezier(0.17, 0.67, 0.36, 1.04) 0s,
+  transition:
+    transform 800ms cubic-bezier(0.17, 0.67, 0.36, 1.04) 0s,
     opacity 250ms ease 0s;
   transform-origin: center center 0px;
   color: var(--deboucled-text-color);
@@ -3384,7 +3562,9 @@ select.deboucled-dropdown {
   overflow: hidden;
   border-radius: 0.3em;
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
-  box-shadow: 0 0 1px 0 black inset, 0 0 1px 0 black;
+  box-shadow:
+    0 0 1px 0 black inset,
+    0 0 1px 0 black;
 }
 select.deboucled-dropdown {
   width: 100%;
@@ -3699,7 +3879,10 @@ select.deboucled-dropdown::-ms-expand {
   align-items: center;
   gap: 8px;
   animation: deboucledSlideInRight 0.3s ease-out;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
   line-height: 1.4;
 }
 

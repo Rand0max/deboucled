@@ -139,6 +139,7 @@ const apiDecensuredCreateTopicUrl = `${decensuredApiUrl}/topic/create`;
 const apiDecensuredTopicByIdUrl = `${decensuredApiUrl}/topic/id`;
 const apiDecensuredTopicsByIdsUrl = `${decensuredApiUrl}/topic/ids`;
 const apiDecensuredTopicsPaginatedUrl = `${decensuredApiUrl}/topic`;
+const apiDecensuredLatestMessagesUrl = `${decensuredApiUrl}/message/latest`;
 const apiDecensuredStatsUrl = `${decensuredApiUrl}/stats/online`;
 const apiDecensuredUsersOnlineUrl = `${decensuredApiUrl}/users/online`;
 const apiDecensuredChatStreamUrl = `${decensuredApiUrl}/chat/stream`;

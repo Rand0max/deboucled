@@ -511,6 +511,21 @@ async function getDecensuredTopicsPaginated(limit, offset) {
     }
 }
 
+async function getDecensuredLatestMessages(limit = 15, offset = 0) {
+    try {
+        const response = await fetchDecensuredApi(`${apiDecensuredLatestMessagesUrl}/${limit}/${offset}`);
+
+        if (!response || !Array.isArray(response)) {
+            return [];
+        }
+
+        return response;
+    } catch (error) {
+        logDecensuredError(error, 'getDecensuredLatestMessages');
+        return [];
+    }
+}
+
 async function checkDecensuredUsers(usernames) {
     if (!usernames || usernames.length === 0) return new Set();
 

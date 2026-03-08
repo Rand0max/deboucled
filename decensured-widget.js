@@ -41,6 +41,9 @@ function createDecensuredFloatingWidget() {
             <button class="deboucled-widget-tab ${defaultTab === 'topics' ? 'active' : ''}" data-tab="topics">
                 📋 Topics
             </button>
+            <button class="deboucled-widget-tab" data-tab="messages">
+                📝 Messages
+            </button>
         </div>
         <div class="deboucled-floating-widget-content">
             <div class="deboucled-floating-widget-loading">
@@ -75,6 +78,14 @@ function createDecensuredFloatingWidget() {
                 <div class="deboucled-floating-widget-topics" id="deboucled-floating-widget-topics">
                     <div class="deboucled-floating-widget-topics-container"></div>
                     <div class="deboucled-floating-widget-topics-loader" style="display: none;">
+                        <div class="deboucled-loading-text">Chargement...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="deboucled-widget-tab-content" data-content="messages">
+                <div class="deboucled-floating-widget-messages" id="deboucled-floating-widget-messages">
+                    <div class="deboucled-floating-widget-messages-container"></div>
+                    <div class="deboucled-floating-widget-messages-loader" style="display: none;">
                         <div class="deboucled-loading-text">Chargement...</div>
                     </div>
                 </div>
@@ -172,6 +183,10 @@ function setupFloatingWidgetEvents() {
                 } else {
                     setTimeout(() => refreshWidgetButton.classList.remove('spinning'), 500);
                 }
+            } else if (currentTab === 'messages') {
+                loadFloatingWidgetMessages().finally(() => {
+                    setTimeout(() => refreshWidgetButton.classList.remove('spinning'), 500);
+                });
             }
         });
     }
@@ -224,6 +239,12 @@ function setupWidgetTabs() {
                 if (chatInstance) {
                     chatInstance.setTabActive(false);
                 }
+            } else if (tabName === 'messages') {
+                const chatInstance = getDecensuredChatInstance();
+                if (chatInstance) {
+                    chatInstance.setTabActive(false);
+                }
+                loadFloatingWidgetMessages();
             }
         });
     });
@@ -449,6 +470,170 @@ function showErrorState(container) {
             <i class="icon-warning"></i>
             <span>Erreur de chargement</span>
             <button onclick="loadFloatingWidgetTopics()">Réessayer</button>
+        </div>
+    `;
+}
+
+async function loadFloatingWidgetMessages() {
+    const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
+    if (!widget || !widget.classList.contains('visible')) return;
+    initializeFloatingWidgetMessagesScroll();
+}
+
+function initializeFloatingWidgetMessagesScroll() {
+    const messagesContainer = document.getElementById('deboucled-floating-widget-messages');
+    const messagesListContainer = messagesContainer?.querySelector('.deboucled-floating-widget-messages-container');
+    const loadingContainer = document.querySelector('.deboucled-floating-widget-loading');
+    const loader = messagesContainer?.querySelector('.deboucled-floating-widget-messages-loader');
+    const refreshButton = document.getElementById('deboucled-floating-widget-refresh');
+
+    if (!messagesContainer || !messagesListContainer) return;
+
+    messagesListContainer.innerHTML = '';
+    let currentPage = 0;
+    let isLoading = false;
+    let hasMoreMessages = true;
+
+    if (refreshButton) refreshButton.disabled = true;
+
+    async function loadMoreMessages() {
+        if (isLoading || !hasMoreMessages) return;
+
+        isLoading = true;
+        const isFirstLoad = currentPage === 0;
+
+        if (isFirstLoad && loadingContainer) {
+            loadingContainer.classList.add('active');
+        } else if (loader) {
+            loader.style.display = 'block';
+        }
+
+        try {
+            const offset = currentPage * DECENSURED_CONFIG.FLOATING_WIDGET.MESSAGES_PER_PAGE;
+            const messages = await getDecensuredLatestMessages(
+                DECENSURED_CONFIG.FLOATING_WIDGET.MESSAGES_PER_PAGE,
+                offset
+            );
+
+            if (messages.length === 0) {
+                hasMoreMessages = false;
+                if (currentPage === 0) {
+                    showEmptyMessagesState(messagesListContainer);
+                }
+                return;
+            }
+
+            if (messages.length < DECENSURED_CONFIG.FLOATING_WIDGET.MESSAGES_PER_PAGE) {
+                hasMoreMessages = false;
+            }
+
+            appendMessagesToContainer(messagesListContainer, messages);
+            currentPage++;
+
+        } catch (error) {
+            logDecensuredError(error, 'loadMoreMessages - Erreur lors du chargement des messages');
+            if (currentPage === 0) {
+                showErrorMessagesState(messagesListContainer);
+            }
+            hasMoreMessages = false;
+        } finally {
+            isLoading = false;
+            if (isFirstLoad && loadingContainer) loadingContainer.classList.remove('active');
+            if (loader) loader.style.display = 'none';
+            if (refreshButton) refreshButton.disabled = false;
+        }
+    }
+
+    messagesContainer.addEventListener('scroll', () => {
+        if (isLoading || !hasMoreMessages) return;
+
+        const { scrollTop, scrollHeight, clientHeight } = messagesContainer;
+        const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+        const isNearBottom = scrollPercentage >= 0.8;
+
+        if (isNearBottom) loadMoreMessages();
+    });
+
+    loadMoreMessages();
+}
+
+function appendMessagesToContainer(container, messages) {
+    messages.forEach(message => {
+        const messageElement = createMessageElement(message);
+        container.appendChild(messageElement);
+    });
+}
+
+function cleanMessagePreview(text) {
+    if (!text) return '';
+    const cleaned = text
+        .split('\n')
+        .filter(line => !line.trimStart().startsWith('>'))
+        .join('\n')
+        .replace(/https?:\/\/\S+/g, '')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+    return cleaned || text.trim();
+}
+
+function createMessageElement(message) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'deboucled-floating-widget-message';
+    messageDiv.setAttribute('data-message-id', message.message_id);
+
+    const timeAgo = formatTimeAgo(message.creation_date);
+    const authorProfileUrl = `https://www.jeuxvideo.com/profil/${encodeURIComponent(message.message_username.toLowerCase())}?mode=infos`;
+    const messageUrl = userPseudo ? message.message_url : `${message.topic_url}#post_${message.message_id}`;
+
+    const realContent = cleanMessagePreview(message.message_real_content);
+    const truncatedContent = truncateText(realContent, 150);
+    const formattedContent = escapeHtml(truncatedContent);
+
+    const topicTitle = message.topic_title || 'Topic inconnu';
+    const topicUrl = message.topic_url || '#';
+
+    messageDiv.innerHTML = `
+        <div class="deboucled-floating-widget-message-header">
+            <i class="deboucled-decensured-topic-icon icon-topic-folder deboucled-floating-widget-message-icon" title="Message Décensured"></i>
+            <a href="${authorProfileUrl}" class="deboucled-floating-widget-message-author" target="_blank" rel="noopener noreferrer" title="Voir le profil de ${escapeHtml(message.message_username)}">${escapeHtml(message.message_username)}</a>
+            <span class="deboucled-floating-widget-message-time">${timeAgo}</span>
+        </div>
+        <div class="deboucled-floating-widget-message-content">
+            <a href="${messageUrl}" class="deboucled-floating-widget-message-text" target="_blank" rel="noopener noreferrer">${formattedContent}</a>
+        </div>
+        <div class="deboucled-floating-widget-message-footer">
+            <a href="${topicUrl}" class="deboucled-floating-widget-message-topic" target="_blank" rel="noopener noreferrer" title="${escapeHtml(topicTitle)}">
+                <strong>${escapeHtml(truncateText(topicTitle, 50))}</strong>
+            </a>
+        </div>
+    `;
+
+    return messageDiv;
+}
+
+function truncateText(text, maxLength) {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '…';
+}
+
+function showEmptyMessagesState(container) {
+    const emptyClass = preferDarkTheme() ? 'deboucled-floating-widget-empty dark-theme' : 'deboucled-floating-widget-empty';
+    container.innerHTML = `
+        <div class="${emptyClass}">
+            <i class="icon-info"></i>
+            <span>Aucun message Décensured récent</span>
+        </div>
+    `;
+}
+
+function showErrorMessagesState(container) {
+    const errorClass = preferDarkTheme() ? 'deboucled-floating-error dark-theme' : 'deboucled-floating-error';
+    container.innerHTML = `
+        <div class="${errorClass}">
+            <i class="icon-warning"></i>
+            <span>Erreur de chargement</span>
+            <button onclick="loadFloatingWidgetMessages()">Réessayer</button>
         </div>
     `;
 }
