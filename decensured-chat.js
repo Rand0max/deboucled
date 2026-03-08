@@ -494,6 +494,14 @@ class DecensuredChat {
                 }
                 break;
 
+            case 'new_topic':
+                handleNewTopicNotification();
+                break;
+
+            case 'new_message_decensured':
+                handleNewMessageDecensuredNotification();
+                break;
+
             default:
                 console.log('[Chat] Unknown message type:', data.type);
         }

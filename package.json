@@ -1,8 +1,8 @@
 {
   "type": "module",
   "devDependencies": {
-    "eslint": "^9.34.0",
-    "isomorphic-dompurify": "^2.26.0",
+    "eslint": "^9.39.4",
+    "isomorphic-dompurify": "^2.36.0",
     "marked": "^14.1.4"
   },
   "dependencies": {

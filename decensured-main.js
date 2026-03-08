@@ -47,4 +47,9 @@ async function initDecensured() {
     setupDynamicTopicHighlighting();
 
     await checkAndProcessNewTopic();
+
+    const currentPage = getCurrentPageType(window.location.pathname);
+    if (currentPage === 'singlemessage') {
+        await decryptMessages();
+    }
 }

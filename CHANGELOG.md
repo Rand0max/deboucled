@@ -1,5 +1,12 @@
 # Changelog Déboucled
 
+## [2.74.0] (08/03/2026)
+
+- Onglet Messages dans le widget Décensured (Rand0max)
+- Notifications en temps réel pour les nouveaux topics et messages Décensured (Rand0max)
+- Badges de notification sur les onglets Topics et Messages du widget (Rand0max)
+- Déchiffrage des "mono-mesages" Décensured (Rand0max)
+
 ## [2.73.2] (08/01/2026)
 
 - Correction des icones (Rand0max)

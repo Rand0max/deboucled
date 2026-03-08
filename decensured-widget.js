@@ -40,9 +40,11 @@ function createDecensuredFloatingWidget() {
             </button>
             <button class="deboucled-widget-tab ${defaultTab === 'topics' ? 'active' : ''}" data-tab="topics">
                 📋 Topics
+                <span class="notification-badge" style="display: none;">0</span>
             </button>
             <button class="deboucled-widget-tab" data-tab="messages">
                 📝 Messages
+                <span class="notification-badge" style="display: none;">0</span>
             </button>
         </div>
         <div class="deboucled-floating-widget-content">
@@ -239,11 +241,13 @@ function setupWidgetTabs() {
                 if (chatInstance) {
                     chatInstance.setTabActive(false);
                 }
+                clearWidgetTabBadge('topics');
             } else if (tabName === 'messages') {
                 const chatInstance = getDecensuredChatInstance();
                 if (chatInstance) {
                     chatInstance.setTabActive(false);
                 }
+                clearWidgetTabBadge('messages');
                 loadFloatingWidgetMessages();
             }
         });
@@ -301,6 +305,14 @@ function showFloatingWidget() {
                 chatInstance.scrollToBottom(false);
             }, 100);
         }
+    }
+
+    // Marquer les notifications comme lues pour l'onglet actif
+    const activeTab = document.querySelector('.deboucled-widget-tab.active')?.dataset.tab;
+    if (activeTab === 'topics') {
+        clearWidgetTabBadge('topics');
+    } else if (activeTab === 'messages') {
+        clearWidgetTabBadge('messages');
     }
 
     if (overlay) {
@@ -643,12 +655,83 @@ function startFloatingWidgetMonitoring() {
         return;
     }
 
+    // Garder le refresh des topics visibles
     setInterval(() => {
         const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
         if (widget && widget.classList.contains('visible') && widget.hasAttribute('data-loaded')) {
             debouncedLoadFloatingWidgetTopics();
         }
     }, DECENSURED_CONFIG.FLOATING_WIDGET.REFRESH_INTERVAL);
+}
+
+let _topicsUnreadCount = 0;
+let _messagesUnreadCount = 0;
+
+function handleNewTopicNotification() {
+    const activeTab = document.querySelector('.deboucled-widget-tab.active')?.dataset.tab;
+    const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
+    const isVisible = widget?.classList.contains('visible');
+
+    if (isVisible && activeTab === 'topics') return;
+
+    _topicsUnreadCount++;
+    updateWidgetTabBadge('topics', _topicsUnreadCount);
+    updateWidgetLanguetteBadge();
+}
+
+function handleNewMessageDecensuredNotification() {
+    const activeTab = document.querySelector('.deboucled-widget-tab.active')?.dataset.tab;
+    const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
+    const isVisible = widget?.classList.contains('visible');
+
+    if (isVisible && activeTab === 'messages') return;
+
+    _messagesUnreadCount++;
+    updateWidgetTabBadge('messages', _messagesUnreadCount);
+    updateWidgetLanguetteBadge();
+}
+
+function updateWidgetTabBadge(tabName, count) {
+    const badge = document.querySelector(`.deboucled-widget-tab[data-tab="${tabName}"] .notification-badge`);
+    if (!badge) return;
+
+    if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'block';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+function clearWidgetTabBadge(tabName) {
+    updateWidgetTabBadge(tabName, 0);
+    if (tabName === 'topics') _topicsUnreadCount = 0;
+    if (tabName === 'messages') _messagesUnreadCount = 0;
+    updateWidgetLanguetteBadge();
+}
+
+function updateWidgetLanguetteBadge() {
+    const widget = document.querySelector(DECENSURED_CONFIG.SELECTORS.DEBOUCLED_FLOATING_WIDGET);
+    if (!widget) return;
+
+    // Ne pas mettre à jour si le widget est visible
+    if (widget.classList.contains('visible')) return;
+
+    // Compter les badges topics + messages
+    const topicsBadge = document.querySelector('.deboucled-widget-tab[data-tab="topics"] .notification-badge');
+    const messagesBadge = document.querySelector('.deboucled-widget-tab[data-tab="messages"] .notification-badge');
+
+    const topicsCount = topicsBadge?.style.display !== 'none' ? parseInt(topicsBadge?.textContent) || 0 : 0;
+    const messagesCount = messagesBadge?.style.display !== 'none' ? parseInt(messagesBadge?.textContent) || 0 : 0;
+    const totalCount = topicsCount + messagesCount;
+
+    if (totalCount > 0) {
+        widget.setAttribute('data-unread-count', totalCount > 99 ? '99+' : totalCount);
+        widget.classList.add('has-unread');
+    } else {
+        widget.removeAttribute('data-unread-count');
+        widget.classList.remove('has-unread');
+    }
 }
 
 function toggleDecensuredFloatingWidget() {
