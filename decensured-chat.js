@@ -736,6 +736,7 @@ class DecensuredChat {
     }
 
     attachReactionUI(messageEl, message) {
+        if (!store.get(storage_optionEnableChatReactions, storage_optionEnableChatReactions_default)) return;
         const contentEl = messageEl.querySelector('.deboucled-chat-message-content');
         if (!contentEl) return;
 
@@ -743,32 +744,26 @@ class DecensuredChat {
         const reactionsBar = document.createElement('div');
         reactionsBar.className = 'deboucled-chat-reactions-bar';
         this.renderReactionsBar(reactionsBar, message);
-        contentEl.after(reactionsBar);
 
-        // Bouton pour ouvrir le picker (dans le header, à côté du reply)
-        const header = messageEl.querySelector('.deboucled-chat-message-header');
-        if (!header) return;
-
-        const reactionBtn = document.createElement('button');
-        reactionBtn.className = 'deboucled-chat-reaction-btn';
-        reactionBtn.innerHTML = '⚡';
-        reactionBtn.title = 'Réagir';
-        reactionBtn.onclick = (e) => {
+        // Bouton "ajouter réaction" Slack-style (toujours visible dans la barre)
+        const addBtn = document.createElement('button');
+        addBtn.className = 'deboucled-chat-reaction-add-btn';
+        addBtn.title = 'Ajouter une réaction';
+        addBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`;
+        addBtn.onclick = (e) => {
             e.stopPropagation();
             this.toggleReactionPicker(messageEl, message.id);
         };
-        header.appendChild(reactionBtn);
+        reactionsBar.appendChild(addBtn);
+
+        contentEl.after(reactionsBar);
     }
 
     renderReactionsBar(barEl, message) {
+        // Préserver le bouton add s'il existe
+        const existingAddBtn = barEl.querySelector('.deboucled-chat-reaction-add-btn');
         barEl.innerHTML = '';
         const reactions = message.reactions || [];
-        if (reactions.length === 0) {
-            barEl.style.display = 'none';
-            return;
-        }
-
-        barEl.style.display = 'flex';
         const currentUser = getCurrentUserPseudo()?.toLowerCase();
 
         for (const reaction of reactions) {
@@ -797,6 +792,9 @@ class DecensuredChat {
             };
             barEl.appendChild(badge);
         }
+
+        // Réinjecter le bouton add à la fin
+        if (existingAddBtn) barEl.appendChild(existingAddBtn);
     }
 
     toggleReactionPicker(messageEl, messageId) {
@@ -858,8 +856,8 @@ class DecensuredChat {
         document.body.appendChild(picker);
 
         // Positionner en fixed par rapport au bouton de réaction
-        const reactionBtn = messageEl.querySelector('.deboucled-chat-reaction-btn');
-        const btnRect = reactionBtn ? reactionBtn.getBoundingClientRect() : messageEl.getBoundingClientRect();
+        const addBtn = messageEl.querySelector('.deboucled-chat-reaction-add-btn');
+        const btnRect = addBtn ? addBtn.getBoundingClientRect() : messageEl.getBoundingClientRect();
         const pickerHeight = picker.offsetHeight;
         const pickerWidth = picker.offsetWidth;
         const spaceAbove = btnRect.top;

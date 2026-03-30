@@ -28,6 +28,14 @@ const apiCheckUpdateUrl = `${deboucledApiUrl}/checkupdate`;
 const apiUpdateUserUrl = `${deboucledApiUrl}/user`;
 const apiDiagnosticUrl = `${deboucledApiUrl}/diagnostic`;
 const apiMessageQuoteUrl = `${deboucledApiUrl}/message/quote`;
+const apiReactionsConfigUrl = `${deboucledApiUrl}/reactions/config`;
+const apiMessageReactionUrl = `${deboucledApiUrl}/message/reaction`;
+const apiMessageReactionsUrl = `${deboucledApiUrl}/message/reactions`;
+const apiMessageReactionsBulkUrl = `${deboucledApiUrl}/message/reactions/bulk`;
+
+let forumReactionEmojis = [];
+let forumReactionStickers = [];
+let forumReactionStickerMap = new Map();
 
 const checkUpdateExpire = TimeSpan.FromHours(1);
 const checkUpdateDeferredExpire = TimeSpan.FromDays(5);

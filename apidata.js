@@ -257,3 +257,67 @@ async function parseMessageQuotesData(forceUpdate) {
         { username: userPseudo.toLowerCase(), userid: userId }
     );
 }
+
+// ===================== Forum Message Reactions =====================
+
+async function loadForumReactionConfig() {
+    try {
+        const config = await fetchJson(apiReactionsConfigUrl, 5000);
+        if (config?.emojis) forumReactionEmojis = config.emojis;
+        if (config?.stickers) {
+            forumReactionStickers = config.stickers;
+            forumReactionStickerMap = new Map(config.stickers.map(s => [s.code, s]));
+        }
+        return config;
+    } catch (error) {
+        console.warn('[Reactions] Error loading config:', error);
+        return null;
+    }
+}
+
+async function toggleForumReaction(messageId, emoji) {
+    if (!userPseudo?.length || !userId) return null;
+    try {
+        const body = JSON.stringify({
+            message_id: String(messageId),
+            username: userPseudo.toLowerCase(),
+            userid: userId,
+            emoji: emoji
+        });
+        let res;
+        await GM.xmlHttpRequest({
+            method: 'POST',
+            url: apiMessageReactionUrl,
+            data: body,
+            headers: { 'Content-Type': 'application/json' },
+            onload: (response) => { res = response; },
+            onerror: (response) => { console.error('[Reactions] Toggle error:', response); }
+        });
+        if (res?.status === 200) return JSON.parse(res.responseText);
+        return null;
+    } catch (error) {
+        console.warn('[Reactions] Toggle error:', error);
+        return null;
+    }
+}
+
+async function getForumReactionsBulk(messageIds) {
+    if (!messageIds?.length) return {};
+    try {
+        const body = JSON.stringify({ message_ids: messageIds });
+        let res;
+        await GM.xmlHttpRequest({
+            method: 'POST',
+            url: apiMessageReactionsBulkUrl,
+            data: body,
+            headers: { 'Content-Type': 'application/json' },
+            onload: (response) => { res = response; },
+            onerror: (response) => { console.error('[Reactions] Bulk error:', response); }
+        });
+        if (res?.status === 200) return JSON.parse(res.responseText);
+        return {};
+    } catch (error) {
+        console.warn('[Reactions] Bulk error:', error);
+        return {};
+    }
+}

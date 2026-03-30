@@ -193,6 +193,7 @@ function buildSettingsPage() {
                 ${addToggleOption(`Intégrer <i>Twitter</i> ${twitterLogo} dans les messages`, storage_optionEmbedTwitter, storage_optionEmbedTwitter_default, 'Intègre automatiquement les miniatures de Tweet dans les messages. ⚠ Attention ⚠ certains bloqueurs de pub peuvent empêcher les tweets de s\'afficher.')}
                 ${addToggleOption(`Intégrer les vidéos dans les messages`, storage_optionEmbedVideos, storage_optionEmbedVideos_default, 'Intègre automatiquement les vidéos (Streamable, YouTube, etc) dans les messages.')}
                 ${addToggleOption(`Améliorer les <i>citations</i> ${quoteLogo} des messages`, storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default, 'Améliore les citations avec plusieurs fonctionnalités :\n\n• Insère le pseudo du message cité\n• Citer une partie des messages en sélectionnant le texte\n• Citer et suggérer des pseudos en écrivant avec l\'arobase @ (conditions : connecté et minimum 3 lettres)\n• Mettre en couleur les pseudos lorsqu\'ils sont cités')}
+                ${addToggleOption(`Activer les ☺ <i>réactions</i> sous les messages`, storage_optionEnableForumReactions, storage_optionEnableForumReactions_default, 'Affiche un bouton de réaction sous chaque message du forum permettant de réagir avec des emojis et des stickers.')}
             </table>`);
     }
     function addDecensuredSection(sectionIsActive) {
@@ -206,6 +207,7 @@ function buildSettingsPage() {
                 ${addToggleOption(`Activer les 📋 topics masqués`, storage_optionEnableDecensuredTopics, storage_optionEnableDecensuredTopics_default, 'Active la possibilité de créer des topics avec des messages masqués et de les mettre en évidence.', optionEnableDecensured, true)}
                 ${addToggleOption(`Afficher le widget 📑 flottant`, storage_optionDisplayDecensuredWidget, storage_optionDisplayDecensuredWidget_default, 'Affiche un widget flottant avec le chat en temps réel et les derniers topics Décensured créés.', optionEnableDecensured, true)}
                 ${addToggleOption(`Activer le 💬 chat en temps réel`, storage_optionEnableDecensuredChat, storage_optionEnableDecensuredChat_default, 'Active le chat en temps réel Décensured pour communiquer avec les autres utilisateurs en direct.', optionEnableDecensured, true)}
+                ${addToggleOption(`Activer les ☺ <i>réactions</i> du chat`, storage_optionEnableChatReactions, storage_optionEnableChatReactions_default, 'Affiche un bouton de réaction sous chaque message du chat permettant de réagir avec des emojis et des stickers.', optionEnableDecensured, true)}
                 ${addToggleOption(`Afficher le 👥 nombre de connectés`, storage_optionDisplayDecensuredUsersCount, storage_optionDisplayDecensuredUsersCount_default, 'Affiche dans le header le nombre d\'utilisateurs Décensured actuellement connectés.', optionEnableDecensured, true)}
                 ${addToggleOption(`Afficher les ${badgeLogo} utilisateurs Décensured`, storage_optionEnableDecensuredBadges, storage_optionEnableDecensuredBadges_default, 'Affiche un petit badge à côté du pseudo des utilisateurs qui utilisent aussi Déboucled pour les messages masqués.', optionEnableDecensured, true)}
             </table>`);
@@ -445,7 +447,8 @@ function addSettingEvents() {
             `${storage_optionDisplayDecensuredUsersCount}-container`,
             `${storage_optionDisplayDecensuredWidget}-container`,
             `${storage_optionEnableDecensuredTopics}-container`,
-            `${storage_optionEnableDecensuredChat}-container`
+            `${storage_optionEnableDecensuredChat}-container`,
+            `${storage_optionEnableChatReactions}-container`
         ];
 
         decensuredSubOptions.forEach(optionId => {
@@ -466,6 +469,8 @@ function addSettingEvents() {
         toggleDecensuredFloatingWidget();
     });
     addToggleEvent(storage_optionEnableDecensuredTopics);
+    addToggleEvent(storage_optionEnableChatReactions);
+    addToggleEvent(storage_optionEnableForumReactions);
     addToggleEvent(storage_optionEnableDecensuredChat, undefined, function () {
         const isEnabled = store.get(storage_optionEnableDecensuredChat, storage_optionEnableDecensuredChat_default);
         if (!isEnabled) {

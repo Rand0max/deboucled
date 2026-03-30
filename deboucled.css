@@ -5260,37 +5260,39 @@ body.dark .deboucled-loading-text::after {
 
 /* ===== Chat Reactions ===== */
 
-/* Reaction button in header (next to reply) */
-.deboucled-chat-reaction-btn {
+/* Bouton ajouter reaction Slack-style (toujours visible) */
+.deboucled-chat-reaction-add-btn {
   background: none;
-  border: none;
-  color: #999;
-  padding: 2px 4px;
-  border-radius: 50%;
+  border: 1px solid transparent;
+  color: #aaa;
+  padding: 2px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
-  font-size: 14px;
-  width: 27px;
-  height: 27px;
+  opacity: 0.5;
 }
 
-.deboucled-chat-message:hover .deboucled-chat-reaction-btn {
-  opacity: 0.6;
+.deboucled-chat-reaction-add-btn:hover {
+  opacity: 1;
+  color: #666;
+  background: rgba(0, 0, 0, 0.06);
+  border-color: #ddd;
 }
 
-.deboucled-chat-reaction-btn:hover {
-  opacity: 1 !important;
-  background: rgba(33, 160, 211, 0.1);
-  transform: scale(1.15);
+.deboucled-floating-widget.dark-theme .deboucled-chat-reaction-add-btn {
+  color: #666;
 }
 
-.deboucled-floating-widget.dark-theme .deboucled-chat-reaction-btn:hover {
-  background: rgba(79, 179, 212, 0.15);
+.deboucled-floating-widget.dark-theme .deboucled-chat-reaction-add-btn:hover {
+  color: #bbb;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #555;
 }
 
 /* Reactions bar under message content */
@@ -5298,7 +5300,8 @@ body.dark .deboucled-loading-text::after {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-top: 4px;
+  margin-top: 6px;
+  align-items: center;
 }
 
 /* Individual reaction badge */
@@ -5479,4 +5482,191 @@ body.dark .deboucled-loading-text::after {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+/* ===================== Forum Message Reactions ===================== */
+
+/* Bouton ajouter reaction Slack-style (toujours visible) */
+.deboucled-forum-reaction-add-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: #bbb;
+  padding: 2px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  opacity: 0.2;
+}
+
+.deboucled-forum-reaction-add-btn:hover {
+  opacity: 1;
+  color: #666;
+  background: rgba(0, 0, 0, 0.06);
+  border-color: #ddd;
+}
+
+/* Dark theme forum */
+.theme-dark .deboucled-forum-reaction-add-btn,
+[data-darkreader-scheme="dark"] .deboucled-forum-reaction-add-btn {
+  color: #666;
+}
+
+.theme-dark .deboucled-forum-reaction-add-btn:hover,
+[data-darkreader-scheme="dark"] .deboucled-forum-reaction-add-btn:hover {
+  color: #bbb;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #555;
+}
+
+/* Reactions bar under message */
+.deboucled-forum-reactions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding-top: 4px;
+  align-items: center;
+}
+
+/* Individual reaction badge */
+.deboucled-forum-reaction-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: #f5f5f5;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.4;
+  color: #333;
+}
+
+.deboucled-forum-reaction-badge:hover {
+  background: #e8e8e8;
+  border-color: #bbb;
+}
+
+.deboucled-forum-reaction-badge.own-reaction {
+  background: rgba(33, 160, 211, 0.1);
+  border-color: rgba(33, 160, 211, 0.4);
+  color: #1a8bb8;
+}
+
+.deboucled-forum-reaction-badge.own-reaction:hover {
+  background: rgba(33, 160, 211, 0.2);
+  border-color: rgba(33, 160, 211, 0.6);
+}
+
+.deboucled-forum-reaction-sticker-img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.deboucled-forum-reaction-badge.sticker-badge {
+  padding: 2px 6px;
+}
+
+/* Forum Reaction picker popup */
+.deboucled-forum-reaction-picker {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 6px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10001;
+  width: 400px;
+  animation: reaction-picker-in 0.15s ease;
+}
+
+.deboucled-forum-reaction-picker.dark-theme {
+  background: #2a2a2a;
+  border-color: #444;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.deboucled-forum-reaction-picker-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.deboucled-forum-reaction-picker-separator {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 4px 0;
+}
+
+.deboucled-forum-reaction-picker.dark-theme .deboucled-forum-reaction-picker-separator {
+  background: #444;
+}
+
+.deboucled-forum-reaction-picker-emoji {
+  background: none;
+  border: none;
+  font-size: 22px;
+  padding: 4px 5px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.12s ease;
+  line-height: 1;
+}
+
+.deboucled-forum-reaction-picker-emoji:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: scale(1.25);
+}
+
+.deboucled-forum-reaction-picker.dark-theme .deboucled-forum-reaction-picker-emoji:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.deboucled-forum-reaction-picker-stickers {
+  max-height: 180px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.deboucled-forum-reaction-picker-sticker {
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.12s ease;
+  line-height: 0;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deboucled-forum-reaction-picker-sticker img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.deboucled-forum-reaction-picker-sticker:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: scale(1.15);
+}
+
+.deboucled-forum-reaction-picker.dark-theme .deboucled-forum-reaction-picker-sticker:hover {
+  background: rgba(255, 255, 255, 0.1);
 }

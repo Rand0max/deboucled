@@ -817,3 +817,207 @@ async function setHdAvatars() {
         }
     });
 }
+
+// ===================== Forum Message Reactions =====================
+
+function renderForumReactionsBar(barEl, reactions) {
+    // Préserver le bouton add
+    const existingAddBtn = barEl.querySelector('.deboucled-forum-reaction-add-btn');
+    barEl.innerHTML = '';
+    barEl.style.display = 'flex';
+    const currentUser = userPseudo?.toLowerCase();
+
+    if (reactions?.length) {
+        for (const reaction of reactions) {
+            const badge = document.createElement('button');
+            badge.className = 'deboucled-forum-reaction-badge';
+            const isOwn = currentUser && reaction.usernames.map(u => u.toLowerCase()).includes(currentUser);
+            if (isOwn) badge.classList.add('own-reaction');
+
+            const sticker = forumReactionStickerMap.get(reaction.emoji);
+            if (sticker) {
+                const img = document.createElement('img');
+                img.src = sticker.url;
+                img.alt = sticker.label;
+                img.className = 'deboucled-forum-reaction-sticker-img';
+                badge.appendChild(img);
+                badge.classList.add('sticker-badge');
+            } else {
+                badge.appendChild(document.createTextNode(reaction.emoji));
+            }
+            badge.appendChild(document.createTextNode(` ${reaction.count}`));
+            badge.title = reaction.usernames.join(', ');
+
+            const messageId = barEl.dataset.messageId;
+            badge.onclick = (e) => {
+                e.stopPropagation();
+                handleForumReactionClick(messageId, reaction.emoji);
+            };
+            barEl.appendChild(badge);
+        }
+    }
+
+    // Réinjecter le bouton add
+    if (existingAddBtn) barEl.appendChild(existingAddBtn);
+}
+
+function toggleForumReactionPicker(messageElement, messageId) {
+    const existingPicker = document.querySelector('.deboucled-forum-reaction-picker');
+    if (existingPicker) {
+        existingPicker.remove();
+        if (existingPicker.dataset.messageId === String(messageId)) return;
+    }
+
+    const picker = document.createElement('div');
+    picker.className = `deboucled-forum-reaction-picker${preferDarkTheme() ? ' dark-theme' : ''}`;
+    picker.dataset.messageId = messageId;
+
+    // Section emojis
+    const emojiSection = document.createElement('div');
+    emojiSection.className = 'deboucled-forum-reaction-picker-section';
+    for (const emoji of forumReactionEmojis) {
+        const btn = document.createElement('button');
+        btn.className = 'deboucled-forum-reaction-picker-emoji';
+        btn.textContent = emoji;
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            handleForumReactionClick(messageId, emoji);
+            picker.remove();
+        };
+        emojiSection.appendChild(btn);
+    }
+    picker.appendChild(emojiSection);
+
+    // Séparateur + Section stickers
+    if (forumReactionStickers.length > 0) {
+        const separator = document.createElement('div');
+        separator.className = 'deboucled-forum-reaction-picker-separator';
+        picker.appendChild(separator);
+
+        const stickerSection = document.createElement('div');
+        stickerSection.className = 'deboucled-forum-reaction-picker-section deboucled-forum-reaction-picker-stickers';
+        for (const sticker of forumReactionStickers) {
+            const btn = document.createElement('button');
+            btn.className = 'deboucled-forum-reaction-picker-sticker';
+            btn.title = sticker.label;
+            const img = document.createElement('img');
+            img.src = sticker.url;
+            img.alt = sticker.label;
+            img.loading = 'lazy';
+            btn.appendChild(img);
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                handleForumReactionClick(messageId, sticker.code);
+                picker.remove();
+            };
+            stickerSection.appendChild(btn);
+        }
+        picker.appendChild(stickerSection);
+    }
+
+    document.body.appendChild(picker);
+
+    // Positionner en fixed par rapport au bouton
+    const addBtn = messageElement.querySelector('.deboucled-forum-reaction-add-btn');
+    const btnRect = addBtn ? addBtn.getBoundingClientRect() : messageElement.getBoundingClientRect();
+    const pickerHeight = picker.offsetHeight;
+    const pickerWidth = picker.offsetWidth;
+    const spaceAbove = btnRect.top;
+
+    let left = btnRect.right - pickerWidth;
+    if (left < 4) left = 4;
+    if (left + pickerWidth > window.innerWidth - 4) left = window.innerWidth - pickerWidth - 4;
+
+    let top;
+    if (spaceAbove >= pickerHeight + 8) {
+        top = btnRect.top - pickerHeight - 4;
+    } else {
+        top = btnRect.bottom + 4;
+    }
+
+    picker.style.position = 'fixed';
+    picker.style.left = `${left}px`;
+    picker.style.top = `${top}px`;
+
+    const closePicker = (e) => {
+        if (!picker.contains(e.target)) {
+            picker.remove();
+            document.removeEventListener('click', closePicker);
+        }
+    };
+    setTimeout(() => document.addEventListener('click', closePicker), 0);
+}
+
+async function handleForumReactionClick(messageId, emoji) {
+    const result = await toggleForumReaction(messageId, emoji);
+    if (!result) return;
+
+    // Refresh reactions for this message
+    const barEl = document.querySelector(`.deboucled-forum-reactions-bar[data-message-id="${messageId}"]`);
+    if (!barEl) return;
+
+    let res;
+    await GM.xmlHttpRequest({
+        method: 'GET',
+        url: `${apiMessageReactionsUrl}/${messageId}`,
+        timeout: 5000,
+        onload: (response) => { res = response; },
+        onerror: () => {}
+    });
+    if (res?.status === 200) {
+        const reactions = JSON.parse(res.responseText);
+        renderForumReactionsBar(barEl, reactions);
+    }
+}
+
+function attachForumReactionUI(messageElement) {
+    const messageId = messageElement.getAttribute('data-id');
+    if (!messageId) return;
+    if (messageElement.querySelector('.deboucled-forum-reaction-add-btn')) return;
+
+    // Barre de réactions sous le message
+    const conteneurMessage = messageElement.querySelector('.conteneur-message');
+    if (!conteneurMessage) return;
+
+    const reactionsBar = document.createElement('div');
+    reactionsBar.className = 'deboucled-forum-reactions-bar';
+    reactionsBar.dataset.messageId = messageId;
+
+    // Bouton "ajouter réaction" Slack-style (toujours visible)
+    const addBtn = document.createElement('button');
+    addBtn.className = 'deboucled-forum-reaction-add-btn';
+    addBtn.title = 'Ajouter une réaction';
+    addBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`;
+    addBtn.onclick = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        toggleForumReactionPicker(messageElement, messageId);
+    };
+    reactionsBar.appendChild(addBtn);
+
+    conteneurMessage.appendChild(reactionsBar);
+}
+
+async function initForumReactions(allMessages) {
+    if (!userPseudo?.length || !userId) return;
+    if (forumReactionEmojis.length === 0) {
+        await loadForumReactionConfig();
+    }
+    if (forumReactionEmojis.length === 0) return;
+
+    const messageIds = [];
+    for (const msg of allMessages) {
+        attachForumReactionUI(msg);
+        const id = msg.getAttribute('data-id');
+        if (id) messageIds.push(Number(id));
+    }
+
+    if (messageIds.length === 0) return;
+
+    // Charger les réactions en bulk
+    const grouped = await getForumReactionsBulk(messageIds);
+    for (const [msgId, reactions] of Object.entries(grouped)) {
+        const barEl = document.querySelector(`.deboucled-forum-reactions-bar[data-message-id="${msgId}"]`);
+        if (barEl) renderForumReactionsBar(barEl, reactions);
+    }
+}

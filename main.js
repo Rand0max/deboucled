@@ -748,6 +748,10 @@ async function handleTopicMessages() {
 
     setHdAvatars();
 
+    if (store.get(storage_optionEnableForumReactions, storage_optionEnableForumReactions_default)) {
+        initForumReactions(allMessages);
+    }
+
     setTimeout(() => {
         const postMessageElement = document.querySelector('.postMessage');
         prependEvent(
