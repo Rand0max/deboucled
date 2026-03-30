@@ -120,6 +120,7 @@ let fetchedChangelog = false;
 let settingsLoaded = false;
 
 const domParser = new DOMParser();
+const regexCache = new Map();
 
 let smileyGifMap = new Map();
 let brokenSmileyGifArray = [];

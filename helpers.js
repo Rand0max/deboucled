@@ -105,6 +105,9 @@ function normalizeValue(value) {
 function buildEntityRegex(array, withBoundaries) {
     if (!array?.length) return null;
 
+    const cacheKey = `E|${withBoundaries ? 1 : 0}|${array.join('\0')}`;
+    if (regexCache.has(cacheKey)) return regexCache.get(cacheKey);
+
     function transformGenericChars(str) {
         const genCharsRegex = /^(?<leadingGenericGrp>\*?)(?<expressionGrp>.*?)(?<trailingGenericGrp>\*?)$/gi;
         const matches = genCharsRegex.exec(str);
@@ -129,14 +132,27 @@ function buildEntityRegex(array, withBoundaries) {
 
     const regex = regexMap.join('|');
 
-    return new RegExp(regex, 'gi');
+    const result = new RegExp(regex, 'gi');
+    regexCache.set(cacheKey, result);
+    return result;
 }
 
 function buildArrayRegex(array) {
+    if (!array?.length) return null;
+
+    const cacheKey = `A|${array.join('\0')}`;
+    if (regexCache.has(cacheKey)) return regexCache.get(cacheKey);
+
     const bStart = '(?<=\\W|^)';
     const bEnd = '(?=\\W|$)';
     let regexMap = array.map((e) => normalizeDiacritic(escapeRegexPatterns(e)));
-    return new RegExp(`${bStart}(${regexMap.join('|')})${bEnd}`, 'gi');
+    const result = new RegExp(`${bStart}(${regexMap.join('|')})${bEnd}`, 'gi');
+    regexCache.set(cacheKey, result);
+    return result;
+}
+
+function invalidateRegexCache() {
+    regexCache.clear();
 }
 
 function insertAfter(newNode, referenceNode) {

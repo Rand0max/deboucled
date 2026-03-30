@@ -512,6 +512,8 @@ async function importFromTotalBlacklist() {
 }
 
 function buildBlacklistsRegex(entityOption = 'both') {
+    invalidateRegexCache();
+
     if (entityOption === 'both' || entityOption === entitySubject) {
         let preBoucleEnabledSubjects = [];
         preBoucleArray.filter(pb => pb.enabled && pb.type === entitySubject)
