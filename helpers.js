@@ -533,7 +533,6 @@ function prependEvent(element, event, fn, options = {}) {
 
             if (executeOriginal) {
                 setTimeout(() => {
-                    // eslint-disable-next-line no-undef
                     const newEvent = new MouseEvent('click', {
                         bubbles: true,
                         cancelable: true,
