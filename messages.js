@@ -695,7 +695,7 @@ function highlightQuotedAuthor(messageContent, messageElement) {
         quotedAuthorsFullRegex,
         (match) => isSelf(match.toLowerCase()) ? match : buildProfilHighlightAnchor(match),
         (n) => {
-            const nodeContent = n.textContent.removeDoubleSpaces();
+            const nodeContent = removeDoubleSpaces(n.textContent);
             // S'il s'agit d'une citation où le pseudo est en html on vire le html et on fusionne le texte
             if (!nodeContent.match(quotedAuthorsFullRegex) && nodeContent.match(quotedAuthorsPartRegex)) {
                 n.textContent = `${nodeContent}${n.nextSibling?.textContent}${n.nextSibling?.nextSibling?.textContent}`;
@@ -706,7 +706,7 @@ function highlightQuotedAuthor(messageContent, messageElement) {
 
     if (currentUserPseudo?.length) {
         // On met en surbrillance verte les citations du compte de l'utilisateur avec ou sans @arobase
-        const selfPseudo = currentUserPseudo.escapeRegexPatterns();
+        const selfPseudo = escapeRegexPatterns(currentUserPseudo);
         const quotedSelfRegex = new RegExp(`\\B@${selfPseudo}\\b|(?<!\\w|@)${selfPseudo}\\b`, 'gi');
         replaceAllTextQuotes(
             messageContent,

@@ -3,79 +3,69 @@
 // HELPERS
 ///////////////////////////////////////////////////////////////////////////////////////
 
-String.prototype.normalizeDiacritic = function () {
-    return this.normalize("NFD").replace(/\p{Diacritic}/gu, '');
+// String utilities
+function normalizeDiacritic(str) {
+    return str.normalize("NFD").replace(/\p{Diacritic}/gu, '');
 }
 
-String.prototype.normalizeCompatibility = function () {
-    return this.normalize('NFKC');
+function normalizeCompatibility(str) {
+    return str.normalize('NFKC');
 }
 
-String.prototype.removeSurrogatePairs = function () {
+function removeSurrogatePairs(str) {
     // eslint-disable-next-line no-useless-escape
-    return this.replace(/[^\p{L}\p{N}\p{P}\p{Z}=\{\^\$\}\+\*\\<>|`£°~€]/gu, '');
+    return str.replace(/[^\p{L}\p{N}\p{P}\p{Z}=\{\^\$\}\+\*\\<>|`£°~€]/gu, '');
 }
 
-String.prototype.escapeRegexPatterns = function () {
-    return this.replaceAll(/[-[\]{}()+?.,\\^$|#]/g, '\\$&');
+function escapeRegexPatterns(str) {
+    return str.replaceAll(/[-[\]{}()+?.,\\^$|#]/g, '\\$&');
 }
 
-String.prototype.handleGenericChar = function () {
-    return this.replaceAll('*', '.*?');
+function handleGenericChar(str) {
+    return str.replaceAll('*', '.*?');
 }
 
-String.prototype.capitalize = function () {
-    if (this.length === 0) return this;
+function capitalize(str) {
+    if (str.length === 0) return str;
     const regex = new RegExp(/\p{L}/, 'u');
-    const i = this.search(regex);
-    if (i < 0) return this;
-    return this.substring(0, i) + this.charAt(i).toUpperCase() + this.slice(i + 1);
+    const i = str.search(regex);
+    if (i < 0) return str;
+    return str.substring(0, i) + str.charAt(i).toUpperCase() + str.slice(i + 1);
 }
 
-String.prototype.removeDoubleSpaces = function () {
-    return this.replaceAll(/ +(?= )/g, '');
+function removeDoubleSpaces(str) {
+    return str.replaceAll(/ +(?= )/g, '');
 }
 
-String.prototype.isMatch = function (s) {
-    return this.match(s) !== null
+function isMatch(str, pattern) {
+    return str.match(pattern) !== null;
 }
 
-Array.prototype.sortNormalize = function () {
-    return this.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+// Array utilities
+function sortNormalize(array) {
+    return array.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 }
 
-Set.prototype.addArray = function (array) {
-    array.forEach(this.add, this);
+// Collection utilities (Map & Set)
+function hasAny(collection) {
+    return collection.size > 0;
 }
 
-Set.prototype.hasAny = function () {
-    return this.size > 0;
+function mapAnyValue(map, callback) {
+    return [...map.values()].some(callback);
 }
 
-Map.prototype.hasAny = function () {
-    return this.size > 0;
+function mapAddIncrement(map, key) {
+    map.set(key.toLowerCase(), (map.get(key.toLowerCase()) ?? 0) + 1);
 }
 
-Map.prototype.anyValue = function (callback) {
-    return [...this.values()].some(callback);
+function mapAddArrayIncrement(map, array) {
+    array.forEach(key => mapAddIncrement(map, key));
 }
 
-Map.prototype.addIncrement = function (key) {
-    this.set(key.toLowerCase(), (this.get(key.toLowerCase()) ?? 0) + 1);
-}
-
-Map.prototype.addArrayIncrement = function (array) {
-    array.forEach(this.addIncrement, this);
-}
-
-Map.prototype.sortByValue = function (desc = false) {
-    if (desc) return new Map([...this].sort((a, b) => String(b[1]).localeCompare(a[1])));
-    return new Map([...this].sort((a, b) => String(a[1]).localeCompare(b[1])));
-}
-
-Map.prototype.sortByValueThenKey = function (descValue = false) {
+function mapSortByValueThenKey(map, descValue = false) {
     if (descValue) {
-        return new Map([...this]
+        return new Map([...map]
             .sort((a, b) => {
                 if (a[1] > b[1]) return -1;
                 if (a[1] < b[1]) return 1;
@@ -85,7 +75,7 @@ Map.prototype.sortByValueThenKey = function (descValue = false) {
             }));
     }
 
-    return new Map([...this]
+    return new Map([...map]
         .sort((a, b) => {
             if (a[1] > b[1]) return 1;
             if (a[1] < b[1]) return -1;
@@ -109,7 +99,7 @@ function mergeArrays(array1, array2) {
 }
 
 function normalizeValue(value) {
-    return value.toString().toUpperCase().normalizeDiacritic();
+    return normalizeDiacritic(value.toString().toUpperCase());
 }
 
 function buildEntityRegex(array, withBoundaries) {
@@ -120,10 +110,10 @@ function buildEntityRegex(array, withBoundaries) {
         const matches = genCharsRegex.exec(str);
         if (!matches?.groups?.expressionGrp) return null;
 
-        const leadingGeneric = matches.groups.leadingGenericGrp ? `(?:${matches.groups.leadingGenericGrp.handleGenericChar()})` : '';
-        const trailingGeneric = matches.groups.trailingGenericGrp ? `(?:${matches.groups.trailingGenericGrp.handleGenericChar()})` : '';
+        const leadingGeneric = matches.groups.leadingGenericGrp ? `(?:${handleGenericChar(matches.groups.leadingGenericGrp)})` : '';
+        const trailingGeneric = matches.groups.trailingGenericGrp ? `(?:${handleGenericChar(matches.groups.trailingGenericGrp)})` : '';
 
-        const expression = matches.groups.expressionGrp.handleGenericChar();
+        const expression = handleGenericChar(matches.groups.expressionGrp);
         return `${leadingGeneric}${expression}${trailingGeneric}`;
     }
 
@@ -132,7 +122,7 @@ function buildEntityRegex(array, withBoundaries) {
     const bEnd = withBoundaries ? '(?=\\W|$)' : '';
 
     const regexMap = array.filter(e => e?.length).map((e) => {
-        let word = e.escapeRegexPatterns().normalizeDiacritic();
+        let word = normalizeDiacritic(escapeRegexPatterns(e));
         word = transformGenericChars(word);
         return `${bStart}${word}${bEnd}`;
     });
@@ -145,7 +135,7 @@ function buildEntityRegex(array, withBoundaries) {
 function buildArrayRegex(array) {
     const bStart = '(?<=\\W|^)';
     const bEnd = '(?=\\W|$)';
-    let regexMap = array.map((e) => e.escapeRegexPatterns().normalizeDiacritic());
+    let regexMap = array.map((e) => normalizeDiacritic(escapeRegexPatterns(e)));
     return new RegExp(`${bStart}(${regexMap.join('|')})${bEnd}`, 'gi');
 }
 

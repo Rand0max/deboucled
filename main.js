@@ -352,7 +352,7 @@ function highlightBlacklistMatches(element, matches) {
 
     // Supprime les surrogate pairs car c'est ingérable
     // Surrogate pairs = grosse merde = JS = calvitie foudroyante
-    const pureMatches = matches.map(m => m.removeSurrogatePairs().trim()).filter(m => m !== '');
+    const pureMatches = matches.map(m => removeSurrogatePairs(m).trim()).filter(m => m !== '');
 
     const buildBlacklistHint = (match) => {
         const blacklists = blacklistsIncludingEntity(match, entitySubject);
@@ -362,8 +362,8 @@ function highlightBlacklistMatches(element, matches) {
 
     let index = -1;
     pureMatches.every(match => {
-        const normMatch = match.normalizeDiacritic();
-        const normContent = content.normalizeDiacritic();
+        const normMatch = normalizeDiacritic(match);
+        const normContent = normalizeDiacritic(content);
         index = normContent.indexOf(normMatch, index + 1);
         if (index <= -1) return false;
         const realMatchContent = content.slice(index, index + normMatch.length);
@@ -386,7 +386,7 @@ function highlightBlacklistMatches(element, matches) {
 
 function blacklistsIncludingEntity(entity, entityType, mustBeEnabled = true) {
     let blacklists = [];
-    let normEntity = entity.normalizeDiacritic();
+    let normEntity = normalizeDiacritic(entity);
     if (entityType == entityAuthor) normEntity = normEntity.toLowerCase();
 
     const cacheKey = `${normEntity}|${entityType}|${mustBeEnabled}`;
@@ -425,7 +425,7 @@ function handleMessageBlacklistMatches(messageElement) {
     function highlightMatches(textChild) {
         const matches = getSubjectBlacklistMatches(textChild.textContent);
         if (!matches?.length) return false;
-        matchedSubjects.addArrayIncrement(matches);
+        mapAddArrayIncrement(matchedSubjects, matches);
         hiddenSubjects++;
         highlightBlacklistMatches(textChild, matches);
         return true;
@@ -496,7 +496,7 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
             removeMessage(messageElement);
             hiddenMessages++;
             hiddenAuthorArray.add(author);
-            matchedAuthors.addArrayIncrement(authorMatch);
+            mapAddArrayIncrement(matchedAuthors, authorMatch);
             hiddenAuthors++;
             return true; // si on a supprimé le message on se casse, plus rien à faire
         }
@@ -613,7 +613,7 @@ function highlightTopicHeaderTitle() {
     const subjectMatches = getSubjectBlacklistMatches(titleElement.textContent);
     if (!subjectMatches?.length) return;
 
-    matchedSubjects.addArrayIncrement(subjectMatches);
+    mapAddArrayIncrement(matchedSubjects, subjectMatches);
     hiddenSubjects++;
 
     highlightBlacklistMatches(titleElement, subjectMatches);

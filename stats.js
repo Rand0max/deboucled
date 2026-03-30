@@ -6,7 +6,7 @@
 
 function addRightBlocMatches() {
     let optionDisplayTopicMatches = store.get(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
-    if (!optionDisplayTopicMatches || (!matchedTopics.hasAny() && !matchedSubjects.hasAny() && !matchedAuthors.hasAny())) return;
+    if (!optionDisplayTopicMatches || (!hasAny(matchedTopics) && !hasAny(matchedSubjects) && !hasAny(matchedAuthors))) return;
 
     const forumRightCol = document.querySelector('#forum-right-col');
     if (!forumRightCol) return;
@@ -27,10 +27,10 @@ function addRightBlocMatches() {
     html += '<div class="scrollable-wrapper">';
     html += '<div id="deboucled-matches-content" class="scrollable-content bloc-info-forum">';
 
-    const formatMatch = (str) => str.replaceAll(',', '').removeDoubleSpaces().trim().capitalize();
+    const formatMatch = (str) => capitalize(removeDoubleSpaces(str.replaceAll(',', '')).trim());
 
     function formatMatches(matches, withHint, formatCallback, urlCallback) {
-        let matchesSorted = matches.sortByValueThenKey(true);
+        let matchesSorted = mapSortByValueThenKey(matches, true);
         let matchesHtml = '';
         let index = 0;
         matchesSorted.forEach((occ, match) => {
@@ -61,9 +61,9 @@ function addRightBlocMatches() {
         return matchesHtml;
     }
 
-    if (matchedSubjects.hasAny()) html += addMatches(matchedSubjects, entitySubject, 'Sujets', true, (m) => formatMatch(m));
-    if (matchedAuthors.hasAny()) html += addMatches(matchedAuthors, entityAuthor, 'Auteurs', true, (m) => formatMatch(m), (m) => `/profil/${m.toLowerCase()}?mode=infos`);
-    if (matchedTopics.hasAny()) html += addMatches(matchedTopics, entityTopicId, 'Topics', false, (_, o) => formatMatch(o), (m) => `/forums/42-51-${m}-1-0-1-0-${buildRandomStr(6)}.htm`);
+    if (hasAny(matchedSubjects)) html += addMatches(matchedSubjects, entitySubject, 'Sujets', true, (m) => formatMatch(m));
+    if (hasAny(matchedAuthors)) html += addMatches(matchedAuthors, entityAuthor, 'Auteurs', true, (m) => formatMatch(m), (m) => `/profil/${m.toLowerCase()}?mode=infos`);
+    if (hasAny(matchedTopics)) html += addMatches(matchedTopics, entityTopicId, 'Topics', false, (_, o) => formatMatch(o), (m) => `/forums/42-51-${m}-1-0-1-0-${buildRandomStr(6)}.htm`);
 
     html += '</div>';
     html += '</div>';
@@ -86,14 +86,14 @@ function addRightBlocMatches() {
             wrapper.onclick = null;
         }
     }
-    if (matchedSubjects.hasAny()) addMatchesToggleEvent(entitySubject);
-    if (matchedAuthors.hasAny()) addMatchesToggleEvent(entityAuthor);
-    if (matchedTopics.hasAny()) addMatchesToggleEvent(entityTopicId);
+    if (hasAny(matchedSubjects)) addMatchesToggleEvent(entitySubject);
+    if (hasAny(matchedAuthors)) addMatchesToggleEvent(entityAuthor);
+    if (hasAny(matchedTopics)) addMatchesToggleEvent(entityTopicId);
 }
 
 function addRightBlocStats() {
     let optionDisplayTopicCharts = store.get(storage_optionDisplayTopicCharts, storage_optionDisplayTopicCharts_default);
-    if (!optionDisplayTopicCharts || !deboucledTopicStatsMap.hasAny() || !deboucledTopicStatsMap.anyValue((v) => v > 0)) return;
+    if (!optionDisplayTopicCharts || !hasAny(deboucledTopicStatsMap) || !mapAnyValue(deboucledTopicStatsMap, (v) => v > 0)) return;
 
     const forumRightCol = document.querySelector('#forum-right-col');
     if (!forumRightCol) return;

@@ -635,10 +635,10 @@ function refreshSubjectKeys(filter = null) {
     let sortCallback = null;
     switch (sortModeSubject) {
         case 1:
-            sortCallback = (array) => array.sortNormalize();
+            sortCallback = (array) => sortNormalize(array);
             break;
         case 2:
-            sortCallback = (array) => array.sortNormalize().reverse();
+            sortCallback = (array) => sortNormalize(array).reverse();
             break;
     }
 
@@ -663,10 +663,10 @@ function refreshAuthorKeys(filter = null) {
     let sortCallback = null;
     switch (sortModeAuthor) {
         case 1:
-            sortCallback = (array) => array.sortNormalize();
+            sortCallback = (array) => sortNormalize(array);
             break;
         case 2:
-            sortCallback = (array) => array.sortNormalize().reverse();
+            sortCallback = (array) => sortNormalize(array).reverse();
             break;
     }
 
