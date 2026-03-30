@@ -46,6 +46,7 @@ class DecensuredChat {
         }
 
         this.setupDOM();
+        await loadChatReactionConfig();
         await this.loadRecentMessages();
         this.loadUnreadState(); // Charger l'état des messages non lus
         this.setupRisiBank(); // Configurer RisiBank si disponible
@@ -502,6 +503,14 @@ class DecensuredChat {
                 handleNewMessageDecensuredNotification();
                 break;
 
+            case 'reaction_added':
+                this.handleReactionUpdate(data.message, true);
+                break;
+
+            case 'reaction_removed':
+                this.handleReactionUpdate(data.message, false);
+                break;
+
             default:
                 console.log('[Chat] Unknown message type:', data.type);
         }
@@ -660,6 +669,7 @@ class DecensuredChat {
             this.buildMessageHTML(message).then(html => {
                 messageEl.innerHTML = html;
                 this.attachReplyButton(messageEl, message);
+                this.attachReactionUI(messageEl, message);
                 this.attachQuoteClickHandler(messageEl);
                 embedVideos(messageEl, '', 400, 300);
             });
@@ -668,6 +678,7 @@ class DecensuredChat {
             this.buildMessageHTML(message).then(html => {
                 messageEl.innerHTML = html;
                 this.attachReplyButton(messageEl, message);
+                this.attachReactionUI(messageEl, message);
                 this.attachQuoteClickHandler(messageEl);
                 embedVideos(messageEl, '', 400, 300);
             });
@@ -722,6 +733,211 @@ class DecensuredChat {
                 }
             });
         });
+    }
+
+    attachReactionUI(messageEl, message) {
+        const contentEl = messageEl.querySelector('.deboucled-chat-message-content');
+        if (!contentEl) return;
+
+        // Barre des réactions existantes
+        const reactionsBar = document.createElement('div');
+        reactionsBar.className = 'deboucled-chat-reactions-bar';
+        this.renderReactionsBar(reactionsBar, message);
+        contentEl.after(reactionsBar);
+
+        // Bouton pour ouvrir le picker (dans le header, à côté du reply)
+        const header = messageEl.querySelector('.deboucled-chat-message-header');
+        if (!header) return;
+
+        const reactionBtn = document.createElement('button');
+        reactionBtn.className = 'deboucled-chat-reaction-btn';
+        reactionBtn.innerHTML = '⚡';
+        reactionBtn.title = 'Réagir';
+        reactionBtn.onclick = (e) => {
+            e.stopPropagation();
+            this.toggleReactionPicker(messageEl, message.id);
+        };
+        header.appendChild(reactionBtn);
+    }
+
+    renderReactionsBar(barEl, message) {
+        barEl.innerHTML = '';
+        const reactions = message.reactions || [];
+        if (reactions.length === 0) {
+            barEl.style.display = 'none';
+            return;
+        }
+
+        barEl.style.display = 'flex';
+        const currentUser = getCurrentUserPseudo()?.toLowerCase();
+
+        for (const reaction of reactions) {
+            const badge = document.createElement('button');
+            badge.className = 'deboucled-chat-reaction-badge';
+            const isOwnReaction = currentUser && reaction.usernames.map(u => u.toLowerCase()).includes(currentUser);
+            if (isOwnReaction) badge.classList.add('own-reaction');
+
+            // Sticker RisiBank : afficher image, sinon emoji texte
+            const sticker = chatReactionStickerMap.get(reaction.emoji);
+            if (sticker) {
+                const img = document.createElement('img');
+                img.src = sticker.url;
+                img.alt = sticker.label;
+                img.className = 'deboucled-chat-reaction-sticker-img';
+                badge.appendChild(img);
+                badge.classList.add('sticker-badge');
+            } else {
+                badge.appendChild(document.createTextNode(reaction.emoji));
+            }
+            badge.appendChild(document.createTextNode(` ${reaction.count}`));
+            badge.title = reaction.usernames.join(', ');
+            badge.onclick = (e) => {
+                e.stopPropagation();
+                this.onReactionClick(message.id, reaction.emoji);
+            };
+            barEl.appendChild(badge);
+        }
+    }
+
+    toggleReactionPicker(messageEl, messageId) {
+        // Fermer un picker déjà ouvert
+        const existingPicker = document.querySelector('.deboucled-chat-reaction-picker');
+        if (existingPicker) {
+            existingPicker.remove();
+            if (existingPicker.dataset.messageId === String(messageId)) return;
+        }
+
+        const picker = document.createElement('div');
+        picker.className = `deboucled-chat-reaction-picker${preferDarkTheme() ? ' dark-theme' : ''}`;
+        picker.dataset.messageId = messageId;
+
+        // Section emojis
+        const emojiSection = document.createElement('div');
+        emojiSection.className = 'deboucled-chat-reaction-picker-section';
+        for (const emoji of chatReactionEmojis) {
+            const btn = document.createElement('button');
+            btn.className = 'deboucled-chat-reaction-picker-emoji';
+            btn.textContent = emoji;
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                this.onReactionClick(messageId, emoji);
+                picker.remove();
+            };
+            emojiSection.appendChild(btn);
+        }
+        picker.appendChild(emojiSection);
+
+        // Séparateur + Section stickers (seulement si des stickers sont disponibles)
+        if (chatReactionStickers.length > 0) {
+            const separator = document.createElement('div');
+            separator.className = 'deboucled-chat-reaction-picker-separator';
+            picker.appendChild(separator);
+
+            const stickerSection = document.createElement('div');
+            stickerSection.className = 'deboucled-chat-reaction-picker-section deboucled-chat-reaction-picker-stickers';
+            for (const sticker of chatReactionStickers) {
+                const btn = document.createElement('button');
+                btn.className = 'deboucled-chat-reaction-picker-sticker';
+                btn.title = sticker.label;
+                const img = document.createElement('img');
+                img.src = sticker.url;
+                img.alt = sticker.label;
+                img.loading = 'lazy';
+                btn.appendChild(img);
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    this.onReactionClick(messageId, sticker.code);
+                    picker.remove();
+                };
+                stickerSection.appendChild(btn);
+            }
+            picker.appendChild(stickerSection);
+        }
+
+        // Ajouter au body pour éviter le clipping par overflow du conteneur de messages
+        document.body.appendChild(picker);
+
+        // Positionner en fixed par rapport au bouton de réaction
+        const reactionBtn = messageEl.querySelector('.deboucled-chat-reaction-btn');
+        const btnRect = reactionBtn ? reactionBtn.getBoundingClientRect() : messageEl.getBoundingClientRect();
+        const pickerHeight = picker.offsetHeight;
+        const pickerWidth = picker.offsetWidth;
+        const spaceAbove = btnRect.top;
+
+        // Horizontal : aligner à droite du bouton, sans dépasser l'écran
+        let left = btnRect.right - pickerWidth;
+        if (left < 4) left = 4;
+
+        // Vertical : au-dessus si assez de place, sinon en dessous
+        let top;
+        if (spaceAbove >= pickerHeight + 8) {
+            top = btnRect.top - pickerHeight - 4;
+        } else {
+            top = btnRect.bottom + 4;
+        }
+
+        picker.style.position = 'fixed';
+        picker.style.left = `${left}px`;
+        picker.style.top = `${top}px`;
+        picker.style.bottom = 'auto';
+        picker.style.right = 'auto';
+        picker.style.margin = '0';
+
+        // Fermer le picker en cliquant ailleurs
+        const closePicker = (e) => {
+            if (!picker.contains(e.target)) {
+                picker.remove();
+                document.removeEventListener('click', closePicker);
+            }
+        };
+        setTimeout(() => document.addEventListener('click', closePicker), 0);
+    }
+
+    async onReactionClick(messageId, emoji) {
+        const response = await toggleChatReaction(messageId, emoji);
+        if (!response) return;
+        // La mise à jour UI se fait via SSE (reaction_added / reaction_removed)
+    }
+
+    handleReactionUpdate(reactionData, isAdded) {
+        if (!reactionData) return;
+        const { message_id, username, emoji } = reactionData;
+
+        // Mettre à jour le message en mémoire
+        const message = this.messages.find(m => m.id === message_id);
+        if (!message) return;
+
+        if (!message.reactions) message.reactions = [];
+
+        if (isAdded) {
+            const existing = message.reactions.find(r => r.emoji === emoji);
+            if (existing) {
+                if (!existing.usernames.includes(username)) {
+                    existing.usernames.push(username);
+                    existing.count = existing.usernames.length;
+                }
+            } else {
+                message.reactions.push({ emoji, usernames: [username], count: 1 });
+            }
+        } else {
+            const existing = message.reactions.find(r => r.emoji === emoji);
+            if (existing) {
+                existing.usernames = existing.usernames.filter(u => u !== username);
+                existing.count = existing.usernames.length;
+                if (existing.count === 0) {
+                    message.reactions = message.reactions.filter(r => r.emoji !== emoji);
+                }
+            }
+        }
+
+        // Mettre à jour le DOM
+        const messageEl = this.messageContainer?.querySelector(`[data-message-id="${message_id}"]`);
+        if (messageEl) {
+            const reactionsBar = messageEl.querySelector('.deboucled-chat-reactions-bar');
+            if (reactionsBar) {
+                this.renderReactionsBar(reactionsBar, message);
+            }
+        }
     }
 
     scrollToMessage(messageId) {

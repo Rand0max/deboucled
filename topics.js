@@ -222,11 +222,11 @@ function handleAntiLoopAi(topicOptions, title, author, titleTag) {
     }
     else if (topicOptions.optionAntiLoopAiMode === 2) {
         if (topicLoop.isSubjectLoop) {
-            matchedSubjects.addArrayIncrement(topicLoop.subjectMatches);
+            mapAddArrayIncrement(matchedSubjects, topicLoop.subjectMatches);
             hiddenSubjects++;
         }
         if (topicLoop.isAuthorLoop) {
-            matchedAuthors.addArrayIncrement(topicLoop.boucledAuthorMatches ?? topicLoop.authorMatches);
+            mapAddArrayIncrement(matchedAuthors, topicLoop.boucledAuthorMatches ?? topicLoop.authorMatches);
             hiddenAuthors++;
         }
         return true;
@@ -263,7 +263,7 @@ async function isTopicBlacklisted(topicElement, topicOptions) {
     if (title?.length) {
         const subjectBlacklisted = getSubjectBlacklistMatches(title);
         if (subjectBlacklisted?.length) {
-            matchedSubjects.addArrayIncrement(subjectBlacklisted);
+            mapAddArrayIncrement(matchedSubjects, subjectBlacklisted);
             hiddenSubjects++;
             return true;
         }
@@ -272,7 +272,7 @@ async function isTopicBlacklisted(topicElement, topicOptions) {
     if (author?.length) {
         const authorBlacklisted = getAuthorBlacklistMatches(author);
         if (authorBlacklisted?.length) {
-            matchedAuthors.addArrayIncrement(authorBlacklisted);
+            mapAddArrayIncrement(matchedAuthors, authorBlacklisted);
             hiddenAuthors++;
             return true;
         }
@@ -282,8 +282,8 @@ async function isTopicBlacklisted(topicElement, topicOptions) {
         const url = titleTag.getAttribute('href');
         const vinzTopic = await isVinzTopic(title, author, url);
         if (vinzTopic) {
-            matchedSubjects.addArrayIncrement([title]);
-            matchedAuthors.addArrayIncrement(['Vinz']);
+            mapAddArrayIncrement(matchedSubjects, [title]);
+            mapAddArrayIncrement(matchedAuthors, ['Vinz']);
             hiddenSubjects++;
             hiddenAuthors++;
             return true;
@@ -310,7 +310,7 @@ function filterMatchResults(matches) {
 
 function getSubjectBlacklistMatches(subject, regex = subjectsBlacklistReg) {
     if (!regex) return null;
-    const normSubject = subject.normalizeDiacritic();
+    const normSubject = normalizeDiacritic(subject);
     const matches = [...normSubject.matchAll(regex)];
     const groupedMatches = filterMatchResults(matches);
     return groupedMatches;
@@ -318,7 +318,7 @@ function getSubjectBlacklistMatches(subject, regex = subjectsBlacklistReg) {
 
 function getAuthorBlacklistMatches(author, isSelf, regex = authorsBlacklistReg) {
     if (!regex) return null;
-    const normAuthor = author.toLowerCase().normalizeDiacritic();
+    const normAuthor = normalizeDiacritic(author.toLowerCase());
     if (deboucledPseudos.includes(normAuthor) || isSelf) return null;
     return normAuthor.match(regex) ? [author] : null;
 }
@@ -400,9 +400,9 @@ async function isTopicPoC(element, optionDetectPocMode) {
     let titleElem = element.querySelector('.lien-jv.topic-title');
     if (!titleElem) return false;
 
-    const title = titleElem.textContent.trim().normalizeDiacritic();
+    const title = normalizeDiacritic(titleElem.textContent.trim());
     const isTitlePocRegex = /(pos(t|te|tez|to|too|tou|ttou)(")?$)|(pos(t|te|tez).*ou.*(cancer|quand|kan))|paustaouk|postukhan|postookan|postouk|postook|pose.*toucan/i;
-    let isTitlePoc = title.isMatch(isTitlePocRegex);
+    let isTitlePoc = isMatch(title, isTitlePocRegex);
 
     if ((optionDetectPocMode === 1 || optionDetectPocMode === 3) && !isTitlePoc) {
         // Inutile de continuer si le titre n'est pas détecté PoC et qu'on n'est pas en mode approfondi
@@ -413,12 +413,12 @@ async function isTopicPoC(element, optionDetectPocMode) {
         const doc = domParser.parseFromString(r, 'text/html');
 
         const firstMessageElem = doc.querySelector('.txt-msg');
-        const firstMessage = firstMessageElem?.textContent.trim().toLowerCase().normalizeDiacritic();
+        const firstMessage = firstMessageElem?.textContent.trim().toLowerCase();
         if (!firstMessage?.length) return false;
 
         const isMessagePocRegex = /pos(t|te|tez) ou/i;
         const maladies = ['cancer', 'ancer', 'cer', 'en serre', 'necrose', 'torsion', 'testiculaire', 'tumeur', 'cholera', 'sida', 'corona', 'coronavirus', 'covid', 'covid19', 'cerf', 'serf', 'phimosis', 'trisomie', 'diarrhee', 'charcot', 'lyme', 'avc', 'cirrhose', 'diabete', 'parkinson', 'alzheimer', 'mucoviscidose', 'lepre', 'tuberculose', 'variole'];
-        const isMessagePoc = firstMessage.isMatch(isMessagePocRegex) || (isTitlePoc && maladies.some(s => firstMessage.includes(s)));
+        const isMessagePoc = isMatch(normalizeDiacritic(firstMessage), isMessagePocRegex) || (isTitlePoc && maladies.some(s => firstMessage.includes(s)));
 
         pocTopicMap.set(topicId, isMessagePoc);
 
@@ -746,11 +746,11 @@ function removeUselessTags(topics) {
         let newTitle = titleElem.textContent;
         newTitle = newTitle.replace(regexAlert, '');
         newTitle = newTitle.replace(regexAyao, '');
-        newTitle = newTitle.removeSurrogatePairs();
+        newTitle = removeSurrogatePairs(newTitle);
         newTitle = newTitle.replace(/\(\)|\[\]|{}/g, '');
-        newTitle = newTitle.removeDoubleSpaces().trim().toLowerCase().capitalize();
+        newTitle = capitalize(removeDoubleSpaces(newTitle).trim().toLowerCase());
         if (newTitle.length > 0) titleElem.textContent = newTitle;
-        else titleElem.textContent = titleElem.textContent.toLowerCase().capitalize();
+        else titleElem.textContent = capitalize(titleElem.textContent.toLowerCase());
     });
 }
 
@@ -1019,7 +1019,7 @@ function initSmileyGifMap() {
     ]);
     //brokenSmileyGifArray = [':fete:', ':rire:',':ouch:'];
 
-    let regexMap = [...smileyGifMap.keys()].map((e) => e.escapeRegexPatterns());
+    let regexMap = [...smileyGifMap.keys()].map((e) => escapeRegexPatterns(e));
     smileyGifRegex = new RegExp(`(${regexMap.join('|')})`, 'gi');
 }
 

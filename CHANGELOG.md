@@ -1,5 +1,9 @@
 # Changelog Déboucled
 
+## [2.75.0] (30/03/2026)
+
+- Réactions emoji et stickers sur les messages du Chat Décensured (Rand0max)
+
 ## [2.74.0] (08/03/2026)
 
 - Onglet Messages dans le widget Décensured (Rand0max)

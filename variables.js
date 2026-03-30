@@ -120,6 +120,7 @@ let fetchedChangelog = false;
 let settingsLoaded = false;
 
 const domParser = new DOMParser();
+const regexCache = new Map();
 
 let smileyGifMap = new Map();
 let brokenSmileyGifArray = [];
@@ -147,4 +148,11 @@ const apiDecensuredChatMessageUrl = `${decensuredApiUrl}/chat/message`;
 const apiDecensuredChatMessagesUrl = `${decensuredApiUrl}/chat/messages`;
 const apiDecensuredChatTypingStartUrl = `${decensuredApiUrl}/chat/typing/start`;
 const apiDecensuredChatTypingStopUrl = `${decensuredApiUrl}/chat/typing/stop`;
+const apiDecensuredChatReactionUrl = `${decensuredApiUrl}/chat/reaction`;
+const apiDecensuredChatReactionsUrl = `${decensuredApiUrl}/chat/reactions`;
+const apiDecensuredChatReactionConfigUrl = `${decensuredApiUrl}/chat/reactions/config`;
+
+let chatReactionEmojis = [];
+let chatReactionStickers = [];
+let chatReactionStickerMap = new Map();
 
