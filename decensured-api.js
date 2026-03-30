@@ -639,3 +639,50 @@ async function sendTypingStop(username, userid) {
         // Silently fail - typing indicator is not critical
     }
 }
+
+async function toggleChatReaction(messageId, emoji) {
+    try {
+        const response = await fetchDecensuredApi(apiDecensuredChatReactionUrl, {
+            method: 'POST',
+            body: JSON.stringify({
+                message_id: messageId,
+                username: getCurrentUserPseudo(),
+                userid: userId,
+                emoji: emoji
+            })
+        });
+
+        return response;
+    } catch (error) {
+        logDecensuredError(error, 'toggleChatReaction');
+        return null;
+    }
+}
+
+async function getChatReactions(messageId) {
+    try {
+        const response = await fetchDecensuredApi(`${apiDecensuredChatReactionsUrl}/${messageId}`, {
+            method: 'GET'
+        });
+
+        return Array.isArray(response) ? response : [];
+    } catch (error) {
+        logDecensuredError(error, 'getChatReactions');
+        return [];
+    }
+}
+
+async function loadChatReactionConfig() {
+    try {
+        const config = await fetchDecensuredApi(apiDecensuredChatReactionConfigUrl, { method: 'GET' });
+        if (config?.emojis) chatReactionEmojis = config.emojis;
+        if (config?.stickers) {
+            chatReactionStickers = config.stickers;
+            chatReactionStickerMap = new Map(config.stickers.map(s => [s.code, s]));
+        }
+        return config;
+    } catch (error) {
+        logDecensuredError(error, 'loadChatReactionConfig');
+        return null;
+    }
+}

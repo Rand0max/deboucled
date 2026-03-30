@@ -45,6 +45,11 @@ const projectGlobals = {
     apiDecensuredChatStreamUrl: 'readonly', apiDecensuredChatMessageUrl: 'readonly',
     apiDecensuredChatMessagesUrl: 'readonly', apiDecensuredChatTypingStartUrl: 'readonly',
     apiDecensuredChatTypingStopUrl: 'readonly',
+    apiDecensuredChatReactionUrl: 'readonly', apiDecensuredChatReactionsUrl: 'readonly',
+    apiDecensuredChatReactionConfigUrl: 'readonly',
+    chatReactionEmojis: 'writable',
+    chatReactionStickers: 'writable',
+    chatReactionStickerMap: 'writable',
 
     // storage.js constants
     store: 'readonly', TTL_CONFIG: 'readonly',
@@ -274,6 +279,7 @@ const projectGlobals = {
     getDecensuredTopicsPaginated: 'readonly', getDecensuredLatestMessages: 'readonly',
     checkDecensuredUsers: 'readonly', sendChatMessage: 'readonly', getChatMessages: 'readonly',
     createChatEventSource: 'readonly', sendTypingStart: 'readonly', sendTypingStop: 'readonly',
+    toggleChatReaction: 'readonly', getChatReactions: 'readonly', loadChatReactionConfig: 'readonly',
     // decensured-formatting.js
     formatSpoilers: 'readonly', formatCodeBlocks: 'readonly', formatInlineCode: 'readonly',
     formatJvcBold: 'readonly', formatJvcItalic: 'readonly', formatJvcUnderline: 'readonly',

@@ -5257,3 +5257,226 @@ body.dark .deboucled-loading-text::after {
     transform: translateY(-6px);
   }
 }
+
+/* ===== Chat Reactions ===== */
+
+/* Reaction button in header (next to reply) */
+.deboucled-chat-reaction-btn {
+  background: none;
+  border: none;
+  color: #999;
+  padding: 2px 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  flex-shrink: 0;
+  font-size: 14px;
+  width: 27px;
+  height: 27px;
+}
+
+.deboucled-chat-message:hover .deboucled-chat-reaction-btn {
+  opacity: 0.6;
+}
+
+.deboucled-chat-reaction-btn:hover {
+  opacity: 1 !important;
+  background: rgba(33, 160, 211, 0.1);
+  transform: scale(1.15);
+}
+
+.deboucled-floating-widget.dark-theme .deboucled-chat-reaction-btn:hover {
+  background: rgba(79, 179, 212, 0.15);
+}
+
+/* Reactions bar under message content */
+.deboucled-chat-reactions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+/* Individual reaction badge */
+.deboucled-chat-reaction-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  background: #f5f5f5;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.4;
+}
+
+.deboucled-chat-reaction-badge:hover {
+  background: #e8e8e8;
+  border-color: #ccc;
+  transform: scale(1.05);
+}
+
+.deboucled-chat-reaction-badge.own-reaction {
+  background: rgba(33, 160, 211, 0.12);
+  border-color: rgba(33, 160, 211, 0.4);
+  color: #1a8ab5;
+}
+
+.deboucled-chat-reaction-badge.own-reaction:hover {
+  background: rgba(33, 160, 211, 0.2);
+  border-color: rgba(33, 160, 211, 0.6);
+}
+
+.deboucled-floating-widget.dark-theme .deboucled-chat-reaction-badge {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #ccc;
+}
+
+.deboucled-floating-widget.dark-theme .deboucled-chat-reaction-badge:hover {
+  background: #333;
+  border-color: #555;
+}
+
+.deboucled-floating-widget.dark-theme .deboucled-chat-reaction-badge.own-reaction {
+  background: rgba(79, 179, 212, 0.15);
+  border-color: rgba(79, 179, 212, 0.4);
+  color: #4fb3d4;
+}
+
+.deboucled-floating-widget.dark-theme .deboucled-chat-reaction-badge.own-reaction:hover {
+  background: rgba(79, 179, 212, 0.25);
+  border-color: rgba(79, 179, 212, 0.6);
+}
+
+/* Reaction picker popup */
+.deboucled-chat-reaction-picker {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 6px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10001;
+  width: 400px;
+  animation: reaction-picker-in 0.15s ease;
+}
+
+.deboucled-chat-reaction-picker.dark-theme {
+  background: #2a2a2a;
+  border-color: #444;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Section (emojis ou stickers) */
+.deboucled-chat-reaction-picker-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+/* Separateur entre emojis et stickers */
+.deboucled-chat-reaction-picker-separator {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 4px 0;
+}
+
+.deboucled-chat-reaction-picker.dark-theme .deboucled-chat-reaction-picker-separator {
+  background: #444;
+}
+
+.deboucled-chat-reaction-picker-emoji {
+  background: none;
+  border: none;
+  font-size: 22px;
+  padding: 4px 5px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.12s ease;
+  line-height: 1;
+}
+
+.deboucled-chat-reaction-picker-emoji:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: scale(1.25);
+}
+
+.deboucled-chat-reaction-picker.dark-theme .deboucled-chat-reaction-picker-emoji:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Section stickers scrollable */
+.deboucled-chat-reaction-picker-stickers {
+  max-height: 180px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* Sticker buttons dans le picker */
+.deboucled-chat-reaction-picker-sticker {
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.12s ease;
+  line-height: 0;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deboucled-chat-reaction-picker-sticker img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.deboucled-chat-reaction-picker-sticker:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: scale(1.15);
+}
+
+.deboucled-chat-reaction-picker.dark-theme .deboucled-chat-reaction-picker-sticker:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Sticker image dans les badges de reaction */
+.deboucled-chat-reaction-sticker-img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.deboucled-chat-reaction-badge.sticker-badge {
+  padding: 2px 6px;
+}
+
+/* Message needs position relative for picker positioning */
+.deboucled-chat-message {
+  position: relative;
+}
+
+@keyframes reaction-picker-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
