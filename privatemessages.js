@@ -20,7 +20,7 @@ async function sendPrivateMessagesToSpam(messageIds, onMpPage) {
     params.append('conv_move', '666');
     messageIds.forEach(m => { params.append('conv_select[]', m); });
 
-    await fetch(url, { method: 'POST', body: params })
+    await pageFetch(url, { method: 'POST', body: params })
         .then(function (response) {
             if (!response.ok) throw Error(response.statusText);
         }).catch(function (err) {
@@ -35,7 +35,7 @@ async function getPrivateMessageAuthor(messageId, hash) {
     params.append('idc', messageId);
     params.append('h', hash);
 
-    const resDoc = await fetch(url, { method: 'POST', body: params })
+    const resDoc = await pageFetch(url, { method: 'POST', body: params })
         .then(function (response) {
             if (!response.ok) throw Error(response.statusText);
             return response.text();

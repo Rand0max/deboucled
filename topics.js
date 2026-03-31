@@ -343,7 +343,7 @@ async function isVinzTopic(subject, author, topicUrl) {
             return normalizeValue(firstMessageElem.textContent.trim());
         }
         if (!topicContent) {
-            topicContent = await fetch(url).then(function (response) {
+            topicContent = await pageFetch(toAbsoluteUrl(url)).then(function (response) {
                 if (!response.ok) throw Error(response.statusText);
                 return response.text();
             }).then(function (r) {
@@ -427,7 +427,7 @@ async function isTopicPoC(element, optionDetectPocMode) {
 
     const url = titleElem.getAttribute('href');
 
-    let isPoc = await fetch(url).then(function (response) {
+    let isPoc = await pageFetch(toAbsoluteUrl(url)).then(function (response) {
         if (!response.ok) throw Error(response.statusText);
         return response.text();
     }).then(function (r) {
@@ -721,7 +721,7 @@ function handleTopicPictos(topics, optionDisplayBlackTopic, optionReplaceResolve
 
 async function topicIsModerated(topicId) {
     async function isModerated(url) {
-        return await fetch(url).then(function (response) {
+        return await pageFetch(toAbsoluteUrl(url)).then(function (response) {
             return response.status === 410;
         }).catch(function () {
             return false;

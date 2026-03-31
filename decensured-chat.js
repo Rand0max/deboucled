@@ -159,13 +159,24 @@ class DecensuredChat {
         sendTypingStop(username, userId);
     }
 
-    setupRisiBank() {
-        if (!document.querySelector('button.risibank-toggle') || typeof window.RisiBank === 'undefined') {
-            console.log('[Chat] RisiBank non disponible');
+    async setupRisiBank() {
+        console.log('[Chat] RisiBank checking...');
+
+        if (!document.querySelector('button.risibank-toggle')) {
+            console.log('[Chat] RisiBank not available : toggle button not found');
             return;
         }
 
-        console.log('[Chat] RisiBank détecté, intégration du bouton');
+        if (typeof unsafeWindow.RisiBank === 'undefined') {
+            await loadPageScript('https://risibank.fr/downloads/web-api/risibank.js');
+        }
+
+        if (typeof unsafeWindow.RisiBank === 'undefined') {
+            console.log('[Chat] RisiBank not available : script not loaded');
+            return;
+        }
+
+        console.log('[Chat] RisiBank detected, integrating button');
         this.risiBankEnabled = true;
         this.createRisiBankButton();
     }
@@ -231,10 +242,10 @@ class DecensuredChat {
             embedContainer = document.getElementById('deboucled-risibank-embed');
         }
 
-        if (!embedContainer || !window.RisiBank) return;
+        if (!embedContainer || !unsafeWindow.RisiBank) return;
 
         try {
-            this.risiBankInstance = window.RisiBank.activate({
+            this.risiBankInstance = unsafeWindow.RisiBank.activate({
                 type: 'iframe',
                 container: embedContainer,
                 theme: preferDarkTheme() ? 'dark' : 'light',
@@ -245,7 +256,7 @@ class DecensuredChat {
                 showNSFW: true,
                 showCopyButton: false,
                 onSelectMedia: (media) => {
-                    window.RisiBank.Actions.addSourceImageLink('.deboucled-chat-input')(media);
+                    unsafeWindow.RisiBank.Actions.addSourceImageLink('.deboucled-chat-input')(media);
                     this.toggleRisiBank();
                 }
             });

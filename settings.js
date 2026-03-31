@@ -127,11 +127,11 @@ function buildSettingsPage() {
             </div>
             <table class="deboucled-option-table">
                 ${addDropdownOption(`Intelligence artificielle ${aiLogo} Anti-Boucle`,
-                    storage_optionAntiLoopAiMode,
-                    'Intelligence artificielle de détection des &quot;boucles&quot; (topics répétitifs) développée spécialement pour Déboucled.\n• Désactivé : aucune vérification sur les boucles.\n• Mode informatif : affiche une balise rouge &quot;BOUCLE&quot; à côté du sujet.\n• Mode filtrage : filtre automatiquement les sujets boucles.',
-                    storage_optionAntiLoopAiMode_default,
-                    ['Désactivé', 'Mode informatif', 'Mode filtrage'],
-                    'deboucled-td-main-option')}
+            storage_optionAntiLoopAiMode,
+            'Intelligence artificielle de détection des &quot;boucles&quot; (topics répétitifs) développée spécialement pour Déboucled.\n• Désactivé : aucune vérification sur les boucles.\n• Mode informatif : affiche une balise rouge &quot;BOUCLE&quot; à côté du sujet.\n• Mode filtrage : filtre automatiquement les sujets boucles.',
+            storage_optionAntiLoopAiMode_default,
+            ['Désactivé', 'Mode informatif', 'Mode filtrage'],
+            'deboucled-td-main-option')}
                 ${addToggleOption('Masquer totalement les messages des <span class="deboucled-blacklisted">pseudos blacklist</span>', storage_optionHideMessages, storage_optionHideMessages_default, 'Permet de masquer complètement les messages d\'un pseudo dans les topics. Si l\'option est désactivée, le contenu des messages sera caché et visible après un clic sur l\'oeil.')}
                 ${addToggleOption(`Filtrer les <i>Messages Privés</i> ${mpLogo} des <i>auteurs blacklist</i>`, storage_optionBlAuthorIgnoreMp, storage_optionBlAuthorIgnoreMp_default, 'Ignorer les MPs des pseudos présents dans votre liste noire et les déplacer automatiquement dans le dossier &quot;Spam&quot;.')}
                 ${addToggleOption(`Utiliser <i>JvArchive</i> pour <i>Pseudo boucled</i> ${spiralLogo}`, storage_optionBoucledUseJvarchive, storage_optionBoucledUseJvarchive_default, 'Quand vous cliquez sur le bouton en spirale à côté du pseudo, un nouvel onglet sera ouvert avec la liste des topics soit avec JVC soit avec JvArchive.')}
@@ -140,10 +140,10 @@ function buildSettingsPage() {
                 ${addRangeOption('Nombre de messages minimum', storage_optionDisplayThreshold, storage_optionDisplayThreshold_default, 10, 1000, 10, 'Nombre de messages minimum dans le topic pour forcer l\'affichage.', allowDisplayThreshold, true)}
                 ${addToggleOption(`Filtrer les <i>topics tendances</i> ${hotTopicLogo}`, storage_optionFilterHotTopics, storage_optionFilterHotTopics_default, 'Filtrer ou non les topics en tendance.', displayHotTopics, false)}
                 ${addDropdownOption(`Protection contre les <i>PoC</i> ${pocLogo}`,
-                    storage_optionDetectPocMode,
-                    'Protection contre les topics &quot;post ou cancer&quot; et les dérivés.\n• Désactivé : aucune protection\n• Mode simple (rapide) : recherche dans les messages uniquement si le titre contient un indice\n• Mode approfondi (plus lent) : recherche systématiquement dans les messages et le titre\n• Mode automatique (rapide) : mode simple + masque automatiquement le topic\n• Mode auto approfondi (plus lent) : mode approfondi + masque automatiquement le topic.',
-                    storage_optionDetectPocMode_default,
-                    ['Désactivé', 'Mode simple', 'Mode approfondi ⚠', 'Mode automatique', 'Mode auto approfondi ⚠'])}
+                storage_optionDetectPocMode,
+                'Protection contre les topics &quot;post ou cancer&quot; et les dérivés.\n• Désactivé : aucune protection\n• Mode simple (rapide) : recherche dans les messages uniquement si le titre contient un indice\n• Mode approfondi (plus lent) : recherche systématiquement dans les messages et le titre\n• Mode automatique (rapide) : mode simple + masque automatiquement le topic\n• Mode auto approfondi (plus lent) : mode approfondi + masque automatiquement le topic.',
+                storage_optionDetectPocMode_default,
+                ['Désactivé', 'Mode simple', 'Mode approfondi ⚠', 'Mode automatique', 'Mode auto approfondi ⚠'])}
             </table>`);
     }
     function addCustomisationSection(sectionIsActive) {
@@ -342,14 +342,16 @@ function addChangeLogEvent() {
 
 async function fetchChangelog() {
     if (fetchedChangelog) return;
-    await fetch(apiChangelogUrl)
-        .then(response => response.text())
-        .then(data => {
-            //data = data.split('\n').slice(0, 100).join('\n');
-            document.querySelector('#deboucled-changelog').innerHTML = data;
+    try {
+        const response = await gmXhr({ method: 'GET', url: apiChangelogUrl });
+        if (response?.responseText) {
+            document.querySelector('#deboucled-changelog').innerHTML = response.responseText;
             document.querySelector('#deboucled-changelog-collapsible-content').style.maxHeight = 'max-content';
             fetchedChangelog = true;
-        });
+        }
+    } catch (err) {
+        console.warn(err);
+    }
 }
 
 function addToggleEvent(id, setValue = true, callback = undefined) {

@@ -956,13 +956,11 @@ async function handleForumReactionClick(messageId, emoji) {
     const barEl = document.querySelector(`.deboucled-forum-reactions-bar[data-message-id="${messageId}"]`);
     if (!barEl) return;
 
-    let res;
-    await GM.xmlHttpRequest({
+    const res = await gmXhr({
         method: 'GET',
         url: `${apiMessageReactionsUrl}/${messageId}`,
         timeout: 5000,
-        onload: (response) => { res = response; },
-        onerror: () => {}
+        onerror: () => { }
     });
     if (res?.status === 200) {
         const reactions = JSON.parse(res.responseText);

@@ -3,6 +3,27 @@
 // HELPERS
 ///////////////////////////////////////////////////////////////////////////////////////
 
+function toAbsoluteUrl(url) {
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    return new URL(url, window.location.origin).href;
+}
+
+// Use page's native fetch for same-origin JVC requests (bypasses Cloudflare challenge)
+// GM.xmlHttpRequest gets blocked by Cloudflare, but native fetch goes through the browser pipeline
+const pageFetch = (typeof unsafeWindow !== 'undefined' && unsafeWindow.fetch)
+    ? unsafeWindow.fetch.bind(unsafeWindow)
+    : fetch;
+
+function loadPageScript(url) {
+    return new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = url;
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.head.appendChild(script);
+    });
+}
+
 // String utilities
 function normalizeDiacritic(str) {
     return str.normalize("NFD").replace(/\p{Diacritic}/gu, '');
@@ -402,7 +423,7 @@ function getTextChildren(contentElement) {
 }
 
 async function fetchHtml(url, handle410 = false) {
-    return fetch(url)
+    return pageFetch(toAbsoluteUrl(url))
         .then(function (response) {
             if (response.ok) return response.text();
             if (handle410 && (response.status === 410 || response.status === 404)) return response.text();
@@ -415,40 +436,10 @@ async function fetchHtml(url, handle410 = false) {
         });
 }
 
-/*
-async function fetchJson(url, timeout = 1500) {
-    return fetchWithTimeout(url, { timeout: timeout })
-        .then(function (response) {
-            if (!response.ok) throw Error(response.statusText);
-            return response.text();
-        })
-        .then(function (text) {
-            return JSON.parse(text);
-        })
-        .catch(function (err) {
-            console.warn(err);
-            return undefined;
-        });
-}
-
-async function fetchWithTimeout(resource, options = {}) {
-    const { timeout = 8000 } = options;
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
-    const response = await fetch(resource,
-        {
-            ...options,
-            signal: controller.signal
-        });
-    clearTimeout(id);
-    return response;
-}
-*/
-
 async function fetchJson(url, timeout = 1500) {
     return fetchWithTimeout(url, timeout)
         .then(function (response) {
-            if (response?.status !== 200) throw Error(response);
+            if (response?.status !== 200) throw Error(response?.statusText || `HTTP ${response?.status}`);
             return response?.responseText;
         })
         .then(function (text) {
@@ -464,13 +455,25 @@ async function fetchJsonWithParams(url, params, timeout = 1500) {
     return fetchJson(url + '?' + new URLSearchParams(params), timeout);
 }
 
+function gmXhr(details) {
+    return new Promise((resolve) => {
+        const origOnload = details.onload;
+        const origOnerror = details.onerror;
+        const origOntimeout = details.ontimeout;
+        GM.xmlHttpRequest({
+            ...details,
+            onload: (response) => { if (origOnload) origOnload(response); resolve(response); },
+            onerror: (response) => { if (origOnerror) origOnerror(response); resolve(undefined); },
+            ontimeout: (response) => { if (origOntimeout) origOntimeout(response); resolve(undefined); }
+        });
+    });
+}
+
 async function fetchWithTimeout(resource, timeout) {
-    let res;
-    await GM.xmlHttpRequest({
+    const res = await gmXhr({
         method: 'GET',
         url: resource,
         timeout: timeout,
-        onload: (response) => { res = response; },
         onerror: (response) => { console.error('fetch error', response); },
         ontimeout: (response) => { console.warn('fetch timeout', response); }
     });

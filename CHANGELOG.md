@@ -1,5 +1,8 @@
 # Changelog Déboucled
 
+## [2.77.0] (31/03/2026)
+- Correction de la compatibilité avec ViolentMonkey et optimisations (Rand0max)
+
 ## [2.76.0] (30/03/2026)
 - Réactions emoji et stickers sur les messages du forum (Rand0max)
 - Option pour activer/désactiver les réactions du forum (Rand0max)

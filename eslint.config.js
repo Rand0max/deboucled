@@ -23,7 +23,8 @@ const projectGlobals = {
     aiLoopSubjectReg: 'writable', aiLoopAuthorReg: 'writable', aiBoucledAuthorsData: 'writable',
     aiBoucledAuthorsReg: 'writable', hotTopicsData: 'writable', messageQuotesPendingArray: 'writable',
     messageQuotesData: 'writable', jvChatActive: 'writable', pocTopicMap: 'writable', topicAuthorMap: 'writable',
-    authorAvatarMap: 'writable', topicFilteredAuthorMap: 'writable', entityBlacklistMatches: 'writable',
+    authorAvatarMap: 'writable', pendingAvatarRequests: 'readonly', saveAvatarsTimer: 'writable', debounceSaveAvatars: 'readonly',
+    topicFilteredAuthorMap: 'writable', entityBlacklistMatches: 'writable',
     decensuredUsersSet: 'writable', hiddenTotalTopics: 'writable', hiddenSubjects: 'writable',
     hiddenTopicsIds: 'writable', hiddenMessages: 'writable', hiddenAuthors: 'writable',
     hiddenPrivateMessages: 'writable', hiddenSpammers: 'writable', hiddenAuthorArray: 'writable',
@@ -416,7 +417,10 @@ const projectGlobals = {
     handleSearch: 'readonly', handlePrivateMessage: 'readonly', handlePrivateMessages: 'readonly',
     buildBoucledAuthorButton: 'readonly', handleProfile: 'readonly',
     handlePrivateMessageNotifs: 'readonly', handleError: 'readonly', loadStyles: 'readonly',
-    updateCurrentUser: 'readonly', getCurrentUserPseudo: 'readonly', init: 'readonly',
+    updateCurrentUser: 'readonly', getCurrentUserPseudo: 'readonly', init: 'readonly', gmXhr: 'readonly',
+    loadPageScript: 'readonly',
+    toAbsoluteUrl: 'readonly',
+    pageFetch: 'readonly',
 };
 
 export default [

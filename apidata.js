@@ -42,15 +42,14 @@ async function checkUpdate() {
 
     const currentUserPseudo = userPseudo ?? store.get(storage_lastUsedPseudo, userId);
     const bodyJson = `{"userid":"${userId}","username":"${currentUserPseudo?.toLowerCase() ?? 'anonymous'}","version":"${getCurrentScriptVersion()}"}`;
-    let checkRes;
-    await GM.xmlHttpRequest({
+    const checkResponse = await gmXhr({
         method: 'POST',
         url: apiCheckUpdateUrl,
         data: bodyJson,
         headers: { 'Content-Type': 'application/json' },
-        onload: (response) => { checkRes = response.responseText; },
         onerror: (response) => { console.error("error : %o", response); }
     });
+    const checkRes = checkResponse?.responseText;
 
     store.set(storage_lastUpdateCheck, Date.now());
 
@@ -79,7 +78,7 @@ async function updateUser(forceUpdate = false) {
         settings: settings
     };
     const bodyJson = JSON.stringify(body);
-    await GM.xmlHttpRequest({
+    await gmXhr({
         method: 'POST',
         url: apiUpdateUserUrl,
         data: bodyJson,
@@ -108,7 +107,7 @@ async function sendDiagnostic(elapsed, exception) {
     const bodyJson = JSON.stringify(body);
     if (!bodyJson || bodyJson === '{}') return;
 
-    await GM.xmlHttpRequest({
+    await gmXhr({
         method: 'POST',
         url: apiDiagnosticUrl,
         data: bodyJson,
@@ -136,7 +135,7 @@ async function sendMessageQuote(messageQuoteInfo) {
     };
     const bodyJson = JSON.stringify(body);
 
-    await GM.xmlHttpRequest({
+    await gmXhr({
         method: 'POST',
         url: apiMessageQuoteUrl,
         data: bodyJson,
@@ -155,7 +154,7 @@ async function updateMessageQuote(userId, username, isRead, quoteId) {
 
     const bodyJson = JSON.stringify(body);
 
-    await GM.xmlHttpRequest({
+    await gmXhr({
         method: 'PUT',
         url: apiMessageQuoteUrl,
         data: bodyJson,
@@ -284,13 +283,11 @@ async function toggleForumReaction(messageId, emoji) {
             userid: userId,
             emoji: emoji
         });
-        let res;
-        await GM.xmlHttpRequest({
+        const res = await gmXhr({
             method: 'POST',
             url: apiMessageReactionUrl,
             data: body,
             headers: { 'Content-Type': 'application/json' },
-            onload: (response) => { res = response; },
             onerror: (response) => { console.error('[Reactions] Toggle error:', response); }
         });
         if (res?.status === 200) return JSON.parse(res.responseText);
@@ -305,13 +302,11 @@ async function getForumReactionsBulk(messageIds) {
     if (!messageIds?.length) return {};
     try {
         const body = JSON.stringify({ message_ids: messageIds });
-        let res;
-        await GM.xmlHttpRequest({
+        const res = await gmXhr({
             method: 'POST',
             url: apiMessageReactionsBulkUrl,
             data: body,
             headers: { 'Content-Type': 'application/json' },
-            onload: (response) => { res = response; },
             onerror: (response) => { console.error('[Reactions] Bulk error:', response); }
         });
         if (res?.status === 200) return JSON.parse(res.responseText);

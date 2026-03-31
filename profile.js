@@ -305,6 +305,27 @@ async function getAuthorAvatarUrl(author, authorProfileUrl) {
         return `${imageRootUrl}${url}`;
     }
 
+    // Deduplicate concurrent requests for the same author
+    if (pendingAvatarRequests.has(author)) {
+        return pendingAvatarRequests.get(author);
+    }
+
+    const promise = fetchAuthorAvatar(author, authorProfileUrl);
+    pendingAvatarRequests.set(author, promise);
+    try {
+        return await promise;
+    } finally {
+        pendingAvatarRequests.delete(author);
+    }
+}
+
+function debounceSaveAvatars() {
+    if (saveAvatarsTimer) clearTimeout(saveAvatarsTimer);
+    saveAvatarsTimer = setTimeout(() => { saveAvatarsTimer = null; saveLocalStorage(); }, 2000);
+}
+
+async function fetchAuthorAvatar(author, authorProfileUrl) {
+
     function storeAvatarUrl(avatarUrl) {
         avatarUrl = avatarUrl.replace('avatar-md', avatarSmallSizeRoute);
         if (avatarUrl === defaultAvatarUrl) authorAvatarMap.set(author, 'def');
@@ -335,11 +356,17 @@ async function getAuthorAvatarUrl(author, authorProfileUrl) {
 
     // First try to get avatar from JVC profile
     const jvcAvatarResult = await getAvatarUsingJvcProfile();
-    if (jvcAvatarResult?.length) return jvcAvatarResult;
+    if (jvcAvatarResult?.length) {
+        debounceSaveAvatars();
+        return jvcAvatarResult;
+    }
 
     if (!avatarUseJvArchiveApi) return defaultAvatarUrl;
 
     // If not successful, fallback with JvArchive
     const jvArchiveAvatarUrl = await getAvatarUsingJvArchive();
-    if (jvArchiveAvatarUrl?.length) return jvArchiveAvatarUrl;
+    if (jvArchiveAvatarUrl?.length) {
+        debounceSaveAvatars();
+        return jvArchiveAvatarUrl;
+    }
 }
