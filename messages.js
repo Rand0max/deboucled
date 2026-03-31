@@ -970,6 +970,13 @@ async function handleForumReactionClick(messageId, emoji) {
     }
 }
 
+function updateForumReactionsTheme() {
+    const isDark = preferDarkTheme();
+    document.querySelectorAll('.deboucled-forum-reactions-bar').forEach(bar => {
+        bar.classList.toggle('dark-theme', isDark);
+    });
+}
+
 function attachForumReactionUI(messageElement) {
     const messageId = messageElement.getAttribute('data-id');
     if (!messageId) return;
@@ -980,7 +987,7 @@ function attachForumReactionUI(messageElement) {
     if (!conteneurMessage) return;
 
     const reactionsBar = document.createElement('div');
-    reactionsBar.className = 'deboucled-forum-reactions-bar';
+    reactionsBar.className = `deboucled-forum-reactions-bar${preferDarkTheme() ? ' dark-theme' : ''}`;
     reactionsBar.dataset.messageId = messageId;
 
     // Bouton "ajouter réaction" Slack-style (toujours visible)

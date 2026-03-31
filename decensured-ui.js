@@ -17,6 +17,7 @@ function setupThemeToggleListener() {
         themeToggleButton.addEventListener('click', () => {
             setTimeout(() => {
                 updateFloatingWidgetTheme();
+                updateForumReactionsTheme();
             }, 100);
         });
     }

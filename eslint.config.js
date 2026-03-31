@@ -343,7 +343,7 @@ const projectGlobals = {
     // decensured-widget.js
     createDecensuredFloatingWidget: 'readonly', setupFloatingWidgetEvents: 'readonly',
     setupWidgetTabs: 'readonly', createFloatingWidgetOverlay: 'readonly',
-    updateFloatingWidgetTheme: 'readonly', showFloatingWidget: 'readonly',
+    updateFloatingWidgetTheme: 'readonly', updateForumReactionsTheme: 'readonly', showFloatingWidget: 'readonly',
     hideFloatingWidget: 'readonly', loadFloatingWidgetTopics: 'readonly',
     initializeFloatingWidgetInfiniteScroll: 'readonly', appendTopicsToContainer: 'readonly',
     createTopicElement: 'readonly', showEmptyState: 'readonly', showErrorState: 'readonly',
