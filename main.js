@@ -23,9 +23,26 @@ async function suggestUpdate() {
 
     const updateRes = await checkUpdate();
     if (updateRes?.length && mustRefresh(storage_lastUpdateDeferredCheck, checkUpdateDeferredExpire)) {
+        let changelogSection = '';
+        try {
+            const changelogRes = await gmXhr({ method: 'GET', url: apiChangelogLatestUrl });
+            if (changelogRes?.responseText) {
+                const data = JSON.parse(changelogRes.responseText);
+                if (data?.version && data?.changes?.length) {
+                    const items = data.changes.map(c => `<div class="deboucled-swal-changelog-item">${c}</div>`).join('');
+                    changelogSection = `<div class="deboucled-swal-changelog">
+                        <div class="deboucled-swal-changelog-header">
+                            <span class="deboucled-swal-changelog-badge">v${data.version}</span>
+                        </div>
+                        ${items}
+                    </div>`;
+                }
+            }
+        } catch { /* ignore */ }
+
         Swal.fire({
             title: '<strong>Nouvelle version disponible !<strong>',
-            html: `<p>Voulez-vous l'installer maintenant pour profiter des dernières améliorations et corrections de Déboucled ?</p>`,
+            html: `<p>Voulez-vous l'installer maintenant pour profiter des dernières améliorations et corrections de Déboucled ?</p>${changelogSection}`,
             imageUrl: 'https://image.noelshack.com/fichiers/2025/37/2/1757408733-deboucled-logo-new.png',
             imageWidth: 200,
             imageHeight: 200,
@@ -37,7 +54,8 @@ async function suggestUpdate() {
             denyButtonText: 'Plus tard',
             customClass: {
                 confirmButton: 'deboucled-bold',
-                title: 'deboucled-swal-title'
+                title: 'deboucled-swal-title',
+                htmlContainer: 'deboucled-swal-html-container'
             },
         }).then((result) => {
             if (result.isConfirmed) {

@@ -109,6 +109,41 @@ body.deboucled-dark-theme {
 .deboucled-swal-title {
   padding-top: 0;
 }
+.deboucled-swal-html-container {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.deboucled-swal-changelog {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  border-radius: 8px;
+  text-align: left;
+}
+.deboucled-swal-changelog-header {
+  margin-bottom: 8px;
+  text-align: center;
+}
+.deboucled-swal-changelog-badge {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4fc3f7;
+  background: rgba(79, 195, 247, 0.15);
+  padding: 2px 10px;
+  border-radius: 10px;
+  letter-spacing: 0.3px;
+}
+.deboucled-swal-changelog-item {
+  font-size: 14px;
+  color: #cfd8dc;
+  line-height: 1.6;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.deboucled-swal-changelog-item:last-child {
+  border-bottom: none;
+}
 
 /* Overlay */
 #deboucled-topic-list-wrapper {

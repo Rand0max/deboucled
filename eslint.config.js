@@ -7,7 +7,7 @@ const projectGlobals = {
     // variables.js
     defaultTopicCount: 'readonly', maxMessageByPage: 'readonly', entitySubject: 'readonly', entityAuthor: 'readonly',
     entityTopicId: 'readonly', jvarchiveUrl: 'readonly', avatarUseJvArchiveApi: 'readonly', deboucledRepositoryUrl: 'readonly',
-    deboucledBackendUrl: 'readonly', deboucledApiUrl: 'readonly', apiChangelogUrl: 'readonly', apiYoutubeBlacklistUrl: 'readonly',
+    deboucledBackendUrl: 'readonly', deboucledApiUrl: 'readonly', apiChangelogUrl: 'readonly', apiChangelogLatestUrl: 'readonly', apiYoutubeBlacklistUrl: 'readonly',
     apiPrebouclesDataUrl: 'readonly', apiAiLoopsDataUrl: 'readonly', apiAiBoucledAuthorsDataUrl: 'readonly',
     apiCheckUpdateUrl: 'readonly', apiUpdateUserUrl: 'readonly', apiDiagnosticUrl: 'readonly', apiMessageQuoteUrl: 'readonly',
     apiReactionsConfigUrl: 'readonly', apiMessageReactionUrl: 'readonly', apiMessageReactionsUrl: 'readonly', apiMessageReactionsBulkUrl: 'readonly',

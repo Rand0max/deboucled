@@ -20,6 +20,7 @@ const deboucledRepositoryUrl = 'https://github.com/Rand0max/deboucled';
 const deboucledBackendUrl = 'https://deboucled.randomax.com';
 const deboucledApiUrl = `${deboucledBackendUrl}/api`;
 const apiChangelogUrl = `${deboucledApiUrl}/changelog`;
+const apiChangelogLatestUrl = `${deboucledApiUrl}/changelog/latest`;
 const apiYoutubeBlacklistUrl = `${deboucledApiUrl}/youtubeblacklist`;
 const apiPrebouclesDataUrl = `${deboucledApiUrl}/preboucles`;
 const apiAiLoopsDataUrl = `${deboucledApiUrl}/loops/v2`;

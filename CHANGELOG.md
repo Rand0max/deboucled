@@ -1,5 +1,8 @@
 # Changelog Déboucled
 
+## [2.78.0] (01/04/2026)
+- Affichage des dernières nouveautés dans la popup de mise à jour (Rand0max)
+
 ## [2.77.0] (31/03/2026)
 - Correction de la compatibilité avec ViolentMonkey et optimisations (Rand0max)
 
