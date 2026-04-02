@@ -5382,13 +5382,15 @@ body.dark .deboucled-loading-text::after {
   border-color: #555;
 }
 
-.deboucled-floating-widget.dark-theme .deboucled-chat-reaction-badge.own-reaction {
+.deboucled-floating-widget.dark-theme
+  .deboucled-chat-reaction-badge.own-reaction {
   background: rgba(79, 179, 212, 0.15);
   border-color: rgba(79, 179, 212, 0.4);
   color: #4fb3d4;
 }
 
-.deboucled-floating-widget.dark-theme .deboucled-chat-reaction-badge.own-reaction:hover {
+.deboucled-floating-widget.dark-theme
+  .deboucled-chat-reaction-badge.own-reaction:hover {
   background: rgba(79, 179, 212, 0.25);
   border-color: rgba(79, 179, 212, 0.6);
 }
@@ -5406,6 +5408,7 @@ body.dark .deboucled-loading-text::after {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   z-index: 10001;
   width: 400px;
+  max-width: 98%;
   animation: reaction-picker-in 0.15s ease;
 }
 
@@ -5429,7 +5432,8 @@ body.dark .deboucled-loading-text::after {
   margin: 4px 0;
 }
 
-.deboucled-chat-reaction-picker.dark-theme .deboucled-chat-reaction-picker-separator {
+.deboucled-chat-reaction-picker.dark-theme
+  .deboucled-chat-reaction-picker-separator {
   background: #444;
 }
 
@@ -5449,7 +5453,8 @@ body.dark .deboucled-loading-text::after {
   transform: scale(1.25);
 }
 
-.deboucled-chat-reaction-picker.dark-theme .deboucled-chat-reaction-picker-emoji:hover {
+.deboucled-chat-reaction-picker.dark-theme
+  .deboucled-chat-reaction-picker-emoji:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
@@ -5487,7 +5492,8 @@ body.dark .deboucled-loading-text::after {
   transform: scale(1.15);
 }
 
-.deboucled-chat-reaction-picker.dark-theme .deboucled-chat-reaction-picker-sticker:hover {
+.deboucled-chat-reaction-picker.dark-theme
+  .deboucled-chat-reaction-picker-sticker:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
@@ -5551,7 +5557,8 @@ body.dark .deboucled-loading-text::after {
   color: #666;
 }
 
-.deboucled-forum-reactions-bar.dark-theme .deboucled-forum-reaction-add-btn:hover {
+.deboucled-forum-reactions-bar.dark-theme
+  .deboucled-forum-reaction-add-btn:hover {
   color: #bbb;
   background: rgba(255, 255, 255, 0.08);
   border-color: #555;
@@ -5605,18 +5612,21 @@ body.dark .deboucled-loading-text::after {
   color: #ddd;
 }
 
-.deboucled-forum-reactions-bar.dark-theme .deboucled-forum-reaction-badge:hover {
+.deboucled-forum-reactions-bar.dark-theme
+  .deboucled-forum-reaction-badge:hover {
   background: #404040;
   border-color: #666;
 }
 
-.deboucled-forum-reactions-bar.dark-theme .deboucled-forum-reaction-badge.own-reaction {
+.deboucled-forum-reactions-bar.dark-theme
+  .deboucled-forum-reaction-badge.own-reaction {
   background: rgba(79, 179, 212, 0.15);
   border-color: rgba(79, 179, 212, 0.4);
   color: #4fb3d4;
 }
 
-.deboucled-forum-reactions-bar.dark-theme .deboucled-forum-reaction-badge.own-reaction:hover {
+.deboucled-forum-reactions-bar.dark-theme
+  .deboucled-forum-reaction-badge.own-reaction:hover {
   background: rgba(79, 179, 212, 0.25);
   border-color: rgba(79, 179, 212, 0.6);
 }
@@ -5666,7 +5676,8 @@ body.dark .deboucled-loading-text::after {
   margin: 4px 0;
 }
 
-.deboucled-forum-reaction-picker.dark-theme .deboucled-forum-reaction-picker-separator {
+.deboucled-forum-reaction-picker.dark-theme
+  .deboucled-forum-reaction-picker-separator {
   background: #444;
 }
 
@@ -5686,7 +5697,8 @@ body.dark .deboucled-loading-text::after {
   transform: scale(1.25);
 }
 
-.deboucled-forum-reaction-picker.dark-theme .deboucled-forum-reaction-picker-emoji:hover {
+.deboucled-forum-reaction-picker.dark-theme
+  .deboucled-forum-reaction-picker-emoji:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
@@ -5722,6 +5734,7 @@ body.dark .deboucled-loading-text::after {
   transform: scale(1.15);
 }
 
-.deboucled-forum-reaction-picker.dark-theme .deboucled-forum-reaction-picker-sticker:hover {
+.deboucled-forum-reaction-picker.dark-theme
+  .deboucled-forum-reaction-picker-sticker:hover {
   background: rgba(255, 255, 255, 0.1);
 }

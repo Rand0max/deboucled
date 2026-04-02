@@ -192,14 +192,3 @@ body.didomi-popup-open {
     --ad-placeholder-w: 0;
   }
 }
-
-html.modal-generic-mode {
-  overflow: auto !important;
-  padding-right: 0 !important;
-}
-
-.modal-generic-mode,
-.modal-generic-overflow,
-#newsletter-app {
-  display: none !important;
-}

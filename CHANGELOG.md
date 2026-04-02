@@ -1,5 +1,8 @@
 # Changelog Déboucled
 
+## [2.78.1] (02/04/2026)
+- Correction du bug de la page blanche lors des DDB (Rand0max)
+
 ## [2.78.0] (01/04/2026)
 - Affichage des dernières nouveautés dans la popup de mise à jour (Rand0max)
 
