@@ -5738,3 +5738,8 @@ body.dark .deboucled-loading-text::after {
   .deboucled-forum-reaction-picker-sticker:hover {
   background: rgba(255, 255, 255, 0.1);
 }
+
+.text-enrichi-forum .img-shack {
+  margin-right: -4px;
+  margin-bottom: -7px;
+}
