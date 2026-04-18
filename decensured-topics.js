@@ -250,7 +250,7 @@ async function preloadDecensuredTopicsStatus(topicElements = null) {
 
     try {
         if (!topicElements) {
-            topicElements = document.querySelectorAll('.topic-list .topic-item, .forum-topic-list .topic-subject');
+            topicElements = document.querySelectorAll('ul.tablesForum--listTopics > li.tablesForum__bodyRow, .topic-list .topic-item, .forum-topic-list .topic-subject');
         }
 
         if (!topicElements.length) return;
@@ -287,7 +287,7 @@ function markTopicAsDecensured(topicElement, topicData) {
     if (!topicElement || !topicData) return;
     if (topicElement.querySelector('.deboucled-decensured-topic-list-indicator')) return;
 
-    const link = topicElement.querySelector('.topic-title, .lien-jv.topic-title');
+    const link = topicElement.querySelector(JVC_SEL.topicTitle);
     if (!link) return;
 
     const topicListItem = link.closest('li');
@@ -301,7 +301,7 @@ function markTopicAsDecensured(topicElement, topicData) {
         link.title = `Titre réel : ${topicData.topic_name_real}\nTitre de couverture : ${topicData.topic_name_fake || topicData.topic_name}`;
     }
 
-    const folderIcon = topicListItem.querySelector('.icon-topic-folder, .topic-img');
+    const folderIcon = topicListItem.querySelector('.icon-topic-folder, .topic-img, .tablesForum__cellPicto');
     if (folderIcon) {
         folderIcon.classList.add('deboucled-decensured-topic-icon');
         folderIcon.title = 'Topic Décensured';

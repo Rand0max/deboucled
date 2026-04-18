@@ -375,11 +375,11 @@ async function processNewTopicCreation() {
 
     if (!topicId || !username) return;
 
-    const messages = document.querySelectorAll('.conteneur-messages-pagi > div.bloc-message-forum');
+    const messages = document.querySelectorAll('#listMessages > .messageUser, .conteneur-messages-pagi > div.bloc-message-forum');
     if (messages.length !== 1) return;
 
     const firstMessage = messages[0];
-    const authorElement = firstMessage.querySelector('.text-user, .bloc-pseudo-msg');
+    const authorElement = firstMessage.querySelector('.messageUser__label, .text-user, .bloc-pseudo-msg');
     const authorName = authorElement ? authorElement.textContent.trim() : '';
 
     if (authorName !== username) return;

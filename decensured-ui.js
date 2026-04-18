@@ -28,7 +28,7 @@ function buildDecensuredMessagesUI() {
     if (currentPage !== 'topicmessages') return;
 
     const modernEditor = document.querySelector('#forums-post-message-editor');
-    const traditionalTextarea = document.querySelector('#message_topic');
+    const traditionalTextarea = document.querySelector(JVC_SEL.messageTopicInput);
 
     let container;
     if (modernEditor) {
@@ -205,7 +205,7 @@ function addDecensuredBadge(msgElement) {
         return;
     }
 
-    const pseudoLink = msgElement.querySelector('.bloc-pseudo-msg');
+    const pseudoLink = msgElement.querySelector(JVC_SEL.messageAuthor);
     if (!pseudoLink) return;
 
     const badge = buildDecensuredBadge();
@@ -271,8 +271,8 @@ function getTopicFormElements() {
         document.querySelector('#forums-post-topic-editor') ||
         findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_FORM);
 
-    let titleInput = document.querySelector('#input-topic-title') || findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT);
-    let messageTextarea = document.querySelector('#message_topic') || findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA);
+    let titleInput = document.querySelector('#input-topic-title, .topicTitle__input') || findElement(DECENSURED_CONFIG.SELECTORS.TOPIC_TITLE_INPUT);
+    let messageTextarea = document.querySelector(JVC_SEL.messageTopicInput) || findElement(DECENSURED_CONFIG.SELECTORS.MESSAGE_TEXTAREA);
 
     const elements = {
         titleInput,
@@ -463,7 +463,7 @@ function highlightDecensuredTopics() {
         return;
     }
 
-    const allTopics = document.querySelectorAll('.topic-list > li:not(.dfp__atf):not(.message)');
+    const allTopics = document.querySelectorAll(JVC_SEL.topicListItem);
 
     if (allTopics.length === 0) {
         return;
@@ -471,7 +471,7 @@ function highlightDecensuredTopics() {
 
     const topicsToCheck = Array.from(allTopics).filter(topic => {
         const hasBeenChecked = topic.classList.contains('deboucled-decensured-checked');
-        const titleLink = topic.querySelector('.topic-title, .lien-jv.topic-title');
+        const titleLink = topic.querySelector(JVC_SEL.topicTitle);
         const hasValidLink = titleLink && titleLink.href;
 
         return !hasBeenChecked && hasValidLink;
@@ -543,7 +543,7 @@ function setupDynamicTopicHighlighting() {
             threshold: 0.1
         });
 
-        const existingTopics = document.querySelectorAll('.topic-list > li:not(.dfp__atf):not(.message)');
+        const existingTopics = document.querySelectorAll(JVC_SEL.topicListItem);
         existingTopics.forEach(topic => topicObserver.observe(topic));
 
         return topicObserver;
@@ -727,7 +727,7 @@ function animateContentTransition(fromElement, toElement, onComplete) {
         return;
     }
 
-    const toggleButton = fromElement.closest('.bloc-message-forum, .conteneur-message')?.querySelector('.deboucled-decensured-indicator');
+    const toggleButton = fromElement.closest('.bloc-message-forum, .conteneur-message, .messageUser')?.querySelector('.deboucled-decensured-indicator');
     if (toggleButton) {
         toggleButton.classList.add('transitioning');
     }

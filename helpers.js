@@ -3,6 +3,119 @@
 // HELPERS
 ///////////////////////////////////////////////////////////////////////////////////////
 
+// --- JVC DOM compatibility layer (April 2026 forum refresh) ---
+// New JVC markup replaces the old BEM-less classes with messageUser__*, tablesForum__*, pagination__*, etc.
+// These helpers target BOTH old and new DOMs so the rest of the code keeps working.
+
+const JVC_SEL = {
+    // topic list
+    topicListContainer: 'ul.tablesForum--listTopics, .topic-list',
+    // NOTE: keeps the .tablesForum__headRow first so existing code treating topics[0] as header still works.
+    topicListItem: 'ul.tablesForum--listTopics > li:not(.dfp__atf):not(.message), .topic-list > li:not(.dfp__atf):not(.message)',
+    topicTitle: 'a.tablesForum__cellSubject, a.lien-jv.topic-title, .topic-title',
+    topicAuthor: '.tablesForum__authorLink, .topic-author',
+    topicCount: '.tablesForum__cellText--msg, .topic-count',
+    topicImg: '.tablesForum__subjectMarkerIcon, .topic-img',
+    topicHeadSubject: '.tablesForum__headRow .tablesForum__rowSujets, .topic-head > span:nth-child(1)',
+    topicHeadLastMsg: '.tablesForum__headRow .tablesForum__rowLastMsg, .topic-head > span:nth-child(4)',
+    // topic (messages) page
+    messagesContainer: '#listMessages, .conteneur-messages-pagi',
+    message: '.messageUser, .bloc-message-forum',
+    messageAuthor: 'a.messageUser__label, span.messageUser__label, a.bloc-pseudo-msg, span.bloc-pseudo-msg',
+    messageDate: 'a.messageUser__date, .bloc-date-msg',
+    messageContent: '.messageUser__msg.js-message-user-msg, .messageUser__msg, .txt-msg.text-enrichi-forum, .txt-msg',
+    messageMain: '.messageUser__main, .bloc-contenu',
+    messageOptions: '.messageUser__footer, .bloc-options-msg',
+    // Anchor for inline author buttons (spirale, filtre, jvarchive). On new DOM
+    // we insert them right after the pseudo link so they stay on the same line
+    // as the pseudo inside .messageUser__profil. Old DOM keeps div.bloc-mp-pseudo.
+    messageMpBloc: 'a.messageUser__label, span.messageUser__label, div.bloc-mp-pseudo',
+    messageAvatar: '.messageUser__header .avatar__image, .user-avatar-msg',
+    messageBlockquote: '.message__blockquote, .blockquote-jv',
+    messageSignature: '.messageUser__signature, .signature-msg',
+    // pagination
+    paginationContainer: '.pagination, .bloc-pagi-default',
+    pageActive: '.pagination__item--current, .page-active',
+    pageLast: '.pagination__button--last, .pagi-fin-actif.icon-next2',
+    // editors / forms
+    topicTitleHeader: '.titleMessagesUsers__title, #bloc-title-forum',
+    topicBlocFormulaire: '#forums-post-message-editor, #forums-post-topic-editor, #bloc-formulaire-forum',
+    messageTopicInput: 'textarea[name="message_topic"], textarea[name="message_reponse"], #message_topic',
+    // misc
+    blocPreRight: '#js-list-message-tools-actions .buttonsNavbar, #js-list-topics-tools-actions, .bloc-pre-right',
+};
+
+// Extracts the topic author pseudo from a topic list row, handling both the legacy DOM
+// and the April 2026 JVC refresh. Returns null when the pseudo is not exposed (e.g. not-logged-in
+// rows where JVC only displays a "+N" participant placeholder).
+function getTopicAuthor(topicElement) {
+    if (!topicElement) return null;
+    // New DOM (logged-in): participants cell has <a class="tablesForum__firstAvatar" title="Pseudo" href="/profil/pseudo...">
+    // New DOM (not-logged-in): same cell but as <span class="JvCare ... tablesForum__firstAvatar" title="Pseudo">
+    // (the href is JvCare-obfuscated in the class, but the title still carries the real pseudo).
+    const firstAvatar = topicElement.querySelector('.tablesForum__firstAvatar');
+    if (firstAvatar) {
+        const pseudo = firstAvatar.getAttribute('title')?.trim()
+            || firstAvatar.querySelector('img')?.getAttribute('alt')?.trim()
+            || '';
+        if (pseudo) return pseudo;
+    }
+    // Legacy DOM or pseudo exposed in text (old .topic-author, or .tablesForum__authorLink
+    // previously injected by addTopic for JvCare-obfuscated rows).
+    const authorLink = topicElement.querySelector(JVC_SEL.topicAuthor);
+    if (!authorLink) return null;
+    const text = authorLink.textContent.trim();
+    // Not-logged-in new DOM: the cell shows "+N" (participant count). Not a real pseudo -> skip.
+    if (!text || /^\+\d+$/.test(text)) return null;
+    return text;
+}
+
+function jvcGetTopicIdFromElement(topicElement) {
+    if (!topicElement) return null;
+    const dataId = topicElement.getAttribute?.('data-id');
+    if (dataId) return dataId;
+    const id = topicElement.id || '';
+    const m = id.match(/^topic-(\d+)$/);
+    return m ? m[1] : null;
+}
+
+function jvcGetMessageIdFromElement(messageElement) {
+    if (!messageElement) return null;
+    const dataId = messageElement.getAttribute?.('data-id');
+    if (dataId) return dataId;
+    // Self id (hybrid component) then fallback to nearest ancestor carrying
+    // the id (new DOM fallback variant wraps .messageUser in <div id="message-X">).
+    const source = messageElement.id ? messageElement : messageElement.closest?.('[id^="message-"]');
+    const id = source?.id || '';
+    const m = id.match(/^message-(\d+)$/);
+    return m ? m[1] : null;
+}
+
+function jvcFindMessageById(id, root) {
+    root = root || document;
+    return root.querySelector(`#message-${id}, .bloc-message-forum[data-id="${id}"], .messageUser[data-id="${id}"]`);
+}
+
+function jvcFindTopicById(id, root) {
+    root = root || document;
+    return root.querySelector(`#topic-${id}, [data-id="${id}"]`);
+}
+
+// Decodes window.jvc.forumsAppPayload (base64 JSON) once and caches the result.
+let _jvcForumsAppPayloadCache;
+function jvcGetForumsAppPayload() {
+    if (_jvcForumsAppPayloadCache !== undefined) return _jvcForumsAppPayloadCache;
+    try {
+        const root = (typeof unsafeWindow !== 'undefined' ? unsafeWindow : window);
+        const raw = root?.jvc?.forumsAppPayload;
+        if (!raw) { _jvcForumsAppPayloadCache = null; return null; }
+        _jvcForumsAppPayloadCache = JSON.parse(atob(raw));
+    } catch {
+        _jvcForumsAppPayloadCache = null;
+    }
+    return _jvcForumsAppPayloadCache;
+}
+
 function toAbsoluteUrl(url) {
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
     return new URL(url, window.location.origin).href;

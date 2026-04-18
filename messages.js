@@ -5,8 +5,104 @@
 
 function getAllMessages(doc) {
     if (!doc) doc = document;
-    let allMessages = doc.querySelectorAll('.conteneur-messages-pagi > div.bloc-message-forum');
-    return [...allMessages];
+    // New JVC DOM ships two parallel renderings of each message on the same
+    // page (hybrid component + fallback wrapper). Grab every .messageUser
+    // descendant of #listMessages then dedupe by resolved message id,
+    // preferring the variant actually rendered (visible dimensions) so that
+    // author buttons aren't injected inside a hidden duplicate.
+    //   variant A: <div class="messageUser js-hybrid-component" id="message-X">  (direct child of #listMessages)
+    //   variant B: <div id="message-X"><div class="messageUser">...</div></div>  (classe sur enfant, id sur parent)
+    // Legacy DOM: .conteneur-messages-pagi > div.bloc-message-forum
+    const container = doc.querySelector('#listMessages, .conteneur-messages-pagi');
+    if (!container) return [];
+
+    const byId = new Map();
+    const nodes = container.querySelectorAll(':scope > .messageUser, :scope > [id^="message-"] > .messageUser, :scope > div.bloc-message-forum, :scope > .bloc-message-forum');
+    let anonIdx = 0;
+    const isVisible = (node) => {
+        try {
+            if (doc !== document) return true; // detached doc: can't measure
+            const r = node.getBoundingClientRect?.();
+            if (!r) return true;
+            return r.width > 0 && r.height > 0;
+        } catch { return true; }
+    };
+    for (const node of nodes) {
+        const id = node.id || node.closest('[id^="message-"]')?.id || node.getAttribute('data-id') || `__anon_${anonIdx++}`;
+        const prev = byId.get(id);
+        if (!prev) { byId.set(id, node); continue; }
+        // Prefer the rendered variant: pick the one with non-zero dimensions.
+        const prevVisible = isVisible(prev);
+        const curVisible = isVisible(node);
+        if (!prevVisible && curVisible) byId.set(id, node);
+    }
+    const result = [...byId.values()];
+    if (result.length) return result;
+
+    // Ultimate fallback: any messageUser / bloc-message-forum anywhere.
+    return [...doc.querySelectorAll('.messageUser, div.bloc-message-forum')];
+}
+
+let deboucledMessageRehydrationObserver = null;
+let deboucledRehydrationProcessing = false;
+
+function markMessageProcessed(mu) {
+    if (mu) mu.setAttribute('data-deboucled-processed', '1');
+}
+
+function isMessageProcessed(mu) {
+    return !!mu && mu.getAttribute('data-deboucled-processed') === '1';
+}
+
+function setupMessageRehydrationObserver(messageOptions) {
+    if (deboucledMessageRehydrationObserver) {
+        deboucledMessageRehydrationObserver.disconnect();
+        deboucledMessageRehydrationObserver = null;
+    }
+    const container = document.querySelector('#listMessages');
+    if (!container || typeof MutationObserver === 'undefined') return;
+
+    // Tag every message already handled by the initial pass so we don't
+    // re-process them on the first observer tick.
+    container.querySelectorAll(':scope > .messageUser, :scope > [id^="message-"] > .messageUser')
+        .forEach(markMessageProcessed);
+
+    const reprocess = (candidate) => {
+        if (!candidate || candidate.nodeType !== 1) return;
+        const mu = candidate.classList?.contains('messageUser')
+            ? candidate
+            : candidate.querySelector?.(':scope > .messageUser, .messageUser');
+        if (!mu) return;
+        if (isMessageProcessed(mu)) return;
+        // Tag BEFORE handleMessage so any internal DOM mutation we cause can't
+        // re-trigger us (the tag survives because JVC replaces the whole node
+        // when it re-hydrates, clearing the tag naturally).
+        markMessageProcessed(mu);
+        try {
+            deboucledRehydrationProcessing = true;
+            handleMessage(mu, messageOptions, false);
+        } catch (e) {
+            // swallow
+        } finally {
+            deboucledRehydrationProcessing = false;
+        }
+    };
+
+    deboucledMessageRehydrationObserver = new MutationObserver((mutations) => {
+        if (deboucledRehydrationProcessing) return;
+        // Only react to direct children of #listMessages being added/replaced
+        // (JVC hydration swaps whole message wrappers). Ignore internal
+        // subtree mutations to avoid reacting to our own DOM edits.
+        for (const m of mutations) {
+            if (m.type !== 'childList') continue;
+            if (m.target !== container) continue;
+            for (const n of m.addedNodes) reprocess(n);
+        }
+    });
+    deboucledMessageRehydrationObserver.observe(container, {
+        childList: true,
+        subtree: false
+    });
 }
 
 function buildMessagesHeader() {
@@ -39,7 +135,7 @@ function buildMessagesHeader() {
         }
     };
 
-    let paginationElement = document.querySelector('div.bloc-pagi-default');
+    let paginationElement = document.querySelector(JVC_SEL.paginationContainer);
     insertAfter(ignoredMessageHeader, paginationElement);
     ignoredMessageHeader.appendChild(toggleIgnoredAuthors);
     ignoredMessageHeader.appendChild(ignoredAuthors);
@@ -101,21 +197,30 @@ function buildDeboucledBlacklistButton(author, callbackAfter, className = 'debou
 }
 
 function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton) {
-    let isSelf = messageElement.querySelector('span.picto-msg-croix');
+    // Idempotency: skip if we already injected our button in this message
+    // (e.g. when the rehydration observer re-runs handleMessage).
+    if (messageElement.querySelector('.deboucled-blacklist-author-button')) return;
+
+    let isSelf = messageElement.querySelector('span.picto-msg-croix, .messageUser__action--delete, .messageUser__action[title*="Supprimer"]');
     if (isSelf) return;
 
     let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { window.location.reload(); });
 
-    let jvcBlacklistButton = messageElement.querySelector('span.picto-msg-tronche');
+    let jvcBlacklistButton = messageElement.querySelector('span.picto-msg-tronche, .messageUser__action[title*="Blacklist"]');
     let logged = (jvcBlacklistButton !== null);
     if (logged) insertAfter(dbcBlacklistButton, jvcBlacklistButton);
-    else messageElement.querySelector('div.bloc-options-msg')?.appendChild(dbcBlacklistButton);
+    else messageElement.querySelector(JVC_SEL.messageOptions)?.appendChild(dbcBlacklistButton);
 
     if (!optionShowJvcBlacklistButton && logged) jvcBlacklistButton.style.display = 'none';
 }
 
 function addAuthorButtons(nearbyElement, author, optionBoucledUseJvarchive) {
     if (!nearbyElement) return;
+    // Idempotency: if our buttons are already next to the pseudo, skip.
+    const container = nearbyElement.parentElement;
+    if (container?.querySelector(':scope > .deboucled-author-boucled-button') &&
+        container?.querySelector(':scope > .deboucled-filter-logo')) return;
+
     let boucledButton = buildBoucledAuthorButton(author, optionBoucledUseJvarchive);
     insertAfter(boucledButton, nearbyElement);
 
@@ -158,14 +263,14 @@ function handleJvChatAndTopicLive(messageOptions) {
         }
         else {
             highlightBlacklistedAuthor(messageElement, authorElement);
-            let mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
+            let mpBloc = messageElement.querySelector(JVC_SEL.messageMpBloc);
             addAuthorButtons(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
         }
         return false;
     }
 
     function createJvChatBlacklistButton(messageElement, authorElement, author) {
-        let isSelf = messageElement.querySelector('span.picto-msg-croix');
+        let isSelf = messageElement.querySelector('span.picto-msg-croix, .messageUser__action--delete, .messageUser__action[title*="Supprimer"]');
         if (isSelf) return;
 
         let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => handleBlacklistedAuthor(messageElement, authorElement, author));
@@ -176,7 +281,7 @@ function handleJvChatAndTopicLive(messageOptions) {
     }
 
     function handleLiveMessage(messageElement, authorElement, topicLiveEvent) {
-        const messageContent = messageElement.querySelector('.txt-msg.text-enrichi-forum');
+        const messageContent = messageElement.querySelector(JVC_SEL.messageContent);
         const author = authorElement.textContent.trim();
         const isSelf = userPseudo?.toLowerCase() === author.toLowerCase();
 
@@ -189,7 +294,7 @@ function handleJvChatAndTopicLive(messageOptions) {
             if (topicLiveEvent) {
                 let optionShowJvcBlacklistButton = store.get(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
                 upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton);
-                let mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
+                let mpBloc = messageElement.querySelector(JVC_SEL.messageMpBloc);
                 addAuthorButtons(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
             }
             else {
@@ -315,9 +420,9 @@ function enableJvChatAndTopicLiveEvents(newMessageCallback, postMessageCallback,
 
     // TopicLive
     window.addEventListener('topiclive:newmessage', function (event) {
-        const messageElement = document.querySelector(`.bloc-message-forum[data-id="${event.detail.id}"]`);
+        const messageElement = jvcFindMessageById(event.detail.id);
         if (!messageElement) return;
-        const authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+        const authorElement = messageElement.querySelector(JVC_SEL.messageAuthor);
         if (!authorElement) return;
         newMessageCallback(messageElement, authorElement, event);
     });
@@ -415,7 +520,7 @@ function embedTwitterLinks(messageContent) {
     if (currentTwitterScript) currentTwitterScript.remove();
 
     twitterLinks.forEach(link => {
-        if (link.closest('.signature-msg') !== null || link.closest('.twitter-tweet') !== null) return;
+        if (link.closest(JVC_SEL.messageSignature) !== null || link.closest('.twitter-tweet') !== null) return;
 
         let tweetElement = document.createElement('blockquote');
         tweetElement.setAttribute('class', 'twitter-tweet');
@@ -536,10 +641,10 @@ function embedYoutube(messageContent) {
 
 function handleLongMessages(allMessages) {
     allMessages.forEach(m => {
-        const txtMsg = m.querySelector('.txt-msg.text-enrichi-forum');
+        const txtMsg = m.querySelector(JVC_SEL.messageContent);
         if (!txtMsg) return;
 
-        let blockquote = txtMsg.querySelector('.deboucled-blacklisted-blockquote') ?? txtMsg.querySelector('blockquote.blockquote-jv');
+        let blockquote = txtMsg.querySelector('.deboucled-blacklisted-blockquote') ?? txtMsg.querySelector(`blockquote.blockquote-jv, blockquote.message__blockquote`);
         if (blockquote && txtMsg.contains(blockquote)) {
             blockquote.parentElement.removeChild(blockquote); // on vire les citations le temps de créer le wrapper
         }
@@ -738,7 +843,7 @@ function highlightSpecialAuthors(author, authorElement, isSelf) {
 }
 
 function fixMessageJvCare(messageElement) {
-    const avatar = messageElement.querySelector('.user-avatar-msg');
+    const avatar = messageElement.querySelector(JVC_SEL.messageAvatar);
     if (avatar && avatar.hasAttribute('data-src') && avatar.hasAttribute('src')) {
         avatar.setAttribute('src', avatar.getAttribute('data-src'));
         avatar.removeAttribute('data-src');
@@ -778,9 +883,9 @@ async function enhanceBlockquotes(messageContent) {
 
     bqContainers.forEach((e) => e.classList.add('deboucled-blockquote-container'));
 
-    const blockquotes = messageContent.querySelectorAll('.blockquote-jv');
+    const blockquotes = messageContent.querySelectorAll(JVC_SEL.messageBlockquote);
     blockquotes.forEach((bq) => {
-        if (bq.parentNode.parentNode.classList.contains('bloc-contenu')) return;
+        if (bq.parentNode.parentNode.classList.contains('bloc-contenu') || bq.parentNode.parentNode.classList.contains('messageUser__main')) return;
         bq.style.display = 'none';
         let numberNestedBq = bq.querySelectorAll('blockquote').length;
         const blockquoteButton = createBlockquoteButton(numberNestedBq + 1);
@@ -807,7 +912,7 @@ function getLocationMessageId() {
 */
 
 async function setHdAvatars() {
-    const avatars = document.querySelectorAll('img.user-avatar-msg');
+    const avatars = document.querySelectorAll('img.user-avatar-msg, img.avatar__image');
     avatars.forEach(img => {
         img.src = img.src.replace('/avatar-sm/', '/avatar-md/');
         if (img.getAttribute('data-src')) {

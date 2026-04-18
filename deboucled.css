@@ -97,7 +97,7 @@ body.deboucled-dark-theme {
   justify-content: center;
   align-items: center;
   column-gap: 7px;
-  margin: 5px 3rem;
+  margin: 1.25rem 3rem 0.25rem;
 }
 .deboucled-sponsoring {
   display: flex;
@@ -1860,6 +1860,207 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
   position: relative;
   width: 2.3rem;
 }
+
+.messageUser__profil {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.4rem;
+  row-gap: 0.1rem;
+  overflow: visible;
+}
+.messageUser__profil > .messageUser__label {
+  order: 0;
+  padding-left: 0.15rem;
+}
+.messageUser__profil > .messageUser__label::before {
+  margin-right: 0.25rem;
+}
+.messageUser__profil > .deboucled-author-boucled-button {
+  order: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  margin: 0;
+  cursor: pointer;
+}
+.messageUser__profil > .deboucled-author-boucled-button > svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+.messageUser__profil > .deboucled-filter-logo,
+.messageUser__profil > .deboucled-clearfilter-logo {
+  order: 2;
+  width: 18px !important;
+  height: 18px !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  flex: 0 0 auto;
+  cursor: pointer;
+  margin: 0;
+}
+.messageUser__profil > .deboucled-jvarchive-logo {
+  order: 3;
+  width: 18px;
+  height: 18px;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+.messageUser__profil > .messageUser__level {
+  order: 10;
+  flex-basis: 100%;
+}
+.messageUser__profil > .messageUser__date {
+  order: 11;
+  flex-basis: 100%;
+}
+.messageUser__profil .deboucled-badge-container,
+.messageUser__profil .deboucled-badge {
+  order: 4;
+  align-self: center;
+}
+
+.messageUser__footer .deboucled-blacklist-author-button,
+.messageUser__footer span.picto-msg-tronche.deboucled-blacklist-author-button {
+  align-self: center;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0.2rem;
+  cursor: pointer;
+}
+
+.buttonsNavbar {
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 0.4rem;
+}
+.buttonsNavbar .forumSearchBar__form {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+.buttonsNavbar .forumSearchBar__dropdownWrapper {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.buttonsNavbar .forumSearchBar__formInput {
+  width: 100%;
+  min-width: 0;
+}
+.buttonsNavbar > #deboucled-option-button,
+.buttonsNavbar > #deboucled-option-button.buttonsNavbar__button,
+#js-list-topics-tools-actions > #deboucled-option-button,
+#js-list-topics-tools-actions > #deboucled-option-button.buttonsNavbar__button {
+  margin-left: auto;
+  height: auto;
+  min-height: 2rem;
+  width: auto;
+  min-width: 0;
+  padding: 0 0.95rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  border-radius: 9999px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: #fff !important;
+  background-color: #0050a6e1 !important;
+  border: var(--jv-btn-border-width, 1px) solid #2073a4 !important;
+}
+.buttonsNavbar > #deboucled-option-button:hover,
+#js-list-topics-tools-actions > #deboucled-option-button:hover {
+  background-color: #004997e1 !important;
+}
+/* Topic list toolbar is taller than messages navbar: match "Nouveau sujet" button height. */
+#js-list-topics-tools-actions {
+  display: flex;
+  align-items: center;
+}
+#js-list-topics-tools-actions > #deboucled-option-button,
+#js-list-topics-tools-actions > #deboucled-option-button.buttonsNavbar__button,
+#js-list-topics-tools-actions .buttonsNavbar > #deboucled-option-button,
+#js-list-topics-tools-actions .buttonsNavbar > #deboucled-option-button.buttonsNavbar__button {
+  min-height: 2.5rem;
+  padding: 0 1.1rem;
+  font-size: 0.875rem;
+}
+.buttonsNavbar > .deboucled-smoothscroll-button {
+  background-color: transparent !important;
+  color: var(--jv-text-secondary) !important;
+  border: 1px solid var(--jv-border-color, rgba(128, 128, 128, 0.35)) !important;
+  min-width: 2rem !important;
+  min-height: 2rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0 !important;
+  border-radius: 9999px;
+  box-shadow: none !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  margin-left: 0.25rem;
+}
+
+.titleMessagesUsers__header,
+.titleMessagesUsers {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: 0.6rem;
+}
+.titleMessagesUsers__title {
+  margin: 0;
+}
+.titleMessagesUsers__title > .deboucled-eye-logo,
+.titleMessagesUsers__title > .deboucled-eye-white-logo,
+.titleMessagesUsers__title > .deboucled-closed-eye-logo,
+.titleMessagesUsers__title > .deboucled-closed-eye-white-logo,
+.titleMessagesUsers__header > .deboucled-eye-logo,
+.titleMessagesUsers__header > .deboucled-eye-white-logo,
+.titleMessagesUsers__header > .deboucled-closed-eye-logo,
+.titleMessagesUsers__header > .deboucled-closed-eye-white-logo,
+.titleMessagesUsers > .deboucled-eye-logo,
+.titleMessagesUsers > .deboucled-eye-white-logo,
+.titleMessagesUsers > .deboucled-closed-eye-logo,
+.titleMessagesUsers > .deboucled-closed-eye-white-logo {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-color: transparent !important;
+  display: inline-block !important;
+  cursor: pointer;
+  opacity: 0.75;
+  margin: 0 0.5rem 0.1em 0 !important;
+  vertical-align: -0.15em;
+  padding: 0 !important;
+  line-height: 1;
+  float: none;
+}
+.titleMessagesUsers__title > .deboucled-eye-logo:hover,
+.titleMessagesUsers__title > .deboucled-eye-white-logo:hover,
+.titleMessagesUsers__title > .deboucled-closed-eye-logo:hover,
+.titleMessagesUsers__title > .deboucled-closed-eye-white-logo:hover,
+.titleMessagesUsers > .deboucled-eye-logo:hover,
+.titleMessagesUsers > .deboucled-eye-white-logo:hover,
+.titleMessagesUsers > .deboucled-closed-eye-logo:hover,
+.titleMessagesUsers > .deboucled-closed-eye-white-logo:hover {
+  opacity: 1;
+}
+
 .titre-bloc-forum span:first-child {
   font-size: unset;
   color: unset;
@@ -2253,12 +2454,6 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
   width: 1rem;
   height: 1rem;
   background-size: 1rem;
-}
-.deboucled-avatar-logo {
-  vertical-align: bottom;
-  height: 18px;
-  border-radius: 50%;
-  margin: 0 1px;
 }
 .deboucled-twitter-logo::before {
   content: "\EA0B";
@@ -2884,7 +3079,7 @@ input[type="search"] {
   max-height: calc(100vh - 140px);
   overflow-y: auto;
   position: fixed;
-  z-index: 31;
+  z-index: 999;
   background: var(--deboucled-background-color);
   border-style: solid;
   border-color: dimgray;
@@ -2906,14 +3101,6 @@ input[type="search"] {
   margin-left: 0.9375rem;
   padding: 0.625rem;
   background: none;
-}
-
-.deboucled-topic-avatar {
-  width: 1.1rem;
-  height: 1.1rem;
-  margin-right: 4px;
-  border-radius: 50%;
-  object-fit: cover;
 }
 
 .deboucled-setting-credits {

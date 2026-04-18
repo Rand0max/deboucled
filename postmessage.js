@@ -4,16 +4,16 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 function getAuthorFromMessageElem(messageElement) {
-    return messageElement?.querySelector('.bloc-pseudo-msg.text-user,.bloc-pseudo-msg.text-modo,.bloc-pseudo-msg.text-admin,.jvchat-author')?.textContent?.trim() ?? '';
+    return messageElement?.querySelector('.messageUser__label, .bloc-pseudo-msg.text-user, .bloc-pseudo-msg.text-modo, .bloc-pseudo-msg.text-admin, .bloc-pseudo-msg, .jvchat-author')?.textContent?.trim() ?? '';
 }
 
 function getDateFromMessageElem(messageElement) {
-    return messageElement.querySelector('.bloc-date-msg')?.textContent?.trim() ?? '';
+    return messageElement.querySelector(JVC_SEL.messageDate)?.textContent?.trim() ?? '';
 }
 
 function getRawTypedMessage(text) {
     if (!text?.length) {
-        const textArea = document.querySelector('#message_topic');
+        const textArea = document.querySelector(JVC_SEL.messageTopicInput);
         if (!textArea?.value?.length) return '';
         text = textArea.value;
     }
@@ -25,9 +25,9 @@ function prepareMessageQuoteInfo(messageElement) {
     const currentUserPseudo = userPseudo ?? store.get(storage_lastUsedPseudo, userId);
     const res = {
         userId: userId,
-        quotedMessageId: messageElement.getAttribute('data-id') ?? messageElement.getAttribute('jvchat-id'),
+        quotedMessageId: jvcGetMessageIdFromElement(messageElement) ?? messageElement.getAttribute('jvchat-id'),
         quotedUsername: getAuthorFromMessageElem(messageElement).toLowerCase(),
-        quotedMessageUrl: messageElement.querySelector('.bloc-date-msg .lien-jv')?.href,
+        quotedMessageUrl: messageElement.querySelector(`${JVC_SEL.messageDate}, .bloc-date-msg .lien-jv`)?.href,
         newMessageId: 0, // filled after redirect
         newMessageUsername: currentUserPseudo?.toLowerCase() ?? 'anonymous',
         newMessageContent: '', // filled at validation
@@ -42,10 +42,12 @@ function prepareMessageQuoteInfo(messageElement) {
 }
 
 function fixNoelshackDirectUrl() {
-    let message = document.querySelector('#message_topic').value;
+    const textArea = document.querySelector(JVC_SEL.messageTopicInput);
+    if (!textArea) return;
+    let message = textArea.value;
     if (message.match(/https:\/\/www\.noelshack\.com\/\d+-\d+-\d+-.*\..*/i)) {
         message = buildNoelshackDirectUrl(message);
-        document.querySelector('#message_topic').value = message
+        textArea.value = message;
     }
 }
 
@@ -57,7 +59,7 @@ async function handlePostMessage() {
 }
 
 function bypassTextCensorship() {
-    const textArea = document.querySelector('#message_topic');
+    const textArea = document.querySelector(JVC_SEL.messageTopicInput);
     if (textArea?.value?.length) {
         setTextAreaValue(textArea, textArea.value.replaceAll(/d[e|é]boucled/gi, 'Déb0ucled'));
         setTextAreaValue(textArea, textArea.value.replaceAll(/d[e|é]censured/gi, 'Déc3nsured'));
@@ -122,7 +124,7 @@ async function postNewMessage() {
 */
 
 async function buildQuoteMessage(messageElement, selection) {
-    const textArea = document.querySelector('#message_topic');
+    const textArea = document.querySelector(JVC_SEL.messageTopicInput);
     if (!textArea) return;
 
     const newQuoteHeader = `> Le ${getDateFromMessageElem(messageElement)} '''${getAuthorFromMessageElem(messageElement)}''' a écrit : `;
@@ -175,7 +177,7 @@ function getSelectionOffset(container, pointerEvent) {
 
 function addMessagePartialQuoteEvents(allMessages) {
     function buildPartialQuoteButton(message) {
-        const blocContenu = message.querySelector('.bloc-contenu');
+        const blocContenu = message.querySelector(JVC_SEL.messageMain);
         if (!blocContenu) return;
         const partialQuoteButton = document.createElement('div');
         partialQuoteButton.className = 'deboucled-quote';
@@ -217,7 +219,7 @@ function addMessagePartialQuoteEvents(allMessages) {
 
 function addMessageQuoteEvents(allMessages) {
     allMessages.forEach((message) => {
-        const quoteButton = message.querySelector('.picto-msg-quote');
+        const quoteButton = message.querySelector('.picto-msg-quote, .messageUser__action[title*="Citer"]');
         if (quoteButton) {
             quoteButton.addEventListener('click', () => buildQuoteMessage(message)); // Full quote
         }
@@ -225,7 +227,7 @@ function addMessageQuoteEvents(allMessages) {
 }
 
 function addAuthorSuggestionEvent() {
-    const textArea = document.querySelector('#message_topic');
+    const textArea = document.querySelector(JVC_SEL.messageTopicInput);
     if (!textArea) return;
 
     const parentContainer = textArea.parentElement;

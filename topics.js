@@ -5,7 +5,7 @@
 
 function getAllTopics(doc) {
     if (!doc) return;
-    let allTopics = doc.querySelectorAll('.topic-list > li:not(.dfp__atf):not(.message)');
+    let allTopics = doc.querySelectorAll(JVC_SEL.topicListItem);
     return [...allTopics];
 }
 
@@ -39,7 +39,7 @@ async function fillTopics(topics, topicOptions) {
 }
 
 function createTopicListOverlay() {
-    let topicTable = document.querySelector('.topic-list');
+    let topicTable = document.querySelector(JVC_SEL.topicListContainer);
     if (!topicTable) return;
 
     topicTable.style.opacity = '0.3';
@@ -62,7 +62,7 @@ function createTopicListOverlay() {
 function toggleTopicOverlay(active) {
     document.querySelector('.deboucled-overlay')?.classList.toggle('active', active);
     document.querySelector('.deboucled-overlay-spinner')?.classList.toggle('active', active);
-    document.querySelector('.topic-list')?.removeAttribute('style');
+    document.querySelector(JVC_SEL.topicListContainer)?.removeAttribute('style');
 }
 
 async function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
@@ -71,7 +71,7 @@ async function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
         await saveStorage();
 
         if (!refreshTopicList) return;
-        let topic = document.querySelector('[data-id="' + topicId + '"]');
+        let topic = jvcFindTopicById(topicId);
         if (!topic) return;
         removeTopic(topic);
         hiddenTotalTopics++;
@@ -80,11 +80,14 @@ async function addTopicIdBlacklist(topicId, topicSubject, refreshTopicList) {
 }
 
 function getTopicTitle() {
-    const titleElement = document.querySelector('#bloc-title-forum');
+    const titleElement = document.querySelector(JVC_SEL.topicTitleHeader);
     return titleElement?.textContent?.trim();
 }
 
 function getCurrentTopicId() {
+    const payload = jvcGetForumsAppPayload();
+    if (payload?.topicId) return String(payload.topicId);
+
     const blocFormulaireElem = document.querySelector('#bloc-formulaire-forum');
     if (blocFormulaireElem) {
         const topicId = blocFormulaireElem.getAttribute('data-topic-id');
@@ -97,12 +100,16 @@ function getCurrentTopicId() {
 }
 
 function getTopicId(topicElement) {
-    return topicElement?.getAttribute('data-id');
+    return jvcGetTopicIdFromElement(topicElement);
 }
 
 function getTopicCurrentPageId(doc) {
     if (!doc) doc = document;
-    const pageActiveElem = doc.querySelector('.page-active');
+    if (doc === document) {
+        const payload = jvcGetForumsAppPayload();
+        if (payload?.pagerView?.currentPage) return parseInt(payload.pagerView.currentPage);
+    }
+    const pageActiveElem = doc.querySelector(JVC_SEL.pageActive);
     if (!pageActiveElem) return undefined;
     return parseInt(pageActiveElem.textContent.trim());
 }
@@ -116,11 +123,16 @@ function getTopicPageIdFromUri(url) {
 
 function getTopicLastPageId(doc) {
     if (!doc) doc = document;
-    const lastPageButton = doc.querySelector('.pagi-fin-actif.icon-next2');
+    if (doc === document) {
+        const payload = jvcGetForumsAppPayload();
+        if (payload?.pagerView?.pageCount) return parseInt(payload.pagerView.pageCount);
+    }
+    const lastPageButton = doc.querySelector(JVC_SEL.pageLast);
     if (!lastPageButton) return undefined;
     let pageId = getTopicPageIdFromUri(lastPageButton.getAttribute('href'));
     if (!pageId) {
-        pageId = getTopicPageIdFromUri(decryptJvCare(lastPageButton.getAttribute('class')));
+        const cls = lastPageButton.getAttribute('class') || '';
+        if (cls.includes('JvCare')) pageId = getTopicPageIdFromUri(decryptJvCare(cls));
     }
     return parseInt(pageId);
 }
@@ -128,14 +140,14 @@ function getTopicLastPageId(doc) {
 function updateTopicsHeader() {
     let optionDisplayTopicIgnoredCount = store.get(storage_optionDisplayTopicIgnoredCount, storage_optionDisplayTopicIgnoredCount_default);
     if (optionDisplayTopicIgnoredCount) {
-        let subjectHeader = document.querySelector('.topic-head > span:nth-child(1)');
-        subjectHeader.innerHTML = `SUJET<span class="deboucled-topic-subject">(${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)})</span>`;
+        let subjectHeader = document.querySelector(JVC_SEL.topicHeadSubject);
+        if (subjectHeader) subjectHeader.innerHTML = `SUJET<span class="deboucled-topic-subject">(${hiddenTotalTopics} ignoré${plural(hiddenTotalTopics)})</span>`;
     }
 
     let optionDisplayBlacklistTopicButton = store.get(storage_optionDisplayBlacklistTopicButton, storage_optionDisplayBlacklistTopicButton_default);
     if (optionDisplayBlacklistTopicButton) {
-        let lastMessageHeader = document.querySelector('.topic-head > span:nth-child(4)');
-        lastMessageHeader.style.width = '5.5rem';
+        let lastMessageHeader = document.querySelector(JVC_SEL.topicHeadLastMsg);
+        if (lastMessageHeader) lastMessageHeader.style.width = '5.5rem';
     }
 }
 
@@ -154,18 +166,75 @@ function removeSiblingMessages(element) {
 }
 
 function addTopic(element, topics) {
-    if (!element.querySelector('.xXx.text-user.topic-author')) {
-        // jvcare supprime le lien vers le profil et le lien dans la date du topic
-        let topicAuthorSpan = element.children[1];
-        let author = topicAuthorSpan.textContent.trim();
-        topicAuthorSpan.outerHTML = `<a href="https://www.jeuxvideo.com/profil/${author.toLowerCase()}?mode=infos" target="_blank" class="xXx text-user topic-author">${author}</a>`;
+    // Handles JvCare-obfuscated topics (not logged in):
+    // - Legacy DOM: author was a JvCare <span class="topic-author"> with the real pseudo in text.
+    //   We promoted it to a plain <a> so the rest of the code (blacklist, badges) could read it.
+    // - New DOM (April 2026, logged-in): real <a class="tablesForum__firstAvatar" href="/profil/...">.
+    // - New DOM (April 2026, not-logged-in): JvCare-obfuscated <span class="JvCare ... tablesForum__firstAvatar" title="Pseudo">
+    //   with no real href. We must decrypt the JvCare class and promote the span to a real <a>
+    //   so that the row behaves like a logged-in row (avatar click, blacklist pipeline, etc.).
+    //   The "+N" placeholder is handled by getTopicAuthor() which filters it out.
 
-        let topicDateSpan = element.children[3];
-        let topicUrl = decryptJvCare(topicDateSpan.firstElementChild.className);
-        let topicDate = topicDateSpan.firstElementChild.textContent.trim();
-        topicDateSpan.innerHTML = `<a href="${topicUrl}" class="xXx lien-jv">${topicDate}</a>`;
+    // 1) Promote JvCare-obfuscated first-avatar <span> to a real <a>.
+    const jvCareAvatar = element.querySelector('span.tablesForum__firstAvatar.JvCare, span.JvCare.tablesForum__firstAvatar');
+    if (jvCareAvatar) {
+        const cls = jvCareAvatar.getAttribute('class') || '';
+        const href = decryptJvCare(cls);
+        const cleanedClass = cls.replace(/\bJvCare\b/, '').replace(/\s+[0-9A-F]{20,}/g, '').replace(/\s+/g, ' ').trim();
+        const authorA = document.createElement('a');
+        authorA.href = href || '#';
+        authorA.target = '_blank';
+        authorA.className = cleanedClass || 'avatar tablesForum__firstAvatar';
+        const title = jvCareAvatar.getAttribute('title');
+        if (title) authorA.title = title;
+        authorA.innerHTML = jvCareAvatar.innerHTML;
+        jvCareAvatar.replaceWith(authorA);
     }
-    document.querySelector('.topic-list').appendChild(element);
+
+    // 2) Legacy fallback: rebuild author anchor from a plain-text author cell when nothing else exists.
+    const existingAuthorLink = element.querySelector('a.tablesForum__firstAvatar, a.tablesForum__authorLink, a.xXx.text-user.topic-author');
+    if (!existingAuthorLink) {
+        const authorCell = element.querySelector('.tablesForum__cellAuthor');
+        if (authorCell) {
+            const author = authorCell.textContent.trim();
+            if (author && !/^\+\d+$/.test(author)) {
+                const authorA = document.createElement('a');
+                authorA.href = `https://www.jeuxvideo.com/profil/${author.toLowerCase()}?mode=infos`;
+                authorA.target = '_blank';
+                authorA.className = 'xXx text-user topic-author tablesForum__authorLink';
+                authorA.title = author;
+                authorA.textContent = author;
+                authorCell.innerHTML = '';
+                authorCell.appendChild(authorA);
+            }
+        }
+    }
+
+    // 3) Decrypt JvCare on the activity cell so topic preview links work.
+    //    New DOM: the cell itself is <span class="JvCare ... tablesForum__cellLink"> (no inner anchor).
+    //    Legacy DOM: <a class="tablesForum__cellLink"> wrapping a JvCare child.
+    const dateCell = element.querySelector('.tablesForum__cellLink') || element.children[3];
+    if (dateCell) {
+        const ownClass = dateCell.getAttribute('class') || '';
+        if (dateCell.tagName !== 'A' && ownClass.includes('JvCare')) {
+            const topicUrl = decryptJvCare(ownClass);
+            const topicDate = dateCell.textContent.trim();
+            const title = dateCell.getAttribute('title') || '';
+            const dataVal = dateCell.getAttribute('data-val') || '';
+            const a = document.createElement('a');
+            a.href = topicUrl;
+            a.className = 'xXx tablesForum__cellLink';
+            if (title) a.title = title;
+            if (dataVal) a.setAttribute('data-val', dataVal);
+            a.textContent = topicDate;
+            dateCell.replaceWith(a);
+        } else if (dateCell.firstElementChild && dateCell.firstElementChild.className?.includes('JvCare')) {
+            const topicUrl = decryptJvCare(dateCell.firstElementChild.className);
+            const topicDate = dateCell.firstElementChild.textContent.trim();
+            dateCell.innerHTML = `<a href="${topicUrl}" class="xXx lien-jv">${topicDate}</a>`;
+        }
+    }
+    document.querySelector(JVC_SEL.topicListContainer).appendChild(element);
     topics.push(element); // on rajoute le nouveau topic à la liste en cours de remplissage pour éviter de le reprendre sur les pages suivantes
 }
 
@@ -180,7 +249,7 @@ function topicExists(topics, element) {
 }
 
 function getTopicMessageCount(element) {
-    let messageCountElement = element.querySelector('.topic-count');
+    let messageCountElement = element.querySelector(JVC_SEL.topicCount);
     return parseInt(messageCountElement?.textContent.trim() ?? "0");
 }
 
@@ -234,9 +303,9 @@ function handleAntiLoopAi(topicOptions, title, author, titleTag) {
 }
 
 async function isTopicBlacklisted(topicElement, topicOptions) {
-    if (!topicElement.hasAttribute('data-id')) return true;
-
     const topicId = getTopicId(topicElement);
+    if (!topicId) return true;
+
     if (topicIdBlacklistMap.has(topicId) && !deboucledTopics.includes(topicId)) {
         matchedTopics.set(topicId, topicIdBlacklistMap.get(topicId));
         hiddenTopicsIds++;
@@ -250,11 +319,9 @@ async function isTopicBlacklisted(topicElement, topicOptions) {
 
     if (topicOptions.optionEnableTopicMsgCountThreshold && getTopicMessageCount(topicElement) < topicOptions.optionTopicMsgCountThreshold) return true;
 
-    const titleTag = topicElement.querySelector('.lien-jv.topic-title');
-    const authorTag = topicElement.querySelector('.topic-author');
-
+    const titleTag = topicElement.querySelector(JVC_SEL.topicTitle);
     const title = titleTag?.textContent.trim();
-    const author = authorTag?.textContent.toLowerCase().trim();
+    const author = getTopicAuthor(topicElement)?.toLowerCase();
 
     if (author?.length && author === userPseudo?.toLowerCase()) {
         return false;
@@ -339,7 +406,7 @@ async function isVinzTopic(subject, author, topicUrl) {
     async function isVinzMessage(url) {
         function getTopicMessageCallback(r) {
             const doc = domParser.parseFromString(r, 'text/html');
-            const firstMessageElem = doc.querySelector('.txt-msg');
+            const firstMessageElem = doc.querySelector(JVC_SEL.messageContent);
             return normalizeValue(firstMessageElem.textContent.trim());
         }
         if (!topicContent) {
@@ -389,15 +456,15 @@ function getTopicPocStatus(topicId) {
 }
 
 async function isTopicPoC(element, optionDetectPocMode) {
-    if (!element.hasAttribute('data-id')) return false;
     let topicId = getTopicId(element);
+    if (!topicId) return false;
 
     if (deboucledTopics.includes(topicId)) return false;
 
     const existingStatus = getTopicPocStatus(topicId);
     if (existingStatus) return existingStatus;
 
-    let titleElem = element.querySelector('.lien-jv.topic-title');
+    let titleElem = element.querySelector(JVC_SEL.topicTitle);
     if (!titleElem) return false;
 
     const title = normalizeDiacritic(titleElem.textContent.trim());
@@ -412,7 +479,7 @@ async function isTopicPoC(element, optionDetectPocMode) {
     function topicCallback(r) {
         const doc = domParser.parseFromString(r, 'text/html');
 
-        const firstMessageElem = doc.querySelector('.txt-msg');
+        const firstMessageElem = doc.querySelector(JVC_SEL.messageContent);
         const firstMessage = firstMessageElem?.textContent.trim().toLowerCase();
         if (!firstMessage?.length) return false;
 
@@ -578,7 +645,7 @@ function addIgnoreButtons(topics) {
     header.appendChild(spanHead);
 
     topics.slice(1).forEach(function (topic) {
-        const topicSubjectElem = topic.querySelector('span:nth-child(1) > a:nth-child(2)');
+        const topicSubjectElem = topic.querySelector(JVC_SEL.topicTitle) || topic.querySelector('span:nth-child(1) > a:nth-child(2)');
         if (!topicSubjectElem) return;
         let topicSubject = topicSubjectElem.textContent.trim();
         let topicId = getTopicId(topic);
@@ -604,13 +671,13 @@ function addPrevisualizeTopicEvent(topics) {
         const imgErreur = page.querySelector('.img-erreur');
         if (imgErreur) return imgErreur;
 
-        const messagePreview = page.querySelector('.bloc-message-forum');
+        const messagePreview = page.querySelector(JVC_SEL.message);
         if (!messagePreview) return;
 
-        messagePreview.querySelector('.bloc-options-msg').remove(); // remove buttons
+        messagePreview.querySelector(JVC_SEL.messageOptions)?.remove(); // remove buttons
 
         // JvCare
-        const avatar = messagePreview.querySelector('.user-avatar-msg');
+        const avatar = messagePreview.querySelector(JVC_SEL.messageAvatar);
         if (avatar && avatar.hasAttribute('data-src') && avatar.hasAttribute('src')) {
             avatar.setAttribute('src', avatar.getAttribute('data-src'));
             avatar.removeAttribute('data-src');
@@ -624,7 +691,7 @@ function addPrevisualizeTopicEvent(topics) {
             m.outerHTML = anchor.outerHTML;
         });
 
-        const text = messagePreview.querySelector('.txt-msg.text-enrichi-forum');
+        const text = messagePreview.querySelector(JVC_SEL.messageContent);
         if (!text) return messagePreview;
 
         if (preferDarkTheme()) {
@@ -639,7 +706,7 @@ function addPrevisualizeTopicEvent(topics) {
 
     async function onPreviewHover(anchor, topicUrl, previewDiv) {
         anchor.classList.toggle('active', true);
-        if (previewDiv.querySelector('.bloc-message-forum')) return; // already loaded
+        if (previewDiv.querySelector(JVC_SEL.message)) return; // already loaded
         const topicContent = await fetchHtml(topicUrl, true).then((html) => prepareMessagePreview(html));
         if (!topicContent) return;
         previewDiv.firstChild.remove();
@@ -647,7 +714,7 @@ function addPrevisualizeTopicEvent(topics) {
     }
 
     topics.slice(1).forEach(function (topic) {
-        const topicTitleElement = topic.querySelector('.topic-title');
+        const topicTitleElement = topic.querySelector(JVC_SEL.topicTitle);
         if (!topicTitleElement) return;
         const topicUrl = topicTitleElement.getAttribute('href');
 
@@ -656,7 +723,7 @@ function addPrevisualizeTopicEvent(topics) {
         const previewRootElement = document.createElement('span');
         previewRootElement.setAttribute('class', 'deboucled-topic-preview-col');
         previewRootElement.innerHTML = '<svg viewBox="0 0 30 30" id="deboucled-preview-logo" class="deboucled-logo-preview"><use href="#previewlogo"/></svg>';
-        const topicImg = topic.querySelector('.topic-img');
+        const topicImg = topic.querySelector(JVC_SEL.topicImg);
         insertAfter(previewRootElement, topicImg);
 
         const previewSpinnerElement = document.createElement('div');
@@ -687,12 +754,12 @@ function handleTopicPictos(topics, optionDisplayBlackTopic, optionReplaceResolve
     }
 
     topics.slice(1).forEach(function (topic) {
-        const topicImg = topic.querySelector('.topic-img');
+        const topicImg = topic.querySelector(JVC_SEL.topicImg);
         if (!topicImg) return;
 
         if (ignoredTopics.some((it) => topicImg.classList.contains(it))) return;
 
-        const messageCount = topic.querySelector('.topic-count');
+        const messageCount = topic.querySelector(JVC_SEL.topicCount);
         if (!messageCount) return;
         const nbMessage = parseInt(messageCount.textContent.trim());
 
@@ -741,54 +808,27 @@ function removeUselessTags(topics) {
     const regexAyao = /\ba+y+a+o*\b/gi;
 
     topics.slice(1).forEach(function (topic) {
-        const titleElem = topic.querySelector('.lien-jv.topic-title');
+        const titleElem = topic.querySelector(JVC_SEL.topicTitle);
         if (!titleElem) return;
-        let newTitle = titleElem.textContent;
+        // New JVC DOM: the subject <a> wraps both the <i class="tablesForum__subjectMarkerIcon"> and
+        // a <span class="tablesForum__subjectText">. Writing textContent on the <a> would wipe the icon,
+        // so target the inner text span when present; fall back to the <a> for the legacy DOM.
+        const textTarget = titleElem.querySelector('.tablesForum__subjectText') ?? titleElem;
+        let newTitle = textTarget.textContent;
         newTitle = newTitle.replace(regexAlert, '');
         newTitle = newTitle.replace(regexAyao, '');
         newTitle = removeSurrogatePairs(newTitle);
         newTitle = newTitle.replace(/\(\)|\[\]|{}/g, '');
         newTitle = capitalize(removeDoubleSpaces(newTitle).trim().toLowerCase());
-        if (newTitle.length > 0) titleElem.textContent = newTitle;
-        else titleElem.textContent = capitalize(titleElem.textContent.toLowerCase());
+        if (newTitle.length > 0) textTarget.textContent = newTitle;
+        else textTarget.textContent = capitalize(textTarget.textContent.toLowerCase());
     });
 }
 
-async function handleTopicAvatars(topics) {
-    GM_addStyle('.topic-list .topic-author { width: 7.4rem; }');
-
-    await Promise.all(topics.slice(1).map(async function (topic) {
-        const topicAuthorElem = topic.querySelector('.topic-author');
-        if (!topicAuthorElem) return;
-
-        const topicAuthorWrapper = document.createElement('span');
-        topicAuthorWrapper.className = 'topic-author';
-        topicAuthorElem.insertAdjacentElement('beforebegin', topicAuthorWrapper);
-
-        topicAuthorElem.classList.remove('topic-author');
-        topicAuthorWrapper.appendChild(topicAuthorElem);
-
-        const authorAvatar = document.createElement('img');
-        authorAvatar.className = 'deboucled-topic-avatar';
-        authorAvatar.src = defaultAvatarUrl;
-        topicAuthorElem.prepend(authorAvatar);
-
-        const author = topicAuthorElem.textContent.trim().toLowerCase();
-        const authorProfileUrl = topicAuthorElem.getAttribute('href');
-
-        const avatarUrl = await getAuthorAvatarUrl(author, authorProfileUrl);
-        if (avatarUrl?.length) {
-            authorAvatar.src = avatarUrl;
-            authorAvatar.onerror = `this.onerror=null; this.src='${defaultAvatarUrl}';`;
-        }
-    }));
-
-    await saveLocalStorage();
-}
 
 function createTopicTitleSmileys(topics) {
     topics.slice(1).forEach(function (topic) {
-        const titleElem = topic.querySelector('.lien-jv.topic-title');
+        const titleElem = topic.querySelector(JVC_SEL.topicTitle);
         if (!titleElem) return;
         titleElem.innerHTML = titleElem.innerHTML.replaceAll(smileyGifRegex, (e) => getSmileyImgHtml(e, false));
     });
@@ -812,7 +852,7 @@ function buildLoaderStatus() {
 }
 
 function buildFloatingNavbar(infScroll) {
-    const messageTopicElement = document.querySelector('#message_topic, .message-lock-topic');
+    const messageTopicElement = document.querySelector(`${JVC_SEL.messageTopicInput}, #forums-post-message-editor, .message-lock-topic`);
 
     const navbar = document.createElement('div');
     navbar.className = 'deboucled-floating-container';
@@ -826,7 +866,7 @@ function buildFloatingNavbar(infScroll) {
     buttonTop.className = 'deboucled-floating-button deboucled-arrow-up-logo';
     setTooltip(buttonTop, 'Retour en haut de page');
 
-    buttonTop.onclick = () => document.querySelector('#bloc-title-forum')?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    buttonTop.onclick = () => document.querySelector(JVC_SEL.topicTitleHeader)?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     navbar.appendChild(buttonTop);
 
     const buttonAnswer = document.createElement('div');
@@ -858,13 +898,15 @@ function buildFloatingNavbar(infScroll) {
     toggleTransparentButton();
     window.addEventListener('scroll', toggleTransparentButton, { passive: true });
     let observer = new IntersectionObserver((entries) => { messageTopicIsVisible = entries[0].isIntersecting; }, { threshold: [1] });
-    observer.observe(messageTopicElement);
-    observer.observe(document.querySelector('.bloc-pagi-default'));
+    if (messageTopicElement) observer.observe(messageTopicElement);
+    const pagiObs = document.querySelector(JVC_SEL.paginationContainer);
+    if (pagiObs) observer.observe(pagiObs);
 }
 
 function toggleInfiniteScroll(infScroll, status) {
     if (!infScroll) return;
-    document.querySelector('#bloc-formulaire-forum').style.display = status ? 'none' : 'block';
+    const blocFormulaire = document.querySelector(JVC_SEL.topicBlocFormulaire);
+    if (blocFormulaire) blocFormulaire.style.display = status ? 'none' : 'block';
     infScroll.options.loadOnScroll = status;
     infScroll.options.scrollThreshold = status ? -200 : false;
     document.querySelector('#deboucled-smoothscroll-toggle')?.classList.toggle('disabled', !status);
@@ -875,8 +917,9 @@ function createSmoothScroll(handleMessageCallback) {
     const lastPageId = getTopicLastPageId();
 
     const forumContainer = document.querySelector('#forum-main-col');
-    const bottomPagi = document.querySelectorAll('.bloc-pagi-default')[1];
-    const blocFormulaire = document.querySelector('#bloc-formulaire-forum');
+    const allPagi = document.querySelectorAll(JVC_SEL.paginationContainer);
+    const bottomPagi = allPagi[allPagi.length - 1];
+    const blocFormulaire = document.querySelector(JVC_SEL.topicBlocFormulaire);
 
     if (!bottomPagi || !forumContainer || !blocFormulaire) return;
 
@@ -890,7 +933,7 @@ function createSmoothScroll(handleMessageCallback) {
         if (lastPageId && nextPageId <= lastPageId) return buildTopicNewPageUri(nextPageId);
     }
 
-    let infScroll = new InfiniteScroll('.conteneur-messages-pagi', {
+    let infScroll = new InfiniteScroll(JVC_SEL.messagesContainer, {
         // debug: true,
         //hideNav: '.bloc-pagi-default:nth-of-type(2n)',
         scrollThreshold: -100,
@@ -916,13 +959,13 @@ function createSmoothScroll(handleMessageCallback) {
     });
 
     document.querySelector('.btn-repondre-msg')?.addEventListener('click', () => toggleInfiniteScroll(infScroll, false));
-    document.querySelector('#message_topic')?.addEventListener('focus', () => toggleInfiniteScroll(infScroll, false));
+    document.querySelector(JVC_SEL.messageTopicInput)?.addEventListener('focus', () => toggleInfiniteScroll(infScroll, false));
 
     buildFloatingNavbar(infScroll);
 }
 
 function buildEnableSmoothScrollButton(smoothScrollCallback) {
-    const bottomMenu = document.querySelector('.bloc-outils-bottom > .bloc-pre-right');
+    const bottomMenu = document.querySelector('.bloc-outils-bottom > .bloc-pre-right') || document.querySelector(JVC_SEL.blocPreRight);
     if (!bottomMenu) return;
 
     const buttonEnableSC = document.createElement('button');

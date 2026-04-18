@@ -280,18 +280,17 @@ async function handleTopicListOptions(topics, topicOptions) {
 
     if (topicOptions.optionDisplayHotTopics) handleHotTopics(topics);
 
-    if (topicOptions.optionDisplayTopicAvatar) handleTopicAvatars(topics);
 }
 
 async function parseTopicListAuthors(topics, optionDisplayBadges) {
     topics.slice(1).forEach(function (topic) {
-        const author = topic.querySelector('.topic-author')?.textContent?.trim()?.toLowerCase();
+        const author = getTopicAuthor(topic)?.toLowerCase();
         if (!author?.length) return;
 
         if (optionDisplayBadges) {
             const excludedLists = [];
             if (topic.querySelector('#deboucled_ai_boucledauthor,#deboucled_ai_boucledsubject')) excludedLists.push('boucledauthors');
-            buildAuthorBlacklistBadges(author, topic.querySelector('.topic-subject'), excludedLists);
+            buildAuthorBlacklistBadges(author, topic.querySelector(`${JVC_SEL.topicTitle}, .topic-subject`), excludedLists);
         }
 
         const topicId = getTopicId(topic);
@@ -311,7 +310,7 @@ async function handleHotTopics(finalTopics) {
     finalTopics.slice(1).forEach(topic => {
         if (!isHotTopic(topic)) return;
 
-        const titleElem = topic.querySelector('.lien-jv.topic-title');
+        const titleElem = topic.querySelector(JVC_SEL.topicTitle);
         if (matchMediaMediumWidth) {
             markTopicHot(titleElem, false); // put the flag before the subject
         }
@@ -338,7 +337,7 @@ async function handlePoc(finalTopics, optionDetectPocMode) {
             updateTopicsHeader();
         }
         else {
-            const titleElem = topic.querySelector('.lien-jv.topic-title');
+            const titleElem = topic.querySelector(JVC_SEL.topicTitle);
             titleElem.style.width = 'auto';
             markTopicPoc(titleElem);
         }
@@ -348,7 +347,7 @@ async function handlePoc(finalTopics, optionDetectPocMode) {
 }
 
 function highlightBlacklistedAuthor(messageElement, authorElement, withTooltip = true) {
-    const pictoCross = messageElement?.querySelector('span.picto-msg-croix');
+    const pictoCross = messageElement?.querySelector('span.picto-msg-croix, .messageUser__action--delete');
 
     const author = authorElement.textContent.trim().toLowerCase();
     if (pictoCross || (userPseudo && userPseudo.toLowerCase() === author)) return;
@@ -490,7 +489,7 @@ function hideMessageContent(contentElement, wrapperAltClass = '') {
 }
 
 function handleBlSubjectIgnoreMessages(messageElement) {
-    let contentElement = messageElement.querySelector('.txt-msg.text-enrichi-forum');
+    let contentElement = messageElement.querySelector(JVC_SEL.messageContent);
     if (!contentElement) return;
 
     let hasAnyMatch = handleMessageBlacklistMatches(contentElement);
@@ -500,14 +499,14 @@ function handleBlSubjectIgnoreMessages(messageElement) {
 }
 
 function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
-    const authorElement = messageElement.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+    const authorElement = messageElement.querySelector(JVC_SEL.messageAuthor);
     if (!authorElement) return;
 
     const title = getTopicTitle();
     const author = authorElement.textContent.trim();
     const isSelf = userPseudo?.toLowerCase() === author.toLowerCase();
-    const mpBloc = messageElement.querySelector('div.bloc-mp-pseudo');
-    const messageContent = messageElement.querySelector('.txt-msg.text-enrichi-forum');
+    const mpBloc = messageElement.querySelector(JVC_SEL.messageMpBloc);
+    const messageContent = messageElement.querySelector(JVC_SEL.messageContent);
 
     function handleBlacklistedAuthor(authorMatch) {
         if (messageOptions.optionHideMessages && !isFirstMessage) {
@@ -592,7 +591,7 @@ async function parseTopicAuthor(pageId) {
     const firstMessage = allMessages[0];
     if (!firstMessage) return;
 
-    const author = firstMessage.querySelector('.bloc-pseudo-msg')?.textContent.trim().toLowerCase();
+    const author = firstMessage.querySelector(JVC_SEL.messageAuthor)?.textContent.trim().toLowerCase();
     topicAuthorMap.set(currentTopicId, author);
 
     await saveLocalStorage();
@@ -601,31 +600,42 @@ async function parseTopicAuthor(pageId) {
 }
 
 function handleTopicWhitelist() {
-    const titleBlocElement = document.querySelector('.titre-bloc.titre-bloc-forum');
+    const titleBlocElement = document.querySelector('.titre-bloc.titre-bloc-forum, .titleMessagesUsers');
     if (!titleBlocElement) return false;
     if (!currentTopicId) return false;
 
     const topicIdIndex = topicIdWhitelistArray.indexOf(currentTopicId);
     const isWhitelisted = topicIdIndex >= 0;
 
-    let whitelistButtonElement = document.createElement('span');
+    const whitelistButtonElement = document.createElement('span');
     const whiteEyeClass = preferDarkTheme() ? '-white' : '';
     whitelistButtonElement.className = isWhitelisted ? `deboucled-closed-eye${whiteEyeClass}-logo big` : `deboucled-eye${whiteEyeClass}-logo big`;
     whitelistButtonElement.setAttribute('deboucled-data-tooltip', isWhitelisted ? 'Masquer les messages blacklist' : 'Afficher les messages blacklist pour ce topic');
     whitelistButtonElement.setAttribute('data-tooltip-location', 'right');
-    whitelistButtonElement.onclick = async () => {
-        if (isWhitelisted) topicIdWhitelistArray.splice(topicIdIndex, 1);
-        else topicIdWhitelistArray.push(currentTopicId);
-        await saveStorage();
-        window.location.reload();
-    };
-    titleBlocElement.prepend(whitelistButtonElement);
+    whitelistButtonElement.dataset.deboucledWhitelistToggle = '1';
+
+    // Event delegation: the h2 title gets re-hydrated by JVC which wipes inline
+    // onclick handlers, so we bind once on document instead.
+    if (!document.body.dataset.deboucledWhitelistDelegation) {
+        document.body.dataset.deboucledWhitelistDelegation = '1';
+        document.body.addEventListener('click', async (ev) => {
+            if (!ev.target?.closest?.('[data-deboucled-whitelist-toggle="1"]')) return;
+            const idx = topicIdWhitelistArray.indexOf(currentTopicId);
+            if (idx >= 0) topicIdWhitelistArray.splice(idx, 1);
+            else topicIdWhitelistArray.push(currentTopicId);
+            await saveStorage();
+            window.location.reload();
+        });
+    }
+
+    const titleInner = titleBlocElement.querySelector('.titleMessagesUsers__title') || titleBlocElement;
+    titleInner.prepend(whitelistButtonElement);
 
     return isWhitelisted;
 }
 
 function highlightTopicHeaderTitle() {
-    let titleElement = document.querySelector('#bloc-title-forum');
+    let titleElement = document.querySelector(JVC_SEL.topicTitleHeader);
     if (!titleElement) return;
 
     const subjectMatches = getSubjectBlacklistMatches(titleElement.textContent);
@@ -638,7 +648,7 @@ function highlightTopicHeaderTitle() {
 }
 
 function buildTopicHeaderBadges() {
-    const titleElement = document.querySelector('#bloc-title-forum');
+    const titleElement = document.querySelector(JVC_SEL.topicTitleHeader);
     if (!titleElement || !currentTopicAuthor?.length || !currentTopicId) return;
 
     if (getTopicPocStatus(currentTopicId)) {
@@ -654,7 +664,7 @@ function buildTopicHeaderBadges() {
 }
 
 function createTopicHeaderSmileys() {
-    const titleElement = document.querySelector('#bloc-title-forum');
+    const titleElement = document.querySelector(JVC_SEL.topicTitleHeader);
     if (!titleElement) return;
     titleElement.innerHTML = titleElement.innerHTML.replaceAll(smileyGifRegex, (e) => getSmileyImgHtml(e, true));
 }
@@ -666,10 +676,10 @@ function handleTopicHeader(messageOptions) {
 }
 
 function displayTopicDeboucledMessage() {
-    const topBlocPagi = document.querySelector('.bloc-pagi-default');
+    const topBlocPagi = document.querySelector(JVC_SEL.paginationContainer);
     if (!topBlocPagi) return;
     let topicDeboucledDiv = document.createElement('div');
-    topicDeboucledDiv.className = 'bloc-message-forum deboucled-topic-deboucled-message';
+    topicDeboucledDiv.className = 'bloc-message-forum messageUser deboucled-topic-deboucled-message';
     topicDeboucledDiv.textContent = 'Topic 100% déboucled !';
     insertAfter(topicDeboucledDiv, topBlocPagi);
 }
@@ -691,7 +701,6 @@ function prepareTopicOptions() {
         optionReplaceResolvedPicto: store.get(storage_optionReplaceResolvedPicto, storage_optionReplaceResolvedPicto_default),
         optionRemoveUselessTags: store.get(storage_optionRemoveUselessTags, storage_optionRemoveUselessTags_default),
         optionDisplayTitleSmileys: store.get(storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default),
-        optionDisplayTopicAvatar: store.get(storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default),
         optionFilterHotTopics: store.get(storage_optionFilterHotTopics, storage_optionFilterHotTopics_default)
     };
 }
@@ -769,6 +778,11 @@ async function handleTopicMessages() {
     if (store.get(storage_optionEnableForumReactions, storage_optionEnableForumReactions_default)) {
         initForumReactions(allMessages);
     }
+
+    // JVC hydrates some messages after our initial injection, wiping our
+    // buttons (typically the first message of the page). Watch #listMessages
+    // for replaced .messageUser nodes and re-run handleMessage on them.
+    setupMessageRehydrationObserver(messageOptions);
 
     setTimeout(() => {
         const postMessageElement = document.querySelector('.postMessage');

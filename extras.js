@@ -50,10 +50,10 @@ function displaySecret() {
     const secretDisplayed = store.get(storage_secret_displayed, storage_secret_displayed_default);
     if (secretDisplayed) return;
 
-    const topics = document.querySelector('.conteneur-topic-pagi');
-    const wrapper = document.querySelector('#forum-main-col');
-    const blocFormulaire = document.querySelector('#bloc-formulaire-forum');
-    const prePagi = document.querySelector('.bloc-pre-pagi-forum');
+    const topics = document.querySelector('.conteneur-topic-pagi, .tablesForum__container');
+    const wrapper = document.querySelector('#forum-main-col, .mainSingleForum');
+    const blocFormulaire = document.querySelector(JVC_SEL.topicBlocFormulaire);
+    const prePagi = document.querySelector(JVC_SEL.blocPreRight);
 
     if (!topics || !wrapper || !blocFormulaire || !prePagi) return;
 

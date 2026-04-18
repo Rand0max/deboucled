@@ -177,7 +177,6 @@ function buildSettingsPage() {
         const scrollLogo = '<span class="deboucled-scroll-logo"></span>';
         const hotTopicLogo = '<span class="deboucled-fire-logo"></span>';
         const smileyLogo = '<img src="https://image.jeuxvideo.com/smileys_img/26.gif" style="vertical-align: bottom;"></img>';
-        const avatarLogo = '<img src="https://image.jeuxvideo.com/avatar-xs/default.jpg" class="deboucled-avatar-logo"></img>';
         const twitterLogo = '<span class="deboucled-twitter-logo"></span>';
         const quoteLogo = '<span class="deboucled-quote-logo"></span>';
 
@@ -189,7 +188,6 @@ function buildSettingsPage() {
                 ${addToggleOption(`Mettre en avant les <i>topics tendances</i> ${hotTopicLogo}`, storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default, 'Afficher un pictogramme de flamme à côté des topics très actifs.')}
                 ${addToggleOption(`Masquer une partie des <i>messages trop longs</i>`, storage_optionHideLongMessages, storage_optionHideLongMessages_default, 'Si cette option est activée, le contenu des longs messages sera masqué et un bouton &quot;lire la suite&quot; apparaitra.')}
                 ${addToggleOption(`Intégrer les <i>smileys JVC</i> ${smileyLogo} dans les titres`, storage_optionDisplayTitleSmileys, storage_optionDisplayTitleSmileys_default, 'Permet d\'intégrer les smileys JVC dans les titres des topics.')}
-                ${addToggleOption(`Afficher les <i>avatars</i> ${avatarLogo} des auteurs`, storage_optionDisplayTopicAvatar, storage_optionDisplayTopicAvatar_default, 'Afficher ou non les avatars des auteurs dans la liste des topics.')}
                 ${addToggleOption(`Intégrer <i>Twitter</i> ${twitterLogo} dans les messages`, storage_optionEmbedTwitter, storage_optionEmbedTwitter_default, 'Intègre automatiquement les miniatures de Tweet dans les messages. ⚠ Attention ⚠ certains bloqueurs de pub peuvent empêcher les tweets de s\'afficher.')}
                 ${addToggleOption(`Intégrer les vidéos dans les messages`, storage_optionEmbedVideos, storage_optionEmbedVideos_default, 'Intègre automatiquement les vidéos (Streamable, YouTube, etc) dans les messages.')}
                 ${addToggleOption(`Améliorer les <i>citations</i> ${quoteLogo} des messages`, storage_optionEnhanceQuotations, storage_optionEnhanceQuotations_default, 'Améliore les citations avec plusieurs fonctionnalités :\n\n• Insère le pseudo du message cité\n• Citer une partie des messages en sélectionnant le texte\n• Citer et suggérer des pseudos en écrivant avec l\'arobase @ (conditions : connecté et minimum 3 lettres)\n• Mettre en couleur les pseudos lorsqu\'ils sont cités')}
@@ -434,7 +432,6 @@ function addSettingEvents() {
     addToggleEvent(storage_optionDisplayTopicIgnoredCount);
     addToggleEvent(storage_optionHideLongMessages);
     addToggleEvent(storage_optionDisplayTitleSmileys);
-    addToggleEvent(storage_optionDisplayTopicAvatar);
     addToggleEvent(storage_optionHideAvatarBorder);
     addToggleEvent(storage_optionEmbedVideos);
     addToggleEvent(storage_optionEmbedTwitter);
@@ -792,17 +789,51 @@ function refreshCollapsibleContentHeight(entity) {
 }
 
 function addSettingButton() {
-    function createDeboucledButton() {
+    function createDeboucledButton(nativeNavbar = false) {
         let button = document.createElement('button');
         button.setAttribute('id', 'deboucled-option-button');
-        button.setAttribute('class', `btn deboucled-button deboucled-option-button${firstLaunch ? ' blinking' : ''}`);
+        // New JVC navbar: inherit native sizing via buttonsNavbar__button class
+        const navbarCls = nativeNavbar ? ' buttonsNavbar__button' : '';
+        button.setAttribute('class', `btn deboucled-button deboucled-option-button${navbarCls}${firstLaunch ? ' blinking' : ''}`);
+        button.setAttribute('type', 'button');
         button.innerHTML = 'Déboucled';
         return button;
     }
 
-    let blocMenu = document.querySelectorAll('.bloc-pre-right');
-    if (blocMenu.length === 0) blocMenu = document.querySelectorAll('div:not(.pagination) > .action-right');
-    blocMenu.forEach(e => { e.prepend(createDeboucledButton()); });
+    // Ensure the button exists inside the container and is last (right-aligned).
+    function ensureButton(container, nativeNavbar) {
+        let existing = container.querySelector(':scope > #deboucled-option-button');
+        if (!existing) {
+            existing = createDeboucledButton(nativeNavbar);
+            container.appendChild(existing);
+        } else if (container.lastElementChild !== existing) {
+            container.appendChild(existing); // keep it last
+        }
+        existing.onclick = optionOnclick;
+    }
+
+    // JVC hydrates #js-list-topics-tools-actions (empty placeholder in SSR)
+    // asynchronously, injecting a .buttonsNavbar child that holds the toolbar.
+    // Observe it so the button is placed INSIDE the navbar, on the right
+    // (after "Actualiser"), and re-injected if JVC re-renders.
+    function observeTopicsToolbar(container) {
+        if (container.dataset.deboucledObserved === '1') return;
+        container.dataset.deboucledObserved = '1';
+
+        const placeButton = () => {
+            const navbar = container.querySelector(':scope > .buttonsNavbar') || container;
+            ensureButton(navbar, true);
+        };
+        placeButton();
+
+        const obs = new MutationObserver(() => {
+            const navbar = container.querySelector(':scope > .buttonsNavbar') || container;
+            const btn = navbar.querySelector(':scope > #deboucled-option-button');
+            if (btn && navbar.lastElementChild === btn) return;
+            placeButton();
+        });
+        obs.observe(container, { childList: true, subtree: true });
+    }
 
     let optionOnclick = function (e) {
         e.preventDefault();
@@ -810,6 +841,23 @@ function addSettingButton() {
         clearEntityInputs();
         showSettings();
     };
+
+    let blocMenu = document.querySelectorAll(JVC_SEL.blocPreRight);
+    if (blocMenu.length === 0) blocMenu = document.querySelectorAll('div:not(.pagination) > .action-right, .formulaireTopic__actionsHeader');
+    blocMenu.forEach(e => {
+        // New JVC navbar: place the button at the end (right side) with native sizing
+        if (e.classList.contains('buttonsNavbar')) {
+            e.appendChild(createDeboucledButton(true));
+        } else if (e.id === 'js-list-message-tools-actions') {
+            const navbar = e.querySelector('.buttonsNavbar') || e;
+            navbar.appendChild(createDeboucledButton(true));
+        } else if (e.id === 'js-list-topics-tools-actions') {
+            observeTopicsToolbar(e);
+        } else {
+            e.prepend(createDeboucledButton());
+        }
+    });
+
     document.querySelectorAll('#deboucled-option-button').forEach(e => { e.onclick = optionOnclick; });
 
     window.onclick = function (e) {

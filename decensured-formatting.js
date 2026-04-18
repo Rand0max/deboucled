@@ -102,7 +102,7 @@ function formatJvcBlockquotes(text) {
                     html += '</p>';
                     isParagraphOpen = false;
                 }
-                html += '<blockquote class="blockquote-jv">';
+                html += '<blockquote class="blockquote-jv message__blockquote">';
                 currentLevel++;
             }
 
@@ -259,7 +259,7 @@ function processParagraphContent(paragraph) {
             continue;
         } else if (inQuote) {
             // Fin de citation
-            processedLines.push(`<blockquote class="blockquote-jv">${quoteLines.join('<br>')}</blockquote>`);
+            processedLines.push(`<blockquote class="blockquote-jv message__blockquote">${quoteLines.join('<br>')}</blockquote>`);
             inQuote = false;
             quoteLines = [];
         }
@@ -298,7 +298,7 @@ function processParagraphContent(paragraph) {
 
     // Fermer les blocs ouverts en fin de paragraphe
     if (inQuote) {
-        processedLines.push(`<blockquote class="blockquote-jv">${quoteLines.join('<br>')}</blockquote>`);
+        processedLines.push(`<blockquote class="blockquote-jv message__blockquote">${quoteLines.join('<br>')}</blockquote>`);
     }
     if (inList) {
         processedLines.push('</ul>');

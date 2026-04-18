@@ -22,7 +22,7 @@ function updateFilteredAuthorHeader() {
         filteredAuthorElement.remove();
     }
     else if (!filteredAuthorElement && filteredAuthor?.length) { // création du bouton
-        const paginationElement = document.querySelector('div.bloc-pagi-default');
+        const paginationElement = document.querySelector(JVC_SEL.paginationContainer);
         if (!paginationElement) return;
 
         filteredAuthorElement = document.createElement('div');
@@ -66,7 +66,7 @@ function updateFilteredMessages() {
     messages.forEach(message => {
         if (!message.getAttribute('blacklisted')) message.style.removeProperty('display');
 
-        const mAuthorElement = message.querySelector('a.bloc-pseudo-msg, span.bloc-pseudo-msg');
+        const mAuthorElement = message.querySelector(JVC_SEL.messageAuthor);
         if (!mAuthorElement) return;
 
         const mAuthor = mAuthorElement.textContent?.trim();
@@ -284,7 +284,7 @@ async function showDeletedMessages() {
         const jvaMessage = await getJvArchiveMessage(messageId);
         if (!jvaMessage?.texte) return;
 
-        const texteElement = message.querySelector('div.text-enrichi-forum');
+        const texteElement = message.querySelector('div.text-enrichi-forum, .messageUser__content');
         if (!texteElement) return;
 
         if (!jvaMessage.texte.includes('<p>')) {

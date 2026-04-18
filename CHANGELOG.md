@@ -1,5 +1,8 @@
 # Changelog Déboucled
 
+## [2.80.0] (18/04/2026)
+- Correction (V0) de Déboucled suite à la mise à jour majeure des forums JVC (Rand0max)
+
 ## [2.78.1] (02/04/2026)
 - Correction du bug de la page blanche lors des DDB (Rand0max)
 

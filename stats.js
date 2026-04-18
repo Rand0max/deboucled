@@ -8,7 +8,7 @@ function addRightBlocMatches() {
     let optionDisplayTopicMatches = store.get(storage_optionDisplayTopicMatches, storage_optionDisplayTopicMatches_default);
     if (!optionDisplayTopicMatches || (!hasAny(matchedTopics) && !hasAny(matchedSubjects) && !hasAny(matchedAuthors))) return;
 
-    const forumRightCol = document.querySelector('#forum-right-col');
+    const forumRightCol = document.querySelector('#forum-right-col, .layout__contentAside');
     if (!forumRightCol) return;
 
     function countMatchesOccurencies(matches) {
@@ -20,12 +20,13 @@ function addRightBlocMatches() {
     const totalMatchesHidden = countMatchesOccurencies(matchedSubjects) + countMatchesOccurencies(matchedAuthors) + matchedTopics.size; // hiddenTotalTopics
 
     let html = '';
-    html += '<div class="card card-jv-forum card-forum-margin">';
-    html += `<div class="card-header">CORRESPONDANCES<span class="deboucled-card-header-right">${totalMatchesHidden} ignoré${plural(totalMatchesHidden)}</span></div>`;
-    html += '<div class="card-body">';
-    html += '<div class="scrollable">';
-    html += '<div class="scrollable-wrapper">';
-    html += '<div id="deboucled-matches-content" class="scrollable-content bloc-info-forum">';
+    html += '<div class="sideCardForum deboucled-side-card">';
+    html += '<div class="sideCardForum__header">';
+    html += '<div class="sideCardForum__headerTitle">Correspondances</div>';
+    html += `<div class="sideCardForum__headerExtra"><span class="deboucled-card-header-right">${totalMatchesHidden} ignoré${plural(totalMatchesHidden)}</span></div>`;
+    html += '</div>';
+    html += '<div class="sideCardForum__body sideCardForum__body--has-scrollbar">';
+    html += '<div id="deboucled-matches-content">';
 
     const formatMatch = (str) => capitalize(removeDoubleSpaces(str.replaceAll(',', '')).trim());
 
@@ -34,7 +35,7 @@ function addRightBlocMatches() {
         let matchesHtml = '';
         let index = 0;
         matchesSorted.forEach((occ, match) => {
-            const className = `deboucled-match${index < matchesSorted.size - 1 ? ' match-after' : ''}`;
+            const className = `deboucled-match sideCardForum__listItemLink sideCardForum__listItemLink--inline d-inline${index < matchesSorted.size - 1 ? ' match-after' : ''}`;
             const hint = withHint ? ` deboucled-data-tooltip="${occ} fois"` : '';
             if (urlCallback) matchesHtml += `<a class="${className}"${hint} href="${urlCallback(match, occ)}" target="_blank">${formatCallback(match, occ)}</a>`;
             else matchesHtml += `<span class="${className}"${hint}>${formatCallback(match, occ)}</span>`;
@@ -46,8 +47,13 @@ function addRightBlocMatches() {
     let optionClickToShowTopicMatches = store.get(storage_optionClickToShowTopicMatches, storage_optionClickToShowTopicMatches_default);
 
     function addMatches(matches, entity, title, withHint, formatCallback, urlCallback) {
+        // Mirror native JVC favorites block: one .sideCardForum__item per section so that
+        // the native skin handles the spacing/separators between sections automatically.
         let matchesHtml = '';
-        matchesHtml += `<h4 class="titre-info-fofo">${title}</h4>`;
+        matchesHtml += '<div class="sideCardForum__item bloc-info-forum">';
+        matchesHtml += `<h4 class="sideCardForum__subtitle titre-info-fofo">${title}</h4>`;
+        matchesHtml += '<ul class="sideCardForum__list">';
+        matchesHtml += '<li class="sideCardForum__listItem">';
         if (optionClickToShowTopicMatches) {
             matchesHtml += `<div id="deboucled-matches-${entity}-wrapper" class="deboucled-hide-wrapper">`;
             matchesHtml += `<span class="deboucled-eye-logo deboucled-display-matches"></span>`;
@@ -57,6 +63,9 @@ function addRightBlocMatches() {
             matchesHtml += `<div id="deboucled-matches-${entity}-wrapper">`;
             matchesHtml += `<div id="deboucled-matched-${entity}">${formatMatches(matches, withHint, formatCallback, urlCallback)}</div>`;
         }
+        matchesHtml += '</div>';
+        matchesHtml += '</li>';
+        matchesHtml += '</ul>';
         matchesHtml += '</div>';
         return matchesHtml;
     }
@@ -68,11 +77,12 @@ function addRightBlocMatches() {
     html += '</div>';
     html += '</div>';
     html += '</div>';
-    html += '</div>';
-    html += '</div>';
 
     let matches = document.createElement('div');
-    forumRightCol.append(matches);
+    // Insert before sponsor/support so that those remain at the bottom of the aside column.
+    const bottomAnchor = forumRightCol.querySelector('.deboucled-support, .deboucled-sponsor');
+    if (bottomAnchor) forumRightCol.insertBefore(matches, bottomAnchor);
+    else forumRightCol.append(matches);
     matches.outerHTML = html;
 
     if (!optionClickToShowTopicMatches) return;
@@ -95,26 +105,27 @@ function addRightBlocStats() {
     let optionDisplayTopicCharts = store.get(storage_optionDisplayTopicCharts, storage_optionDisplayTopicCharts_default);
     if (!optionDisplayTopicCharts || !hasAny(deboucledTopicStatsMap) || !mapAnyValue(deboucledTopicStatsMap, (v) => v > 0)) return;
 
-    const forumRightCol = document.querySelector('#forum-right-col');
+    const forumRightCol = document.querySelector('#forum-right-col, .layout__contentAside');
     if (!forumRightCol) return;
 
     const calcAverage = arr => arr.reduce((p, c) => p + c, 0) / arr.length;
     const average = Math.round(calcAverage([...deboucledTopicStatsMap.values()]));
 
     let html = '';
-    html += '<div class="card card-jv-forum card-forum-margin" style="max-height: 130px;">';
-    html += `<div class="card-header">TENDANCE DE FILTRAGE<span class="deboucled-card-header-right">Moyenne : ${average}</span></div>`;
-    html += '<div class="card-body" style="max-height: 130px;">';
-    html += '<div class="scrollable">';
-    html += '<div class="scrollable-wrapper">';
-    html += '<div id="deboucled-chart-content" class="scrollable-content bloc-info-forum">';
+    html += '<div class="sideCardForum deboucled-side-card">';
+    html += '<div class="sideCardForum__header">';
+    html += '<div class="sideCardForum__headerTitle">Tendance de filtrage</div>';
+    html += `<div class="sideCardForum__headerExtra"><span class="deboucled-card-header-right">Moyenne : ${average}</span></div>`;
     html += '</div>';
-    html += '</div>';
+    html += '<div class="sideCardForum__body">';
+    html += '<div id="deboucled-chart-content" class="sideCardForum__item bloc-info-forum">';
     html += '</div>';
     html += '</div>';
     html += '</div>';
     let chart = document.createElement('div');
-    forumRightCol.append(chart);
+    const bottomAnchor = forumRightCol.querySelector('.deboucled-support, .deboucled-sponsor');
+    if (bottomAnchor) forumRightCol.insertBefore(chart, bottomAnchor);
+    else forumRightCol.append(chart);
     chart.outerHTML = html;
 
     buildStatsChart();
@@ -227,21 +238,22 @@ function addRightBlocHotTopics() {
     let optionDisplayHotTopics = store.get(storage_optionDisplayHotTopics, storage_optionDisplayHotTopics_default);
     if (!optionDisplayHotTopics || !hotTopicsData?.length || currentForumId !== 51) return; // JvArchive seulement pour le 18-25
 
-    const forumRightCol = document.querySelector('#forum-right-col');
+    const forumRightCol = document.querySelector('#forum-right-col, .layout__contentAside');
     if (!forumRightCol) return;
 
     let html = '';
-    html += '<div class="card card-jv-forum card-forum-margin">'; // deboucled-fire-logo
-    html += `<div class="card-header">TOPICS TENDANCES<span class="deboucled-fire-logo cardtitle"></span></div>`;
-    html += '<div class="card-body">';
-    html += '<div class="scrollable">';
-    html += '<div class="scrollable-wrapper">';
-    html += '<div id="deboucled-hottopics-content" class="scrollable-content bloc-info-forum">';
-    html += '<ul class="liste-sous-forums">';
+    html += '<div class="sideCardForum deboucled-side-card">';
+    html += '<div class="sideCardForum__header">';
+    html += '<div class="sideCardForum__headerTitle">Topics tendances</div>';
+    html += '<div class="sideCardForum__headerExtra"><span class="deboucled-fire-logo cardtitle"></span></div>';
+    html += '</div>';
+    html += '<div class="sideCardForum__body sideCardForum__body--has-scrollbar">';
+    html += '<div id="deboucled-hottopics-content" class="sideCardForum__item bloc-info-forum">';
+    html += '<ul class="sideCardForum__list liste-sous-forums">';
     hotTopicsData.forEach(ht => {
-        html += `<li class="line-ellipsis deboucled-card-element-wrapper" data-id="${ht.id}">`;
+        html += `<li class="sideCardForum__listItem line-ellipsis deboucled-card-element-wrapper" data-id="${ht.id}">`;
         html += '<i title="Topic hot" class="icon-topic-folder topic-folder2 topic-img deboucled-card-element-icon"></i>';
-        html += `<a href="${ht.url}" class="lien-jv deboucled-card-element-left">${ht.title}</a>`;
+        html += `<a href="${ht.url}" class="sideCardForum__listItemLink sideCardForum__listItemLink--inline d-inline lien-jv deboucled-card-element-left">${ht.title}</a>`;
         html += `<span class="deboucled-card-element-right">${ht.nbMessages}</span>`;
         html += '</li>';
     });
@@ -249,10 +261,10 @@ function addRightBlocHotTopics() {
     html += '</div>';
     html += '</div>';
     html += '</div>';
-    html += '</div>';
-    html += '</div>';
 
     let card = document.createElement('div');
-    forumRightCol.append(card);
+    const bottomAnchor = forumRightCol.querySelector('.deboucled-support, .deboucled-sponsor');
+    if (bottomAnchor) forumRightCol.insertBefore(card, bottomAnchor);
+    else forumRightCol.append(card);
     card.outerHTML = html;
 }

@@ -9,7 +9,7 @@ function getMessageElements() {
         return messageElementsCache;
     }
 
-    let messageElements = document.querySelectorAll('.conteneur-messages-pagi > div.bloc-message-forum');
+    let messageElements = document.querySelectorAll('#listMessages > .messageUser, .conteneur-messages-pagi > div.bloc-message-forum');
 
     if (messageElements.length === 0) {
         for (const selector of DECENSURED_CONFIG.SELECTORS.MESSAGE_ELEMENTS) {
@@ -59,7 +59,7 @@ async function processDecensuredMessage(msgElement, decensuredMsg) {
         return;
     }
 
-    const authorElement = msgElement.querySelector('.bloc-pseudo-msg');
+    const authorElement = msgElement.querySelector(JVC_SEL.messageAuthor);
     if (authorElement) {
         const username = authorElement.textContent.trim();
         if (username) {
@@ -68,7 +68,7 @@ async function processDecensuredMessage(msgElement, decensuredMsg) {
         }
     }
 
-    const contentElement = msgElement.querySelector('.message-content, .text-enrichi-forum');
+    const contentElement = msgElement.querySelector('.message-content, .text-enrichi-forum, .messageUser__content');
     if (!contentElement) return;
 
     const originalContentsContainer = document.createElement("div");
@@ -111,7 +111,7 @@ async function processDecensuredMessage(msgElement, decensuredMsg) {
 
     msgElement.classList.add('deboucled-decensured-processed');
 
-    const quoteButton = msgElement.querySelector('.picto-msg-quote');
+    const quoteButton = msgElement.querySelector('.picto-msg-quote, .messageUser__action[title*="Citer"]');
     if (quoteButton) {
         const newQuoteButton = quoteButton.cloneNode(true);
         quoteButton.parentNode.replaceChild(newQuoteButton, quoteButton);
@@ -152,7 +152,7 @@ async function addDecensuredBadgesToAllMessages() {
         const uncachedUsernames = [];
 
         messageElements.forEach(msgElement => {
-            const pseudoLink = msgElement.querySelector('.bloc-pseudo-msg');
+            const pseudoLink = msgElement.querySelector(JVC_SEL.messageAuthor);
             if (!pseudoLink) return;
 
             const username = pseudoLink.textContent.trim();
@@ -213,13 +213,13 @@ async function decryptTopicMessages() {
 }
 
 async function handleDecensuredQuote(msgElement, decensuredMsg, selection = null) {
-    const textArea = document.querySelector('#message_topic');
+    const textArea = document.querySelector(JVC_SEL.messageTopicInput);
     if (!textArea) return;
 
     activateDecensuredMode();
 
-    const authorElement = msgElement.querySelector('.bloc-pseudo-msg');
-    const dateElement = msgElement.querySelector('.bloc-date-msg');
+    const authorElement = msgElement.querySelector(JVC_SEL.messageAuthor);
+    const dateElement = msgElement.querySelector(JVC_SEL.messageDate);
 
     const author = authorElement ? authorElement.textContent.trim() : 'Utilisateur';
     const date = dateElement ? dateElement.textContent.trim() : '';
@@ -360,7 +360,7 @@ function addJvChatDecensuredBadge(jvchatElement) {
 }
 
 async function handleJvChatDecensuredQuote(jvchatElement, decensuredMsg) {
-    const textArea = document.querySelector('#message_topic');
+    const textArea = document.querySelector(JVC_SEL.messageTopicInput);
     if (!textArea) return;
 
     activateDecensuredMode();
@@ -390,7 +390,7 @@ async function handleJvChatDecensuredQuote(jvchatElement, decensuredMsg) {
 
 function getCurrentMessageContent(msgElement, decensuredMsg) {
     const realContentDiv = msgElement.querySelector('.deboucled-decensured-content');
-    const originalContent = msgElement.querySelector('.message-content p, .text-enrichi-forum p');
+    const originalContent = msgElement.querySelector('.message-content p, .text-enrichi-forum p, .messageUser__content p');
 
     if (realContentDiv && realContentDiv.style.display !== 'none') {
         return decensuredMsg.message_real_content;
@@ -410,20 +410,20 @@ function createMessageIndex(decensuredMessages) {
 }
 
 function getMessageId(messageElement) {
-    const messageLink = messageElement.querySelector('a[href*="#message"]');
+    const messageLink = messageElement.querySelector('a[href*="#message"], a.messageUser__date[href*="/forums/message/"]');
 
     if (messageLink) {
         const href = messageLink.href;
-        const match = href.match(/#message(\d+)/);
-        const result = match ? match[1] : null;
-        return result;
+        const match = href.match(/#message(\d+)|\/forums\/message\/(\d+)/);
+        const result = match ? (match[1] || match[2]) : null;
+        if (result) return result;
     }
 
     const messageId = messageElement.id;
-
-    if (messageId && messageId.startsWith('message')) {
-        const result = messageId.replace('message', '');
-        return result;
+    if (messageId) {
+        // New DOM: id="message-123", Legacy: id="message123"
+        const m = messageId.match(/^message[-]?(\d+)$/);
+        if (m) return m[1];
     }
 
     const dataId = messageElement.getAttribute('data-id') || messageElement.getAttribute('data-message-id');

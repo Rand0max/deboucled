@@ -174,13 +174,17 @@ const DECENSURED_CONFIG = {
             '#bloc-formulaire-forum'
         ],
         MESSAGE_ELEMENTS: [
+            '.messageUser',
+            '#listMessages > .messageUser',
             '.bloc-message-forum',
             '.conteneur-message .txt-msg',
             '.bloc-message-forum .txt-msg',
+            '.messageUser .messageUser__content',
             '.txt-msg'
         ],
         REPORT_BUTTON: [
             '.picto-msg-exclam',
+            '.messageUser__action[title*="Signaler"]',
             '[class*="picto-msg-exclam"]'
         ],
         TOPIC_TITLE_INPUT: [
