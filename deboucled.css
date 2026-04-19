@@ -3351,7 +3351,6 @@ input[type="search"] {
 .deboucled-badge-container {
   display: flex;
   row-gap: 0.3rem;
-  margin-left: auto;
   width: auto;
   justify-content: flex-start;
 }
@@ -5924,4 +5923,10 @@ body.dark .deboucled-loading-text::after {
 .deboucled-forum-reaction-picker.dark-theme
   .deboucled-forum-reaction-picker-sticker:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+@media (min-width: 1450px) {
+  .layout {
+    --grid-template-columns: 1fr 55rem 24.5rem 1fr;
+  }
 }
