@@ -295,8 +295,10 @@ blockquote .deboucled-highlighted {
 }
 .deboucled-topic-blacklist {
   margin: auto 0;
-  display: block;
-  grid-area: blacklist;
+  display: inline-block;
+  opacity: 1 !important;
+  height: auto !important;
+  position: initial !important;
 }
 .deboucled-preview-content-text-light {
   color: #ddd;
@@ -1990,7 +1992,9 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
 #js-list-topics-tools-actions > #deboucled-option-button,
 #js-list-topics-tools-actions > #deboucled-option-button.buttonsNavbar__button,
 #js-list-topics-tools-actions .buttonsNavbar > #deboucled-option-button,
-#js-list-topics-tools-actions .buttonsNavbar > #deboucled-option-button.buttonsNavbar__button {
+#js-list-topics-tools-actions
+  .buttonsNavbar
+  > #deboucled-option-button.buttonsNavbar__button {
   min-height: 2.5rem;
   padding: 0 1.1rem;
   font-size: 0.875rem;
@@ -5928,5 +5932,10 @@ body.dark .deboucled-loading-text::after {
 @media (min-width: 1450px) {
   .layout {
     --grid-template-columns: 1fr 55rem 24.5rem 1fr;
+  }
+}
+@media (min-width: 611.98px) {
+  .tablesForum--listTopics {
+    --tables-forums-grid-template-columns: 1fr 8.75rem 4.125rem 4rem auto;
   }
 }
