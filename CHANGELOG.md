@@ -1,5 +1,8 @@
 # Changelog Déboucled
 
+## [2.80.2] (20/04/2026)
+- Corrections visuelles et refonte du thème Refined (Rand0max)
+
 ## [2.80.0] (18/04/2026)
 - Correction (V0) de Déboucled suite à la mise à jour majeure des forums JVC (Rand0max)
 
