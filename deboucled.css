@@ -3065,6 +3065,9 @@ input[type="search"] {
   cursor: pointer;
   user-select: text;
   color: var(--jv-blue-gray-color);
+  display: inline-flex !important;
+  align-items: center;
+  vertical-align: middle;
 }
 .deboucled-match.match-after::after {
   content: ",";
@@ -5938,5 +5941,8 @@ body.dark .deboucled-loading-text::after {
 @media (min-width: 611.98px) {
   .tablesForum--listTopics {
     --tables-forums-grid-template-columns: 1fr 8.75rem 4.125rem 4rem auto;
+  }
+  .tablesForum--listTopics.tablesForum--isClassicListTable {
+    --tables-forums-grid-template-columns: 1fr 8.75rem 3.75rem 5.875rem auto;
   }
 }
