@@ -527,18 +527,22 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
 
     const authorBlacklistedMatch = getAuthorBlacklistMatches(author, isSelf);
     if (authorBlacklistedMatch?.length) {
-        if (handleBlacklistedAuthor(authorBlacklistedMatch)) return;
+        if (handleBlacklistedAuthor(authorBlacklistedMatch)) {
+            markMessageProcessed(messageElement);
+            return;
+        }
     }
     else if (messageOptions.optionAntiSpam && isContentYoutubeBlacklisted(messageContent)) {
         addEntityBlacklist(shadowent, author); // on rajoute automatiquement le spammeur à la BL
         buildBlacklistsRegex(entityAuthor);
         hiddenSpammers++;
-        if (handleBlacklistedAuthor([author])) return;
+        if (handleBlacklistedAuthor([author])) {
+            markMessageProcessed(messageElement);
+            return;
+        }
     }
     else {
-        let optionShowJvcBlacklistButton = store.get(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
-        upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton);
-        addAuthorButtons(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
+        ensureDeboucledAuthorControls(messageElement, authorElement, messageOptions);
     }
 
     handleMessageAssignTopicAuthor(author, authorElement);
@@ -572,6 +576,8 @@ function handleMessage(messageElement, messageOptions, isFirstMessage = false) {
     if (topicFilteredAuthor?.length && author.toLowerCase() !== topicFilteredAuthor.toLowerCase()) {
         messageElement.style.display = 'none';
     }
+
+    markMessageProcessed(messageElement);
 }
 
 async function parseTopicAuthor(pageId) {

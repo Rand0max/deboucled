@@ -54,6 +54,31 @@ function isMessageProcessed(mu) {
     return !!mu && mu.getAttribute('data-deboucled-processed') === '1';
 }
 
+function getMessageAuthorText(messageElement) {
+    return messageElement?.querySelector(JVC_SEL.messageAuthor)?.textContent?.trim() ?? '';
+}
+
+function getMessageAuthorControlState(messageElement) {
+    return {
+        hasBlacklistButton: !!messageElement?.querySelector('.deboucled-blacklist-author-button'),
+        hasBoucledButton: !!messageElement?.querySelector('.deboucled-author-boucled-button'),
+        hasFilterButton: !!messageElement?.querySelector('.deboucled-filter-logo,.deboucled-clearfilter-logo')
+    };
+}
+
+function messageNeedsAuthorControlRepair(messageElement) {
+    const author = getMessageAuthorText(messageElement);
+    if (!author?.length) return false;
+
+    const isSelf = userPseudo?.toLowerCase() === author.toLowerCase();
+    const authorBlacklisted = getAuthorBlacklistMatches(author, isSelf)?.length > 0;
+    const state = getMessageAuthorControlState(messageElement);
+
+    return !state.hasBoucledButton ||
+        !state.hasFilterButton ||
+        (!isSelf && !authorBlacklisted && !state.hasBlacklistButton);
+}
+
 function setupMessageRehydrationObserver(messageOptions) {
     if (deboucledMessageRehydrationObserver) {
         deboucledMessageRehydrationObserver.disconnect();
@@ -62,47 +87,60 @@ function setupMessageRehydrationObserver(messageOptions) {
     const container = document.querySelector('#listMessages');
     if (!container || typeof MutationObserver === 'undefined') return;
 
-    // Tag every message already handled by the initial pass so we don't
-    // re-process them on the first observer tick.
-    container.querySelectorAll(':scope > .messageUser, :scope > [id^="message-"] > .messageUser')
-        .forEach(markMessageProcessed);
+    const resolveMessageElement = (candidate) => {
+        if (!candidate || candidate.nodeType !== 1) return;
+        return candidate.classList?.contains('messageUser')
+            ? candidate
+            : candidate.querySelector?.(':scope > .messageUser, .messageUser') || candidate.closest?.('.messageUser');
+    };
+
+    const repairAuthorControls = (messageElement) => {
+        if (!messageNeedsAuthorControlRepair(messageElement)) return;
+        const authorElement = messageElement.querySelector(JVC_SEL.messageAuthor);
+        ensureDeboucledAuthorControls(messageElement, authorElement, messageOptions);
+    };
+
+    const repairExistingAuthorControls = () => {
+        container.querySelectorAll(':scope > .messageUser, :scope > [id^="message-"] > .messageUser')
+            .forEach((messageElement) => repairAuthorControls(messageElement));
+    };
 
     const reprocess = (candidate) => {
-        if (!candidate || candidate.nodeType !== 1) return;
-        const mu = candidate.classList?.contains('messageUser')
-            ? candidate
-            : candidate.querySelector?.(':scope > .messageUser, .messageUser');
+        if (candidate?.matches?.('.deboucled-author-boucled-button,.deboucled-filter-logo,.deboucled-clearfilter-logo,.deboucled-blacklist-author-button,.deboucled-quote,.deboucled-badge,.deboucled-badge-container')) return;
+
+        const mu = resolveMessageElement(candidate);
         if (!mu) return;
-        if (isMessageProcessed(mu)) return;
-        // Tag BEFORE handleMessage so any internal DOM mutation we cause can't
-        // re-trigger us (the tag survives because JVC replaces the whole node
-        // when it re-hydrates, clearing the tag naturally).
-        markMessageProcessed(mu);
+
+        if (isMessageProcessed(mu)) {
+            repairAuthorControls(mu);
+            return;
+        }
+
         try {
             deboucledRehydrationProcessing = true;
             handleMessage(mu, messageOptions, false);
-        } catch (e) {
-            // swallow
+        } catch {
+            // ignore observer races while JVC is hydrating messages
         } finally {
             deboucledRehydrationProcessing = false;
         }
     };
 
+    repairExistingAuthorControls();
+
     deboucledMessageRehydrationObserver = new MutationObserver((mutations) => {
         if (deboucledRehydrationProcessing) return;
-        // Only react to direct children of #listMessages being added/replaced
-        // (JVC hydration swaps whole message wrappers). Ignore internal
-        // subtree mutations to avoid reacting to our own DOM edits.
         for (const m of mutations) {
             if (m.type !== 'childList') continue;
-            if (m.target !== container) continue;
             for (const n of m.addedNodes) reprocess(n);
         }
     });
     deboucledMessageRehydrationObserver.observe(container, {
         childList: true,
-        subtree: false
+        subtree: true
     });
+
+    setTimeout(() => repairExistingAuthorControls(), 1000);
 }
 
 function buildMessagesHeader() {
@@ -199,27 +237,41 @@ function buildDeboucledBlacklistButton(author, callbackAfter, className = 'debou
 function upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton) {
     // Idempotency: skip if we already injected our button in this message
     // (e.g. when the rehydration observer re-runs handleMessage).
-    if (messageElement.querySelector('.deboucled-blacklist-author-button')) return;
+    if (messageElement.querySelector('.deboucled-blacklist-author-button')) return true;
 
-    let isSelf = messageElement.querySelector('span.picto-msg-croix, .messageUser__action--delete, .messageUser__action[title*="Supprimer"]');
-    if (isSelf) return;
+    let isSelf = userPseudo?.toLowerCase() === author.toLowerCase() || messageElement.querySelector('span.picto-msg-croix, .messageUser__action--delete, .messageUser__action[title*="Supprimer"]');
+    if (isSelf) return true;
 
     let dbcBlacklistButton = buildDeboucledBlacklistButton(author, () => { window.location.reload(); });
 
     let jvcBlacklistButton = messageElement.querySelector('span.picto-msg-tronche, .messageUser__action[title*="Blacklist"]');
     let logged = (jvcBlacklistButton !== null);
     if (logged) insertAfter(dbcBlacklistButton, jvcBlacklistButton);
-    else messageElement.querySelector(JVC_SEL.messageOptions)?.appendChild(dbcBlacklistButton);
+    else {
+        const messageOptionsElement = messageElement.querySelector(JVC_SEL.messageOptions);
+        if (messageOptionsElement) {
+            messageOptionsElement.appendChild(dbcBlacklistButton);
+        }
+        else {
+            const authorAnchor = messageElement.querySelector(JVC_SEL.messageMpBloc);
+            if (!authorAnchor) {
+                return false;
+            }
+            insertAfter(dbcBlacklistButton, authorAnchor);
+        }
+    }
 
     if (!optionShowJvcBlacklistButton && logged) jvcBlacklistButton.style.display = 'none';
+
+    return true;
 }
 
 function addAuthorButtons(nearbyElement, author, optionBoucledUseJvarchive) {
-    if (!nearbyElement) return;
+    if (!nearbyElement) return false;
     // Idempotency: if our buttons are already next to the pseudo, skip.
     const container = nearbyElement.parentElement;
     if (container?.querySelector(':scope > .deboucled-author-boucled-button') &&
-        container?.querySelector(':scope > .deboucled-filter-logo')) return;
+        container?.querySelector(':scope > .deboucled-filter-logo,:scope > .deboucled-clearfilter-logo')) return true;
 
     let boucledButton = buildBoucledAuthorButton(author, optionBoucledUseJvarchive);
     insertAfter(boucledButton, nearbyElement);
@@ -229,6 +281,29 @@ function addAuthorButtons(nearbyElement, author, optionBoucledUseJvarchive) {
 
     let filterAuthorButton = buildFilterAuthorMessageButton(author);
     insertAfter(filterAuthorButton, boucledButton); // jvArchiveProfilButton);
+
+    return true;
+}
+
+function ensureDeboucledAuthorControls(messageElement, authorElement, messageOptions) {
+    if (!messageElement || !authorElement) return false;
+
+    const author = authorElement.textContent.trim();
+    if (!author?.length) return false;
+
+    const isSelf = userPseudo?.toLowerCase() === author.toLowerCase();
+    const authorBlacklisted = getAuthorBlacklistMatches(author, isSelf)?.length > 0;
+    let blacklistReady = isSelf || authorBlacklisted;
+
+    if (!blacklistReady) {
+        let optionShowJvcBlacklistButton = store.get(storage_optionShowJvcBlacklistButton, storage_optionShowJvcBlacklistButton_default);
+        blacklistReady = upgradeJvcBlacklistButton(messageElement, author, optionShowJvcBlacklistButton);
+    }
+
+    const mpBloc = messageElement.querySelector(JVC_SEL.messageMpBloc);
+    const authorButtonsReady = addAuthorButtons(mpBloc, author, messageOptions.optionBoucledUseJvarchive);
+
+    return blacklistReady && authorButtonsReady;
 }
 
 function buildAuthorBadges(authorElement, author, messageOptions, title) {

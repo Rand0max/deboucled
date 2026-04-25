@@ -1870,6 +1870,7 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
   column-gap: 0.4rem;
   row-gap: 0.1rem;
   overflow: visible;
+  width: 100%;
 }
 .messageUser__profil > .messageUser__label {
   order: 0;
@@ -1906,8 +1907,29 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
   cursor: pointer;
   margin: 0;
 }
-.messageUser__profil > .deboucled-jvarchive-logo {
+.deboucled-blacklist-author-button:hover {
+  opacity: 1 !important;
+}
+.messageUser__profil > .deboucled-blacklist-author-button,
+.messageUser__profil
+  > span.picto-msg-tronche.deboucled-blacklist-author-button {
   order: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px !important;
+  height: 18px !important;
+  background-size: 18px !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  flex: 0 0 auto;
+  cursor: pointer;
+  margin: 0;
+  margin-left: auto;
+  opacity: 0.6;
+}
+.messageUser__profil > .deboucled-jvarchive-logo {
+  order: 4;
   width: 18px;
   height: 18px;
   background-size: contain !important;
@@ -1957,6 +1979,11 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
 .buttonsNavbar .forumSearchBar__formInput {
   width: 100%;
   min-width: 0;
+}
+.buttonsNavbar .forumSearchBar__form > .deboucled-search-filter-switch {
+  flex: 0 0 50px;
+  align-self: center;
+  margin: 0 0.5rem 0 0.2rem;
 }
 .buttonsNavbar > #deboucled-option-button,
 .buttonsNavbar > #deboucled-option-button.buttonsNavbar__button,

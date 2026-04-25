@@ -244,7 +244,8 @@ const projectGlobals = {
     initSmileyGifMap: 'readonly', buildSmileyUrl: 'readonly', getSmileyImgHtml: 'readonly',
     // messages.js
     getAllMessages: 'readonly', buildMessagesHeader: 'readonly', updateMessagesHeader: 'readonly',
-    setupMessageRehydrationObserver: 'readonly',
+    markMessageProcessed: 'readonly', setupMessageRehydrationObserver: 'readonly',
+    ensureDeboucledAuthorControls: 'readonly',
     removeMessage: 'readonly', buildDeboucledBlacklistButton: 'readonly',
     upgradeJvcBlacklistButton: 'readonly', addAuthorButtons: 'readonly', buildAuthorBadges: 'readonly',
     handleJvChatAndTopicLive: 'readonly', handleLiveDecensuredMessage: 'readonly',

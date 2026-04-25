@@ -877,11 +877,13 @@ function addSettingButton() {
 function addSearchFilterToggle() {
     let optionFilterResearch = store.get(storage_optionFilterResearch, storage_optionFilterResearch_default);
 
-    const formRechForum = document.querySelector('.form-rech-forum');
+    if (document.querySelector('#deboucled-search-filter-toggle')) return optionFilterResearch;
+
+    const formRechForum = document.querySelector('.form-rech-forum, #js-list-topics-tools-actions .forumSearchBar__form, .forumSearchBar__form');
     if (!formRechForum) return optionFilterResearch;
 
     let toggleElem = document.createElement('label');
-    toggleElem.className = 'deboucled-switch';
+    toggleElem.className = 'deboucled-switch deboucled-search-filter-switch';
     toggleElem.title = 'Filtrer les résultats avec Déboucled';
     toggleElem.innerHTML = `<input type="checkbox" id="deboucled-search-filter-toggle" ${optionFilterResearch ? 'checked' : ''}><span class="deboucled-toggle-slider round red"></span>`;
     formRechForum.appendChild(toggleElem);

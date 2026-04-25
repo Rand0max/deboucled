@@ -1,5 +1,8 @@
 # Changelog Déboucled
 
+## [2.80.3] (25/04/2026)
+- Corrections de l'affichage des boutons (blacklist, boucled, filtre) et du filtrage de la recherche (Rand0max)
+
 ## [2.80.2] (20/04/2026)
 - Corrections visuelles et refonte du thème Refined (Rand0max)
 

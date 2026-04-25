@@ -14,7 +14,7 @@ const JVC_SEL = {
     topicListItem: 'ul.tablesForum--listTopics > li:not(.dfp__atf):not(.message), .topic-list > li:not(.dfp__atf):not(.message)',
     topicTitle: 'a.tablesForum__cellSubject, a.lien-jv.topic-title, .topic-title',
     topicAuthor: '.tablesForum__authorLink, .topic-author',
-    topicCount: '.tablesForum__cellText--msg, .topic-count',
+    topicCount: '.tablesForum__cellText[data-val-short], .tablesForum__cellText--msg, .topic-count',
     topicImg: '.tablesForum__subjectMarkerIcon, .topic-img',
     topicHeadSubject: '.tablesForum__headRow .tablesForum__rowSujets, .topic-head > span:nth-child(1)',
     topicHeadLastMsg: '.tablesForum__headRow .tablesForum__rowLastMsg, .topic-head > span:nth-child(4)',
@@ -76,7 +76,11 @@ function jvcGetTopicIdFromElement(topicElement) {
     if (dataId) return dataId;
     const id = topicElement.id || '';
     const m = id.match(/^topic-(\d+)$/);
-    return m ? m[1] : null;
+    if (m) return m[1];
+    const titleLink = topicElement.querySelector?.(JVC_SEL.topicTitle) || topicElement.querySelector?.('a[href*="/forums/"]');
+    const href = titleLink?.getAttribute('href') || '';
+    const topicMatch = href.match(/\/forums\/(?:1|42)-\d+-(\d+)-/);
+    return topicMatch ? topicMatch[1] : null;
 }
 
 function jvcGetMessageIdFromElement(messageElement) {
