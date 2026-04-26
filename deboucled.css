@@ -1948,8 +1948,8 @@ body.deboucled-dark-theme .deboucled-ux-help strong {
 }
 .messageUser__profil .deboucled-badge-container,
 .messageUser__profil .deboucled-badge {
-  order: 4;
-  align-self: center;
+  order: 2;
+  align-self: flex-end;
 }
 
 .messageUser__footer .deboucled-blacklist-author-button,
@@ -3378,7 +3378,7 @@ input[type="search"] {
 }
 
 .deboucled-badge-message {
-  line-height: 0.6rem;
+  /* line-height: 0.6rem; */
   margin-right: 0.35rem;
   grid-area: badge;
   align-self: auto;
